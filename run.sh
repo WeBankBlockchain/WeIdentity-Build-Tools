@@ -1,11 +1,9 @@
 #!/bin/bash
 set -e
 
-source_code_dir=$(pwd)
-cd $source_code_dir
-
-app_xml_config=${source_code_dir}/script/tpl/applicationContext.xml
-app_xml_config_tmp=${source_code_dir}/script/tpl/applicationContext.xml.tmp
+SOURCE_CODE_DIR=$(pwd)
+APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
+APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
 
 function check_jdk()
 {
@@ -17,12 +15,7 @@ function check_jdk()
             JAVACMD="$JAVA_HOME/jre/sh/java"
         else
             JAVACMD="$JAVA_HOME/bin/java"
-	fi
-    if [ ! -x "$JAVACMD" ] ; then
-        echo "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-             Please set the JAVA_HOME variable in your environment to match the
-             location of your Java installation."
-    fi
+        fi
     else
         JAVACMD="java"
         which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
@@ -35,8 +28,9 @@ function check_jdk()
 
 function modify_config()
 {
-    cd ${source_code_dir}
+    cd ${SOURCE_CODE_DIR}
     echo "begin to modify sdk config..."
+    #modify applicationContext.xml with newly deployed contract address
     weid_address=$(cat weIdContract.address)
     cpt_address=$(cat cptController.address)
     issuer_address=$(cat authorityIssuer.address)
@@ -44,18 +38,19 @@ function modify_config()
     export CPT_ADDRESS=${cpt_address}
     export ISSUER_ADDRESS=${issuer_address}
     MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}'
-    if [ -f ${app_xml_config} ];then
-	rm ${app_xml_config}
+    if [ -f ${APP_XML_CONFIG} ];then
+        rm ${APP_XML_CONFIG}
     fi
-    envsubst ${MYVARS} < ${app_xml_config_tmp} >${app_xml_config}
-    cp ${app_xml_config} ${source_code_dir}/resources
+    envsubst ${MYVARS} < ${APP_XML_CONFIG_TMP} >${APP_XML_CONFIG}
+    cp ${APP_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     echo "modify sdk config finished..."
 }
 
 function deploy_contract()
 {
     echo "begin to deploy contract..."
-    cd ${source_code_dir}
+    cd ${SOURCE_CODE_DIR}
+    #deploy contract to your blockchain nodes
     build_classpath
     java -cp "$CLASSPATH" com.webank.weid.contract.deploy.DeployContract
     echo "contract deployment done."
@@ -64,22 +59,22 @@ function deploy_contract()
 function build_classpath()
 {
 
-    CLASSPATH=${source_code_dir}/resources
-    for jar_file in ${source_code_dir}/dist/app/*.jar
+    CLASSPATH=${SOURCE_CODE_DIR}/resources
+    for jar_file in ${SOURCE_CODE_DIR}/dist/app/*.jar
         do
             CLASSPATH=${CLASSPATH}:${jar_file}
         done
 
-    for jar_file in ${source_code_dir}/dist/lib/*.jar
+    for jar_file in ${SOURCE_CODE_DIR}/dist/lib/*.jar
         do
             CLASSPATH=${CLASSPATH}:${jar_file}
         done
-
 }
 
 function clean_data()
 {
-	 if [ -f weIdContract.address ];then
+    #delete useless files
+    if [ -f weIdContract.address ];then
         rm -f weIdContract.address
     fi
     if [ -f cptController.address ];then
@@ -88,7 +83,6 @@ function clean_data()
     if [ -f authorityIssuer.address ];then
         rm -f authorityIssuer.address
     fi
-
 }
 
 function main()

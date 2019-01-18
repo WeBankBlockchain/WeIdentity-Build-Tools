@@ -30,6 +30,6 @@ sourceSets {
 
 jar {
     destinationDir file('../dist/app')
-    archiveName 'weidentity-contract-java' +'-'+version+'.jar'
+    archiveName 'weidentity-contract-java' + '-' + version + '.jar'
 
-    }
+}

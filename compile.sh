@@ -1,16 +1,16 @@
 #!/bin/bash
+source ./run.config
+
 set -e
 
-source_code_dir=$(pwd)
-cd $source_code_dir
-
+SOURCE_CODE_DIR=$(pwd)
 SOLC=$(which fisco-solc)
-WEB3J="${source_code_dir}/script/web3sdk.sh"
+WEB3J="${SOURCE_CODE_DIR}/script/web3sdk.sh"
 chmod +x ${WEB3J}
-config_file=${source_code_dir}/run.config
-app_xml_config_tpl=${source_code_dir}/script/tpl/applicationContext.xml.tpl
-app_xml_config=${source_code_dir}/script/tpl/applicationContext.xml
-app_xml_config_tmp=${source_code_dir}/script/tpl/applicationContext.xml.tmp
+CONFIG_FILE=${SOURCE_CODE_DIR}/run.config
+APP_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
+APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
+APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
 
 function check_jdk()
 {
@@ -22,14 +22,13 @@ function check_jdk()
             JAVACMD="$JAVA_HOME/jre/sh/java"
         else
             JAVACMD="$JAVA_HOME/bin/java"
-	fi
-    if [ ! -x "$JAVACMD" ] ; then
-        echo "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-             Please set the JAVA_HOME variable in your environment to match the
-             location of your Java installation."
     fi
+        if [ ! -x "$JAVACMD" ] ; then
+            echo "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+                Please set the JAVA_HOME variable in your environment to match the
+                location of your Java installation."
+        fi
     else
-        JAVACMD="java"
         which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
     Please set the JAVA_HOME variable in your environment to match the
@@ -41,6 +40,7 @@ function check_jdk()
 function compile_contract() 
 { 
     echo "Begin to check if contracts update or not."
+    # check if contracts need to be compiled
     num=$(ls contracts|grep ".sol"|wc -l)
     if [ 0 -eq ${num} ];then
         echo "no contract updates, no need to compile contract."
@@ -50,11 +50,13 @@ function compile_contract()
     fi
  
     cd contracts/
-    
+    #begin to compile contracts
+    #java package path for contract code
     package="com.webank.weid.contract"
-    output_dir="${source_code_dir}/output"
+    output_dir="${SOURCE_CODE_DIR}/output"
     echo "output_dir is $output_dir"
     local files=$(ls ./*.sol)
+    #compile contract with web3j
     for itemfile in ${files}
     do
         local item=$(basename ${itemfile} ".sol")
@@ -63,30 +65,30 @@ function compile_contract()
         ${WEB3J} solidity generate  "${output_dir}/${item}.bin" "${output_dir}/${item}.abi" -o ${output_dir} -p ${package} 
     done
     
-    cd ${source_code_dir}/script
+    cd ${SOURCE_CODE_DIR}/script
     if [ -d src/ ];then
         rm -rf src
     fi
     mkdir src
     cp -r ${output_dir}/com src/
     gradle build
-    cd ${source_code_dir}
+    cd ${SOURCE_CODE_DIR}
     build_classpath
     echo "Compile contracts done."
 }
 
 function clean_config()
 {
-    cd ${source_code_dir}
+    cd ${SOURCE_CODE_DIR}
     echo "begin to clean config..."
     if [ -d bin/ ];then
-    	rm -rf bin/
+        rm -rf bin/
     fi
-    if [ -d ${source_code_dir}/script/src/ ];then
-    	rm -rf ${source_code_dir}/script/src/
+    if [ -d ${SOURCE_CODE_DIR}/script/src/ ];then
+        rm -rf ${SOURCE_CODE_DIR}/script/src/
     fi
     if [ -d output/ ];then
-    	rm -rf output/
+        rm -rf output/
     fi
     
     if [ -d build/ ];then
@@ -98,18 +100,18 @@ function clean_config()
 function compile()
 {
     echo "begin to compile build tools..."
-    cd ${source_code_dir}
-    node_addr=$(grep "blockchain.node.address" $config_file |awk -F"=" '{print $2}')
+    cd ${SOURCE_CODE_DIR}
+    #if more than one blockchain node exist, use this to seperate them
     OLD_IFS="$IFS"
     IFS=","
-    array=($node_addr)
+    array=($blockchain_address)
     IFS="$OLD_IFS"
-    content=
+    #fill with ip and port of blockchain nodes
     for var in ${array[@]}
     do
-	if [ ! -z ${content} ];then
-	    content="${content}\n"
-	fi
+    if [ ! -z ${content} ];then
+         content="${content}\n"
+    fi
         content="${content}<value>WeIdentity@$var</value>"
     done
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
@@ -117,18 +119,17 @@ function compile()
     export CPT_ADDRESS="0x0"
     export ISSUER_ADDRESS="0x0"
     MYVARS='${BLOCKCHIAN_NODE_INFO}:${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}'
-    if [ -f ${app_xml_config} ];then
-        rm ${app_xml_config}
+    if [ -f ${APP_XML_CONFIG} ];then
+        rm ${APP_XML_CONFIG}
     fi
-    envsubst ${MYVARS} < ${app_xml_config_tpl} >${app_xml_config}
-    if [ -f ${app_xml_config_tmp} ];then
-        rm ${app_xml_config_tmp}
+    envsubst ${MYVARS} < ${APP_XML_CONFIG_TPL} >${APP_XML_CONFIG}
+    if [ -f ${APP_XML_CONFIG_TMP} ];then
+        rm ${APP_XML_CONFIG_TMP}
     fi
-    envsubst '${BLOCKCHIAN_NODE_INFO}' < ${app_xml_config_tpl} >${app_xml_config_tmp}
-    cp ${app_xml_config} ${source_code_dir}/resources
-    #cp ${app_xml_config} ${app_xml_config_tmp}
-    cp ${source_code_dir}/script/tpl/log4j2.xml ${source_code_dir}/resources
-    cp -rf ${source_code_dir}/resources ${source_code_dir}/src/main/
+    envsubst '${BLOCKCHIAN_NODE_INFO}' < ${APP_XML_CONFIG_TPL} >${APP_XML_CONFIG_TMP}
+    cp ${APP_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
+    cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
+    cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     gradle build
     build_classpath
     compile_contract
@@ -138,22 +139,20 @@ function compile()
 function build_classpath()
 {
 
-    CLASSPATH=${source_code_dir}/resources
-    for jar_file in ${source_code_dir}/dist/app/*.jar
+    CLASSPATH=${SOURCE_CODE_DIR}/resources
+    for jar_file in ${SOURCE_CODE_DIR}/dist/app/*.jar
         do
             CLASSPATH=${CLASSPATH}:${jar_file}
         done
 
-    for jar_file in ${source_code_dir}/dist/lib/*.jar
+    for jar_file in ${SOURCE_CODE_DIR}/dist/lib/*.jar
         do
             CLASSPATH=${CLASSPATH}:${jar_file}
         done
-
 }
 
 function main()
 {
-    #compile_contract
     check_jdk
     compile
     clean_config

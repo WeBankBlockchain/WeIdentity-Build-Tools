@@ -8,4 +8,4 @@
    :caption: Contents:
 
    docs/weidentity-build-tools-doc.rst
-   返回首页 <https://weidentity.readthedocs.io/zh_CN/latest/>
+   返回首页 <https://weidentity.readthedocs.io/projects/buildtools/zh_CN/latest/>

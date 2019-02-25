@@ -99,7 +99,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weidentity-java-sdk
 相关接口请见：\ `WeIdentity JAVA
-SDK文档 <https://weidentity.readthedocs.io/zh_CN/develop/docs/weidentity-java-sdk-doc.html>`__
+SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__
 
 --------------
 

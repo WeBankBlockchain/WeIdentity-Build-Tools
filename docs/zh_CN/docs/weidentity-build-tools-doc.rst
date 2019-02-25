@@ -1,40 +1,13 @@
-.. raw:: html
+.. role:: raw-html-m2r(raw)
+   :format: html
 
-   <center><h2>
+.. _weidentity-build-tools-doc:
 
-如何在自己的应用中集成 weidentity-java-sdk
+WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
+============================================================
 
-.. raw:: html
-
-   </h2></center>
-
-介绍
-~~~~
-
-本页面主要介绍如何使用 weidentity-build-tools 工具，在自己的应用中集成
-`weidentity-java-sdk <https://github.com/WeBankFinTech/weidentity-java-sdk>`__\ 。
-
-weidentity-build-tools 为您完成了下面的工作：
-
--  部署了 `WeIdentity
-   智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ 。
--  生成 weidentity-java-sdk 使用的配置文件
-   ``applicationContext.xml``\ 。
-
---------------
-
-准备工作
-~~~~~~~~
-
-请参考\ `SDK一键安装 <https://weidentity.readthedocs.io/zh_CN/master/docs/weidentity-installation.html>`__\ 的“准备工作”章节。
-
---------------
-
-开始使用
-~~~~~~~~
-
-1 通过 maven 下载 weidentity-java-sdk.jar
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. 通过 maven 引入 weidentity-java-sdk 依赖
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 在 ``build.gradle`` 文件中中添加相关的包依赖：
 
@@ -50,7 +23,8 @@ weidentity-build-tools 为您完成了下面的工作：
 
    <div id="section-2">
 
-2 部署 WeIdentity 智能合约
+2. 部署 WeIdentity 智能合约
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. raw:: html
 

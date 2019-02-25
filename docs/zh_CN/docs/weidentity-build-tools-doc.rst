@@ -26,7 +26,7 @@ weidentity-build-tools 为您完成了下面的工作：
 准备工作
 ~~~~~~~~
 
-请参考\ `SDK一键安装 <https://weidentity.readthedocs.io/zh_CN/master/docs/weidentity-installation.html>`__\ 的“准备工作”章节。
+请参考\ `SDK一键安装 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-installation.html>`__\ 的“准备工作”章节。
 
 --------------
 

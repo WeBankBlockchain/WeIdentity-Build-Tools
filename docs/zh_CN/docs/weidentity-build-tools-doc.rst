@@ -6,6 +6,14 @@
 WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 ============================================================
 
+整体介绍
+--------
+
+  通过安装部署工具，您可以快速的在您的应用项目中集成weidentity-java-sdk。
+
+部署步骤
+--------
+
 1. 通过 maven 引入 weidentity-java-sdk 依赖
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -30,13 +38,15 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 
    </div>
 
-下载 ``weidentity-build-tools`` 工具到您的 service 部署的服务器上，完成
-WeIdentity 智能合约的部署以及配置。
+2.1 下载安装部署工具
+''''''''''''''''''''''''''''''
+ 安装部署工具： `weidentity-build-tools <https://github.com/WeBankFinTech/weidentity-build-tools/tree/master>`__\  。
+
 
 该工具默认会使用最新版本的
-`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ 。该工具可以帮您编译合约、打包合约、发布合约和自动配置。
+`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ 。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
 
-2.1 配置区块链节点 IP 和 channelport
+2.2 配置区块链节点 IP 和 channelport
 ''''''''''''''''''''''''''''''''''''
 
 ::
@@ -60,15 +70,14 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 注：如果您需要使用特定版本的 WeIdentity
 智能合约，请参考附录章节进行相应的更新操作。
 
-2.2 配置节点证书和秘钥文件
+2.3 配置节点证书和秘钥文件
 ''''''''''''''''''''''''''
 
-| 在区块链节点的安装目录下，将目录 ``build/web3sdk/conf/`` 里的证书文件
-``ca.crt`` 和 ``client.keystore`` 复制出来。
-| 拷贝至 weidentity-build-tools 下面的 ``resources``
+在区块链节点的安装目录下，将目录 ``build/web3sdk/conf/`` 里的证书文件
+``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至 weidentity-build-tools 下面的 ``resources``
 目录：\ ``weidentity-build-tools/resources/``\ 。
 
-2.3 部署合约并自动生成配置文件
+2.4 部署智能合约并自动生成配置文件
 ''''''''''''''''''''''''''''''
 
 如果您是第一次使用本工具，您需要先进行编译：

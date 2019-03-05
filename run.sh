@@ -34,10 +34,12 @@ function modify_config()
     weid_address=$(cat weIdContract.address)
     cpt_address=$(cat cptController.address)
     issuer_address=$(cat authorityIssuer.address)
+    evidence_address=$(cat evidenceController.address)
     export WEID_ADDRESS=${weid_address}
     export CPT_ADDRESS=${cpt_address}
     export ISSUER_ADDRESS=${issuer_address}
-    MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}'
+    export EVIDENCE_ADDRESS=${evidence_address}
+    MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}'
     if [ -f ${APP_XML_CONFIG} ];then
         rm ${APP_XML_CONFIG}
     fi
@@ -82,6 +84,9 @@ function clean_data()
     fi
     if [ -f authorityIssuer.address ];then
         rm -f authorityIssuer.address
+    fi
+    if [ -f evidenceController.address ];then
+        rm -f evidenceController.address
     fi
 }
 

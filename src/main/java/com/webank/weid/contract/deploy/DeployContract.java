@@ -45,6 +45,7 @@ import com.webank.weid.contract.AuthorityIssuerController;
 import com.webank.weid.contract.AuthorityIssuerData;
 import com.webank.weid.contract.CptController;
 import com.webank.weid.contract.CptData;
+import com.webank.weid.contract.EvidenceFactory;
 import com.webank.weid.contract.RoleController;
 import com.webank.weid.contract.WeIdContract;
 
@@ -129,6 +130,7 @@ public class DeployContract {
         String weIdContractAddress = deployWeIdContract();
         String authorityIssuerDataAddress = deployAuthorityIssuerContracts();
         deployCptContracts(authorityIssuerDataAddress, weIdContractAddress);
+        deployEvidenceContracts();
     }
 
     private static String deployWeIdContract() {
@@ -245,6 +247,31 @@ public class DeployContract {
             return authorityIssuerDataAddress;
         }
         return authorityIssuerDataAddress;
+    }
+    
+    private static String deployEvidenceContracts() {
+        if (web3j == null) {
+            loadConfig();
+        }
+
+        try {
+            Future<EvidenceFactory> f =
+                EvidenceFactory.deploy(
+                    web3j,
+                    credentials,
+                    WeIdConstant.GAS_PRICE,
+                    WeIdConstant.GAS_LIMIT,
+                    WeIdConstant.INILITIAL_VALUE
+                );
+            EvidenceFactory evidenceFactory = f
+                .get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+            String evidenceFactoryAddress = evidenceFactory.getContractAddress();
+            writeAddressToFile(evidenceFactoryAddress, "evidenceController.address");
+            return evidenceFactoryAddress;
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            logger.error("EvidenceFactory deploy exception", e);
+        }
+        return StringUtils.EMPTY;
     }
 
     private static void writeAddressToFile(

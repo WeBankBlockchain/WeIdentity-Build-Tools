@@ -18,7 +18,7 @@
  */
 
 
-package com.webank.weid.contract.transfer;
+package com.webank.weid.command;
 
 import java.util.Map;
 
@@ -39,10 +39,10 @@ import com.webank.weid.util.SerializationUtils;
 /**
  * @author tonychen 2019年4月8日
  */
-public class CptTools {
+public class CptToPojo {
 
     private static final String CPT_KEY = "cpt.list";
-    private static final Logger logger = LoggerFactory.getLogger(CptTools.class);
+    private static final Logger logger = LoggerFactory.getLogger(CptToPojo.class);
     private static CptService cptService = new CptServiceImpl();
 
     /**

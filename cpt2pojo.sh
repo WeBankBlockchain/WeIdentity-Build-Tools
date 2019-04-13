@@ -23,7 +23,7 @@ function cpt_to_pojo()
 
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.contract.transfer.CptTools ${SOURCE_CODE_DIR}/cpt.config 
+    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${SOURCE_CODE_DIR}/conf/cpt2pojo_config/parameter.conf 
     mv Cpt*.json ${cpt_dir}
     
     for cpt_file in ${cpt_dir}/*.json

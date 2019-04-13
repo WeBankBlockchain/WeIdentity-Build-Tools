@@ -35,7 +35,22 @@ function deploy_contract()
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
-    java -cp "$CLASSPATH" com.webank.weid.contract.deploy.DeployContract
+    java -cp "$CLASSPATH" com.webank.weid.command.DeployContract
+    
+    if [ ! $? -eq 0 ]; then
+        echo "deploy contract failed, please check."
+        exit $?;
+    fi
+    
+
+    if [ ! -d ${SOURCE_CODE_DIR}/output/keyPair ];then
+        
+        mkdir -p ${SOURCE_CODE_DIR}/output/keyPair
+    fi
+
+    mv public_key ${SOURCE_CODE_DIR}/output/keyPair
+    mv private_key ${SOURCE_CODE_DIR}/output/keyPair
+    
     echo "contract deployment done."
 }
 

@@ -17,7 +17,7 @@
  *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.webank.weid.contract.deploy;
+package com.webank.weid.command;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -26,10 +26,10 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bcos.channel.client.Service;
-import org.bcos.contract.tools.ToolConf;
 import org.bcos.web3j.abi.datatypes.Address;
 import org.bcos.web3j.crypto.Credentials;
-import org.bcos.web3j.crypto.GenCredential;
+import org.bcos.web3j.crypto.ECKeyPair;
+import org.bcos.web3j.crypto.Keys;
 import org.bcos.web3j.protocol.Web3j;
 import org.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.slf4j.Logger;
@@ -112,8 +112,23 @@ public class DeployContract {
         web3j = Web3j.build(channelEthereumService);
 
         logger.info("begin init credentials");
-        ToolConf toolConf = context.getBean(ToolConf.class);
-        credentials = GenCredential.create(toolConf.getPrivKey());
+        
+        ECKeyPair keyPair = null;
+
+        try {
+            keyPair = Keys.createEcKeyPair();
+        } catch (Exception e) {
+            logger.error("Create weId failed.", e);
+            return false;
+        }
+
+        String publicKey = String.valueOf(keyPair.getPublicKey());
+        String privateKey = String.valueOf(keyPair.getPrivateKey());
+        
+        //将公私钥输出到output
+        FileUtils.writeToFile(publicKey, "public_key", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(privateKey, "private_key", FileOperator.OVERWRITE);
+        credentials = Credentials.create(keyPair);
 
         if (null == credentials) {
             logger.error("[BaseService] credentials init failed.");

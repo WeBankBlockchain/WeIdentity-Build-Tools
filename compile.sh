@@ -1,6 +1,6 @@
 #!/bin/bash
 source ./common.inc
-source ./run.config
+source ./conf/run.config
 
 set -e
 
@@ -8,7 +8,7 @@ set -e
 SOLC=$(which fisco-solc)
 WEB3J="${SOURCE_CODE_DIR}/script/web3sdk.sh"
 chmod +x ${WEB3J}
-CONFIG_FILE=${SOURCE_CODE_DIR}/run.config
+CONFIG_FILE=${SOURCE_CODE_DIR}/conf/run.config
 APP_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
 APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
 APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp

@@ -66,13 +66,13 @@ List web3sdk_dependencies = [
     "com.github.jnr:jnr-unixsocket:0.15"
 ]
 
-List weidentity_contract = [
-    "com.webank:weidentity-contract-java:1.+"
+List weidentity = [
+    "com.webank:weidentity-java-sdk:1.1.+"
 ]
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile logger, spring, lombok, apache_commons, jackson, web3sdk_dependencies, weidentity_contract
+    compile logger, spring, lombok, apache_commons, jackson, web3sdk_dependencies, weidentity
     compile files("lib/web3sdk.jar")
 }
 

@@ -1,5 +1,5 @@
 /*
- *       Copyright© (2018) WeBank Co., Ltd.
+ *       Copyright© (2018-2019) WeBank Co., Ltd.
  *
  *       This file is part of weidentity-build-tools.
  *
@@ -17,12 +17,8 @@
  *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.webank.weid.contract.deploy;
+package com.webank.weid.command;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -30,10 +26,10 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bcos.channel.client.Service;
-import org.bcos.contract.tools.ToolConf;
 import org.bcos.web3j.abi.datatypes.Address;
 import org.bcos.web3j.crypto.Credentials;
-import org.bcos.web3j.crypto.GenCredential;
+import org.bcos.web3j.crypto.ECKeyPair;
+import org.bcos.web3j.crypto.Keys;
 import org.bcos.web3j.protocol.Web3j;
 import org.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.slf4j.Logger;
@@ -41,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.webank.weid.constant.FileOperator;
+import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.AuthorityIssuerController;
 import com.webank.weid.contract.AuthorityIssuerData;
 import com.webank.weid.contract.CptController;
@@ -48,6 +46,7 @@ import com.webank.weid.contract.CptData;
 import com.webank.weid.contract.EvidenceFactory;
 import com.webank.weid.contract.RoleController;
 import com.webank.weid.contract.WeIdContract;
+import com.webank.weid.util.FileUtils;
 
 /**
  * The Class DeployContract.
@@ -57,20 +56,17 @@ import com.webank.weid.contract.WeIdContract;
 public class DeployContract {
 
     /**
+     * The context.
+     */
+    protected static final ApplicationContext context;
+    /**
      * log4j.
      */
     private static final Logger logger = LoggerFactory.getLogger(DeployContract.class);
-
     /**
      * The Constant for default deploy contracts timeout.
      */
     private static final Integer DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS = 15;
-
-    /**
-     * The context.
-     */
-    protected static final ApplicationContext context;
-
     /**
      * The credentials.
      */
@@ -116,8 +112,23 @@ public class DeployContract {
         web3j = Web3j.build(channelEthereumService);
 
         logger.info("begin init credentials");
-        ToolConf toolConf = context.getBean(ToolConf.class);
-        credentials = GenCredential.create(toolConf.getPrivKey());
+        
+        ECKeyPair keyPair = null;
+
+        try {
+            keyPair = Keys.createEcKeyPair();
+        } catch (Exception e) {
+            logger.error("Create weId failed.", e);
+            return false;
+        }
+
+        String publicKey = String.valueOf(keyPair.getPublicKey());
+        String privateKey = String.valueOf(keyPair.getPrivateKey());
+        
+        //将公私钥输出到output
+        FileUtils.writeToFile(publicKey, "public_key", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(privateKey, "private_key", FileOperator.OVERWRITE);
+        credentials = Credentials.create(keyPair);
 
         if (null == credentials) {
             logger.error("[BaseService] credentials init failed.");
@@ -147,7 +158,7 @@ public class DeployContract {
             WeIdContract weIdContract =
                 f.get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
             String contractAddress = weIdContract.getContractAddress();
-            writeAddressToFile(contractAddress, "weIdContract.address");
+            FileUtils.writeToFile(contractAddress, "weIdContract.address", FileOperator.OVERWRITE);
             return contractAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("WeIdContract deploy exception.", e);
@@ -183,7 +194,8 @@ public class DeployContract {
             CptController cptController =
                 f2.get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
             String cptControllerAddress = cptController.getContractAddress();
-            writeAddressToFile(cptControllerAddress, "cptController.address");
+            FileUtils
+                .writeToFile(cptControllerAddress, "cptController.address", FileOperator.OVERWRITE);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("CptController deploy exception.", e);
         }
@@ -240,7 +252,8 @@ public class DeployContract {
                     TimeUnit.SECONDS);
             String authorityIssuerControllerAddress =
                 authorityIssuerController.getContractAddress();
-            writeAddressToFile(authorityIssuerControllerAddress, "authorityIssuer.address");
+            FileUtils.writeToFile(authorityIssuerControllerAddress, "authorityIssuer.address",
+                FileOperator.OVERWRITE);
 
         } catch (Exception e) {
             logger.error("AuthorityIssuerData deployment error:", e);
@@ -248,7 +261,7 @@ public class DeployContract {
         }
         return authorityIssuerDataAddress;
     }
-    
+
     private static String deployEvidenceContracts() {
         if (web3j == null) {
             loadConfig();
@@ -266,7 +279,8 @@ public class DeployContract {
             EvidenceFactory evidenceFactory = f
                 .get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
             String evidenceFactoryAddress = evidenceFactory.getContractAddress();
-            writeAddressToFile(evidenceFactoryAddress, "evidenceController.address");
+            FileUtils.writeToFile(evidenceFactoryAddress, "evidenceController.address",
+                FileOperator.OVERWRITE);
             return evidenceFactoryAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("EvidenceFactory deploy exception", e);
@@ -274,35 +288,4 @@ public class DeployContract {
         return StringUtils.EMPTY;
     }
 
-    private static void writeAddressToFile(
-        String contractAddress,
-        String fileName) {
-
-        OutputStreamWriter ow = null;
-        try {
-            boolean flag = true;
-            File file = new File(fileName);
-            if (file.exists()) {
-                flag = file.delete();
-            }
-            if (!flag) {
-                logger.error("writeAddressToFile() delete file is fail.");
-                return;
-            }
-            ow = new OutputStreamWriter(new FileOutputStream(fileName, true), WeIdConstant.UTF_8);
-            String content = new StringBuffer().append(contractAddress).toString();
-            ow.write(content);
-            ow.close();
-        } catch (IOException e) {
-            logger.error("writer file exception.", e);
-        } finally {
-            if (null != ow) {
-                try {
-                    ow.close();
-                } catch (IOException e) {
-                    logger.error("io close exception.", e);
-                }
-            }
-        }
-    }
 }

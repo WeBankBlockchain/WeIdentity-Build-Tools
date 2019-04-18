@@ -17,7 +17,7 @@
  *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.webank.weid.contract.deploy;
+package com.webank.weid.constant;
 
 import java.math.BigInteger;
 
@@ -26,7 +26,7 @@ import java.math.BigInteger;
  *
  * @author tonychen
  */
-public final class WeIdConstant {
+public final class BuildToolsConstant {
 
     /**
      * The Constant GAS_PRICE.

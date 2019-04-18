@@ -1,30 +1,11 @@
 #!/bin/bash
+source ./common.inc
+
 set -e
 
-SOURCE_CODE_DIR=$(pwd)
+#SOURCE_CODE_DIR=$(pwd)
 APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
 APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
-
-function check_jdk()
-{
-    echo "Begin to check jdk..."
-    # Determine the Java command to use to start the JVM.
-    if [ -n "$JAVA_HOME" ] ; then
-        if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-            # IBM's JDK on AIX uses strange locations for the executables
-            JAVACMD="$JAVA_HOME/jre/sh/java"
-        else
-            JAVACMD="$JAVA_HOME/bin/java"
-        fi
-    else
-        JAVACMD="java"
-        which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
-
-    Please set the JAVA_HOME variable in your environment to match the
-    location of your Java installation."
-    fi
-    echo "jdk check finished."
-}
 
 function modify_config()
 {
@@ -54,23 +35,23 @@ function deploy_contract()
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
-    java -cp "$CLASSPATH" com.webank.weid.contract.deploy.DeployContract
+    java -cp "$CLASSPATH" com.webank.weid.command.DeployContract
+    
+    if [ ! $? -eq 0 ]; then
+        echo "deploy contract failed, please check."
+        exit $?;
+    fi
+    
+
+    if [ ! -d ${SOURCE_CODE_DIR}/output/keyPair ];then
+        
+        mkdir -p ${SOURCE_CODE_DIR}/output/keyPair
+    fi
+
+    mv public_key ${SOURCE_CODE_DIR}/output/keyPair
+    mv private_key ${SOURCE_CODE_DIR}/output/keyPair
+    
     echo "contract deployment done."
-}
-
-function build_classpath()
-{
-
-    CLASSPATH=${SOURCE_CODE_DIR}/resources
-    for jar_file in ${SOURCE_CODE_DIR}/dist/app/*.jar
-        do
-            CLASSPATH=${CLASSPATH}:${jar_file}
-        done
-
-    for jar_file in ${SOURCE_CODE_DIR}/dist/lib/*.jar
-        do
-            CLASSPATH=${CLASSPATH}:${jar_file}
-        done
 }
 
 function clean_data()

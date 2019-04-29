@@ -48,8 +48,8 @@ function deploy_contract()
         mkdir -p ${SOURCE_CODE_DIR}/output/keyPair
     fi
 
-    mv public_key ${SOURCE_CODE_DIR}/output/keyPair
-    mv private_key ${SOURCE_CODE_DIR}/output/keyPair
+    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/keyPair
+    mv ecdsa_key ${SOURCE_CODE_DIR}/output/keyPair
     
     echo "contract deployment done."
 }

@@ -20,6 +20,8 @@
 
 package com.webank.weid.command;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,32 +58,38 @@ public class CptToPojo {
             System.exit(1);
         }
         String filePath = args[0];
+        List<String>succeedList = new ArrayList<>();
+        List<String>failedList = new ArrayList<>();
         try {
             PropertyUtils.loadProperties(filePath);
 
             String cptStr = PropertyUtils.getProperty(CPT_KEY);
             String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
 
+      
             //2. get cpt info from blockchain
             for (String cptId : cptList) {
                 ResponseData<Cpt> response = cptService.queryCpt(Integer.valueOf(cptId));
-                if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-                    logger
-                        .error("Query CPT :{} failed. ErrorCode is:{}", cptId,
-                            response.getErrorCode());
-                    System.exit(1);
-                }
+				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+					logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
+							response.getErrorCode(), response.getErrorMessage());
+					failedList.add(cptId);
+					continue;
+				}
                 Cpt cpt = response.getResult();
                 Map<String, Object> cptMap = cpt.getCptJsonSchema();
                 String cptJson = SerializationUtils.serialize(cptMap);
                 String fileName = "Cpt" + String.valueOf(cpt.getCptId()) + ".json";
                 FileUtils.writeToFile(cptJson, fileName, FileOperator.OVERWRITE);
+                succeedList.add(String.valueOf(cpt.getCptId()));
             }
         } catch (Exception e) {
             logger.error("[CptTools] execute with exception, {}", e);
+            System.out.println("[CptTools] execute with exception"+ e);
             System.exit(1);
         }
 
+        System.out.println("List:["+succeedList+"] are successfully transformed to pojo. List:["+failedList+"] are failed.");
         //3. exit with success.
         System.exit(0);
     }

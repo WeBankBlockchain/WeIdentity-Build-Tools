@@ -1,5 +1,9 @@
 #!/bin/bash
+
+cd ..
 source ./common.inc
+
+cd ${SOURCE_CODE_DIR}
 
 set -e
 
@@ -23,7 +27,7 @@ function cpt_to_pojo()
 
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${SOURCE_CODE_DIR}/conf/cpt2pojo_config/parameter.conf 
+    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${SOURCE_CODE_DIR}/conf/cpt_to_pojo_config/parameter.conf 
     mv Cpt*.json ${cpt_dir}
     
     for cpt_file in ${cpt_dir}/*.json

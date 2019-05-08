@@ -78,6 +78,9 @@ public class RegistAuthorityIssuer {
 		
 		ResponseData<Boolean> response = authorityIssuerService.registerAuthorityIssuer(registerAuthorityIssuerArgs);
 		if(! response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+			logger.error("[RegistAuthorityIssuer] create weidentity did faild. error code : {}, error msg :{}",
+					response.getErrorCode(), response.getErrorMessage());
+			System.out.println("[RegistAuthorityIssuer] regist faild. result is : "+response);
 			System.exit(1);
 		}
 		

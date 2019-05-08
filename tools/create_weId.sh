@@ -1,6 +1,9 @@
 #!/bin/sh
 
+cd ..
 source ./common.inc
+
+cd ${SOURCE_CODE_DIR}
 
 build_classpath
 
@@ -12,9 +15,9 @@ if [ ! $? -eq 0 ]; then
     exit $?;
 fi
 
- if [ ! -d ${SOURCE_CODE_DIR}/output/createWeId ];then
+ if [ ! -d ${SOURCE_CODE_DIR}/output/create_weId ];then
         
-        mkdir -p ${SOURCE_CODE_DIR}/output/createWeId
+        mkdir -p ${SOURCE_CODE_DIR}/output/create_weId
 fi
 
 if [ -f "weId" ];then
@@ -25,10 +28,11 @@ if [ -f "weId" ];then
     IFS="$OLD_IFS"
     weid_address=${array[2]}
     echo "weid_address=${weid_address}"
-    mkdir -p ${SOURCE_CODE_DIR}/output/createWeId/${weid_address}
-    mv public_key ${SOURCE_CODE_DIR}/output/createWeId/${weid_address}/
-    mv private_key ${SOURCE_CODE_DIR}/output/createWeId/${weid_address}/
-    mv weId ${SOURCE_CODE_DIR}/output/createWeId/${weid_address}/
+    mkdir -p ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}
+    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}/
+    cp ecdsa_key ${SOURCE_CODE_DIR}/conf/
+    mv ecdsa_key ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}/
+    mv weId ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}/
 fi
 
 echo "new weidentity did has been created."

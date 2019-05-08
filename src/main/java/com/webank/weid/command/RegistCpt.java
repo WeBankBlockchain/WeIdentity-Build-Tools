@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
 import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.constant.FileOperator;
 import com.webank.weid.protocol.base.CptBaseInfo;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
@@ -101,10 +102,12 @@ public class RegistCpt {
 				cptStringArgs.setCptJsonSchema(cptJsonSchema);
 				cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 				ResponseData<CptBaseInfo> response = cptService.registerCpt(cptStringArgs);
+				String content = new StringBuffer().append(fileName).append("=").append(String.valueOf(response.getResult().getCptId())).toString();
+				FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
 				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 					logger.error("[RegistCpt] load config faild. ErrorCode is:{}, msg :{}", response.getErrorCode(),
 							response.getErrorMessage());
-					System.exit(1);
+					continue;
 				}
 			} catch (IOException e) {
 				logger.error("[RegistCpt] load config faild. ", e);

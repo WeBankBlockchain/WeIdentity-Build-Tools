@@ -126,8 +126,8 @@ public class DeployContract {
         String privateKey = String.valueOf(keyPair.getPrivateKey());
         
         //将公私钥输出到output
-        FileUtils.writeToFile(publicKey, "public_key", FileOperator.OVERWRITE);
-        FileUtils.writeToFile(privateKey, "private_key", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(publicKey, "ecdsa_key.pub", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(privateKey, "ecdsa_key", FileOperator.OVERWRITE);
         credentials = Credentials.create(keyPair);
 
         if (null == credentials) {

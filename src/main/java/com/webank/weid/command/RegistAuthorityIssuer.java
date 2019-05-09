@@ -55,6 +55,7 @@ public class RegistAuthorityIssuer {
 		//config file path
 		String config = args[0];
 		String privateKeyFile = args[1];//privateKey
+		System.out.println("private key file:"+privateKeyFile);
 		
         try {
             PropertyUtils.loadProperties(config);
@@ -63,6 +64,7 @@ public class RegistAuthorityIssuer {
         }
         String weId = PropertyUtils.getProperty("weId");
         String name = PropertyUtils.getProperty("name");
+        System.out.println("[registerAuthorityIssuer] regist authorityissuer:"+weId+", name is :"+name);
 		RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
 		AuthorityIssuer authorityIssuer = new AuthorityIssuer();
 		authorityIssuer.setName(name);

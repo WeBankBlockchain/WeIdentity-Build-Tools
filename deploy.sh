@@ -43,10 +43,11 @@ function deploy_contract()
     fi
     
 
-    if [ ! -d ${SOURCE_CODE_DIR}/output/keyPair ];then
+    if [ -d ${SOURCE_CODE_DIR}/output/keyPair ];then
         
-        mkdir -p ${SOURCE_CODE_DIR}/output/keyPair
+        rm -rf ${SOURCE_CODE_DIR}/output/keyPair
     fi
+    mkdir -p ${SOURCE_CODE_DIR}/output/keyPair
 
     mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/keyPair
     mv ecdsa_key ${SOURCE_CODE_DIR}/output/keyPair

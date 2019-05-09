@@ -64,9 +64,6 @@ function clean_config()
     if [ -d ${SOURCE_CODE_DIR}/script/src/ ];then
         rm -rf ${SOURCE_CODE_DIR}/script/src/
     fi
-    if [ -d output/ ];then
-        rm -rf output/
-    fi
     
     if [ -d build/ ];then
         rm -rf build/

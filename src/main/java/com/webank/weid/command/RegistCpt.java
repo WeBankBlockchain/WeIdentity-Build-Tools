@@ -38,6 +38,7 @@ import com.webank.weid.rpc.CptService;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.PropertyUtils;
+import com.webank.weid.util.SerializationUtils;
 
 /**
  * @author tonychen 2019年4月11日
@@ -96,19 +97,28 @@ public class RegistCpt {
 				if (!fileName.endsWith(".json")) {
 					continue;
 				}
+				System.out.println("[registerCpt] begin to regist cpt file:"+fileName);
 				jsonNode = JsonLoader.fromFile(f);
 				String cptJsonSchema = jsonNode.toString();
 				CptStringArgs cptStringArgs = new CptStringArgs();
 				cptStringArgs.setCptJsonSchema(cptJsonSchema);
 				cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 				ResponseData<CptBaseInfo> response = cptService.registerCpt(cptStringArgs);
-				String content = new StringBuffer().append(fileName).append("=").append(String.valueOf(response.getResult().getCptId())).toString();
-				FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
+				System.out.println("[RegistCpt] result:" + SerializationUtils.serialize(response));
 				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 					logger.error("[RegistCpt] load config faild. ErrorCode is:{}, msg :{}", response.getErrorCode(),
 							response.getErrorMessage());
+					System.out.println("[registerCpt] regist cpt file:"+fileName+" failed, errorcode is "+ response.getErrorCode());
 					continue;
 				}
+				String content = new StringBuffer()
+						.append(fileName)
+						.append("=")
+						.append(String.valueOf(response.getResult().getCptId()))
+						.append("\r\n")
+						.toString();
+				FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
+				System.out.println("[registerCpt] regist cpt file:"+fileName+" successfully, errorcode is \"");
 			} catch (IOException e) {
 				logger.error("[RegistCpt] load config faild. ", e);
 				System.exit(1);

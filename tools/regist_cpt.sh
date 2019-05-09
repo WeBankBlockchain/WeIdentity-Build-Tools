@@ -23,8 +23,12 @@ if [ ! $? -eq 0 ]; then
     exit $?
 fi
 
+if [ ! -d ${SOURCE_CODE_DIR}/output/regist_cpt ];then
+	mkdir -p  ${SOURCE_CODE_DIR}/output/regist_cpt
+fi
+
 if [ -f regist_cpt.out ];then
-	mv regist_cpt.out ${SOURCE_CODE_DIR}/output/regist_cpt
+	mv regist_cpt.out ${SOURCE_CODE_DIR}/output/regist_cpt/
 fi
 
 echo "regist cpt finished."

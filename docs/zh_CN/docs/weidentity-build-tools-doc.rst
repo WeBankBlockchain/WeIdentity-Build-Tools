@@ -40,8 +40,10 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 
 2.1 下载安装部署工具
 ''''''''''''''''''''''''''''''
- 安装部署工具： `weidentity-build-tools <https://github.com/WeBankFinTech/weidentity-build-tools/tree/master>`__\  。
+::
 
+    git clone https://github.com/WeBankFinTech/weidentity-build-tools.git 
+ 
 
 该工具默认会使用最新版本的
 `WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ 。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
@@ -73,8 +75,8 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 2.3 配置节点证书和秘钥文件
 ''''''''''''''''''''''''''
 
-在区块链节点的安装目录下，将目录 ``build/web3sdk/conf/`` 里的证书文件
-``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至 weidentity-build-tools 下面的 ``resources``
+请参考\ `物料包web3sdk配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__
+将证书文件``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至 weidentity-build-tools 下面的 ``resources``
 目录：\ ``weidentity-build-tools/resources/``\ 。
 
 2.4 部署智能合约并自动生成配置文件
@@ -110,12 +112,15 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 2.5 快速使用
 ''''''''''''''''''''''''''''''
+前提是您已经完成2.4步骤的操作，发布了智能合约。
+
 此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity DID、注册Authority issuer、发布CPT
 等动作也可以通过直接在应用里通过weidentity-java-sdk完成，您可以结合您的需要进行选择。
 
 2.5.1 创建您的Weidentiy DID
+>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-这个步骤会帮您快速创建一个weidentity DID，前提是您已经完成2.4步骤的操作，发布了智能合约。
+这个步骤会帮您快速创建一个weidentity DID。
 
 ::
 
@@ -135,8 +140,9 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 此时，我们可以在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weidentity DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key。
 
 2.5.2 注册权威机构（authority issuer）
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-这个步骤会帮您将一个指定的weidentity DID注册为权威机构，前提是您已经完成2.4步骤的操作，发布了智能合约。
+这个步骤会帮您将一个指定的weidentity DID注册为权威机构。
 
 执行命令之前，您需要将要注册为权威机构的weidentity DID的信息配置在配置文件里：
 
@@ -156,8 +162,9 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
 
 2.5.3 权威机构发布CPT
+>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-此步骤会帮助权威机构发布指定的CPT到区块链上，前提是您已经完成2.4步骤的操作，发布了智能合约。
+此步骤会帮助权威机构发布指定的CPT到区块链上。
 
 如果您是权威机构，执行命令之前，您需要将您的weidentity DID和您想发布的CPT配置到对应的目录和文件中。
 
@@ -205,6 +212,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 您会看到类似于“cpt_1.json=101”的信息，表明cpt_1.json的CPT发布成功，发布的CPT ID是101。
 
 2.5.4 拉取CPT并转成weidentity-cpt.jar
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO，在创建credential的时候，可以直接使用POJO进行创建。
 
@@ -215,9 +223,16 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
     cd ../conf/cpt_to_pojo_config/
     vim parameter.conf
 
-将您想拉取的CPT配置在里面，支持配置多个CPT。
+将您想拉取的CPT配置在里面，支持配置多个CPT，用逗号做分隔。比如您想拉取CPT ID为100和101的CPT，您可以配置为：
+
+::
+
+    cpt.list=100,101
+
+注：此处的CPT ID是权威机构已经发布到区块链上的，否则是拉取不成功的。
 
 配置完成后，您只需要执行对应的命令即可进行CPT的拉取和POJO的转化。
+
 
 ::
 
@@ -261,7 +276,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 如果您还没有完成上述的\ `第2.1节和第2.2节 <#section-2>`__\ 里的配置，您需要先完成配置。
 
 将特定版本的智能合约上传至 ``contracts`` 目录：
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ::
 
@@ -270,7 +285,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 上传WeIdentity的智能合约的合约文件（.sol结尾的文件），要注意的是，由于部分合约之间有依赖，所以为了保证编译顺利完成，您需要将WeIdentity所有的智能合约都上传至该目录，包括您没修改过的智能合约。
 
 部署合约并自动生成配置文件
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''''''''
 
 配置好之后，执行\ ``deploy.sh``\ ：
 

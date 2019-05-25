@@ -25,14 +25,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 /**
  * tools for properties.
  *
  * @author tonychen 2019年3月21日
  */
-public final class PropertyUtils {
+public final class ConfigUtils {
 
     private static Properties prop = new Properties();
+    
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    
+    private static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer().withDefaultPrettyPrinter();
 
     /**
      * load properties from specific config file.
@@ -41,13 +51,10 @@ public final class PropertyUtils {
      */
     public static void loadProperties(String filePath) throws IOException {
 
-    	
         InputStream in;
-//        in = PropertyUtils.class.getClassLoader().getResourceAsStream(filePath);
         in = new FileInputStream(new File(filePath));
         prop.load(in);
         in.close();
-
     }
 
     /**
@@ -59,4 +66,25 @@ public final class PropertyUtils {
         return prop.getProperty(key);
     }
 
+    /**
+     * get property value by specific key.
+     *
+     * @param key property key
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return prop.getProperty(key, defaultValue);
+    }
+    
+    public static String serialize(Object object) {
+    	
+    	String result;
+    	try {
+    		result =  OBJECT_WRITER.writeValueAsString(object);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			result = StringUtils.EMPTY;
+		}
+    	return result;
+    }
+    
 }

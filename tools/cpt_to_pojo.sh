@@ -42,15 +42,37 @@ function cpt_to_pojo()
 
     cd ${SOURCE_CODE_DIR}
     
-    
 }
 
+function generate_presentation_policy()
+{
+	echo "begin to generate presentation policy ..."
+	
+	build_classpath
+	
+	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy ${SOURCE_CODE_DIR}/conf/cpt_to_pojo_config/parameter.conf
+	
+	presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
+	if [ ! -d ${presentation_policy} ];then
+		mkdir ${presentation_policy}
+	fi
+    
+	if [ -f "presentationPolicy.json" ];then
+		mv presentationPolicy.json ${presentation_policy}
+	else
+		echo "generate presentation policy failed."
+		exit 1
+	fi
+    
+}
 
 function main()
 {
     check_jdk
     
     cpt_to_pojo
+    
+	generate_presentation_policy
 }
 
 main

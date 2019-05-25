@@ -36,9 +36,9 @@ import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.CptService;
 import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.util.ConfigUtils;
+import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.PropertyUtils;
-import com.webank.weid.util.SerializationUtils;
 
 /**
  * @author tonychen 2019年4月11日
@@ -69,7 +69,7 @@ public class RegistCpt {
 		File file = new File(cptDir);
 
 		try {
-			PropertyUtils.loadProperties(config);
+			ConfigUtils.loadProperties(config);
 
 		} catch (IOException e) {
 			logger.error("[RegistCpt] load config faild. ", e);
@@ -81,7 +81,7 @@ public class RegistCpt {
 			System.exit(1);
 		}
 
-		String weId = PropertyUtils.getProperty("weId");
+		String weId = ConfigUtils.getProperty("weId");
 //		String weId = FileUtils.readFile("weId");
 		WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
 		weIdAuthentication.setWeId(weId);
@@ -104,7 +104,7 @@ public class RegistCpt {
 				cptStringArgs.setCptJsonSchema(cptJsonSchema);
 				cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 				ResponseData<CptBaseInfo> response = cptService.registerCpt(cptStringArgs);
-				System.out.println("[RegistCpt] result:" + SerializationUtils.serialize(response));
+				System.out.println("[RegistCpt] result:" + DataToolUtils.serialize(response));
 				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 					logger.error("[RegistCpt] load config faild. ErrorCode is:{}, msg :{}", response.getErrorCode(),
 							response.getErrorMessage());

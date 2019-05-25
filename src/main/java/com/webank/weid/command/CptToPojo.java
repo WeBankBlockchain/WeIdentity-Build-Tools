@@ -34,9 +34,9 @@ import com.webank.weid.protocol.base.Cpt;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.CptService;
 import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.util.ConfigUtils;
+import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.PropertyUtils;
-import com.webank.weid.util.SerializationUtils;
 
 /**
  * @author tonychen 2019年4月8日
@@ -61,9 +61,9 @@ public class CptToPojo {
         List<String>succeedList = new ArrayList<>();
         List<String>failedList = new ArrayList<>();
         try {
-            PropertyUtils.loadProperties(filePath);
+        	ConfigUtils.loadProperties(filePath);
 
-            String cptStr = PropertyUtils.getProperty(CPT_KEY);
+            String cptStr = ConfigUtils.getProperty(CPT_KEY);
             String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
 
       
@@ -78,7 +78,7 @@ public class CptToPojo {
 				}
                 Cpt cpt = response.getResult();
                 Map<String, Object> cptMap = cpt.getCptJsonSchema();
-                String cptJson = SerializationUtils.serialize(cptMap);
+                String cptJson = DataToolUtils.serialize(cptMap);
                 String fileName = "Cpt" + String.valueOf(cpt.getCptId()) + ".json";
                 FileUtils.writeToFile(cptJson, fileName, FileOperator.OVERWRITE);
                 succeedList.add(String.valueOf(cpt.getCptId()));

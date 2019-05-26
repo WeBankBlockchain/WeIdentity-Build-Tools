@@ -46,4 +46,7 @@ public class CommandArgs {
 	
 	@Parameter(names = "--org-name", description = "org name")
 	private String orgName;
+
+	@Parameter(names = "--type", description = "type")
+	private String type;
 }

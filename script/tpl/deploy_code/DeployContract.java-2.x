@@ -52,6 +52,12 @@ import com.webank.weid.contract.RoleController;
 import com.webank.weid.contract.SpecificIssuerController;
 import com.webank.weid.contract.SpecificIssuerData;
 import com.webank.weid.contract.WeIdContract;
+import com.webank.weid.protocol.base.WeIdAuthentication;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.protocol.request.CptStringArgs;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdUtils;
 

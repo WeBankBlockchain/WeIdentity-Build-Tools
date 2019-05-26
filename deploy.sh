@@ -1,11 +1,14 @@
 #!/bin/bash
 source ./script/common.inc
+source run.config
 
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
 APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
 APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
+FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
+FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
 
 function modify_config()
 {
@@ -28,6 +31,11 @@ function modify_config()
     fi
     envsubst ${MYVARS} < ${APP_XML_CONFIG_TMP} >${APP_XML_CONFIG}
     cp ${APP_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
+    if [ -f ${FISCO_XML_CONFIG} ];then
+        rm ${FISCO_XML_CONFIG}
+    fi
+    envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TMP} >${FISCO_XML_CONFIG}
+    cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     echo "modify sdk config finished..."
 }
 
@@ -57,6 +65,21 @@ function deploy_contract()
     echo "contract deployment done."
 }
 
+function deploy_system_cpt()
+{
+    echo "begin to deploy system contract..."
+    cd ${SOURCE_CODE_DIR}
+    build_classpath
+    java -cp "$CLASSPATH" com.webank.weid.command.DeploySystemCpt
+
+    if [ ! $? -eq 0 ]; then
+        echo "deploy system cpt failed, please check."
+        exit $?;
+    fi
+
+    echo "deploy system cpt done."
+}
+
 function clean_data()
 {
     #delete useless files
@@ -82,6 +105,9 @@ function main()
     check_jdk
     deploy_contract
     modify_config
+    if [ "${blockchain_fiscobcos_version}" = "1" ];then
+        deploy_system_cpt
+    fi
     clean_data
 }
 

@@ -19,7 +19,10 @@
 
 package com.webank.weid.command;
 
+import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -50,9 +53,15 @@ import com.webank.weid.contract.CptController;
 import com.webank.weid.contract.CptData;
 import com.webank.weid.contract.EvidenceFactory;
 import com.webank.weid.contract.RoleController;
-import com.webank.weid.contract.WeIdContract;
 import com.webank.weid.contract.SpecificIssuerController;
 import com.webank.weid.contract.SpecificIssuerData;
+import com.webank.weid.contract.WeIdContract;
+import com.webank.weid.protocol.base.WeIdAuthentication;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.protocol.request.CptStringArgs;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdUtils;
 
@@ -98,7 +107,45 @@ public class DeployContract {
 
         loadConfig();
         deployContract();
+        if (!registerSystemCpt()) {
+            System.exit(1);
+        }
         System.exit(0);
+    }
+
+    /**
+     * Deploy System CPTs.
+     *
+     * @return true if succeed, false otherwise
+     */
+    public static boolean registerSystemCpt() {
+        CptStringArgs cptStringArgs = new CptStringArgs();
+        WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
+        BigInteger privateKey = credentials.getEcKeyPair().getPrivateKey();
+        String weId = WeIdUtils
+            .convertPublicKeyToWeId(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
+        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
+        weIdPrivateKey.setPrivateKey(privateKey.toString());
+        weIdAuthentication.setWeIdPrivateKey(weIdPrivateKey);
+        weIdAuthentication.setWeId(weId);
+        cptStringArgs.setWeIdAuthentication(weIdAuthentication);
+
+        List<Integer> cptIdList = Arrays.asList(101, 102, 103);
+        CptServiceImpl cptService = new CptServiceImpl();
+        for (Integer cptId : cptIdList) {
+            String cptJsonSchema = DataToolUtils.generateDefaultCptJsonSchema(cptId);
+            if (cptJsonSchema.isEmpty()) {
+                logger.info("[DeployContract] Cannot generate CPT json schema with ID: " + cptId);
+                return false;
+            }
+            cptStringArgs.setCptJsonSchema(cptJsonSchema);
+            ResponseData responseData = cptService.registerCpt(cptStringArgs, cptId);
+            if (responseData.getResult() == null) {
+                logger.info("[DeployContract] Register System CPT failed with ID: " + cptId);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -112,21 +159,21 @@ public class DeployContract {
         try {
             service.run();
         } catch (Exception e) {
-            logger.error("[BaseService] Service init failed.", e);
+            logger.error("[DeployContract] Service init failed.", e);
         }
 
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
         channelEthereumService.setChannelService(service);
         web3j = Web3j.build(channelEthereumService);
 
-        logger.info("begin init credentials");
+        logger.info("[DeployContract] begin init credentials");
 
         ECKeyPair keyPair = null;
 
         try {
             keyPair = Keys.createEcKeyPair();
         } catch (Exception e) {
-            logger.error("Create weId failed.", e);
+            logger.error("[DeployContract] Create weId failed.", e);
             return false;
         }
 
@@ -139,7 +186,7 @@ public class DeployContract {
         credentials = Credentials.create(keyPair);
 
         if (null == credentials) {
-            logger.error("[BaseService] credentials init failed.");
+            logger.error("[DeployContract] credentials init failed.");
             return false;
         }
         return true;
@@ -174,7 +221,7 @@ public class DeployContract {
             FileUtils.writeToFile(contractAddress, "weIdContract.address", FileOperator.OVERWRITE);
             return contractAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error("WeIdContract deploy exception.", e);
+            logger.error("[DeployContract] WeIdContract deploy exception.", e);
         }
         return StringUtils.EMPTY;
     }
@@ -219,7 +266,7 @@ public class DeployContract {
                 .setRoleController(new Address(roleControllerAddress));
             f3.get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error("CptController deploy exception", e);
+            logger.error("[DeployContract] CptController deploy exception", e);
         }
         return StringUtils.EMPTY;
     }
@@ -241,7 +288,7 @@ public class DeployContract {
                 f1.get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
             return roleController.getContractAddress();
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error("RoleController deploy exception", e);
+            logger.error("[DeployContract] RoleController deploy exception", e);
             return StringUtils.EMPTY;
         }
     }
@@ -269,7 +316,7 @@ public class DeployContract {
                 issuerAddressList.put("CommitteeMemberData", committeeMemberDataAddress);
             }
         } catch (Exception e) {
-            logger.error("CommitteeMemberData deployment error:", e);
+            logger.error("[DeployContract] CommitteeMemberData deployment error:", e);
             return issuerAddressList;
         }
 
@@ -293,7 +340,7 @@ public class DeployContract {
                     .put("CommitteeMemberController", committeeMemberControllerAddress);
             }
         } catch (Exception e) {
-            logger.error("CommitteeMemberController deployment error:", e);
+            logger.error("[DeployContract] CommitteeMemberController deployment error:", e);
             return issuerAddressList;
         }
 
@@ -315,7 +362,7 @@ public class DeployContract {
                 issuerAddressList.put("AuthorityIssuerData", authorityIssuerDataAddress);
             }
         } catch (Exception e) {
-            logger.error("AuthorityIssuerData deployment error:", e);
+            logger.error("[DeployContract] AuthorityIssuerData deployment error:", e);
             return issuerAddressList;
         }
 
@@ -338,7 +385,7 @@ public class DeployContract {
                     .put("AuthorityIssuerController", authorityIssuerControllerAddress);
             }
         } catch (Exception e) {
-            logger.error("AuthorityIssuerController deployment error:", e);
+            logger.error("[DeployContract] AuthorityIssuerController deployment error:", e);
             return issuerAddressList;
         }
 
@@ -346,7 +393,7 @@ public class DeployContract {
             FileUtils.writeToFile(authorityIssuerControllerAddress, "authorityIssuer.address",
                 FileOperator.OVERWRITE);
         } catch (Exception e) {
-            logger.error("Write error:", e);
+            logger.error("[DeployContract] Write error:", e);
         }
 
         String specificIssuerDataAddress = StringUtils.EMPTY;
@@ -367,7 +414,7 @@ public class DeployContract {
                 issuerAddressList.put("SpecificIssuerData", specificIssuerDataAddress);
             }
         } catch (Exception e) {
-            logger.error("SpecificIssuerData deployment error:", e);
+            logger.error("[DeployContract] SpecificIssuerData deployment error:", e);
         }
 
         try {
@@ -392,10 +439,10 @@ public class DeployContract {
                 FileUtils.writeToFile(specificIssuerControllerAddress, "specificIssuer.address",
                     FileOperator.OVERWRITE);
             } catch (Exception e) {
-                logger.error("Write error:", e);
+                logger.error("[DeployContract] Write error:", e);
             }
         } catch (Exception e) {
-            logger.error("SpecificIssuerController deployment error:", e);
+            logger.error("[DeployContract] SpecificIssuerController deployment error:", e);
         }
         return issuerAddressList;
     }
@@ -421,7 +468,7 @@ public class DeployContract {
                 FileOperator.OVERWRITE);
             return evidenceFactoryAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error("EvidenceFactory deploy exception", e);
+            logger.error("[DeployContract] EvidenceFactory deploy exception", e);
         }
         return StringUtils.EMPTY;
     }

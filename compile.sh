@@ -93,7 +93,8 @@ function compile()
     export CPT_ADDRESS="0x0"
     export ISSUER_ADDRESS="0x0"
     export EVIDENCE_ADDRESS="0x0"
-    MYVARS='${BLOCKCHIAN_NODE_INFO}:${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}'
+    export SPECIFICISSUER_ADDRESS="0x0"
+    MYVARS='${BLOCKCHIAN_NODE_INFO}:${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}'
     if [ -f ${APP_XML_CONFIG} ];then
         rm ${APP_XML_CONFIG}
     fi
@@ -104,6 +105,7 @@ function compile()
     envsubst '${BLOCKCHIAN_NODE_INFO}' < ${APP_XML_CONFIG_TPL} >${APP_XML_CONFIG_TMP}
     cp ${APP_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
+    cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     gradle build
     build_classpath

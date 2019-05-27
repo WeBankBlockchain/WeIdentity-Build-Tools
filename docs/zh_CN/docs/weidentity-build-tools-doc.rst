@@ -22,7 +22,7 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 ::
 
     dependencies {
-        compile 'com.webank:weidentity-java-sdk:1.+'
+        compile 'com.webank:weidentity-java-sdk:1.2.0.rc-3'
     }
 
 ####
@@ -33,6 +33,7 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 
 2. 部署 WeIdentity 智能合约
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 .. raw:: html
 
@@ -90,7 +91,11 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
     chmod +x compile.sh   
     ./compile.sh
 
-如果执行过程没报错，大约1分钟左右可以编译完成。编译完成后，您可以执行脚本deploy.sh进行Weidentity智能合约的发布与自动配置。
+如果执行过程没报错，大约1分钟左右可以编译完成。
+
+如果您不是发布智能合约的机构，您可以直接跳过后续步骤，直接进入章节3。
+
+编译完成后，您可以执行脚本deploy.sh进行Weidentity智能合约的发布与自动配置。
 
 ::
 
@@ -110,15 +115,32 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 您将看到私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub，并会自动将该私钥对应的地址注册为commit member，此私钥后续用于注册authority issuer。
 
-2.5 快速使用
-''''''''''''''''''''''''''''''
-前提是您已经完成2.4步骤的操作，发布了智能合约。
+
+.. raw:: html
+
+   <div id="section-3">
+
+3 快速使用
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. raw:: html
+
+   </div>
+
+
+在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
+
+如果您是weidentity智能合约的发布者，您需要保证\ `章节2 <#section-2>`__\ 的所有步骤已经正确完成。
+
+如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址，并正确的配置在weidentity-build-tools的\ ``resources`` 目录下的\ ``applicationContext.xml``里。
+配置方法请参考\ `附录2 <#reference-2>`__\。
 
 此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity DID、注册Authority issuer、发布CPT
 等动作也可以通过直接在应用里通过weidentity-java-sdk完成，您可以结合您的需要进行选择。
 
-2.5.1 创建您的Weidentiy DID
->>>>>>>>>>>>>>>>>>>>>>>>>>>
+3.1 创建您的Weidentiy DID
+''''''''''''''''''''''''''''''
 
 这个步骤会帮您快速创建一个weidentity DID。
 
@@ -139,10 +161,12 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 此时，我们可以在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weidentity DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key。
 
-2.5.2 注册权威机构（authority issuer）
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+3.2 注册权威机构（authority issuer）
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+该步骤需要发布智能合约的机构来执行，需要使用\ `第2.4节 <#section-2>`__\ 中生成的私钥来注册权威机构。
 这个步骤会帮您将一个指定的weidentity DID注册为权威机构。
+如果您不是智能合约的发布者，您可以将您的weidentity DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
 执行命令之前，您需要将要注册为权威机构的weidentity DID的信息配置在配置文件里：
 
@@ -161,12 +185,12 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
 
-2.5.3 权威机构发布CPT
->>>>>>>>>>>>>>>>>>>>>>>>>>>
+3.3 机构发布CPT
+''''''''''''''''''''''''''''''
 
-此步骤会帮助权威机构发布指定的CPT到区块链上。
+此步骤会帮助机构发布指定的CPT到区块链上。
 
-如果您是权威机构，执行命令之前，您需要将您的weidentity DID和您想发布的CPT配置到对应的目录和文件中。
+执行命令之前，您需要将您的weidentity DID和您想发布的CPT配置到对应的目录和文件中。
 
 ::
 
@@ -178,7 +202,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 做完上述配置之后，您可以执行命令来发布CPT。
 
-执行注册CPT的命令需要您指定您的私钥的文件路径，如果您是执行2.5.1生成的weidentity DID，您可以在output目录下找到您的私钥。
+执行注册CPT的命令需要您指定您的私钥的文件路径，如果您是执行\ `3.1节 <#section-3>`__\生成的weidentity DID，您可以在output目录下找到您的私钥。
 
 ::
 
@@ -200,21 +224,30 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
     cd ../../../tools/
     ./regist_cpt.sh /home/app/weidentity-build-tools/output/create_weId/0x5efd256d02c1a27675de085b86989fa2ac1baddb/ecdsa_key
 
-执行命令大约需要10秒钟，如果执行没报错，会在屏幕打印命令的执行情况。
+执行命令大约需要10秒钟，假设我们要发布的CPT是ID card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
 
-发布CPT的结果也可以在output目录下查看。
+::
+
+
+    [RegisterCpt] begin to register cpt file:cpt_ID_card.json
+    [RegisterCpt] result:{"errorCode":0,"errorMessage":"success","result":{"cptId":1000,"cptVersion":1}}
+
+
+说明CPT文件cpt_ID_card.json成功发布到区块链上，且发布的ID为1000，后续我们可以用这个ID来查询我们发布的CPT。
+
+同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在output目录下查看。
 
 ::
 
     cd ../output/regist_cpt/
     cat regist_cpt.out
 
-您会看到类似于“cpt_1.json=101”的信息，表明cpt_1.json的CPT发布成功，发布的CPT ID是101。
+您会看到类似于“cpt_ID_card.json=1000”的信息，表明cpt_ID_card.json的CPT发布成功，发布的CPT ID是1000。
 
-2.5.4 拉取CPT并转成weidentity-cpt.jar
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+3.4 拉取CPT并生成presentation policy模板
+'''''''''''''''''''''''''''''''''''''''''''
 
-此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO，在创建credential的时候，可以直接使用POJO进行创建。
+此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO，在创建credential的时候，可以直接使用POJO进行创建。同时也会根据您配置的CPT ID来生成一个presentation policy模板。
 
 在执行命令之前，您需要将您要拉取的CPT配置到文件中。
 
@@ -257,7 +290,7 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
     cd ../../output/presentation_policy
     ls
 
-3 完成 weidentity-java-sdk 的集成
+4 完成 weidentity-java-sdk 的集成
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ::
 
@@ -304,12 +337,70 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 如果执行过程没有报错，该工具会帮您部署您的新合约，并为您打包好新的智能合约的jar包
 ``weidentity-contract-java-*.jar``\ (具体的版本号依赖智能合约的版本号)，放在dist/app目录下，您可以使用这个jar包，替换之前的WeIdentity智能合约jar包。
 
-您需要重新将resources目录下的 ``ca.crt``\ ，\ ``client.keystore`` 以及
+您需要重新将resources目录下的\ ``ca.crt``\ ，\ ``client.keystore`` 以及
 ``applicationContext.xml`` 拷贝至您的应用的\ ``resources`` 目录下。
 
 --------------
 
-附录2 升级 weidentity-java-sdk
+.. raw:: html
+
+   <div id="reference-2">
+
+
+附录2 手工配置ApplicationContext.xml
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+   </div>
+
+前提是您已经完成\ `章节2 <#section-2>`__\的步骤。
+
+编辑applicationContext.xml：
+
+::
+
+    cd weidentity-build-tools/resources/
+    vim applicationContext.xml
+
+您可以看到配置内容，我们需要将weidentity的智能合约地址写入到指定配置项，找到以下配置项：
+
+::
+
+    <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"
+    id="appConfig">
+    <property name="properties">
+      <props>
+        <prop key="weId.contractaddress">0x0</prop>
+        <prop key="cpt.contractaddress">0x0</prop>
+        <prop key="issuer.contractaddress">0x0</prop>
+        <prop key="evidence.contractaddress">0x0</prop>
+        <prop key="specificissuer.contractaddress">0x0</prop>
+      </props>
+    </property>
+    </bean>
+
+您需要将每个配置项替换成对应的智能合约地址，比如，如果weid Contract的发布地址是0xabbc75543648af0861b14daa4f8582f28cd95f5e，
+您需要将“weId.contractaddress”对应的0x0替换成0xabbc75543648af0861b14daa4f8582f28cd95f5e，变成以下内容：
+
+::
+
+    <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"
+    id="appConfig">
+    <property name="properties">
+      <props>
+        <prop key="weId.contractaddress">0xabbc75543648af0861b14daa4f8582f28cd95f5e</prop>
+        <prop key="cpt.contractaddress">0x0</prop>
+        <prop key="issuer.contractaddress">0x0</prop>
+        <prop key="evidence.contractaddress">0x0</prop>
+        <prop key="specificissuer.contractaddress">0x0</prop>
+      </props>
+    </property>
+    </bean>
+
+其他的智能合约地址的配置依次类推，直到所有的配置项都配置完成。
+
+附录3 升级 weidentity-java-sdk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 如果在后续weidentity java

@@ -59,7 +59,7 @@ public class RegistCpt {
 	public static void main(String[] args) {
 
 		if (args == null || args.length < 3) {
-			logger.error("[RegistCpt] input parameters error, please check your input!");
+			logger.error("[RegisterCpt] input parameters error, please check your input!");
 			System.exit(1);
 		}
 
@@ -72,7 +72,7 @@ public class RegistCpt {
 			ConfigUtils.loadProperties(config);
 
 		} catch (IOException e) {
-			logger.error("[RegistCpt] load config faild. ", e);
+			logger.error("[RegisterCpt] load config faild. ", e);
 			System.exit(1);
 		}
 
@@ -97,18 +97,18 @@ public class RegistCpt {
 				if (!fileName.endsWith(".json")) {
 					continue;
 				}
-				System.out.println("[registerCpt] begin to regist cpt file:"+fileName);
+				System.out.println("[registerCpt] begin to register cpt file:"+fileName);
 				jsonNode = JsonLoader.fromFile(f);
 				String cptJsonSchema = jsonNode.toString();
 				CptStringArgs cptStringArgs = new CptStringArgs();
 				cptStringArgs.setCptJsonSchema(cptJsonSchema);
 				cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 				ResponseData<CptBaseInfo> response = cptService.registerCpt(cptStringArgs);
-				System.out.println("[RegistCpt] result:" + DataToolUtils.serialize(response));
+				System.out.println("[RegisterCpt] result:" + DataToolUtils.serialize(response));
 				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-					logger.error("[RegistCpt] load config faild. ErrorCode is:{}, msg :{}", response.getErrorCode(),
+					logger.error("[RegisterCpt] load config faild. ErrorCode is:{}, msg :{}", response.getErrorCode(),
 							response.getErrorMessage());
-					System.out.println("[registerCpt] regist cpt file:"+fileName+" failed, errorcode is "+ response.getErrorCode());
+					System.out.println("[RegisterCpt] register cpt file:"+fileName+" failed, errorcode is "+ response.getErrorCode());
 					continue;
 				}
 				String content = new StringBuffer()
@@ -118,9 +118,9 @@ public class RegistCpt {
 						.append("\r\n")
 						.toString();
 				FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
-				System.out.println("[registerCpt] regist cpt file:"+fileName+" successfully, errorcode is \"");
+				System.out.println("[RegisterCpt] register cpt file:"+fileName+" successfully, errorcode is \"");
 			} catch (IOException e) {
-				logger.error("[RegistCpt] load config faild. ", e);
+				logger.error("[RegisterCpt] load config faild. ", e);
 				System.exit(1);
 			}
 

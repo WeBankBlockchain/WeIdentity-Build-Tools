@@ -52,7 +52,8 @@ public class CreateWeId {
 		if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 			logger.error("[CreateWeId] create weidentity did faild. error code : {}, error msg :{}",
 					response.getErrorCode(), response.getErrorMessage());
-			System.out.println(1);
+			System.out.println("[CreateWeId] create weid failed.");
+			System.exit(1);
 		}
 		CreateWeIdDataResult result = response.getResult();
 		String weId = result.getWeId();

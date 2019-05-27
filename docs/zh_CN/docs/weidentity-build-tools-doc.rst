@@ -250,6 +250,13 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 
 直接将weidentity-cpt.jar拷贝至您的应用的classpath下即可使用。
 
+此步骤同时也会帮您生成一个默认的presentation policy的配置模板，您可以按您的需求来修改。
+
+::
+
+    cd ../../output/presentation_policy
+    ls
+
 3 完成 weidentity-java-sdk 的集成
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ::

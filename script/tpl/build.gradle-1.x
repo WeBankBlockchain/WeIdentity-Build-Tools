@@ -3,7 +3,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-version = "1.0.0"
+version = "1.1.1"
 
 // Specify JDK version - may vary in different scenarios
 sourceCompatibility = 1.8
@@ -54,18 +54,13 @@ List jackson = [
     "com.github.fge:json-schema-validator:2.2.6"
 ]
 
-List web3sdk = [
-    "org.fisco-bcos:web3sdk:1.2.5"
-]
-
 List weidentity = [
-    "com.webank:weidentity-java-sdk:1.2.+"
+    "com.webank:weidentity-java-sdk:1.2.0.rc-3",
 ]
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile logger, spring, lombok, apache_commons, jackson, web3sdk, weidentity
-    //compile files("lib/web3sdk.jar")
+    compile logger, spring, lombok, apache_commons, jackson, weidentity
 }
 
 sourceSets {

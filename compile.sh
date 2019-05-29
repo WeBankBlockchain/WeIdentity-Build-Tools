@@ -86,7 +86,13 @@ function compile()
     if [ ! -z ${content} ];then
          content="${content}\n"
     fi
+    if [ "${fisco.bcos.version}" = "1" ];then 
         content="${content}<value>WeIdentity@$var</value>"
+    elif [ "${fisco.bcos.version}" = "2" ];then 
+    	content="${content}<value>$var</value>"
+    else
+    	echo "currently FISCO BCOS ${fisco.bcos.version}.x is not supported."
+    fi
     done
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
     export WEID_ADDRESS="0x0"
@@ -109,13 +115,25 @@ function compile()
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     gradle build
     build_classpath
-    compile_contract
+    #compile_contract
     echo "compile finished."
 }
 
+function setup()
+{
+	if [ "${fisco.bcos.version}" = "1" || "${fisco.bcos.version}" = "2" ];then 
+        cp ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl-${fisco.bcos.version}.x ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
+        cp ${SOURCE_CODE_DIR}/script/tpl/build.gradle-${fisco.bcos.version}.x ${SOURCE_CODE_DIR}/build.gradle
+        cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${fisco.bcos.version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/
+    else
+    	echo "currently FISCO BCOS ${fisco.bcos.version}.x is not supported."
+    	exit 1
+    fi
+}
 
 function main()
 {
+	setup
     check_jdk
     compile
     clean_config

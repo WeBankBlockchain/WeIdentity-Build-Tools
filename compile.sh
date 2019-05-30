@@ -86,12 +86,12 @@ function compile()
     if [ ! -z ${content} ];then
          content="${content}\n"
     fi
-    if [ "${fisco.bcos.version}" = "1" ];then 
+    if [ "${blockchain_fiscobcos_version}" = "1" ];then 
         content="${content}<value>WeIdentity@$var</value>"
-    elif [ "${fisco.bcos.version}" = "2" ];then 
+    elif [ "${blockchain_fiscobcos_version}" = "2" ];then 
     	content="${content}<value>$var</value>"
     else
-    	echo "currently FISCO BCOS ${fisco.bcos.version}.x is not supported."
+    	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
     fi
     done
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
@@ -113,7 +113,7 @@ function compile()
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
-    gradle build
+    gradle clean build
     build_classpath
     #compile_contract
     echo "compile finished."
@@ -121,12 +121,12 @@ function compile()
 
 function setup()
 {
-	if [ "${fisco.bcos.version}" = "1" || "${fisco.bcos.version}" = "2" ];then 
-        cp ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl-${fisco.bcos.version}.x ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
-        cp ${SOURCE_CODE_DIR}/script/tpl/build.gradle-${fisco.bcos.version}.x ${SOURCE_CODE_DIR}/build.gradle
-        cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${fisco.bcos.version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/
+	if [ "${blockchain_fiscobcos_version}" = "1" ] || [ "${blockchain_fiscobcos_version}" = "2" ];then 
+        cp ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
+        cp ${SOURCE_CODE_DIR}/script/tpl/build.gradle-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/build.gradle
+        cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeployContract.java
     else
-    	echo "currently FISCO BCOS ${fisco.bcos.version}.x is not supported."
+    	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
     	exit 1
     fi
 }

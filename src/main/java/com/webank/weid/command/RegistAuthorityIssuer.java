@@ -29,7 +29,6 @@ import com.webank.weid.protocol.request.RegisterAuthorityIssuerArgs;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.AuthorityIssuerService;
 import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
-import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.FileUtils;
 
 /**
@@ -58,14 +57,7 @@ public class RegistAuthorityIssuer {
 		String privateKeyFile = args[2];//privateKey
 		System.out.println("private key file:"+privateKeyFile);
 		
-//        try {
-//        	ConfigUtils.loadProperties(config);
-//        }catch(Exception e) {
-//        	System.exit(1);
-//        }
-//        String weId = ConfigUtils.getProperty("weId");
-        String name = ConfigUtils.getProperty("name");
-        System.out.println("[registerAuthorityIssuer] regist authorityissuer:"+weid+", name is :"+name);
+        System.out.println("[registerAuthorityIssuer] regist authorityissuer:"+weid+", name is :"+orgName);
 		RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
 		AuthorityIssuer authorityIssuer = new AuthorityIssuer();
 		authorityIssuer.setName(orgName);

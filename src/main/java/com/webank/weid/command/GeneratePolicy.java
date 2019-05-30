@@ -43,9 +43,9 @@ public class GeneratePolicy {
             System.exit(1);
         }
         String cptStr = args[0];
+        String orgName = args[1];
       
         String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
-//        String[] cptList = {"101","103"};
         
         PresentationPolicyE policyE = null ;
         Constructor<?>[] constructors = PresentationPolicyE.class.getDeclaredConstructors();
@@ -85,6 +85,11 @@ public class GeneratePolicy {
 			} 
         }
         policyE.setPolicy(policy);
+        policyE.setOrgId(orgName);
+        Map<String,String>extraMap = new HashMap<>();
+        extraMap.put("extra1", "");
+        extraMap.put("extra2", "");
+        policyE.setExtra(extraMap);
         
         Map<String, Object> policyEMap;
 		try {

@@ -3,7 +3,11 @@ package com.webank.weid.command;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -97,42 +101,97 @@ public class GeneratePolicy {
 		
         Map<String, Object>policy1 = (HashMap<String, Object>)policyEMap.get("policy");
         for(Map.Entry<String, Object>entry:policy1.entrySet()) {
-//        	String cptIdKey = entry.getKey();
         	HashMap<String, Object> claimPolicyMap = (HashMap<String, Object>)entry.getValue();
         	HashMap<String, Object>disclosureMap =  DataToolUtils.deserialize((String)claimPolicyMap.get("fieldsToBeDisclosed"), HashMap.class);
         	claimPolicyMap.put("fieldsToBeDisclosed", disclosureMap);
         }
         String presentationPolicy = ConfigUtils.serialize(policyEMap);
-        FileUtils.writeToFile(presentationPolicy, "presentationPolicy.json", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(presentationPolicy, "presentation_policy.json", FileOperator.OVERWRITE);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("[GeneratePolicy] generate policy failed. error message :{}", e);
 		}
 	}
 	
-	public static void buildInstance(Object obj) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
-        Field[] fields = obj.getClass().getDeclaredFields();
+	public static void buildInstance(Object obj) throws Exception {
+        Class<?> cls = obj.getClass();
+        Field[] fields = cls.getDeclaredFields();
         for (Field field : fields) {
-            if (!BeanUtils.isSimpleValueType(field.getType())) {
+            if (isSimpleValueType(field.getType())) {
                 field.setAccessible(true);
-                System.out.println(field.getType());
-                Object inner_obj = field.getType().newInstance();
-                buildInstance(inner_obj);
-                field.set(obj, inner_obj);
+                if (field.getType() == List.class) {
+                    Type type = field.getGenericType();
+                    List<Object> list = buildList(type);
+                    if (list != null) {
+                        field.set(obj, list);
+                    }
+                } else {
+                    Object inner_obj = field.getType().newInstance();
+                    buildInstance(inner_obj);
+                    field.set(obj, inner_obj);
+                }
             }
         }
     }
-	
-	private static void generatePolicy(Map<String, Object> map) {
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			Object value = entry.getValue();
-			if (value instanceof Map) {
-				generatePolicy((HashMap) value);
-			} else {
-				String defaultValue = "0";
-				entry.setValue(defaultValue);
-			}
-		}
-	}
 
+    private static List<Object> buildList(Type type) throws Exception {
+        ParameterizedType pt = (ParameterizedType) type;
+        Type paType = pt.getActualTypeArguments()[0];
+        // 如果又是一个List类型
+        if (paType instanceof ParameterizedType) {
+            ParameterizedType innerType = (ParameterizedType) (paType);
+            List<Object> innerParaList = buildList(innerType);
+            if (innerParaList != null) {
+                List<Object> innerList = new ArrayList<>();
+                innerList.add(innerParaList);
+                return innerList;
+            }
+        } else { // 不是List
+            String innerClassString = paType.getTypeName();
+            Class<?> innerClass = Class.forName(innerClassString);
+            // 如果是简单类型则不需要构建里面的对象
+            if (isSimpleValueType(innerClass)) {
+                Object inner = innerClass.newInstance();
+                buildInstance(inner);
+                List<Object> innerList = new ArrayList<>();
+                innerList.add(inner);
+                return innerList;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isSimpleValueType(Class<?> cls) {
+        return !BeanUtils.isSimpleValueType(cls) && !cls.isArray();
+    }
+    
+    private static void generatePolicy(Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                generatePolicy((HashMap)value);
+            }else if (value instanceof List) {
+               boolean isMapOrList = generatePolicyFromList((ArrayList<Object>)value);
+               if (!isMapOrList) {
+                   entry.setValue(0);
+               }
+            } else {
+                entry.setValue(0);
+            }
+        }
+    }
+    
+    private static boolean generatePolicyFromList(List<Object> objList){
+        List<Object> list = (List<Object>)objList;
+        for (Object obj : list) {
+            if (obj instanceof Map) {
+                generatePolicy((HashMap)obj);
+            } else if ( obj instanceof List) {
+                return generatePolicyFromList((ArrayList<Object>)obj);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
 }

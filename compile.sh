@@ -86,7 +86,13 @@ function compile()
     if [ ! -z ${content} ];then
          content="${content}\n"
     fi
+    if [ "${blockchain_fiscobcos_version}" = "1" ];then 
         content="${content}<value>WeIdentity@$var</value>"
+    elif [ "${blockchain_fiscobcos_version}" = "2" ];then 
+    	content="${content}<value>$var</value>"
+    else
+    	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
+    fi
     done
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
     export WEID_ADDRESS="0x0"
@@ -107,15 +113,27 @@ function compile()
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
-    gradle build
+    gradle clean build
     build_classpath
-    compile_contract
+    #compile_contract
     echo "compile finished."
 }
 
+function setup()
+{
+	if [ "${blockchain_fiscobcos_version}" = "1" ] || [ "${blockchain_fiscobcos_version}" = "2" ];then 
+        cp ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
+        cp ${SOURCE_CODE_DIR}/script/tpl/build.gradle-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/build.gradle
+        cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeployContract.java
+    else
+    	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
+    	exit 1
+    fi
+}
 
 function main()
 {
+	setup
     check_jdk
     compile
     clean_config

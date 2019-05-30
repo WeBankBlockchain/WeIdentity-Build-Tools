@@ -57,12 +57,13 @@ function generate_presentation_policy()
 		mkdir ${presentation_policy}
 	fi
     
-	if [ -f "presentationPolicy.json" ];then
-		mv presentationPolicy.json ${presentation_policy}
+	if [ -f "presentation_policy.json" ];then
+		mv presentation_policy.json ${presentation_policy}
 	else
 		echo "generate presentation policy failed."
 		exit 1
 	fi
+    echo "presentation policy template is successfully generated."
     
 }
 

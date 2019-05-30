@@ -7,6 +7,7 @@ cd ${SOURCE_CODE_DIR}
 
 if [ $# -lt 1 ] ;then
 	echo "input error. please input your private key file path."
+    exit 1
 fi
 
 build_classpath

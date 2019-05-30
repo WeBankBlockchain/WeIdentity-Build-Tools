@@ -1,13 +1,20 @@
 #!/bin/bash
 
+if [ $# -lt 2 ] || [ "$1" != "--cpt-list" ];then
+	echo "input error. please input like this: ./cpt_to_pojo.sh --cpt-list 1000,10001"
+    exit 1
+fi
+
+cpt_list=$2
+
 cd ..
-source ./common.inc
+source run.config
+source ./script/common.inc
 
 cd ${SOURCE_CODE_DIR}
 
 set -e
 
-#SOURCE_CODE_DIR=$(pwd)
 
 
 function cpt_to_pojo()
@@ -27,7 +34,7 @@ function cpt_to_pojo()
 
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${SOURCE_CODE_DIR}/conf/cpt_to_pojo_config/parameter.conf 
+    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${cpt_list} 
     mv Cpt*.json ${cpt_dir}
     
     for cpt_file in ${cpt_dir}/*.json
@@ -50,7 +57,7 @@ function generate_presentation_policy()
 	
 	build_classpath
 	
-	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy ${SOURCE_CODE_DIR}/conf/cpt_to_pojo_config/parameter.conf
+	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy ${cpt_list} ${org_name}
 	
 	presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
 	if [ ! -d ${presentation_policy} ];then

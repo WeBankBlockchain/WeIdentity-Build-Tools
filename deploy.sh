@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./common.inc
+source ./script/common.inc
 
 set -e
 
@@ -45,14 +45,14 @@ function deploy_contract()
     fi
     
 
-    if [ -d ${SOURCE_CODE_DIR}/output/keyPair ];then
+    if [ -d ${SOURCE_CODE_DIR}/output/admin ];then
         
-        rm -rf ${SOURCE_CODE_DIR}/output/keyPair
+        rm -rf ${SOURCE_CODE_DIR}/output/admin
     fi
-    mkdir -p ${SOURCE_CODE_DIR}/output/keyPair
+    mkdir -p ${SOURCE_CODE_DIR}/output/admin
 
-    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/keyPair
-    mv ecdsa_key ${SOURCE_CODE_DIR}/output/keyPair
+    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
+    mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
     
     echo "contract deployment done."
 }

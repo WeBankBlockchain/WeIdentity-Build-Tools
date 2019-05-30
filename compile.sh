@@ -1,6 +1,6 @@
 #!/bin/bash
-source ./common.inc
-source ./conf/run.config
+source ./script/common.inc
+source run.config
 
 set -e
 

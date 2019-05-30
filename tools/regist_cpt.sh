@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 cd ..
-source ./common.inc
+source ./script/common.inc
 
 cd ${SOURCE_CODE_DIR}
 
@@ -17,7 +17,7 @@ if [ -f regist_cpt.out ];then
 fi
 
 echo "begin to regist cpt, please wait..."
-java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt ${SOURCE_CODE_DIR}/conf/regist_cpt_conf/parameter.conf ${SOURCE_CODE_DIR}/conf/regist_cpt_conf $1
+java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $2 $4 $6
 
 if [ ! $? -eq 0 ]; then
     echo "regist cpt faild, please check."

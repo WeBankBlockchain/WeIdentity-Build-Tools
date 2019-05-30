@@ -63,28 +63,20 @@ public class RegistCpt {
 			System.exit(1);
 		}
 
-		String config = args[0];
+		String weid = args[0];
 		String cptDir = args[1];
 		String privateKeyFile = args[2];
 		File file = new File(cptDir);
-
-		try {
-			ConfigUtils.loadProperties(config);
-
-		} catch (IOException e) {
-			logger.error("[RegisterCpt] load config faild. ", e);
-			System.exit(1);
-		}
 
 		if (!file.isDirectory()) {
 			logger.error("failed.");
 			System.exit(1);
 		}
 
-		String weId = ConfigUtils.getProperty("weId");
+//		String weId = ConfigUtils.getProperty("weId");
 //		String weId = FileUtils.readFile("weId");
 		WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
-		weIdAuthentication.setWeId(weId);
+		weIdAuthentication.setWeId(weid);
 		String privateKey = FileUtils.readFile(privateKeyFile);
 		WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
 		weIdPrivateKey.setPrivateKey(privateKey);

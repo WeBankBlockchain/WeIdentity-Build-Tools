@@ -1,14 +1,26 @@
-#/bin/sh
+#/bin/bash
 
 cd ..
-source ./common.inc
+source run.config
+source ./script/common.inc
+
+if [ $# -lt 2 ] ;then
+	echo "input error."
+    exit 1
+fi
+
+if [ "$1" = "--weid" ] ;then
+	weid=$2
+fi
+
 
 cd ${SOURCE_CODE_DIR}
 
 build_classpath
 
 echo "begin to regist authority issuer, please wait..."
-java -cp "$CLASSPATH" com.webank.weid.command.RegistAuthorityIssuer ${SOURCE_CODE_DIR}/conf/regist_authority_issuer_config/parameter.conf ${SOURCE_CODE_DIR}/output/keyPair/ecdsa_key
+private_key=${SOURCE_CODE_DIR}/output/admin/ecdsa_key
+java -cp "$CLASSPATH" com.webank.weid.command.RegistAuthorityIssuer ${weid} ${org_name} ${private_key}
 
 if [ ! $? -eq 0 ]; then
     echo "regist authority issuer faild, please check."

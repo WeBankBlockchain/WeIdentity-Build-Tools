@@ -42,19 +42,10 @@ public class GeneratePolicy {
             logger.error("[GeneratePolicy] input parameters error, please check your input!");
             System.exit(1);
         }
-        String filePath = args[0];
+        String cptStr = args[0];
+        String orgName = args[1];
       
-
-        try {
-        	
-        	ConfigUtils.loadProperties(filePath);
-        }catch (Exception e) {
-        	
-        }
-
-        String cptStr = ConfigUtils.getProperty(CPT_KEY);
         String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
-//        String[] cptList = {"101","103"};
         
         PresentationPolicyE policyE = null ;
         Constructor<?>[] constructors = PresentationPolicyE.class.getDeclaredConstructors();
@@ -94,6 +85,11 @@ public class GeneratePolicy {
 			} 
         }
         policyE.setPolicy(policy);
+        policyE.setOrgId(orgName);
+        Map<String,String>extraMap = new HashMap<>();
+        extraMap.put("extra1", "");
+        extraMap.put("extra2", "");
+        policyE.setExtra(extraMap);
         
         Map<String, Object> policyEMap;
 		try {

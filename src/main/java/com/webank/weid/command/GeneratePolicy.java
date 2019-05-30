@@ -106,7 +106,7 @@ public class GeneratePolicy {
         	claimPolicyMap.put("fieldsToBeDisclosed", disclosureMap);
         }
         String presentationPolicy = ConfigUtils.serialize(policyEMap);
-        FileUtils.writeToFile(presentationPolicy, "presentationPolicy.json", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(presentationPolicy, "presentation_policy.json", FileOperator.OVERWRITE);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("[GeneratePolicy] generate policy failed. error message :{}", e);

@@ -56,7 +56,7 @@ List jackson = [
 ]
 
 List weidentity = [
-    "com.webank:weidentity-java-sdk:1.3.0.rc-2",
+    "com.webank:weidentity-java-sdk:1.3.0-rc.3",
 ]
 
 // In this section you declare the dependencies for your production and test code

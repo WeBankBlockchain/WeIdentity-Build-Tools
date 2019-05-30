@@ -34,7 +34,6 @@ import com.webank.weid.protocol.base.Cpt;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.CptService;
 import com.webank.weid.service.impl.CptServiceImpl;
-import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 
@@ -43,7 +42,6 @@ import com.webank.weid.util.FileUtils;
  */
 public class CptToPojo {
 
-    private static final String CPT_KEY = "cpt.list";
     private static final Logger logger = LoggerFactory.getLogger(CptToPojo.class);
     private static CptService cptService = new CptServiceImpl();
 
@@ -54,25 +52,21 @@ public class CptToPojo {
 
         //1. get cpt list
         if (args == null || args.length < 1) {
-            logger.error("[CptTools] input parameters error, please check your input!");
+            System.out.println("[CptTools] input parameters error, please check your input!");
             System.exit(1);
         }
-        String filePath = args[0];
+        String cptStr = args[0];
         List<String>succeedList = new ArrayList<>();
         List<String>failedList = new ArrayList<>();
         try {
-        	ConfigUtils.loadProperties(filePath);
 
-            String cptStr = ConfigUtils.getProperty(CPT_KEY);
             String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
-
-      
             //2. get cpt info from blockchain
             for (String cptId : cptList) {
                 ResponseData<Cpt> response = cptService.queryCpt(Integer.valueOf(cptId));
 				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 					logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
-							response.getErrorCode(), response.getErrorMessage());
+						response.getErrorCode(), response.getErrorMessage());
 					failedList.add(cptId);
 					continue;
 				}

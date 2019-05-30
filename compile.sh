@@ -1,6 +1,6 @@
 #!/bin/bash
-source ./common.inc
-source ./conf/run.config
+source ./script/common.inc
+source run.config
 
 set -e
 
@@ -113,6 +113,10 @@ function compile()
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
+    
+    if [ -d ${SOURCE_CODE_DIR}/dist ];then
+        rm -rf ${SOURCE_CODE_DIR}/dist
+    fi
     gradle clean build
     build_classpath
     #compile_contract

@@ -20,8 +20,8 @@ fi
         mkdir -p ${SOURCE_CODE_DIR}/output/create_weid
 fi
 
-if [ -f "weId" ];then
-    weid=$(cat weId)
+if [ -f "weid" ];then
+    weid=$(cat weid)
     OLD_IFS="$IFS"
     IFS=":"
     array=($weid)

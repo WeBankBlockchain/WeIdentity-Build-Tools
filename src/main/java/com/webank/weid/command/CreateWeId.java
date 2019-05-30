@@ -62,7 +62,7 @@ public class CreateWeId {
 		String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
 		
 		//输出的文件命名，以及weid和公私钥的存储方式
-		FileUtils.writeToFile(weId, "weId", FileOperator.OVERWRITE);
+		FileUtils.writeToFile(weId, "weid", FileOperator.OVERWRITE);
 		FileUtils.writeToFile(publicKey, "ecdsa_key.pub", FileOperator.OVERWRITE);
 		FileUtils.writeToFile(privateKey, "ecdsa_key", FileOperator.OVERWRITE);
 		

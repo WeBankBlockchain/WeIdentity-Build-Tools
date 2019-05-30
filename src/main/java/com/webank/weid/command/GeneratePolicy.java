@@ -42,17 +42,8 @@ public class GeneratePolicy {
             logger.error("[GeneratePolicy] input parameters error, please check your input!");
             System.exit(1);
         }
-        String filePath = args[0];
+        String cptStr = args[0];
       
-
-        try {
-        	
-        	ConfigUtils.loadProperties(filePath);
-        }catch (Exception e) {
-        	
-        }
-
-        String cptStr = ConfigUtils.getProperty(CPT_KEY);
         String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
 //        String[] cptList = {"101","103"};
         

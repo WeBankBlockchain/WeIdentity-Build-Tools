@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 cd ..
-source ./common.inc
+source ./script/common.inc
 
 cd ${SOURCE_CODE_DIR}
 
@@ -15,9 +15,9 @@ if [ ! $? -eq 0 ]; then
     exit $?;
 fi
 
- if [ ! -d ${SOURCE_CODE_DIR}/output/create_weId ];then
+ if [ ! -d ${SOURCE_CODE_DIR}/output/create_weid ];then
         
-        mkdir -p ${SOURCE_CODE_DIR}/output/create_weId
+        mkdir -p ${SOURCE_CODE_DIR}/output/create_weid
 fi
 
 if [ -f "weId" ];then
@@ -28,11 +28,11 @@ if [ -f "weId" ];then
     IFS="$OLD_IFS"
     weid_address=${array[2]}
     echo "weid_address=${weid_address}"
-    mkdir -p ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}
-    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}/
+    mkdir -p ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}
+    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
     cp ecdsa_key ${SOURCE_CODE_DIR}/conf/
-    mv ecdsa_key ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}/
-    mv weId ${SOURCE_CODE_DIR}/output/create_weId/${weid_address}/
+    mv ecdsa_key ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
+    mv weid ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
 fi
 
 echo "new weidentity did has been created."

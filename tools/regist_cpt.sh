@@ -5,9 +5,19 @@ source ./script/common.inc
 
 cd ${SOURCE_CODE_DIR}
 
-if [ $# -lt 1 ] ;then
-	echo "input error. please input your private key file path."
+if [ $# -lt 4 ] ;then
+	echo "input error. please check your input."
     exit 1
+fi
+
+weid=$2
+cpt_dir=$4
+
+if [ "$5" = "--private-key" ];then
+    private_key=$6
+else
+    we_address=`echo $weid|awk -F":" '{print $3}' `    
+    private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
 fi
 
 build_classpath
@@ -17,7 +27,7 @@ if [ -f regist_cpt.out ];then
 fi
 
 echo "begin to regist cpt, please wait..."
-java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $2 $4 $6
+java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt ${weid} ${cpt_dir} ${private_key}
 
 if [ ! $? -eq 0 ]; then
     echo "regist cpt faild, please check."

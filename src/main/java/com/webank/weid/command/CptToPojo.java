@@ -42,7 +42,6 @@ import com.webank.weid.util.FileUtils;
  */
 public class CptToPojo {
 
-    private static final String CPT_KEY = "cpt.list";
     private static final Logger logger = LoggerFactory.getLogger(CptToPojo.class);
     private static CptService cptService = new CptServiceImpl();
 
@@ -53,7 +52,7 @@ public class CptToPojo {
 
         //1. get cpt list
         if (args == null || args.length < 1) {
-            logger.error("[CptTools] input parameters error, please check your input!");
+            System.out.println("[CptTools] input parameters error, please check your input!");
             System.exit(1);
         }
         String cptStr = args[0];
@@ -62,13 +61,12 @@ public class CptToPojo {
         try {
 
             String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
-
             //2. get cpt info from blockchain
             for (String cptId : cptList) {
                 ResponseData<Cpt> response = cptService.queryCpt(Integer.valueOf(cptId));
 				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 					logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
-							response.getErrorCode(), response.getErrorMessage());
+						response.getErrorCode(), response.getErrorMessage());
 					failedList.add(cptId);
 					continue;
 				}

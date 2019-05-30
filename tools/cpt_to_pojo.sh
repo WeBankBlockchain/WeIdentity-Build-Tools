@@ -5,12 +5,16 @@ if [ $# -lt 2 ] || [ "$1" != "--cpt-list" ];then
     exit 1
 fi
 
+cpt_list=$2
+
 cd ..
+source run.config
 source ./script/common.inc
 
 cd ${SOURCE_CODE_DIR}
 
 set -e
+
 
 
 function cpt_to_pojo()
@@ -30,7 +34,7 @@ function cpt_to_pojo()
 
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo $2 
+    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${cpt_list} 
     mv Cpt*.json ${cpt_dir}
     
     for cpt_file in ${cpt_dir}/*.json
@@ -53,7 +57,7 @@ function generate_presentation_policy()
 	
 	build_classpath
 	
-	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy $2
+	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy ${cpt_list} ${org_name}
 	
 	presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
 	if [ ! -d ${presentation_policy} ];then

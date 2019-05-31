@@ -183,7 +183,10 @@ public class GeneratePolicy {
             if (obj instanceof Map) {
                 generatePolicy((HashMap)obj);
             } else if ( obj instanceof List) {
-                return generatePolicyFromList((ArrayList<Object>)obj);
+            	boolean result = generatePolicyFromList((ArrayList<Object>)obj);
+                if (!result) {
+                    return result;
+                }
             } else {
                 return false;
             }

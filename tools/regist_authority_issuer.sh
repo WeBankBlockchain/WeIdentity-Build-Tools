@@ -20,7 +20,7 @@ build_classpath
 
 echo "begin to regist authority issuer, please wait..."
 private_key=${SOURCE_CODE_DIR}/output/admin/ecdsa_key
-java -cp "$CLASSPATH" com.webank.weid.command.RegistAuthorityIssuer ${weid} ${org_name} ${private_key}
+java -cp "$CLASSPATH" com.webank.weid.command.RegistAuthorityIssuer $@ --org-name ${org_name} --private-key ${private_key}
 
 if [ ! $? -eq 0 ]; then
     echo "regist authority issuer faild, please check."

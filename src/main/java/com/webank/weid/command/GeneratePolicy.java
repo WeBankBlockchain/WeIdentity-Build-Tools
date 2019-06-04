@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
+import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.protocol.base.ClaimPolicy;
 import com.webank.weid.protocol.base.PresentationPolicyE;
@@ -30,7 +31,6 @@ public class GeneratePolicy {
 
 	private static final Logger logger = LoggerFactory.getLogger(GeneratePolicy.class);
 	
-	private static final String CPT_KEY = "cpt.list";
 	
 	/**
 	 * @param args
@@ -38,12 +38,19 @@ public class GeneratePolicy {
 	public static void main(String[] args) {
 		
 		
-        if (args == null || args.length < 1) {
+        if (args == null || args.length < 4) {
             logger.error("[GeneratePolicy] input parameters error, please check your input!");
             System.exit(1);
         }
-        String cptStr = args[0];
-        String orgName = args[1];
+        
+        CommandArgs commandArgs = new CommandArgs();
+    	JCommander.newBuilder()
+    	  .addObject(commandArgs)
+    	  .build()
+    	  .parse(args);
+    	
+        String cptStr = commandArgs.getCptIdList();
+        String orgName = commandArgs.getOrgName();
       
         String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
         
@@ -183,7 +190,10 @@ public class GeneratePolicy {
             if (obj instanceof Map) {
                 generatePolicy((HashMap)obj);
             } else if ( obj instanceof List) {
-                return generatePolicyFromList((ArrayList<Object>)obj);
+            	boolean result = generatePolicyFromList((ArrayList<Object>)obj);
+                if (!result) {
+                    return result;
+                }
             } else {
                 return false;
             }

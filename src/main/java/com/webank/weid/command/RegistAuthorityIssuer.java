@@ -22,6 +22,7 @@ package com.webank.weid.command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
@@ -46,15 +47,21 @@ public class RegistAuthorityIssuer {
 	 */
 	public static void main(String[] args) {
 		
-		if (args == null || args.length < 2) {
+		if (args == null || args.length < 6) {
 			logger.error("[RegistCpt] input parameters error, please check your input!");
 			System.exit(1);
 		}
 		
+		CommandArgs commandArgs = new CommandArgs();
+    	JCommander.newBuilder()
+    	  .addObject(commandArgs)
+    	  .build()
+    	  .parse(args);
+    	
 		//config file path
-		String weid = args[0];
-		String orgName = args[1];
-		String privateKeyFile = args[2];//privateKey
+		String weid = commandArgs.getWeid();
+		String orgName = commandArgs.getOrgName();
+		String privateKeyFile = commandArgs.getPrivateKey();//privateKey
 		System.out.println("private key file:"+privateKeyFile);
 		
         System.out.println("[registerAuthorityIssuer] regist authorityissuer:"+weid+", name is :"+orgName);

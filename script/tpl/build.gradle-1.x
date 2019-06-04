@@ -3,7 +3,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-version = "1.1.1"
+version = "1.0.1"
 
 // Specify JDK version - may vary in different scenarios
 sourceCompatibility = 1.8
@@ -42,6 +42,10 @@ List spring = [
     "org.springframework:spring-test:$spring_version"
 ]
 
+List jcommander = [
+	"com.beust:jcommander:1.72"
+]
+
 List apache_commons = [
     "org.apache.commons:commons-collections4:4.1",
     "org.apache.commons:commons-lang3:3.5",
@@ -60,7 +64,7 @@ List weidentity = [
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile logger, spring, lombok, apache_commons, jackson, weidentity
+    compile logger, spring, lombok, apache_commons, jackson, weidentity, jcommander
 }
 
 sourceSets {

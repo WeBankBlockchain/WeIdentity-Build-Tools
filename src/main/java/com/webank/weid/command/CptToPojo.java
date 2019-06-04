@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.protocol.base.Cpt;
@@ -49,13 +51,25 @@ public class CptToPojo {
      * @param args
      */
     public static void main(String[] args) {
-
+    	
         //1. get cpt list
-        if (args == null || args.length < 1) {
+        if (args == null || args.length < 2) {
             System.out.println("[CptTools] input parameters error, please check your input!");
             System.exit(1);
         }
-        String cptStr = args[0];
+    	
+    	CommandArgs commandArgs = new CommandArgs();
+    	JCommander.newBuilder()
+    	  .addObject(commandArgs)
+    	  .build()
+    	  .parse(args);
+
+        String cptStr = commandArgs.getCptIdList();
+        if(StringUtils.isEmpty(cptStr)) {
+        	System.out.println("[CptTools] input parameters error, please check your input!");
+        	System.exit(1);
+        }
+        
         List<String>succeedList = new ArrayList<>();
         List<String>failedList = new ArrayList<>();
         try {
@@ -83,7 +97,13 @@ public class CptToPojo {
             System.exit(1);
         }
 
-        System.out.println("List:["+succeedList+"] are successfully transformed to pojo. List:["+failedList+"] are failed.");
+        if(CollectionUtils.isEmpty(failedList)) {
+        	
+        	System.out.println("All cpt:["+succeedList+"] are successfully transformed to pojo.");
+        }else {
+        	System.out.println("List:["+succeedList+"] are successfully transformed to pojo, List:["+failedList+"] are failed.");
+        }
+        
         //3. exit with success.
         System.exit(0);
     }

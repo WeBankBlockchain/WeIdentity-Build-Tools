@@ -49,6 +49,10 @@ List apache_commons = [
     "commons-cli:commons-cli:1.3.1"
 ]
 
+List jcommander = [
+	"com.beust:jcommander:1.72"
+]
+
 // In this section you declare the dependencies for your production and test code
 List jackson = [
     "com.fasterxml.jackson.core:jackson-databind:2.8.8.1",
@@ -61,7 +65,7 @@ List weidentity = [
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile logger, spring, lombok, apache_commons, jackson, weidentity
+    compile logger, spring, lombok, apache_commons, jackson, weidentity, jcommander
 }
 
 sourceSets {

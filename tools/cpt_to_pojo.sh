@@ -34,7 +34,7 @@ function cpt_to_pojo()
 
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo ${cpt_list} 
+    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo $@
     mv Cpt*.json ${cpt_dir}
     
     for cpt_file in ${cpt_dir}/*.json
@@ -57,7 +57,7 @@ function generate_presentation_policy()
 	
 	build_classpath
 	
-	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy ${cpt_list} ${org_name}
+	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy $@ --org-name ${org_name}
 	
 	presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
 	if [ ! -d ${presentation_policy} ];then
@@ -78,9 +78,9 @@ function main()
 {
     check_jdk
     
-    cpt_to_pojo
+    cpt_to_pojo $@
     
-	generate_presentation_policy
+	generate_presentation_policy $@
 }
 
-main
+main $@

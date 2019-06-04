@@ -10,16 +10,6 @@ if [ $# -lt 4 ] ;then
     exit 1
 fi
 
-weid=$2
-cpt_dir=$4
-
-if [ "$5" = "--private-key" ];then
-    private_key=$6
-else
-    we_address=`echo $weid|awk -F":" '{print $3}' `    
-    private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
-fi
-
 build_classpath
 
 if [ -f regist_cpt.out ];then
@@ -27,7 +17,23 @@ if [ -f regist_cpt.out ];then
 fi
 
 echo "begin to regist cpt, please wait..."
-java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt ${weid} ${cpt_dir} ${private_key}
+
+if [ "$1" = "--private-key" ] || [ "$3" = "--private-key" ] || [ "$5" = "--private-key" ];then
+    java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@
+else
+	if [ "$1" = "--weid" ] ;then
+		weid=$2
+	elif [ "$3" = "--weid" ] ;then
+		weid=$4
+	elif [ "$5" = "--weid" ] ;then
+		weid=$6
+	else
+		echo "a weid is needed."
+	fi
+    we_address=`echo $weid|awk -F":" '{print $3}' `    
+    private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
+    java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@ --private-key ${private_key}
+fi
 
 if [ ! $? -eq 0 ]; then
     echo "regist cpt faild, please check."

@@ -1,7 +1,8 @@
 #/bin/sh
 
-source ../run.config
-source ../script/common.inc
+cd ..
+source run.config
+source ./script/common.inc
 
 if [ $# -lt 2 ] ;then
 	echo "input error."
@@ -28,7 +29,7 @@ build_classpath
 echo "begin to register specific issuers and types, please wait..."
 
 private_key=${SOURCE_CODE_DIR}/output/admin/ecdsa_key
-java -cp "$CLASSPATH" com.webank.weid.command.RegistSpecificIssuer $@ --private-key ${private_key}
+java -cp "$CLASSPATH" com.webank.weid.command.RegisterSpecificIssuer $@ --private-key ${private_key}
 
 if [ ! $? -eq 0 ]; then
     echo "register specific issuers and types failed, please check error logs for details."

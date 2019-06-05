@@ -88,7 +88,7 @@ public class RegisterSpecificIssuer {
             ResponseData<Boolean> response = authorityIssuerService
                 .addIssuerIntoIssuerType(callerAuth, type, weId);
             if (!response.getResult()) {
-                logger.error("[RegisterIssuer] Add issuer into type FAILED: " + weId);
+                logger.error("[RegisterIssuer] Add issuer into type FAILED: " + response.getErrorMessage());
                 System.exit(1);
             }
         }

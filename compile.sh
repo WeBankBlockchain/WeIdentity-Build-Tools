@@ -141,6 +141,7 @@ function setup()
         cp ${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
         cp ${SOURCE_CODE_DIR}/script/tpl/build.gradle-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/build.gradle
         cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeployContract.java
+        cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeploySystemCpt.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeploySystemCpt.java
     else
     	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
     	exit 1

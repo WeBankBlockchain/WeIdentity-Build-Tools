@@ -105,9 +105,7 @@ function main()
     check_jdk
     deploy_contract
     modify_config
-    if [ "${blockchain_fiscobcos_version}" = "1" ];then
-        deploy_system_cpt
-    fi
+    deploy_system_cpt
     clean_data
 }
 

@@ -263,6 +263,26 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
     ls
 
 
+3.5 注册特定类型机构（specific issuer）
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+该步骤需要发布智能合约的机构来执行，需要使用\ `第2.4节 <#section-2>`__\ 中生成的私钥来注册各类特定类型的机构，如学校、医院、政府部门等。
+这个步骤会帮您将一个指定的weidentity DID注册为特定类型的某种机构。
+如果您不是智能合约的发布者，您可以将您的weidentity DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
+
+假设您要注册的机构的weid为did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
+
+::
+    ./regist_specific_issuer.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
+
+执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been successfully registered on blockchain”。注册成功。如果类型不存在，此命令也会自动注册一个类型。
+
+如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
+
+::
+    ./regist_specific_issuer.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
+
+
 4 完成 weidentity-java-sdk 的集成
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ::
@@ -285,8 +305,8 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
    <div id="reference-2">
 
 
-附录1 手工配置ApplicationContext.xml
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+附录1 手工配置ApplicationContext.xml或fisco.properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. raw:: html
 
@@ -337,6 +357,16 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
     </bean>
 
 其他的智能合约地址的配置依次类推，直到所有的配置项都配置完成。
+
+对应地，对于fisco.properties，您只需将对应的合约地址修改按照同样方法修改即可：
+
+::
+
+    weid.contractaddress=0xabbc75543648af0861b14daa4f8582f28cd95f5e
+    cpt.contractaddress=0x0
+    issuer.contractaddress=0x0
+    evidence.contractaddress=0x0
+    specificissuer.contractaddress=0x0
 
 附录2 升级 weidentity-java-sdk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

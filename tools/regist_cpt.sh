@@ -30,7 +30,7 @@ else
 	else
 		echo "a weid is needed."
 	fi
-    we_address=`echo $weid|awk -F":" '{print $3}' `    
+    we_address=`echo $weid|awk -F":" '{print $4}' `    
     private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
     java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@ --private-key ${private_key}
 fi

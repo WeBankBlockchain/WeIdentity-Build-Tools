@@ -122,7 +122,7 @@ function compile()
     envsubst '${BLOCKCHIAN_NODE_INFO}' < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG_TMP}
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
-    cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
+    #cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     
     if [ -d ${SOURCE_CODE_DIR}/dist ];then

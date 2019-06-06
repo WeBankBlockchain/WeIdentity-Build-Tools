@@ -1,7 +1,7 @@
 #!/bin/bash
 source ./script/common.inc
 source run.config
-
+echo "org_id:${org_id}"
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
@@ -9,7 +9,8 @@ APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
 APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
 FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
 FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
-WEIDENTITY_CONFIG=${SOURCE_CODE_DIR}/resources/weidentity.properties
+WEIDENTITY_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties.tpl
+WEIDENTITY_CONFIG=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties
 
 function modify_config()
 {
@@ -26,7 +27,7 @@ function modify_config()
     export ISSUER_ADDRESS=${issuer_address}
     export EVIDENCE_ADDRESS=${evidence_address}
     export SPECIFICISSUER_ADDRESS=${specificIssuer_address}
-    export ORG_ID=${org_id}
+    #export ORG_ID=${org_id}
     export CHAIN_ID=${chain_id}
     MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}:${CHAIN_ID}'
     if [ -f ${APP_XML_CONFIG} ];then
@@ -42,13 +43,18 @@ function modify_config()
         rm ${FISCO_XML_CONFIG}
     fi
     envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TMP} >${FISCO_XML_CONFIG}
-    envsubst ${ORG_ID} < ${WEIDENTITY_CONFIG} >${WEIDENTITY_CONFIG}
+    #envsubst ${ORG_ID} < ${WEIDENTITY_CONFIG} >${WEIDENTITY_CONFIG_TMP}
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
+   # cp -f ${WEIDENTITY_CONFIG_TMP} ${SOURCE_CODE_DIR}/resources/${WEIDENTITY_CONFIG}
     echo "modify sdk config finished..."
 }
 
 function deploy_contract()
 {
+    export ORG_ID=${org_id}
+    envsubst '${ORG_ID}' < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
+    cp  ${WEIDENTITY_CONFIG} ${SOURCE_CODE_DIR}/resources
+
     echo "begin to deploy contract..."
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes

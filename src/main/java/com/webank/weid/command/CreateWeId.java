@@ -31,42 +31,41 @@ import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.util.FileUtils;
 
 /**
- * @author tonychen 2019年4月11日
- *
+ * @author tonychen 2019/4/11
  */
 public class CreateWeId {
 
-	/**
+    /**
      * log4j.
      */
     private static final Logger logger = LoggerFactory.getLogger(CreateWeId.class);
-    
-	private static WeIdService weIdService = new WeIdServiceImpl();
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		
-		ResponseData<CreateWeIdDataResult> response = weIdService.createWeId();
-		if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-			logger.error("[CreateWeId] create weidentity did faild. error code : {}, error msg :{}",
-					response.getErrorCode(), response.getErrorMessage());
-			System.out.println("[CreateWeId] create weid failed.");
-			System.exit(1);
-		}
-		CreateWeIdDataResult result = response.getResult();
-		String weId = result.getWeId();
-		System.out.println("[CreateWeId] weid is :"+weId);
-		String publicKey = result.getUserWeIdPublicKey().getPublicKey();
-		String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
-		
-		//输出的文件命名，以及weid和公私钥的存储方式
-		FileUtils.writeToFile(weId, "weid", FileOperator.OVERWRITE);
-		FileUtils.writeToFile(publicKey, "ecdsa_key.pub", FileOperator.OVERWRITE);
-		FileUtils.writeToFile(privateKey, "ecdsa_key", FileOperator.OVERWRITE);
-		
-		System.exit(0);
-	}
+
+    private static WeIdService weIdService = new WeIdServiceImpl();
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        ResponseData<CreateWeIdDataResult> response = weIdService.createWeId();
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error("[CreateWeId] create weidentity did faild. error code : {}, error msg :{}",
+                response.getErrorCode(), response.getErrorMessage());
+            System.out.println("[CreateWeId] create weid failed.");
+            System.exit(1);
+        }
+        CreateWeIdDataResult result = response.getResult();
+        String weId = result.getWeId();
+        System.out.println("[CreateWeId] weid is :" + weId);
+        String publicKey = result.getUserWeIdPublicKey().getPublicKey();
+        String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
+
+        //write weId, publicKey and privateKey to output dir
+        FileUtils.writeToFile(weId, "weid", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(publicKey, "ecdsa_key.pub", FileOperator.OVERWRITE);
+        FileUtils.writeToFile(privateKey, "ecdsa_key", FileOperator.OVERWRITE);
+
+        System.exit(0);
+    }
 
 }

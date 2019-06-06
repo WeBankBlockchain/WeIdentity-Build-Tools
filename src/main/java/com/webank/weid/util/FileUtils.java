@@ -36,7 +36,7 @@ import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.FileOperator;
 
 /**
- * @author tonychen 2019年4月8日
+ * @author tonychen 2019/4/8
  */
 public final class FileUtils {
 

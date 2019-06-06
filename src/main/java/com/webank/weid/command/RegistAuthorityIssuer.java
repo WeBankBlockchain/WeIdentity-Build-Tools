@@ -19,10 +19,10 @@
 
 package com.webank.weid.command;
 
+import com.beust.jcommander.JCommander;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
@@ -33,60 +33,63 @@ import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
 import com.webank.weid.util.FileUtils;
 
 /**
- * @author tonychen 2019年4月11日
- *
+ * @author tonychen 2019/4/11
  */
 public class RegistAuthorityIssuer {
-	
 
-	private static final Logger logger = LoggerFactory.getLogger(RegistAuthorityIssuer.class);
-	
-	private static AuthorityIssuerService authorityIssuerService = new AuthorityIssuerServiceImpl();
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		if (args == null || args.length < 6) {
-			logger.error("[RegistCpt] input parameters error, please check your input!");
-			System.exit(1);
-		}
-		
-		CommandArgs commandArgs = new CommandArgs();
-    	JCommander.newBuilder()
-    	  .addObject(commandArgs)
-    	  .build()
-    	  .parse(args);
-    	
-		//config file path
-		String weid = commandArgs.getWeid();
-		String orgName = commandArgs.getOrgName();
-		String privateKeyFile = commandArgs.getPrivateKey();//privateKey
-		System.out.println("private key file:"+privateKeyFile);
-		
-        System.out.println("[registerAuthorityIssuer] regist authorityissuer:"+weid+", name is :"+orgName);
-		RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
-		AuthorityIssuer authorityIssuer = new AuthorityIssuer();
-		authorityIssuer.setName(orgName);
-		authorityIssuer.setWeId(weid);
-		authorityIssuer.setAccValue("1");
-		authorityIssuer.setCreated(System.currentTimeMillis());
-		registerAuthorityIssuerArgs.setAuthorityIssuer(authorityIssuer);
-		
-		String privateKey = FileUtils.readFile(privateKeyFile);
-		WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
-		weIdPrivateKey.setPrivateKey(privateKey);
-		registerAuthorityIssuerArgs.setWeIdPrivateKey(weIdPrivateKey);
-		
-		ResponseData<Boolean> response = authorityIssuerService.registerAuthorityIssuer(registerAuthorityIssuerArgs);
-		if(! response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-			logger.error("[RegistAuthorityIssuer] create weidentity did faild. error code : {}, error msg :{}",
-					response.getErrorCode(), response.getErrorMessage());
-			System.out.println("[RegistAuthorityIssuer] regist faild. result is : "+response);
-			System.exit(1);
-		}
-		
-		System.exit(0);
-	}
+
+    private static final Logger logger = LoggerFactory.getLogger(RegistAuthorityIssuer.class);
+
+    private static AuthorityIssuerService authorityIssuerService = new AuthorityIssuerServiceImpl();
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        if (args == null || args.length < 6) {
+            logger.error("[RegistCpt] input parameters error, please check your input!");
+            System.exit(1);
+        }
+
+        CommandArgs commandArgs = new CommandArgs();
+        JCommander.newBuilder()
+            .addObject(commandArgs)
+            .build()
+            .parse(args);
+
+        //config file path
+        String weid = commandArgs.getWeid();
+        String orgId = commandArgs.getOrgId();
+        String privateKeyFile = commandArgs.getPrivateKey();//privateKey
+        System.out.println("private key file:" + privateKeyFile);
+
+        System.out.println(
+            "[registerAuthorityIssuer] regist authorityissuer:" + weid + ", name is :" + orgId);
+        RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
+        AuthorityIssuer authorityIssuer = new AuthorityIssuer();
+        authorityIssuer.setName(orgId);
+        authorityIssuer.setWeId(weid);
+        authorityIssuer.setAccValue("1");
+        authorityIssuer.setCreated(System.currentTimeMillis());
+        registerAuthorityIssuerArgs.setAuthorityIssuer(authorityIssuer);
+
+        String privateKey = FileUtils.readFile(privateKeyFile);
+        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
+        weIdPrivateKey.setPrivateKey(privateKey);
+        registerAuthorityIssuerArgs.setWeIdPrivateKey(weIdPrivateKey);
+
+        ResponseData<Boolean> response = authorityIssuerService
+            .registerAuthorityIssuer(registerAuthorityIssuerArgs);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error(
+                "[RegistAuthorityIssuer] create weidentity did faild. error code : {}, error msg :{}",
+                response.getErrorCode(), response.getErrorMessage());
+            System.out.println("[RegistAuthorityIssuer] regist faild. result is : " + response);
+            System.exit(1);
+        }
+
+        System.exit(0);
+    }
 
 }

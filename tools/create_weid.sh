@@ -30,7 +30,6 @@ if [ -f "weid" ];then
     echo "weid_address=${weid_address}"
     mkdir -p ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}
     mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
-    cp ecdsa_key ${SOURCE_CODE_DIR}/conf/
     mv ecdsa_key ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
     mv weid ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
 fi

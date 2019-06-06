@@ -55,7 +55,9 @@ List apache_commons = [
 // In this section you declare the dependencies for your production and test code
 List jackson = [
     "com.fasterxml.jackson.core:jackson-databind:2.8.8.1",
-    "com.github.fge:json-schema-validator:2.2.6"
+    "com.github.fge:json-schema-validator:2.2.6",
+    "com.github.reinert:jjschema:1.16",
+    "com.google.zxing:core:3.3.0"
 ]
 
 List weidentity = [

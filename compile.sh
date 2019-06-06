@@ -12,7 +12,9 @@ CONFIG_FILE=${SOURCE_CODE_DIR}/conf/run.config
 APP_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
 APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
 APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
-
+FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
+FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
+FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
 
 function compile_contract() 
 { 
@@ -87,7 +89,7 @@ function compile()
          content="${content}\n"
     fi
     if [ "${blockchain_fiscobcos_version}" = "1" ];then 
-        content="${content}<value>WeIdentity@$var</value>"
+      content="${content}WeIdentity@$var;"
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then 
     	content="${content}<value>$var</value>"
     else
@@ -110,6 +112,15 @@ function compile()
     fi
     envsubst '${BLOCKCHIAN_NODE_INFO}' < ${APP_XML_CONFIG_TPL} >${APP_XML_CONFIG_TMP}
     cp ${APP_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
+    if [ -f ${FISCO_XML_CONFIG} ];then
+        rm ${FISCO_XML_CONFIG}
+    fi
+    envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
+    if [ -f ${FISCO_XML_CONFIG_TMP} ];then
+        rm ${FISCO_XML_CONFIG_TMP}
+    fi
+    envsubst '${BLOCKCHIAN_NODE_INFO}' < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG_TMP}
+    cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
@@ -127,8 +138,10 @@ function setup()
 {
 	if [ "${blockchain_fiscobcos_version}" = "1" ] || [ "${blockchain_fiscobcos_version}" = "2" ];then 
         cp ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tpl
+        cp ${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
         cp ${SOURCE_CODE_DIR}/script/tpl/build.gradle-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/build.gradle
         cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeployContract.java
+        cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeploySystemCpt.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeploySystemCpt.java
     else
     	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
     	exit 1

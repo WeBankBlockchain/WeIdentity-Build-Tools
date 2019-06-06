@@ -23,15 +23,16 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bcos.channel.client.Service;
-import org.bcos.web3j.crypto.Credentials;
-import org.bcos.web3j.crypto.ECKeyPair;
-import org.bcos.web3j.protocol.Web3j;
-import org.bcos.web3j.protocol.channel.ChannelEthereumService;
+import org.fisco.bcos.channel.client.Service;
+import org.fisco.bcos.web3j.crypto.Credentials;
+import org.fisco.bcos.web3j.crypto.ECKeyPair;
+import org.fisco.bcos.web3j.protocol.Web3j;
+import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
@@ -55,7 +56,12 @@ public class DeploySystemCpt {
     /**
      * The Fisco Config bundle.
      */
-    protected static final FiscoConfig fiscoConfig;
+    // protected static final FiscoConfig fiscoConfig;
+
+    /**
+     * The context.
+     */
+    protected static final ApplicationContext context;
 
     /**
      * log4j.
@@ -73,10 +79,13 @@ public class DeploySystemCpt {
     private static Web3j web3j;
 
     static {
+        /*
         fiscoConfig = new FiscoConfig();
         if (!fiscoConfig.load()) {
             logger.error("[DeployContract] Failed to load Fisco-BCOS blockchain node information.");
         }
+        */
+        context = new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 
     /**
@@ -103,20 +112,18 @@ public class DeploySystemCpt {
     }
 
     private static boolean initWeb3j() {
-        logger.info("[DeployContract] begin to init web3j instance..");
-        Service service = TransactionUtils.buildFiscoBcosService(fiscoConfig);
+        Service service = context.getBean(Service.class);
         try {
             service.run();
         } catch (Exception e) {
-            logger.error("[DeployContract] Service init failed. ", e);
-            return false;
+            logger.error("[BaseService] Service init failed. ", e);
         }
 
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
         channelEthereumService.setChannelService(service);
-        web3j = Web3j.build(channelEthereumService);
+        web3j = Web3j.build(channelEthereumService, service.getGroupId());
         if (web3j == null) {
-            logger.error("[DeployContract] web3j init failed. ");
+            logger.error("[BaseService] web3j init failed. ");
             return false;
         }
 

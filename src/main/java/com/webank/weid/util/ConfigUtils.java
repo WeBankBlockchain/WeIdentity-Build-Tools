@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 /**
  * tools for properties.
  *
- * @author tonychen 2019年3月21日
+ * @author tonychen 2019/3/21
  */
 public final class ConfigUtils {
 

@@ -1,5 +1,5 @@
 #orgid, used for amop communication
-blockchain.orgId=1001
+blockchain.orgid=${ORG_ID}
 
 #presistence configuration
 #mysql connection config

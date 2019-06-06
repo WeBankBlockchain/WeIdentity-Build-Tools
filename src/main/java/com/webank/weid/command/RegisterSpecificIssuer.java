@@ -23,10 +23,9 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import com.beust.jcommander.JCommander;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.beust.jcommander.JCommander;
 
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
@@ -88,7 +87,8 @@ public class RegisterSpecificIssuer {
             ResponseData<Boolean> response = authorityIssuerService
                 .addIssuerIntoIssuerType(callerAuth, type, weId);
             if (!response.getResult()) {
-                logger.error("[RegisterIssuer] Add issuer into type FAILED: " + response.getErrorMessage());
+                logger.error(
+                    "[RegisterIssuer] Add issuer into type FAILED: " + response.getErrorMessage());
                 System.exit(1);
             }
         }

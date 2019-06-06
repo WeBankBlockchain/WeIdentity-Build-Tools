@@ -21,7 +21,7 @@
 package com.webank.weid.constant;
 
 /**
- * @author tonychen 2019年4月8日
+ * @author tonychen 2019/4/8
  */
 public enum FileOperator {
 

@@ -57,7 +57,7 @@ function generate_presentation_policy()
 	
 	build_classpath
 	
-	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy $@ --org-name ${org_name}
+	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy $@ --org-id ${org_id}
 	
 	presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
 	if [ ! -d ${presentation_policy} ];then

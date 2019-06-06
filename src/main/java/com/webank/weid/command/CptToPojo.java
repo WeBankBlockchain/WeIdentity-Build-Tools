@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.beust.jcommander.JCommander;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.protocol.base.Cpt;
@@ -40,7 +40,7 @@ import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 
 /**
- * @author tonychen 2019年4月8日
+ * @author tonychen 2019/4/9
  */
 public class CptToPojo {
 
@@ -51,39 +51,39 @@ public class CptToPojo {
      * @param args
      */
     public static void main(String[] args) {
-    	
+
         //1. get cpt list
         if (args == null || args.length < 2) {
             System.out.println("[CptTools] input parameters error, please check your input!");
             System.exit(1);
         }
-    	
-    	CommandArgs commandArgs = new CommandArgs();
-    	JCommander.newBuilder()
-    	  .addObject(commandArgs)
-    	  .build()
-    	  .parse(args);
+
+        CommandArgs commandArgs = new CommandArgs();
+        JCommander.newBuilder()
+            .addObject(commandArgs)
+            .build()
+            .parse(args);
 
         String cptStr = commandArgs.getCptIdList();
-        if(StringUtils.isEmpty(cptStr)) {
-        	System.out.println("[CptTools] input parameters error, please check your input!");
-        	System.exit(1);
+        if (StringUtils.isEmpty(cptStr)) {
+            System.out.println("[CptTools] input parameters error, please check your input!");
+            System.exit(1);
         }
-        
-        List<String>succeedList = new ArrayList<>();
-        List<String>failedList = new ArrayList<>();
+
+        List<String> succeedList = new ArrayList<>();
+        List<String> failedList = new ArrayList<>();
         try {
 
             String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
             //2. get cpt info from blockchain
             for (String cptId : cptList) {
                 ResponseData<Cpt> response = cptService.queryCpt(Integer.valueOf(cptId));
-				if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-					logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
-						response.getErrorCode(), response.getErrorMessage());
-					failedList.add(cptId);
-					continue;
-				}
+                if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+                    logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
+                        response.getErrorCode(), response.getErrorMessage());
+                    failedList.add(cptId);
+                    continue;
+                }
                 Cpt cpt = response.getResult();
                 Map<String, Object> cptMap = cpt.getCptJsonSchema();
                 String cptJson = DataToolUtils.serialize(cptMap);
@@ -93,17 +93,20 @@ public class CptToPojo {
             }
         } catch (Exception e) {
             logger.error("[CptTools] execute with exception, {}", e);
-            System.out.println("[CptTools] execute with exception"+ e);
+            System.out.println("[CptTools] execute with exception" + e);
             System.exit(1);
         }
 
-        if(CollectionUtils.isEmpty(failedList)) {
-        	
-        	System.out.println("All cpt:["+succeedList+"] are successfully transformed to pojo.");
-        }else {
-        	System.out.println("List:["+succeedList+"] are successfully transformed to pojo, List:["+failedList+"] are failed.");
+        if (CollectionUtils.isEmpty(failedList)) {
+
+            System.out
+                .println("All cpt:[" + succeedList + "] are successfully transformed to pojo.");
+        } else {
+            System.out.println(
+                "List:[" + succeedList + "] are successfully transformed to pojo, List:["
+                    + failedList + "] are failed.");
         }
-        
+
         //3. exit with success.
         System.exit(0);
     }

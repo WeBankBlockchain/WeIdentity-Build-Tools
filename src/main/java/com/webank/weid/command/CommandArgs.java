@@ -41,4 +41,7 @@ public class CommandArgs {
 
     @Parameter(names = "--type", description = "type")
     private String type;
+    
+    @Parameter(names = "--remove-issuer", description = "remove authority issuer")
+    private String removedIssuer;
 }

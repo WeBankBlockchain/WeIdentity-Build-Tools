@@ -26,7 +26,7 @@ if [ -f "weid" ];then
     IFS=":"
     array=($weid)
     IFS="$OLD_IFS"
-    weid_address=${array[2]}
+    weid_address=${array[3]}
     echo "weid_address=${weid_address}"
     mkdir -p ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}
     mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/

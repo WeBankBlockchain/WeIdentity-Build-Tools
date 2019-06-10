@@ -93,8 +93,14 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 .. code:: shell
 
-    org_name=test
+    org_id=test
 
+配置chain id，该配置项用于标识您接入的区块链网络。
+假设您的chain id定义为1，则您可以配置为：
+
+.. code:: shell
+
+    chain_id=1
 
 2.3 配置节点证书和秘钥文件
 ''''''''''''''''''''''''''
@@ -132,9 +138,9 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
     ./deploy.sh
 
 运行成功后，会自动在 ``resources`` 目录下生成
-``applicationContext.xml``\ 。并且自动将 weidentity-contract
+``fisco.properties``\ 和 ``weidentity.properties``\ 。并且自动将 weidentity-contract
 部署到区块链节点上，并将相应的智能合约地址也填入到
-``applicationContext.xml``\ 。
+``fisco.properties``\ 。
 同时，我们还会在weidentity-build-tools/output/admin目录下动态生成公私钥对。
 
 ::
@@ -162,7 +168,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 如果您是weidentity智能合约的发布者，您需要保证\ `章节2 <#section-2>`__\ 的所有步骤已经正确完成。
 
-如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址，并正确的配置在weidentity-build-tools的\ ``resources`` 目录下的\ ``applicationContext.xml``里。
+如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，并正确的配置在weidentity-build-tools的\ ``resources`` 目录下的\ ``fisco.properties`` 里。
 配置方法请参考\ `附录1 <#reference-2>`__\。
 
 此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity DID、注册Authority issuer、发布CPT
@@ -191,28 +197,34 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 这个步骤会帮您将一个指定的weidentity DID注册为权威机构。
 如果您不是智能合约的发布者，您可以将您的weidentity DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
-假设您要注册的权威机构的weid为did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb。
+假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb。
 ::
-    ./regist_authority_issuer.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
+
+
+如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
+
+::
+    ./regist_authority_issuer.sh ----remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 3.3 机构发布CPT
 ''''''''''''''''''''''''''''''
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
-假如机构的weid是did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private_key/key
+假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private_key/key
 
 ::
 
-    ./regist_cpt.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt --private-key /home/test/private_key/key
+    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt --private-key /home/test/private_key/key
 
 如果您的weid是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥。
 
 ::
 
-    ./regist_cpt.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
+    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
 
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
@@ -270,17 +282,17 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 这个步骤会帮您将一个指定的weidentity DID注册为特定类型的某种机构。
 如果您不是智能合约的发布者，您可以将您的weidentity DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
-假设您要注册的机构的weid为did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
+假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
 
 ::
-    ./regist_specific_issuer.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
+    ./regist_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been successfully registered on blockchain”。注册成功。如果类型不存在，此命令也会自动注册一个类型。
 
 如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
 ::
-    ./regist_specific_issuer.sh --weid did:weid:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
+    ./regist_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 
 4 完成 weidentity-java-sdk 的集成
@@ -290,7 +302,7 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
     cd weidentity-build-tools/resources
     ls
 
-您可以将resources目录下刚刚生成的\ ``applicationContext.xml`` 文件，以及
+您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以及
 ``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``  `` node.crt`` 和 ``node.key`` ，拷贝至您的应用的 ``resources``
 目录下，weidentity-java-sdk会自动加载相应的资源文件。
 
@@ -305,7 +317,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
    <div id="reference-2">
 
 
-附录1 手工配置ApplicationContext.xml或fisco.properties
+附录1 手工配置fisco.properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. raw:: html
@@ -314,51 +326,17 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 前提是您已经完成\ `章节2 <#section-2>`__\的步骤。
 
-编辑applicationContext.xml：
+编辑fisco.properties：
 
 ::
 
     cd weidentity-build-tools/resources/
-    vim applicationContext.xml
+    vim fisco.properties
 
-您可以看到配置内容，我们需要将weidentity的智能合约地址写入到指定配置项，找到以下配置项：
-
-::
-
-    <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"
-    id="appConfig">
-    <property name="properties">
-      <props>
-        <prop key="weId.contractaddress">0x0</prop>
-        <prop key="cpt.contractaddress">0x0</prop>
-        <prop key="issuer.contractaddress">0x0</prop>
-        <prop key="evidence.contractaddress">0x0</prop>
-        <prop key="specificissuer.contractaddress">0x0</prop>
-      </props>
-    </property>
-    </bean>
+您可以看到配置内容，我们需要将weidentity的智能合约地址和chain id写入到指定配置项，找到以下配置项：
 
 您需要将每个配置项替换成对应的智能合约地址，比如，如果weid Contract的发布地址是0xabbc75543648af0861b14daa4f8582f28cd95f5e，
 您需要将“weId.contractaddress”对应的0x0替换成0xabbc75543648af0861b14daa4f8582f28cd95f5e，变成以下内容：
-
-::
-
-    <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"
-    id="appConfig">
-    <property name="properties">
-      <props>
-        <prop key="weId.contractaddress">0xabbc75543648af0861b14daa4f8582f28cd95f5e</prop>
-        <prop key="cpt.contractaddress">0x0</prop>
-        <prop key="issuer.contractaddress">0x0</prop>
-        <prop key="evidence.contractaddress">0x0</prop>
-        <prop key="specificissuer.contractaddress">0x0</prop>
-      </props>
-    </property>
-    </bean>
-
-其他的智能合约地址的配置依次类推，直到所有的配置项都配置完成。
-
-对应地，对于fisco.properties，您只需将对应的合约地址修改按照同样方法修改即可：
 
 ::
 
@@ -367,6 +345,16 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
     issuer.contractaddress=0x0
     evidence.contractaddress=0x0
     specificissuer.contractaddress=0x0
+
+其他的智能合约地址的配置依次类推，直到所有的配置项都配置完成。
+
+配置完智能合约地址后，您还需要将chain id也配置到指定项：
+假设您需要配置的chain id的值为1，则进行如下配置。
+
+::
+
+    chain.id=1
+
 
 附录2 升级 weidentity-java-sdk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

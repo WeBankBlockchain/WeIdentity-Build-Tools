@@ -25,7 +25,9 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 </div>
 #### 2.1 下载安装部署工具
 
+``` 
     git clone https://github.com/WeBankFinTech/weidentity-build-tools.git 
+``` 
 
 该工具默认会使用最新版本的
 [WeIdentity智能合约](https://github.com/WeBankFinTech/weidentity-contract)。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
@@ -99,9 +101,11 @@ weidentity-build-tools 下面的 `resources`
 
 如果您是第一次使用本工具，您需要先进行编译：
 
+``` 
     cd ..
     chmod +x compile.sh   
     ./compile.sh
+``` 
 
 如果执行过程没报错，大约1分钟左右可以编译完成。
 
@@ -109,16 +113,20 @@ weidentity-build-tools 下面的 `resources`
 
 编译完成后，您可以执行脚本deploy.sh进行Weidentity智能合约的发布与自动配置。
 
+``` 
     chmod +x deploy.sh   
     ./deploy.sh
+``` 
 
 运行成功后，会自动在 `resources` 目录下生成 `fisco.properties`和
 `weidentity.properties`。并且自动将 weidentity-contract
 部署到区块链节点上，并将相应的智能合约地址也填入到 `fisco.properties`。
 同时，我们还会在weidentity-build-tools/output/admin目录下动态生成公私钥对。
 
+``` 
     cd output/admin
     ls
+``` 
 
 您将看到私钥文件ecdsa\_key，以及对应的公钥文件ecdsa\_key.pub，并会自动将该私钥对应的地址注册为commit
 member，此私钥后续用于注册authority issuer。
@@ -144,9 +152,11 @@ DID、注册Authority issuer、发布CPT
 
 这个步骤会帮您快速创建一个weidentity DID。
 
+``` 
     cd weidentity-build-tools/tools
     chmod +x *.sh
     ./create_weid.sh
+``` 
 
 执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has
 been created”，并会打印出刚刚生成的weidentity
@@ -165,17 +175,20 @@ DID文件weId，公钥ecdsa\_key.pub和私钥ecdsa\_key。
 DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb。
-:: ./regist\_authority\_issuer.sh --weid
-did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
+``` 
+./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+
+``` 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has
 been successfully registed on blockchain”。注册成功。
 
 如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
 
-::
-:   ./regist\_authority\_issuer.sh ----remove-issuer
-    did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+``` 
+ ./regist_authority_issuer.sh ----remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+
+``` 
 
 #### 3.3 机构发布CPT
 
@@ -190,12 +203,13 @@ been successfully registed on blockchain”。注册成功。
     ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID
-card，另假设文件名是cpt\_ID\_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
+card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
 
-:
-
+``` 
     [RegisterCpt] begin to register cpt file:cpt_ID_card.json
     [RegisterCpt] result:{"errorCode":0,"errorMessage":"success","result":{"cptId":1000,"cptVersion":1}}
+
+``` 
 
 说明CPT文件cpt\_ID\_card.json成功发布到区块链上，且发布的ID为1000，后续我们可以用这个ID来查询我们发布的CPT。
 
@@ -209,7 +223,9 @@ policy模板。
 假如您需要将cpt id为1000和1001的cpt从区块链上拉取下来，并基于cpt
 1000和cpt 1001生成presentation policy的配置模板。
 
+``` 
     ./cpt_to_pojo.sh --cpt.list=100,101
+``` 
 
 注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的。
 
@@ -219,16 +235,20 @@ failed.”的信息，这条信息表明CPT ID为100和101的已经拉取成功�
 
 CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 
+``` 
     cd ../dist/app/
     ls
+``` 
 
 直接将weidentity-cpt.jar拷贝至您的应用的classpath下即可使用。
 
 此步骤同时也会帮您生成一个默认的presentation
 policy的配置模板，您可以按您的需求来修改。
 
+``` 
     cd ../../output/presentation_policy
     ls
+``` 
 
 #### 3.5 注册特定类型机构（specific issuer）
 
@@ -239,9 +259,9 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
 
 假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
 
-::
-:   ./regist\_specific\_issuer.sh --weid
-    did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
+``` 
+  ./regist_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
+``` 
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been
 successfully registered on
@@ -249,15 +269,16 @@ blockchain”。注册成功。如果类型不存在，此命令也会自动注�
 
 如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
-::
-:   ./regist\_specific\_issuer.sh --weid
-    did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb
-    --type college
+``` 
+   ./regist\_specific\_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
+``` 
 
 ### 4 完成 weidentity-java-sdk 的集成
 
+``` 
     cd weidentity-build-tools/resources
     ls
+``` 
 
 您可以将resources目录下刚刚生成的`fisco.properties`
 文件，`weidentity.properties` 文件，以及 `ca.crt`，`client.keystore`
@@ -279,8 +300,10 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 编辑fisco.properties：
 
+``` 
     cd weidentity-build-tools/resources/
     vim fisco.properties
+``` 
 
 您可以看到配置内容，我们需要将weidentity的智能合约地址和chain
 id写入到指定配置项，找到以下配置项：
@@ -289,18 +312,23 @@ id写入到指定配置项，找到以下配置项：
 Contract的发布地址是0xabbc75543648af0861b14daa4f8582f28cd95f5e，
 您需要将“weId.contractaddress”对应的0x0替换成0xabbc75543648af0861b14daa4f8582f28cd95f5e，变成以下内容：
 
+``` 
+
     weid.contractaddress=0xabbc75543648af0861b14daa4f8582f28cd95f5e
     cpt.contractaddress=0x0
     issuer.contractaddress=0x0
     evidence.contractaddress=0x0
     specificissuer.contractaddress=0x0
+``` 
 
 其他的智能合约地址的配置依次类推，直到所有的配置项都配置完成。
 
 配置完智能合约地址后，您还需要将chain id也配置到指定项：
 假设您需要配置的chain id的值为1，则进行如下配置。
 
+``` 
     chain.id=1
+``` 
 
 ### 附录2 升级 weidentity-java-sdk
 

@@ -85,12 +85,12 @@ function compile()
     #fill with ip and port of blockchain nodes
     for var in ${array[@]}
     do
-    if [ ! -z ${content} ];then
-         content="${content}\n"
-    fi
-    if [ "${blockchain_fiscobcos_version}" = "1" ];then 
+    if [ "${blockchain_fiscobcos_version}" = "1" ];then
       content="${content}WeIdentity@$var;"
-    elif [ "${blockchain_fiscobcos_version}" = "2" ];then 
+    elif [ "${blockchain_fiscobcos_version}" = "2" ];then
+      if [ ! -z ${content} ];then
+           content="${content}\n"
+      fi
     	content="${content}<value>$var</value>"
     else
     	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."

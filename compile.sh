@@ -148,9 +148,30 @@ function setup()
     fi
 }
 
+function check_parameter()
+{
+    if [ -z ${blockchain_address} ];then
+        echo "blockchain address is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${blockchain_fiscobcos_version} ];then
+        echo "blockchain version config is illegal, please check the config."
+        exit 1
+    fi
+    if [ -z ${org_id} ];then
+        echo "org id is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${chain_id} ];then
+        echo "chain id is empty, please check the config."
+        exit 1
+    fi
+}
+
 function main()
 {
-	setup
+    check_parameter
+    setup
     check_jdk
     compile
     clean_config

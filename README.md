@@ -20,9 +20,11 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 * * * * *
 
 <div id="section-2">
-### 2. 部署 WeIdentity 智能合约
 
+
+### 2. 部署 WeIdentity 智能合约
 </div>
+
 #### 2.1 下载安装部署工具
 
 ``` 
@@ -128,13 +130,14 @@ weidentity-build-tools 下面的 `resources`
     ls
 ``` 
 
-您将看到私钥文件ecdsa\_key，以及对应的公钥文件ecdsa\_key.pub，并会自动将该私钥对应的地址注册为commit
+您将看到私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub，并会自动将该私钥对应的地址注册为commit
 member，此私钥后续用于注册authority issuer。
 
 <div id="section-3">
-### 3 快速使用
 
+### 3 快速使用
 </div>
+
 在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
 
 如果您是weidentity智能合约的发布者，您需要保证[章节2](#section-2)的所有步骤已经正确完成。
@@ -160,12 +163,12 @@ DID、注册Authority issuer、发布CPT
 
 执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has
 been created”，并会打印出刚刚生成的weidentity
-did，同时在output目录weidentity-build-tools/output/create\_weid/下生成对应的weidentity
+did，同时在output目录weidentity-build-tools/output/create_weid/下生成对应的weidentity
 DID 以及公钥和私钥。
 
 在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity
 DID匹配的目录，里面包含了weidentity
-DID文件weId，公钥ecdsa\_key.pub和私钥ecdsa\_key。
+DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key。
 
 #### 3.2 注册权威机构（authority issuer）
 
@@ -194,7 +197,7 @@ been successfully registed on blockchain”。注册成功。
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
-假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private\_key/key
+假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private_key/key
 
     ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt --private-key /home/test/private_key/key
 
@@ -211,9 +214,9 @@ card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下
 
 ``` 
 
-说明CPT文件cpt\_ID\_card.json成功发布到区块链上，且发布的ID为1000，后续我们可以用这个ID来查询我们发布的CPT。
+说明CPT文件cpt_ID_card.json成功发布到区块链上，且发布的ID为1000，后续我们可以用这个ID来查询我们发布的CPT。
 
-同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weidentity-build-tools/output/regist\_cpt/目录下查看。
+同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weidentity-build-tools/output/regist_cpt/目录下查看。
 
 #### 3.4 拉取CPT并生成presentation policy模板
 
@@ -270,7 +273,7 @@ blockchain”。注册成功。如果类型不存在，此命令也会自动注�
 如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
 ``` 
-   ./regist\_specific\_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
+   ./regist_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 ``` 
 
 ### 4 完成 weidentity-java-sdk 的集成
@@ -293,9 +296,11 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 * * * * *
 
 <div id="reference-2">
+
 ### 附录1 手工配置fisco.properties
 
 </div>
+
 前提是您已经完成[章节2](#section-2)的步骤。
 
 编辑fisco.properties：
@@ -305,8 +310,7 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
     vim fisco.properties
 ``` 
 
-您可以看到配置内容，我们需要将weidentity的智能合约地址和chain
-id写入到指定配置项，找到以下配置项：
+您可以看到配置内容，我们需要将weidentity的智能合约地址和chain id写入到指定配置项，找到以下配置项：
 
 您需要将每个配置项替换成对应的智能合约地址，比如，如果weid
 Contract的发布地址是0xabbc75543648af0861b14daa4f8582f28cd95f5e，

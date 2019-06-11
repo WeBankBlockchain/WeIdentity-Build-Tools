@@ -189,7 +189,7 @@ been successfully registed on blockchain”。注册成功。
 如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
 
 ``` 
- ./regist_authority_issuer.sh ----remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+ ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 ``` 
 
@@ -220,7 +220,7 @@ card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下
 
 #### 3.4 拉取CPT并生成presentation policy模板
 
-此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO，在创建credential的时候，可以直接使用POJO进行创建。同时也会根据您生成一个presentation
+此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO然后生成weidentity-cpt.jar，在创建credential的时候，可以直接使用POJO进行创建。同时也会根据您生成一个presentation
 policy模板。
 
 假如您需要将cpt id为1000和1001的cpt从区块链上拉取下来，并基于cpt

@@ -197,9 +197,9 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 这个步骤会帮您将一个指定的weidentity DID注册为权威机构。
 如果您不是智能合约的发布者，您可以将您的weidentity DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
-假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb。
+假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称是test。
 ::
-    ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
 
@@ -251,7 +251,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 ::
 
-    ./cpt_to_pojo.sh --cpt.list=100,101
+    ./cpt_to_pojo.sh --cpt-list=1000,1001
     
 
 注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的。

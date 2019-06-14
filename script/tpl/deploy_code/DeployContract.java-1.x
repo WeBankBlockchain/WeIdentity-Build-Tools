@@ -186,9 +186,11 @@ public class DeployContract {
                 f.get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
             String contractAddress = weIdContract.getContractAddress();
             FileUtils.writeToFile(contractAddress, "weIdContract.address", FileOperator.OVERWRITE);
+            logger.info("[DeployContract] WeId Contract address is {}.", contractAddress);
             return contractAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("[DeployContract] WeIdContract deploy exception.", e);
+            System.exit(1);
         }
         return StringUtils.EMPTY;
     }
@@ -198,7 +200,10 @@ public class DeployContract {
         String weIdContractAddress,
         String roleControllerAddress) {
         if (web3j == null) {
-            loadConfig();
+            if(!loadConfig()){
+            	logger.error("[DeployContract] load config failed.");
+            	System.exit(1);
+            }
         }
 
         try {
@@ -228,12 +233,13 @@ public class DeployContract {
             String cptControllerAddress = cptController.getContractAddress();
             FileUtils
                 .writeToFile(cptControllerAddress, "cptController.address", FileOperator.OVERWRITE);
-
+			logger.info("[DeployContract] cptController address is {}.", cptControllerAddress);
             Future<TransactionReceipt> f3 = cptController
                 .setRoleController(new Address(roleControllerAddress));
             f3.get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("[DeployContract] CptController deploy exception", e);
+            System.exit(1);
         }
         return StringUtils.EMPTY;
     }
@@ -359,6 +365,7 @@ public class DeployContract {
         try {
             FileUtils.writeToFile(authorityIssuerControllerAddress, "authorityIssuer.address",
                 FileOperator.OVERWRITE);
+            logger.info("[DeployContract] authority Issuer Controller contract Address is {}.", authorityIssuerControllerAddress);
         } catch (Exception e) {
             logger.error("[DeployContract] Write error:", e);
         }
@@ -405,11 +412,14 @@ public class DeployContract {
             try {
                 FileUtils.writeToFile(specificIssuerControllerAddress, "specificIssuer.address",
                     FileOperator.OVERWRITE);
+                logger.info("[DeployContract] specific Issuer contract address is {}.", specificIssuerControllerAddress);
             } catch (Exception e) {
                 logger.error("[DeployContract] Write error:", e);
+                System.exit(1);
             }
         } catch (Exception e) {
             logger.error("[DeployContract] SpecificIssuerController deployment error:", e);
+            System.exit(1);
         }
         return issuerAddressList;
     }
@@ -433,6 +443,7 @@ public class DeployContract {
             String evidenceFactoryAddress = evidenceFactory.getContractAddress();
             FileUtils.writeToFile(evidenceFactoryAddress, "evidenceController.address",
                 FileOperator.OVERWRITE);
+            logger.info("[DeployContract] evidence contract address is {}.", evidenceFactoryAddress);
             return evidenceFactoryAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("[DeployContract] EvidenceFactory deploy exception", e);

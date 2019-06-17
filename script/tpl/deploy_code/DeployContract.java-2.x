@@ -207,6 +207,7 @@ public class DeployContract {
 
             String contractAddress = weIdContract.getContractAddress();
             FileUtils.writeToFile(contractAddress, "weIdContract.address", FileOperator.OVERWRITE);
+            logger.info("[DeployContract] weid contract Address is {}.", contractAddress);
             return contractAddress;
         
     }
@@ -238,7 +239,7 @@ public class DeployContract {
                 ).send();
             String cptControllerAddress = cptController.getContractAddress();
             FileUtils.writeToFile(cptControllerAddress, "cptController.address", FileOperator.OVERWRITE);
-
+			logger.info("[DeployContract] cptController contract Address is {}.", cptControllerAddress);
             TransactionReceipt receipt = 
             		cptController.setRoleController(roleControllerAddress).send();
             if (receipt == null) {
@@ -330,6 +331,7 @@ public class DeployContract {
 
         try {
             FileUtils.writeToFile(authorityIssuerControllerAddress, "authorityIssuer.address", FileOperator.OVERWRITE);
+            logger.info("[DeployContract] authorityIssuer contract Address is {}.", authorityIssuerControllerAddress);
         } catch (Exception e) {
             logger.error("Write error:", e);
         }
@@ -363,6 +365,7 @@ public class DeployContract {
             }
             try {
                 FileUtils.writeToFile(specificIssuerControllerAddress, "specificIssuer.address", FileOperator.OVERWRITE);
+                logger.info("[DeployContract] specificIssuer contract Address is {}.", specificIssuerControllerAddress);
             } catch (Exception e) {
                 logger.error("Write error:", e);
             }
@@ -385,6 +388,7 @@ public class DeployContract {
                 ).send();
             String evidenceFactoryAddress = evidenceFactory.getContractAddress();
             FileUtils.writeToFile(evidenceFactoryAddress, "evidenceController.address", FileOperator.OVERWRITE);
+            logger.info("[DeployContract] evidence contract Address is {}.", evidenceFactoryAddress);
             return evidenceFactoryAddress;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("EvidenceFactory deploy exception", e);

@@ -130,8 +130,10 @@ public class RegistCpt {
                     response.getErrorCode(),
                     response.getErrorMessage());
                 System.out.println(
-                    "[RegisterCpt] register cpt file:" + fileName + " failed, errorcode is "
-                        + response.getErrorCode());
+                    "[RegisterCpt] register cpt file:" + fileName + "  result ---> failed. ");
+            }else {
+                System.out.println(
+                    "[RegisterCpt] register cpt file:" + fileName +" result ---> success.");
             }
             String content = new StringBuffer()
                 .append(fileName)
@@ -141,7 +143,7 @@ public class RegistCpt {
                 .toString();
             FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
             System.out.println(
-                "[RegisterCpt] register cpt file:" + fileName + " successfully, errorcode is \"");
+                "[RegisterCpt] register cpt file:" + fileName + " with success.");
         } catch (IOException e) {
             logger.error("[RegisterCpt] load config faild. ", e);
             System.exit(1);

@@ -1,11 +1,9 @@
 #!/bin/bash
 
-if [ $# -lt 2 ] || [ "$1" != "--cpt-list" ];then
+if [ $# -lt 2 ];then
 	echo "input error. please input like this: ./cpt_to_pojo.sh --cpt-list 1000,10001"
     exit 1
 fi
-
-cpt_list=$2
 
 cd ..
 source run.config
@@ -14,8 +12,6 @@ source ./script/common.inc
 cd ${SOURCE_CODE_DIR}
 
 set -e
-
-
 
 function cpt_to_pojo()
 {

@@ -66,21 +66,28 @@ public class RegisterSpecificIssuer {
         String weid = commandArgs.getWeid();
         String type = commandArgs.getType();
         String privateKeyFile = commandArgs.getPrivateKey();//privateKey
-        System.out.println("private key file:" + privateKeyFile);
+        if (StringUtils.isEmpty(privateKeyFile)) {
+            System.out.println("[RegisterIssuer] Failed to load private key. Abort.");
+            logger.error("[RegisterIssuer] Failed to load private key. Abort.");
+            System.exit(1);
+        }
         String removedIssuer = commandArgs.getRemovedIssuer();
 
         if (StringUtils.isEmpty(type)) {
-        	System.out.println("[RegisterIssuer] Please input your issued type.");
+        	System.out.println("[RegisterIssuer] Failed to load issued type. Abort.");
+            logger.error("[RegisterIssuer] Failed to load issued type. Abort.");
         	System.exit(1);
         }
         
         if(StringUtils.isEmpty(weid) && StringUtils.isEmpty(removedIssuer)) {
-        	System.out.println("[RegisterIssuer] Please input your issuer weid.");
+        	System.out.println("[RegisterIssuer] Failed to load issuer weid or removed issuer. Abort.");
+            logger.error("[RegisterIssuer] Failed to load issuer weid or removed issuer. Abort.");
         	System.exit(1);
         }
         
         if(StringUtils.isNotEmpty(weid) && StringUtils.isNotEmpty(removedIssuer)) {
-        	System.out.println("[RegisterIssuer] issuer weid and removed issuer can not be both iuput.");
+        	System.out.println("[RegisterIssuer] issuer weid and removed issuer can not both exist. Abort.");
+            logger.error("[RegisterIssuer] issuer weid and removed issuer can not both exist. Abort.");
         	System.exit(1);
         } 
 
@@ -93,7 +100,7 @@ public class RegisterSpecificIssuer {
             DataToolUtils.publicKeyFromPrivate(new BigInteger(privateKey)).toString()));
 
         // Register this issuer type anyway
-        logger.info("[RegisterIssuer] registering issuer type: " + type);
+        logger.info("[RegisterIssuer] Registering issuer type with best effort: " + type);
         ResponseData<Boolean> responseData = authorityIssuerService
             .registerIssuerType(callerAuth, type);
 
@@ -102,11 +109,14 @@ public class RegisterSpecificIssuer {
             List<String> weIdList = Arrays.asList(weid.split(";"));
             for (String weId : weIdList) {
                 System.out.println("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
+                logger.info("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
                 ResponseData<Boolean> response = authorityIssuerService
                     .addIssuerIntoIssuerType(callerAuth, type, weId);
                 if (!response.getResult()) {
                     System.out.println(
-                        "[RegisterIssuer] Add issuer into type FAILED: " + response.getErrorMessage());
+                        "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
+                    logger.errror(
+                        "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
                     System.exit(1);
                 }
             }
@@ -117,11 +127,14 @@ public class RegisterSpecificIssuer {
             List<String> weIdList = Arrays.asList(removedIssuer.split(";"));
             for (String weId : weIdList) {
                 System.out.println("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
+                logger.info("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
                 ResponseData<Boolean> response = authorityIssuerService
                     .removeIssuerFromIssuerType(callerAuth, type, weId);
                 if (!response.getResult()) {
                     System.out.println(
-                        "[RegisterIssuer] Remove issuer from type FAILED: " + response.getErrorMessage());
+                        "[RegisterIssuer] Remove FAILED: " + response.getErrorMessage());
+                    logger.error(
+                        "[RegisterIssuer] Remove FAILED: " + response.getErrorMessage());
                     System.exit(1);
                 }
             }

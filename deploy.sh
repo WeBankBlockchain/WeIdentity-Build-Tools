@@ -17,11 +17,21 @@ function modify_config()
     cd ${SOURCE_CODE_DIR}
     echo "begin to modify sdk config..."
     #modify applicationContext.xml with newly deployed contract address
+    if [ ! -f weIdContract.address ];then
+    	echo "deploy contract failed."
+    	exit 1
+    fi
     weid_address=$(cat weIdContract.address)
+    echo "weid contract address is ${weid_address}"
     cpt_address=$(cat cptController.address)
+    echo "cpt contract address is ${cpt_address}"
     issuer_address=$(cat authorityIssuer.address)
+    echo "authority issuer contract address is ${issuer_address}"
     evidence_address=$(cat evidenceController.address)
+    echo "evidence contract address is ${evidence_address}"
     specificIssuer_address=$(cat specificIssuer.address)
+    echo "specificIssuer contract address is ${specificIssuer_address}"
+    
     export WEID_ADDRESS=${weid_address}
     export CPT_ADDRESS=${cpt_address}
     export ISSUER_ADDRESS=${issuer_address}

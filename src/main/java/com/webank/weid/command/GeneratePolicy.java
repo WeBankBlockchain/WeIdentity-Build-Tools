@@ -37,7 +37,7 @@ public class GeneratePolicy {
     public static void main(String[] args) {
 
         if (args == null || args.length < 4) {
-            logger.error("[GeneratePolicy] input parameters error, please check your input!");
+            System.err.println("[GeneratePolicy] input parameters error, please check your input!");
             System.exit(1);
         }
 
@@ -49,6 +49,7 @@ public class GeneratePolicy {
 
         String cptStr = commandArgs.getCptIdList();
         String orgId = commandArgs.getOrgId();
+        String policyId = commandArgs.getPolicyId();
 
         String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
 
@@ -91,6 +92,9 @@ public class GeneratePolicy {
         }
         policyE.setPolicy(policy);
         policyE.setOrgId(orgId);
+        if(StringUtils.isNotEmpty(policyId)) {
+        	policyE.setId(Integer.valueOf(policyId));
+        }
         Map<String, String> extraMap = new HashMap<>();
         extraMap.put("extra1", "");
         extraMap.put("extra2", "");
@@ -111,8 +115,8 @@ public class GeneratePolicy {
             FileUtils.writeToFile(presentationPolicy, "presentation_policy.json",
                 FileOperator.OVERWRITE);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("[GeneratePolicy] generate policy failed. error message :{}", e);
+            System.exit(1);
         }
     }
 

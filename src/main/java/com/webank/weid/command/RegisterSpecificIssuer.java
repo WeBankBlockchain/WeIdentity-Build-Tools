@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import com.beust.jcommander.JCommander;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,30 @@ public class RegisterSpecificIssuer {
         String weid = commandArgs.getWeid();
         String type = commandArgs.getType();
         String privateKeyFile = commandArgs.getPrivateKey();//privateKey
-        System.out.println("private key file:" + privateKeyFile);
+        if (StringUtils.isEmpty(privateKeyFile)) {
+            System.out.println("[RegisterIssuer] Failed to load private key. Abort.");
+            logger.error("[RegisterIssuer] Failed to load private key. Abort.");
+            System.exit(1);
+        }
+        String removedIssuer = commandArgs.getRemovedIssuer();
+
+        if (StringUtils.isEmpty(type)) {
+        	System.out.println("[RegisterIssuer] Failed to load issued type. Abort.");
+            logger.error("[RegisterIssuer] Failed to load issued type. Abort.");
+        	System.exit(1);
+        }
+        
+        if(StringUtils.isEmpty(weid) && StringUtils.isEmpty(removedIssuer)) {
+        	System.out.println("[RegisterIssuer] Failed to load issuer weid or removed issuer. Abort.");
+            logger.error("[RegisterIssuer] Failed to load issuer weid or removed issuer. Abort.");
+        	System.exit(1);
+        }
+        
+        if(StringUtils.isNotEmpty(weid) && StringUtils.isNotEmpty(removedIssuer)) {
+        	System.out.println("[RegisterIssuer] issuer weid and removed issuer can not both exist. Abort.");
+            logger.error("[RegisterIssuer] issuer weid and removed issuer can not both exist. Abort.");
+        	System.exit(1);
+        } 
 
         String privateKey = FileUtils.readFile(privateKeyFile);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
@@ -75,21 +99,44 @@ public class RegisterSpecificIssuer {
         callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(
             DataToolUtils.publicKeyFromPrivate(new BigInteger(privateKey)).toString()));
 
-        // Register this issuer type
-        logger.info("[RegisterIssuer] registering issuer type: " + type);
+        // Register this issuer type anyway
+        logger.info("[RegisterIssuer] Registering issuer type with best effort: " + type);
         ResponseData<Boolean> responseData = authorityIssuerService
             .registerIssuerType(callerAuth, type);
 
-        // Add the DIDs into this type
-        List<String> weIdList = Arrays.asList(weid.split(";"));
-        for (String weId : weIdList) {
-            logger.info("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
-            ResponseData<Boolean> response = authorityIssuerService
-                .addIssuerIntoIssuerType(callerAuth, type, weId);
-            if (!response.getResult()) {
-                logger.error(
-                    "[RegisterIssuer] Add issuer into type FAILED: " + response.getErrorMessage());
-                System.exit(1);
+        if (!StringUtils.isEmpty(weid)) {
+            // Add the DIDs into this type
+            List<String> weIdList = Arrays.asList(weid.split(";"));
+            for (String weId : weIdList) {
+                System.out.println("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
+                logger.info("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
+                ResponseData<Boolean> response = authorityIssuerService
+                    .addIssuerIntoIssuerType(callerAuth, type, weId);
+                if (!response.getResult()) {
+                    System.out.println(
+                        "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
+                    logger.errror(
+                        "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
+                    System.exit(1);
+                }
+            }
+        }
+        
+        if (!StringUtils.isEmpty(removedIssuer)) {
+            // Remove the DIDs from this type
+            List<String> weIdList = Arrays.asList(removedIssuer.split(";"));
+            for (String weId : weIdList) {
+                System.out.println("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
+                logger.info("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
+                ResponseData<Boolean> response = authorityIssuerService
+                    .removeIssuerFromIssuerType(callerAuth, type, weId);
+                if (!response.getResult()) {
+                    System.out.println(
+                        "[RegisterIssuer] Remove FAILED: " + response.getErrorMessage());
+                    logger.error(
+                        "[RegisterIssuer] Remove FAILED: " + response.getErrorMessage());
+                    System.exit(1);
+                }
             }
         }
 

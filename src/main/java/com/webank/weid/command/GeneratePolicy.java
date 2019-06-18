@@ -92,8 +92,8 @@ public class GeneratePolicy {
         }
         policyE.setPolicy(policy);
         policyE.setOrgId(orgId);
-        if(StringUtils.isNotEmpty(policyId)) {
-        	policyE.setId(Integer.valueOf(policyId));
+        if (StringUtils.isNotEmpty(policyId)) {
+            policyE.setId(Integer.valueOf(policyId));
         }
         Map<String, String> extraMap = new HashMap<>();
         extraMap.put("extra1", "");

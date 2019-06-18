@@ -43,7 +43,6 @@ import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.TransactionUtils;
 import com.webank.weid.util.WeIdUtils;
 
 /**

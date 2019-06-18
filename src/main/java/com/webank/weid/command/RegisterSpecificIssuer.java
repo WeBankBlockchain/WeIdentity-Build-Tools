@@ -115,7 +115,7 @@ public class RegisterSpecificIssuer {
                 if (!response.getResult()) {
                     System.out.println(
                         "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
-                    logger.errror(
+                    logger.error(
                         "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
                     System.exit(1);
                 }

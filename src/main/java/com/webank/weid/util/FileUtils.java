@@ -75,26 +75,26 @@ public final class FileUtils {
             }
         }
     }
-    
+
     public static String readFile(String fileName) {
-    	
-    	File file = new File(fileName);
-    	if(! file.exists()) {
-    		return StringUtils.EMPTY;
-    	}
-    	InputStream in = null;
-    	int length = 0;
-    	byte[] data = new byte[1024*4];
-    	try {
-			in = new FileInputStream(file);
-			length = in.read(data);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return new String(data, 0, length);
+
+        File file = new File(fileName);
+        if (!file.exists()) {
+            return StringUtils.EMPTY;
+        }
+        InputStream in = null;
+        int length = 0;
+        byte[] data = new byte[1024 * 4];
+        try {
+            in = new FileInputStream(file);
+            length = in.read(data);
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new String(data, 0, length);
     }
 }

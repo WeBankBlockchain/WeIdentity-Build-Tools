@@ -43,6 +43,13 @@ function cpt_to_pojo()
 
     gradle build
 
+	if [ ! $? -eq 0 ]; then
+    	echo "package cpt faild, please check the log -> ${SOURCE_CODE_DIR}/logs/error.log."
+    	exit $?;
+	fi
+	
+	echo "the weidentity-cpt.jar path is ${SOURCE_CODE_DIR}/dist/app"
+	
     cd ${SOURCE_CODE_DIR}
     
 }
@@ -66,7 +73,7 @@ function generate_presentation_policy()
 		echo "generate presentation policy failed."
 		exit 1
 	fi
-    echo "presentation policy template is successfully generated."
+    echo "presentation policy template is successfully generated, you can find it at ${SOURCE_CODE_DIR}/output/presentation_policy."
     
 }
 

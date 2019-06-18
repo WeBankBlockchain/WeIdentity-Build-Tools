@@ -25,11 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * tools for properties.
@@ -38,11 +37,10 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  */
 public final class ConfigUtils {
 
-    private static Properties prop = new Properties();
-    
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
-    private static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer().withDefaultPrettyPrinter();
+    private static final ObjectWriter OBJECT_WRITER = OBJECT_MAPPER.writer()
+        .withDefaultPrettyPrinter();
+    private static Properties prop = new Properties();
 
     /**
      * load properties from specific config file.
@@ -74,17 +72,17 @@ public final class ConfigUtils {
     public static String getProperty(String key, String defaultValue) {
         return prop.getProperty(key, defaultValue);
     }
-    
+
     public static String serialize(Object object) {
-    	
-    	String result;
-    	try {
-    		result =  OBJECT_WRITER.writeValueAsString(object);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			result = StringUtils.EMPTY;
-		}
-    	return result;
+
+        String result;
+        try {
+            result = OBJECT_WRITER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            result = StringUtils.EMPTY;
+        }
+        return result;
     }
-    
+
 }

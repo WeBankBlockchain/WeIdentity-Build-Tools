@@ -11,7 +11,7 @@ echo "begin to create weidentity did, please wait..."
 java -cp "$CLASSPATH" com.webank.weid.command.CreateWeId
 
 if [ ! $? -eq 0 ]; then
-    echo "Create weid faild, please check it."
+    echo "Create weid faild, please check the log -> ../logs/error.log."
     exit $?;
 fi
 
@@ -27,11 +27,10 @@ if [ -f "weid" ];then
     array=($weid)
     IFS="$OLD_IFS"
     weid_address=${array[3]}
-    echo "weid_address=${weid_address}"
     mkdir -p ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}
     mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
     mv ecdsa_key ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
     mv weid ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
 fi
 
-echo "new weidentity did has been created."
+echo "new weidentity did has been created, the related data can be found at ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}."

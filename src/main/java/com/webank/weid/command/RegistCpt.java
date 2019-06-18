@@ -131,9 +131,9 @@ public class RegistCpt {
                     response.getErrorMessage());
                 System.out.println(
                     "[RegisterCpt] register cpt file:" + fileName + "  result ---> failed. ");
-            }else {
+            } else {
                 System.out.println(
-                    "[RegisterCpt] register cpt file:" + fileName +" result ---> success.");
+                    "[RegisterCpt] register cpt file:" + fileName + " result ---> success.");
             }
             String content = new StringBuffer()
                 .append(fileName)

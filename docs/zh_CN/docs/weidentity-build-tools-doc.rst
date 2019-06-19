@@ -207,7 +207,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
 
 ::
-    ./regist_authority_issuer.sh ----remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 3.3 机构发布CPT
 ''''''''''''''''''''''''''''''
@@ -285,15 +285,19 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
 
 ::
-    ./regist_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
+    ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been successfully registered on blockchain”。注册成功。如果类型不存在，此命令也会自动注册一个类型。
 
 如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
 ::
-    ./regist_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
+    ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
+如果您需要移除某个机构，前提是您是智能合约发布者或者您有相应的权限，比如您要从college类型中移除did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb：
+
+::
+    ./register_specific_issuer.sh --remove-issuer did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 4 完成 weidentity-java-sdk 的集成
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -9,8 +9,7 @@ APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
 APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
 FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
 FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
-WEIDENTITY_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties.tpl
-WEIDENTITY_CONFIG=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties
+FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
 
 function modify_config()
 {
@@ -52,7 +51,7 @@ function modify_config()
     if [ -f ${FISCO_XML_CONFIG} ];then
         rm ${FISCO_XML_CONFIG}
     fi
-    envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TMP} >${FISCO_XML_CONFIG}
+    envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     #envsubst ${ORG_ID} < ${WEIDENTITY_CONFIG} >${WEIDENTITY_CONFIG_TMP}
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
    # cp -f ${WEIDENTITY_CONFIG_TMP} ${SOURCE_CODE_DIR}/resources/${WEIDENTITY_CONFIG}
@@ -61,9 +60,6 @@ function modify_config()
 
 function deploy_contract()
 {
-    export ORG_ID=${org_id}
-    envsubst '${ORG_ID}' < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
-    cp  ${WEIDENTITY_CONFIG} ${SOURCE_CODE_DIR}/resources
 
     echo "begin to deploy contract..."
     cd ${SOURCE_CODE_DIR}

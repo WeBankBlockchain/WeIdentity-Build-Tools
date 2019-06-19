@@ -12,11 +12,16 @@ targetCompatibility = 1.8
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 // In this section you declare where to find the dependencies of your project
 repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://dl.bintray.com/ethereum/maven/" }
-    maven {
-        url "http://maven.aliyun.com/nexus/content/groups/public/"
+    if (gradle.startParameter.isOffline()) {
+        maven {
+            url 'dependencies'
+        }
+    } else {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "http://maven.aliyun.com/nexus/content/groups/public/"
+        }
     }
 }
 
@@ -67,7 +72,11 @@ List weidentity = [
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile logger, spring, lombok, apache_commons, jackson, weidentity, jcommander
+    if (gradle.startParameter.isOffline()) {
+        compile fileTree(dir: 'dist/lib', include: '*.jar')
+    } else {
+        compile logger, spring, lombok, apache_commons, jackson, weidentity, jcommander
+    }
 }
 
 sourceSets {

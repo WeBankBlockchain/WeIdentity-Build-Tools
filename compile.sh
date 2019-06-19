@@ -4,6 +4,11 @@ source run.config
 
 set -e
 
+if [[ "$@" == "--offline" ]];then
+    OFFLINE_MODE="1"
+    echo "Compile in offline mode.."
+fi
+
 #SOURCE_CODE_DIR=$(pwd)
 SOLC=$(which fisco-solc)
 WEB3J="${SOURCE_CODE_DIR}/script/web3sdk.sh"
@@ -50,7 +55,11 @@ function compile_contract()
     fi
     mkdir src
     cp -r ${output_dir}/com src/
-    gradle build
+    if [[ ${OFFLINE_MODE} == "1" ]];then
+        gradle build --offline
+    else
+        gradle build
+    fi
     cd ${SOURCE_CODE_DIR}
     build_classpath
     echo "Compile contracts done."
@@ -125,10 +134,14 @@ function compile()
     #cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     
-    if [ -d ${SOURCE_CODE_DIR}/dist ];then
-        rm -rf ${SOURCE_CODE_DIR}/dist
+    if [ -d ${SOURCE_CODE_DIR}/dist/app ];then
+        rm -rf ${SOURCE_CODE_DIR}/dist/app
     fi
-    gradle clean build
+    if [[ ${OFFLINE_MODE} == "1" ]];then
+        gradle clean build --offline
+    else
+        gradle clean build
+    fi
     build_classpath
     #compile_contract
     echo "compile finished."

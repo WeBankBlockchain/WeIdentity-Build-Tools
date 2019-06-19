@@ -86,7 +86,7 @@ function compile()
     for var in ${array[@]}
     do
     if [ "${blockchain_fiscobcos_version}" = "1" ];then
-      content="${content}WeIdentity@$var;"
+      content="${content}WeIdentity@$var,"
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
       if [ ! -z ${content} ];then
            content="${content}\n"

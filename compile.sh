@@ -92,10 +92,19 @@ function compile()
     array=($blockchain_address)
     IFS="$OLD_IFS"
     #fill with ip and port of blockchain nodes
+    declare -i num
+    num=1
     for var in ${array[@]}
     do
+    declare -i length
+    length=${#array[@]}
     if [ "${blockchain_fiscobcos_version}" = "1" ];then
-      content="${content}WeIdentity@$var,"
+      if [ $num -lt $length ];then
+        content="${content}WeIdentity@$var,"
+      fi
+      if [ $num -eq $length ];then
+        content="${content}WeIdentity@$var"
+      fi
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
       if [ ! -z ${content} ];then
            content="${content}\n"
@@ -104,6 +113,7 @@ function compile()
     else
     	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
     fi
+    num=${num}+1
     done
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
     export WEID_ADDRESS="0x0"

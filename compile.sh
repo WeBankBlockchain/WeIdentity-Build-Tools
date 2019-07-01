@@ -20,6 +20,8 @@ APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
 FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
 FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
 FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
+WEIDENTITY_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties.tpl
+WEIDENTITY_CONFIG=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties
 
 function compile_contract() 
 { 
@@ -115,12 +117,14 @@ function compile()
     fi
     num=${num}+1
     done
+    
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
     export WEID_ADDRESS="0x0"
     export CPT_ADDRESS="0x0"
     export ISSUER_ADDRESS="0x0"
     export EVIDENCE_ADDRESS="0x0"
     export SPECIFICISSUER_ADDRESS="0x0"
+    export CHAIN_ID=${chain_id}
     MYVARS='${BLOCKCHIAN_NODE_INFO}:${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}'
     if [ -f ${APP_XML_CONFIG} ];then
         rm ${APP_XML_CONFIG}
@@ -134,15 +138,24 @@ function compile()
     if [ -f ${FISCO_XML_CONFIG} ];then
         rm ${FISCO_XML_CONFIG}
     fi
-    envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
+    envsubst '${CHAIN_ID}}' < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}
     fi
-    envsubst '${BLOCKCHIAN_NODE_INFO}' < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG_TMP}
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
     #cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
+    
+    #modify weidentity properties
+    export ORG_ID=${org_id}
+    export JDBC_URL=${jdbc_url}
+    export JDBC_USERNAME=${jdbc_username}
+    export JDBC_PASSWORD=${jdbc_password}
+    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${JDBC_URL}:${JDBC_USERNAME}:${JDBC_PASSWORD}'
+    envsubst ${VARS} < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
+    cp  ${WEIDENTITY_CONFIG} ${SOURCE_CODE_DIR}/resources
+    
     
     if [ -d ${SOURCE_CODE_DIR}/dist/app ];then
         rm -rf ${SOURCE_CODE_DIR}/dist/app

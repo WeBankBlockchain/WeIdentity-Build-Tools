@@ -22,6 +22,7 @@ repositories {
         maven {
             url "http://maven.aliyun.com/nexus/content/groups/public/"
         }
+        maven { url "https://dl.bintray.com/ethereum/maven/" }
     }
 }
 
@@ -66,8 +67,8 @@ List jackson = [
     "com.google.zxing:core:3.3.0"
 ]
 
-List weidentity = [
-    "com.webank:weidentity-java-sdk:1.2.1"
+List weid = [
+    "com.webank:weid-java-sdk:1.3.0"
 ]
 
 // In this section you declare the dependencies for your production and test code
@@ -75,7 +76,7 @@ dependencies {
     if (gradle.startParameter.isOffline()) {
         compile fileTree(dir: 'dist/lib', include: '*.jar')
     } else {
-        compile logger, spring, lombok, apache_commons, jackson, weidentity, jcommander
+        compile logger, spring, lombok, apache_commons, jackson, weid, jcommander
     }
 }
 

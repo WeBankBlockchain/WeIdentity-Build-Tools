@@ -5,8 +5,6 @@ echo "org_id:${org_id}"
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
-APP_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml
-APP_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/applicationContext.xml.tmp
 FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
 FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
 FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
@@ -15,7 +13,6 @@ function modify_config()
 {
     cd ${SOURCE_CODE_DIR}
     echo "begin to modify sdk config..."
-    #modify applicationContext.xml with newly deployed contract address
     if [ ! -f weIdContract.address ];then
     	echo "deploy contract failed."
     	exit 1
@@ -39,14 +36,6 @@ function modify_config()
     #export ORG_ID=${org_id}
     export CHAIN_ID=${chain_id}
     MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}:${CHAIN_ID}'
-    if [ -f ${APP_XML_CONFIG} ];then
-        rm ${APP_XML_CONFIG}
-    fi
-    
-    if [ "${blockchain_fiscobcos_version}" = "2" ];then
-    	envsubst ${MYVARS} < ${APP_XML_CONFIG_TMP} >${APP_XML_CONFIG}
-    	cp ${APP_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
-    fi
     
     if [ -f ${FISCO_XML_CONFIG} ];then
         rm ${FISCO_XML_CONFIG}
@@ -103,6 +92,7 @@ function deploy_system_cpt()
 function clean_data()
 {
     #delete useless files
+    cd ${SOURCE_CODE_DIR} 
     if [ -f weIdContract.address ];then
         rm -f weIdContract.address
     fi

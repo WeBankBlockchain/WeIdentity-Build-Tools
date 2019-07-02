@@ -35,7 +35,8 @@ function modify_config()
     export SPECIFICISSUER_ADDRESS=${specificIssuer_address}
     #export ORG_ID=${org_id}
     export CHAIN_ID=${chain_id}
-    MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}:${CHAIN_ID}'
+    export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
+    MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}:${CHAIN_ID}:${FISCO_BCOS_VERSION}'
     
     if [ -f ${FISCO_XML_CONFIG} ];then
         rm ${FISCO_XML_CONFIG}
@@ -115,7 +116,7 @@ function main()
     check_jdk
     deploy_contract
     modify_config
-    deploy_system_cpt
+    #deploy_system_cpt
     clean_data
 }
 

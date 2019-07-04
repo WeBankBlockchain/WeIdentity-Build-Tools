@@ -20,6 +20,7 @@
 package com.webank.weid.command;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +28,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.channel.client.Service;
+import org.fisco.bcos.channel.handler.ChannelConnections;
+import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
 import org.fisco.bcos.web3j.abi.datatypes.Address;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
@@ -36,9 +39,8 @@ import org.fisco.bcos.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.v2.AuthorityIssuerController;
@@ -52,12 +54,7 @@ import com.webank.weid.contract.v2.RoleController;
 import com.webank.weid.contract.v2.SpecificIssuerController;
 import com.webank.weid.contract.v2.SpecificIssuerData;
 import com.webank.weid.contract.v2.WeIdContract;
-import com.webank.weid.protocol.base.WeIdAuthentication;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.request.CptStringArgs;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.service.impl.CptServiceImpl;
-import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.exception.InitWeb3jException;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdUtils;
 
@@ -68,16 +65,19 @@ import com.webank.weid.util.WeIdUtils;
  */
 public class DeployContract {
 
+
+    /**
+     * The Fisco Config bundle.
+     */
+    protected static final FiscoConfig fiscoConfig;
+
     /**
      * log4j.
      */
     private static final Logger logger = LoggerFactory.getLogger(DeployContract.class);
 
-    /**
-     * The context.
-     */
-    protected static final ApplicationContext context;
 
+    private static Service service;
     /**
      * The credentials.
      */
@@ -89,7 +89,10 @@ public class DeployContract {
     private static Web3j web3j;
 
     static {
-        context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    	fiscoConfig = new FiscoConfig();
+        if (!fiscoConfig.load()) {
+            logger.error("[DeployContract] Failed to load Fisco-BCOS blockchain node information.");
+        }
     }
 
     /**
@@ -110,19 +113,21 @@ public class DeployContract {
      */
     private static boolean loadConfig() {
 
-        Service service = context.getBean(Service.class);
+    	logger.info("[WeServiceImplV2] begin to init web3j instance..");
+        service = buildFiscoBcosService(fiscoConfig);
         try {
             service.run();
         } catch (Exception e) {
-            logger.error("[BaseService] Service init failed. ", e);
+            logger.error("[WeServiceImplV2] Service init failed. ", e);
+            throw new InitWeb3jException(e);
         }
 
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
         channelEthereumService.setChannelService(service);
-        web3j = Web3j.build(channelEthereumService, service.getGroupId());
+        web3j = Web3j.build(channelEthereumService);
         if (web3j == null) {
-            logger.error("[BaseService] web3j init failed. ");
-            return false;
+            logger.error("[WeServiceImplV2] web3j init failed. ");
+            throw new InitWeb3jException();
         }
 
         credentials = GenCredential.create();      
@@ -142,6 +147,30 @@ public class DeployContract {
         return true;
     }
 
+    private static Service buildFiscoBcosService(FiscoConfig fiscoConfig) {
+
+        Service service = new Service();
+        service.setOrgID(fiscoConfig.getCurrentOrgId());
+        service.setConnectSeconds(Integer.valueOf(fiscoConfig.getWeb3sdkTimeout()));
+        // group info
+        Integer groupId = Integer.valueOf(fiscoConfig.getGroupId());
+        service.setGroupId(groupId);
+
+        // connect key and string
+        ChannelConnections channelConnections = new ChannelConnections();
+        channelConnections.setGroupId(groupId);
+        channelConnections.setCaCertPath("classpath:" + fiscoConfig.getV2CaCrtPath());
+        channelConnections.setNodeCaPath("classpath:" + fiscoConfig.getV2NodeCrtPath());
+        channelConnections.setNodeKeyPath("classpath:" + fiscoConfig.getV2NodeKeyPath());
+        channelConnections.setConnectionsStr(Arrays.asList(fiscoConfig.getNodes().split(",")));
+        GroupChannelConnectionsConfig connectionsConfig = new GroupChannelConnectionsConfig();
+        connectionsConfig.setAllChannelConnections(Arrays.asList(channelConnections));
+        service.setAllChannelConnections(connectionsConfig);
+
+        // thread pool params
+        return service;
+    }
+    
     /**
      * Gets the web3j.
      *

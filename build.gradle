@@ -30,25 +30,6 @@ List lombok = [
     "org.projectlombok:lombok:1.16.14"
 ]
 
-def logger_version = "2.1"
-List logger = [
-    "org.slf4j:jul-to-slf4j:1.7.10",
-    "org.apache.logging.log4j:log4j-api:$logger_version",
-    "org.apache.logging.log4j:log4j-core:$logger_version",
-    "org.apache.logging.log4j:log4j-slf4j-impl:$logger_version",
-    "org.apache.logging.log4j:log4j-web:$logger_version"
-]
-
-def spring_version = "4.1.8.RELEASE"
-List spring = [
-    "org.springframework:spring-core:$spring_version",
-    "org.springframework:spring-beans:$spring_version",
-    "org.springframework:spring-context:$spring_version",
-    "org.springframework:spring-tx:$spring_version",
-    "org.springframework:spring-jdbc:$spring_version",
-    "org.springframework:spring-test:$spring_version"
-]
-
 List jcommander = [
 	"com.beust:jcommander:1.72"
 ]
@@ -76,7 +57,7 @@ dependencies {
     if (gradle.startParameter.isOffline()) {
         compile fileTree(dir: 'dist/lib', include: '*.jar')
     } else {
-        compile logger, spring, lombok, apache_commons, jackson, weid, jcommander
+        compile lombok, apache_commons, jackson, weid, jcommander
     }
 }
 

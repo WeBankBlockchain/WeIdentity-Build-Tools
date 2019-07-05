@@ -7,6 +7,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ import com.webank.weid.util.FileUtils;
 public class GeneratePolicy {
 
     private static final Logger logger = LoggerFactory.getLogger(GeneratePolicy.class);
-
 
     /**
      * @param args
@@ -55,7 +55,7 @@ public class GeneratePolicy {
 
         PresentationPolicyE policyE = null;
         Constructor<?>[] constructors = PresentationPolicyE.class.getDeclaredConstructors();
-        for (Constructor constructor : constructors) {
+        for (Constructor<?> constructor : constructors) {
             if (constructor.getParameterCount() == 0) {
                 constructor.setAccessible(true);
                 try {
@@ -73,7 +73,7 @@ public class GeneratePolicy {
         for (String cptId : cptList) {
             String className = "com.webank.weid.cpt." + "Cpt" + cptId;
             try {
-                Class clazz = Class.forName(className);
+                Class<?> clazz = Class.forName(className);
                 Object obj = clazz.newInstance();
                 buildInstance(obj);
 
@@ -95,15 +95,10 @@ public class GeneratePolicy {
         if (StringUtils.isNotEmpty(policyId)) {
             policyE.setId(Integer.valueOf(policyId));
         }
-        Map<String, String> extraMap = new HashMap<>();
-        extraMap.put("extra1", "");
-        extraMap.put("extra2", "");
-        policyE.setExtra(extraMap);
 
-        Map<String, Object> policyEMap;
         try {
-            policyEMap = DataToolUtils.objToMap(policyE);
-
+            LinkedHashMap<String, Object> policyEMap = 
+                ConfigUtils.objToMap(policyE, LinkedHashMap.class);
             Map<String, Object> policy1 = (HashMap<String, Object>) policyEMap.get("policy");
             for (Map.Entry<String, Object> entry : policy1.entrySet()) {
                 HashMap<String, Object> claimPolicyMap = (HashMap<String, Object>) entry.getValue();
@@ -111,6 +106,12 @@ public class GeneratePolicy {
                     .deserialize((String) claimPolicyMap.get("fieldsToBeDisclosed"), HashMap.class);
                 claimPolicyMap.put("fieldsToBeDisclosed", disclosureMap);
             }
+            
+            Map<String, String> extraMap = new HashMap<>();
+            extraMap.put("extra1", "");
+            extraMap.put("extra2", "");
+            policyEMap.put("extra", extraMap);
+            
             String presentationPolicy = ConfigUtils.serialize(policyEMap);
             FileUtils.writeToFile(presentationPolicy, "presentation_policy.json",
                 FileOperator.OVERWRITE);

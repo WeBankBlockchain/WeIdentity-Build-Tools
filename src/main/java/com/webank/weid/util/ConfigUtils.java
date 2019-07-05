@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,5 +85,8 @@ public final class ConfigUtils {
         }
         return result;
     }
-
+    
+    public static <T extends Map> T objToMap(Object obj, Class<T> cls) throws IOException {
+        return (T)OBJECT_MAPPER.readValue(serialize(obj), cls);
+    }
 }

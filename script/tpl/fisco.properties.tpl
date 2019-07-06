@@ -10,6 +10,7 @@ evidence.contractaddress=${EVIDENCE_ADDRESS}
 specificissuer.contractaddress=${SPECIFICISSUER_ADDRESS}
 
 chain.id=${CHAIN_ID}
+group.id=1
 
 # Blockchain connection params. Do NOT change these unless you are troubleshooting!
 web3sdk.timeout=10000
@@ -23,6 +24,6 @@ v1.ca-crt-path=ca.crt
 v1.client-crt-password=123456
 v1.client-key-store-path=client.keystore
 v1.key-store-password=123456
-v2.ca-crt-path=ca.crt
-v2.node-crt-path=node.crt
-v2.node-key-path=node.key
+v2.ca-crt-path=./v2/ca.crt
+v2.node-crt-path=./v2/node.crt
+v2.node-key-path=./v2/node.key

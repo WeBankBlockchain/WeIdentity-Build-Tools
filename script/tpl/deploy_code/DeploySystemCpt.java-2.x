@@ -30,9 +30,22 @@ import org.fisco.bcos.web3j.protocol.Web3j;
 import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.fisco.bcos.channel.client.ChannelPushCallback;
+import org.fisco.bcos.channel.client.Service;
+import org.fisco.bcos.channel.dto.ChannelRequest;
+import org.fisco.bcos.channel.dto.ChannelResponse;
+import org.fisco.bcos.channel.handler.ChannelConnections;
+import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
+import org.fisco.bcos.web3j.crypto.Credentials;
+import org.fisco.bcos.web3j.crypto.ECKeyPair;
+import org.fisco.bcos.web3j.crypto.gm.GenCredential;
+import org.fisco.bcos.web3j.protocol.Web3j;
+import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
+import org.fisco.bcos.web3j.protocol.core.methods.response.BlockNumber;
+
+import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
@@ -56,12 +69,7 @@ public class DeploySystemCpt {
     /**
      * The Fisco Config bundle.
      */
-    // protected static final FiscoConfig fiscoConfig;
-
-    /**
-     * The context.
-     */
-    protected static final ApplicationContext context;
+    protected static final FiscoConfig fiscoConfig;
 
     /**
      * log4j.
@@ -79,13 +87,10 @@ public class DeploySystemCpt {
     private static Web3j web3j;
 
     static {
-        /*
         fiscoConfig = new FiscoConfig();
         if (!fiscoConfig.load()) {
             logger.error("[DeployContract] Failed to load Fisco-BCOS blockchain node information.");
         }
-        */
-        context = new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 
     /**
@@ -112,11 +117,13 @@ public class DeploySystemCpt {
     }
 
     private static boolean initWeb3j() {
-        Service service = context.getBean(Service.class);
+        logger.info("[DeployContract] begin to init web3j instance..");
+        Service service = buildFiscoBcosService(fiscoConfig);
         try {
             service.run();
         } catch (Exception e) {
             logger.error("[BaseService] Service init failed. ", e);
+            return false;
         }
 
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
@@ -142,6 +149,39 @@ public class DeploySystemCpt {
         return true;
     }
 
+    private static Service buildFiscoBcosService(FiscoConfig fiscoConfig) {
+
+        Service service = new Service();
+        service.setOrgID(fiscoConfig.getCurrentOrgId());
+        service.setConnectSeconds(Integer.valueOf(fiscoConfig.getWeb3sdkTimeout()));
+        // group info
+        Integer groupId = Integer.valueOf(fiscoConfig.getGroupId());
+        service.setGroupId(groupId);
+
+        // connect key and string
+        ChannelConnections channelConnections = new ChannelConnections();
+        channelConnections.setGroupId(groupId);
+        channelConnections.setCaCertPath("classpath:" + fiscoConfig.getV2CaCrtPath());
+        channelConnections.setNodeCaPath("classpath:" + fiscoConfig.getV2NodeCrtPath());
+        channelConnections.setNodeKeyPath("classpath:" + fiscoConfig.getV2NodeKeyPath());
+        channelConnections.setConnectionsStr(Arrays.asList(fiscoConfig.getNodes().split(",")));
+        GroupChannelConnectionsConfig connectionsConfig = new GroupChannelConnectionsConfig();
+        connectionsConfig.setAllChannelConnections(Arrays.asList(channelConnections));
+        service.setAllChannelConnections(connectionsConfig);
+
+        // thread pool params
+        
+        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+        pool.setBeanName("web3sdk");
+        pool.setCorePoolSize(Integer.valueOf(fiscoConfig.getWeb3sdkCorePoolSize()));
+        pool.setMaxPoolSize(Integer.valueOf(fiscoConfig.getWeb3sdkMaxPoolSize()));
+        pool.setQueueCapacity(Integer.valueOf(fiscoConfig.getWeb3sdkQueueSize()));
+        pool.setKeepAliveSeconds(Integer.valueOf(fiscoConfig.getWeb3sdkKeepAliveSeconds()));
+        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.AbortPolicy());
+        pool.initialize();
+        service.setThreadPool(pool);
+        return service;
+    }
 
     /**
      * Deploy System CPTs.

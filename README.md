@@ -1,10 +1,10 @@
-WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
+WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 =============================================================
 
 整体介绍
 --------
 
-> 通过安装部署工具，您可以快速的在您的应用项目中集成weidentity-java-sdk。
+> 通过安装部署工具，您可以快速的在您的应用项目中集成weid-java-sdk。
 
 部署步骤
 --------
@@ -14,7 +14,7 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 在 `build.gradle` 文件中中添加相关的包依赖：
 
     dependencies {
-        compile 'com.webank:weidentity-java-sdk:1.2.0'
+        compile 'com.webank:weid-java-sdk:1.3.0'
     }
 
 * * * * *
@@ -28,15 +28,15 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 #### 2.1 下载安装部署工具
 
 ``` 
-    git clone https://github.com/WeBankFinTech/weidentity-build-tools.git 
+    git clone https://github.com/WeBankFinTech/weid-build-tools.git 
 ``` 
 
 该工具默认会使用最新版本的
-[WeIdentity智能合约](https://github.com/WeBankFinTech/weidentity-contract)。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
+[WeIdentity智能合约](https://github.com/WeBankFinTech/weid-contract)。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
 
 #### 2.2 配置区块链节点和机构信息
 
-    cd weidentity-build-tools   
+    cd weid-build-tools   
     vim run.config   
 
 修改 `blockchain.node.address` 字段，填入区块链节点 IP 和
@@ -90,14 +90,14 @@ chain_id=1
 如果您使用的是FISCO BCOS 1.3.x的版本，您可以 请参考[FISCO BCOS 1.3
 web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html)
 将证书文件 `ca.crt` 和 `client.keystore` 复制出来，拷贝至
-weidentity-build-tools 下面的 `resources`
-目录：`weidentity-build-tools/resources/`。
+weid-build-tools 下面的 `resources`
+目录：`weid-build-tools/resources/`。
 
 如果您使用的是FISCO BCOS 2.0的版本，您可以 请参考[FISCO BCOS 2.0
 web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html)
 将证书文件 `ca.crt` `node.crt` 和 `node.key` 复制出来，拷贝至
-weidentity-build-tools 下面的 `resources`
-目录：`weidentity-build-tools/resources/`。
+weid-build-tools 下面的 `resources`
+目录：`weid-build-tools/resources/`。
 
 #### 2.4 部署智能合约并自动生成配置文件
 
@@ -121,9 +121,9 @@ weidentity-build-tools 下面的 `resources`
 ``` 
 
 运行成功后，会自动在 `resources` 目录下生成 `fisco.properties`和
-`weidentity.properties`。并且自动将 weidentity-contract
+`weidentity.properties`。并且自动将 weid-contract
 部署到区块链节点上，并将相应的智能合约地址也填入到 `fisco.properties`。
-同时，我们还会在weidentity-build-tools/output/admin目录下动态生成公私钥对。
+同时，我们还会在weid-build-tools/output/admin目录下动态生成公私钥对。
 
 ``` 
     cd output/admin
@@ -149,21 +149,21 @@ id，并正确的配置在weidentity-build-tools的`resources`
 此步骤提供快速创建Weidentity DID、注册Authority
 issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity
 DID、注册Authority issuer、发布CPT
-等动作也可以通过直接在应用里通过weidentity-java-sdk完成，您可以结合您的需要进行选择。
+等动作也可以通过直接在应用里通过weid-java-sdk完成，您可以结合您的需要进行选择。
 
 #### 3.1 创建您的Weidentiy DID
 
 这个步骤会帮您快速创建一个weidentity DID。
 
 ``` 
-    cd weidentity-build-tools/tools
+    cd weid-build-tools/tools
     chmod +x *.sh
     ./create_weid.sh
 ``` 
 
 执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has
 been created”，并会打印出刚刚生成的weidentity
-did，同时在output目录weidentity-build-tools/output/create_weid/下生成对应的weidentity
+did，同时在output目录weid-build-tools/output/create_weid/下生成对应的weidentity
 DID 以及公钥和私钥。
 
 在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity
@@ -279,7 +279,7 @@ blockchain”。注册成功。如果类型不存在，此命令也会自动注�
 ### 4 完成 weidentity-java-sdk 的集成
 
 ``` 
-    cd weidentity-build-tools/resources
+    cd weid-build-tools/resources
     ls
 ``` 
 
@@ -287,7 +287,7 @@ blockchain”。注册成功。如果类型不存在，此命令也会自动注�
 文件，`weidentity.properties` 文件，以及 `ca.crt`，`client.keystore`
 如果是FISCO BCOS 2.0，则是 `ca.crt` `node.crt` 和 `node.key`
 ，拷贝至您的应用的 `resources`
-目录下，weidentity-java-sdk会自动加载相应的资源文件。
+目录下，weid-java-sdk会自动加载相应的资源文件。
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weidentity-java-sdk
 相关接口请见：[WeIdentity JAVA
@@ -306,7 +306,7 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 编辑fisco.properties：
 
 ``` 
-    cd weidentity-build-tools/resources/
+    cd weid-build-tools/resources/
     vim fisco.properties
 ``` 
 
@@ -334,7 +334,7 @@ Contract的发布地址是0xabbc75543648af0861b14daa4f8582f28cd95f5e，
     chain.id=1
 ``` 
 
-### 附录2 升级 weidentity-java-sdk
+### 附录2 升级 weid-java-sdk
 
-如果在后续weidentity java
-sdk出了新的版本，您希望将您现有的版本升级为新版本，或者回退到以前的版本，您可以手工将您的build.gradle里配置的版本改为您想要的版本，然后重新执行以上的步骤即可。默认的，您依赖的特定版本的weidentity-java-sdk会依赖对应的版本的weidentity智能合约，如果您要定制您的智能合约版本，您可以手工替换智能合约的jar包。
+如果在后续weid java
+sdk出了新的版本，您希望将您现有的版本升级为新版本，或者回退到以前的版本，您可以手工将您的build.gradle里配置的版本改为您想要的版本，然后重新执行以上的步骤即可。默认的，您依赖的特定版本的weid-java-sdk会依赖对应的版本的weidentity智能合约，如果您要定制您的智能合约版本，您可以手工替换智能合约的jar包。

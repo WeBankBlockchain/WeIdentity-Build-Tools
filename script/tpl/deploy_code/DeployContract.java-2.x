@@ -39,6 +39,7 @@ import org.fisco.bcos.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.FileOperator;
@@ -167,7 +168,15 @@ public class DeployContract {
         connectionsConfig.setAllChannelConnections(Arrays.asList(channelConnections));
         service.setAllChannelConnections(connectionsConfig);
 
-        // thread pool params
+        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+        pool.setBeanName("web3sdk");
+        pool.setCorePoolSize(Integer.valueOf(fiscoConfig.getWeb3sdkCorePoolSize()));
+        pool.setMaxPoolSize(Integer.valueOf(fiscoConfig.getWeb3sdkMaxPoolSize()));
+        pool.setQueueCapacity(Integer.valueOf(fiscoConfig.getWeb3sdkQueueSize()));
+        pool.setKeepAliveSeconds(Integer.valueOf(fiscoConfig.getWeb3sdkKeepAliveSeconds()));
+        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.AbortPolicy());
+        pool.initialize();
+        service.setThreadPool(pool);
         return service;
     }
     

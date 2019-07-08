@@ -61,10 +61,12 @@ function compile()
         content="${content}WeIdentity@$var"
       fi
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
-      if [ ! -z ${content} ];then
-           content="${content}\n"
+    	if [ $num -lt $length ];then
+        content="${content}$var,"
       fi
-    	content="${content}<value>$var</value>"
+      if [ $num -eq $length ];then
+        content="${content}$var"
+      fi
     else
     	echo "currently FISCO BCOS ${blockchain_fiscobcos_version}.x is not supported."
     fi

@@ -29,9 +29,9 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 
 .. raw:: html
 
-   <div id="section-2">
+   <div id="section-1">
 
-2. 部署 WeIdentity 智能合约
+1. 部署 WeIdentity 智能合约
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -39,22 +39,22 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
 
    </div>
 
-2.1 下载安装部署工具
+1.1 下载安装部署工具
 ''''''''''''''''''''''''''''''
 ::
 
-    git clone https://github.com/WeBankFinTech/weidentity-build-tools.git 
+    git clone https://github.com/WeBankFinTech/weid-build-tools.git
  
 
 该工具默认会使用最新版本的
-`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ 。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
+`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ ，该工具可以帮您发布智能合约和自动配置。
 
 2.2 配置区块链节点和机构信息
 ''''''''''''''''''''''''''''''''''''
 
 ::
 
-    cd weidentity-build-tools   
+    cd weid-build-tools   
     vim run.config   
 
 修改 ``blockchain.node.address`` 字段，填入区块链节点 IP 和
@@ -102,20 +102,22 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
     chain_id=1
 
-2.3 配置节点证书和秘钥文件
+1.3 配置节点证书和秘钥文件
 ''''''''''''''''''''''''''
+
+::
+
+    cd resources
 
 如果您使用的是FISCO BCOS 1.3.x的版本，您可以
 请参考\ `FISCO BCOS 1.3 web3sdk配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__
-将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至 weidentity-build-tools 下面的 ``resources``
-目录：\ ``weidentity-build-tools/resources/``\ 。
+将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至当前目录下 。
 
 如果您使用的是FISCO BCOS 2.0的版本，您可以
 请参考\ `FISCO BCOS 2.0 web3sdk配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html>`__
-将证书文件 `` ca.crt``  `` node.crt`` 和 ``node.key`` 复制出来，拷贝至 weidentity-build-tools 下面的 ``resources`` 
-目录：\ ``weidentity-build-tools/resources/``\ 。
+将证书文件 `` ca.crt``  `` node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
 
-2.4 部署智能合约并自动生成配置文件
+1.4 部署智能合约并自动生成配置文件
 ''''''''''''''''''''''''''''''
 
 如果您是第一次使用本工具，您需要先进行编译：
@@ -137,20 +139,46 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
     chmod +x deploy.sh   
     ./deploy.sh
 
-运行成功后，会自动在 ``resources`` 目录下生成
-``fisco.properties``\ 和 ``weidentity.properties``\ 。并且自动将 weidentity-contract
-部署到区块链节点上，并将相应的智能合约地址也填入到
-``fisco.properties``\ 。
-同时，我们还会在weidentity-build-tools/output/admin目录下动态生成公私钥对。
+运行成功后，会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub ，此私钥后续用于注册权威机构。
+
+至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成。
+
+
+2 weid-java-sdk 的集成
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+2.1 在您的应用工程中引入weid-java-sdk
+'''''''''''''''''''''''''''''''''''''''''''''
+
+在您的应用工程的gradle文件中配置weid-java-sdk依赖：
 
 ::
 
-    cd output/admin
-    ls
+    dependencies {
+        compile 'com.webank:weidentity-java-sdk:1.3.1.rc-2'
+    }
 
-您将看到私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub，并会自动将该私钥对应的地址注册为commit member，此私钥后续用于注册authority issuer。
+2.2 配置您的应用工程
+''''''''''''''''''''''''''''''''''''
+将build-tools里配置好的配置文件拷贝至您的应用工程中：
+::
+
+    dependencies {
+        compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
+    }
 
 
+您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以及
+``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``  `` node.crt`` 和 ``node.key`` ，拷贝至您的应用的 ``resources``
+目录下，weidentity-java-sdk会自动加载相应的资源文件。
+
+现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
+相关接口请见：\ `WeIdentity JAVA
+SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__
+
+
+我们提供了一些快捷工具，可以帮您快速体验weid-java-sdk，请参考\ `章节3 <#section-3>`__\ .
+--------------
 .. raw:: html
 
    <div id="section-3">
@@ -166,7 +194,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
 
-如果您是weidentity智能合约的发布者，您需要保证\ `章节2 <#section-2>`__\ 的所有步骤已经正确完成。
+如果您是weidentity智能合约的发布者，您需要保证\ `章节1 <#section-1>`__\ 的所有步骤已经正确完成。
 
 如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，并正确的配置在weidentity-build-tools的\ ``resources`` 目录下的\ ``fisco.properties`` 里。
 配置方法请参考\ `附录1 <#reference-2>`__\。
@@ -299,22 +327,6 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 ::
     ./register_specific_issuer.sh --remove-issuer did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
-4 完成 weidentity-java-sdk 的集成
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-::
-
-    cd weidentity-build-tools/resources
-    ls
-
-您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以及
-``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``  `` node.crt`` 和 ``node.key`` ，拷贝至您的应用的 ``resources``
-目录下，weidentity-java-sdk会自动加载相应的资源文件。
-
-现在您可以使用 WeIdentity 开发您的区块链身份应用。weidentity-java-sdk
-相关接口请见：\ `WeIdentity JAVA
-SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__
-
---------------
 
 .. raw:: html
 

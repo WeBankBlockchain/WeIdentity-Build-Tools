@@ -3,27 +3,17 @@
 
 .. _weidentity-build-tools-doc:
 
-WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式）
+WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 ============================================================
 
 整体介绍
 --------
 
-  通过安装部署工具，您可以快速的在您的应用项目中集成weidentity-java-sdk。
+  通过安装部署工具，您可以快速的在您的应用项目中集成weid-java-sdk。
 
 部署步骤
 --------
 
-1. 通过 maven 引入 weidentity-java-sdk 依赖
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-在 ``build.gradle`` 文件中中添加相关的包依赖：
-
-::
-
-    dependencies {
-        compile 'com.webank:weidentity-java-sdk:1.2.0'
-    }
 
 ####
 
@@ -155,7 +145,7 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 ::
 
     dependencies {
-        compile 'com.webank:weidentity-java-sdk:1.3.1.rc-2'
+        compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
     }
 
 2.2 配置您的应用工程
@@ -163,14 +153,13 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 将build-tools里配置好的配置文件拷贝至您的应用工程中：
 ::
 
-    dependencies {
-        compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
-    }
+    cd resources/
+    ls
 
 
 您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以及
 ``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``  `` node.crt`` 和 ``node.key`` ，拷贝至您的应用的 ``resources``
-目录下，weidentity-java-sdk会自动加载相应的资源文件。
+目录下，weid-java-sdk会自动加载相应的资源文件。
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
 相关接口请见：\ `WeIdentity JAVA
@@ -196,11 +185,11 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 如果您是weidentity智能合约的发布者，您需要保证\ `章节1 <#section-1>`__\ 的所有步骤已经正确完成。
 
-如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，并正确的配置在weidentity-build-tools的\ ``resources`` 目录下的\ ``fisco.properties`` 里。
+如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，并正确的配置在weid-build-tools的\ ``resources`` 目录下的\ ``fisco.properties`` 里。
 配置方法请参考\ `附录1 <#reference-2>`__\。
 
 此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity DID、注册Authority issuer、发布CPT
-等动作也可以通过直接在应用里通过weidentity-java-sdk完成，您可以结合您的需要进行选择。
+等动作也可以通过直接在应用里通过weid-java-sdk完成，您可以结合您的需要进行选择。
 
 3.1 创建您的Weidentiy DID
 ''''''''''''''''''''''''''''''
@@ -209,11 +198,11 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 ::
 
-    cd weidentity-build-tools/tools
+    cd weid-build-tools/tools
     chmod +x *.sh
     ./create_weid.sh
 
-执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has been created”，并会打印出刚刚生成的weidentity did，同时在output目录weidentity-build-tools/output/create_weid/下生成对应的weidentity DID
+执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has been created”，并会打印出刚刚生成的weidentity did，同时在output目录weid-build-tools/output/create_weid/下生成对应的weidentity DID
 以及公钥和私钥。
 
 在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weidentity DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key。
@@ -266,7 +255,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 说明CPT文件cpt_ID_card.json成功发布到区块链上，且发布的ID为1000，后续我们可以用这个ID来查询我们发布的CPT。
 
-同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weidentity-build-tools/output/regist_cpt/目录下查看。
+同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weid-build-tools/output/regist_cpt/目录下查看。
 
 
 3.4 拉取CPT并生成presentation policy模板
@@ -346,7 +335,7 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 
 ::
 
-    cd weidentity-build-tools/resources/
+    cd weid-build-tools/resources/
     vim fisco.properties
 
 您可以看到配置内容，我们需要将weidentity的智能合约地址和chain id写入到指定配置项，找到以下配置项：
@@ -372,7 +361,7 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
     chain.id=1
 
 
-附录2 升级 weidentity-java-sdk
+附录2 升级 weid-java-sdk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 如果在后续weidentity java

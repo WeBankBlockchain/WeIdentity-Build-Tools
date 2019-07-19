@@ -156,15 +156,15 @@ channelport，示例如下：
 
 
 您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以及
-``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``  `` node.crt`` 和 ``node.key`` ，拷贝至您的应用的 ``resources``
+``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``\  ， \ `` node.crt`` 和 \ ``node.key`` ，拷贝至您的应用的 ``resources``
 目录下，weid-java-sdk会自动加载相应的资源文件。
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
 相关接口请见：\ `WeIdentity JAVA
 SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__
 
-
 我们提供了一些快捷工具，可以帮您快速体验weid-java-sdk，请参考\ `章节3 <#section-3>`__\ .
+
 --------------
 .. raw:: html
 
@@ -214,6 +214,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称是test。
 ::
+
     ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
@@ -230,17 +231,21 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
-假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private_key/key
-
-::
-
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt --private-key /home/test/private_key/key
-
-如果您的weid是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥。
+如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥，只用指定cpt的路径即可。
 
 ::
 
     ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
+
+如果您是通过其他途径创建的weid，您需要自己指定私钥的位置。
+假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
+
+::
+
+    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/ --private-key /home/test/private_key/ecdsa_key
+
+如果您的weid是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥。
+
 
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
@@ -267,7 +272,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 ::
 
-    ./cpt_to_pojo.sh --cpt-list=1000,1001
+    ./cpt_to_pojo.sh --cpt-list 1000,1001
     
 
 注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的。
@@ -301,6 +306,7 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
 
 ::
+
     ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been successfully registered on blockchain”。注册成功。如果类型不存在，此命令也会自动注册一个类型。
@@ -308,11 +314,13 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
 ::
+
     ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 如果您需要移除某个机构，前提是您是智能合约发布者或者您有相应的权限，比如您要从college类型中移除did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb：
 
 ::
+
     ./register_specific_issuer.sh --remove-issuer did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
 

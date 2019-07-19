@@ -1,7 +1,6 @@
 #!/bin/bash
 source ./script/common.inc
 source run.config
-echo "org_id:${org_id}"
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
@@ -17,6 +16,8 @@ function modify_config()
     	echo "deploy contract failed."
     	exit 1
     fi
+    echo "contract is deployed with success."
+    echo "===========================================."
     weid_address=$(cat weIdContract.address)
     echo "weid contract address is ${weid_address}"
     cpt_address=$(cat cptController.address)
@@ -27,6 +28,8 @@ function modify_config()
     echo "evidence contract address is ${evidence_address}"
     specificIssuer_address=$(cat specificIssuer.address)
     echo "specificIssuer contract address is ${specificIssuer_address}"
+    echo "===========================================."
+    echo ""
     
     export WEID_ADDRESS=${weid_address}
     export CPT_ADDRESS=${cpt_address}
@@ -45,13 +48,12 @@ function modify_config()
     #envsubst ${ORG_ID} < ${WEIDENTITY_CONFIG} >${WEIDENTITY_CONFIG_TMP}
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
    # cp -f ${WEIDENTITY_CONFIG_TMP} ${SOURCE_CODE_DIR}/resources/${WEIDENTITY_CONFIG}
-    echo "modify sdk config finished..."
 }
 
 function deploy_contract()
 {
-
-    echo "begin to deploy contract..."
+	echo " "
+    echo "begin to deploy contract, please wait....."
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
@@ -72,7 +74,6 @@ function deploy_contract()
     mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
     mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
     
-    echo "contract deployment done."
 }
 
 function deploy_system_cpt()
@@ -111,9 +112,29 @@ function clean_data()
     fi
 }
 
+function check_node_cert(){
+
+	cd ${SOURCE_CODE_DIR}/resources 
+	if [ "${blockchain_fiscobcos_version}" = "1" ];then
+        if [ ! -f  ca.crt -o ! -f  client.keystore ];then
+        echo "ERROR : fisco bcos version is 1.3, ca.crt and client.keystore are needed."
+        exit 1
+      fi
+    elif [ "${blockchain_fiscobcos_version}" = "2" ];then
+        if [ ! -f  ca.crt -o ! -f  node.crt -o ! -f  node.key ];then
+        echo "ERROR : fisco bcos version is 2.0. ca.crt, node.crt and node.key are needed."
+        exit 1
+        fi
+    else
+        echo "the version : ${blockchain_fiscobcos_version} is not supported, we only support FISCO BCOS 1.3 and 2.0."
+        exit 1
+   fi
+}
+
 function main()
 {
     check_jdk
+    check_node_cert
     deploy_contract
     modify_config
     #deploy_system_cpt

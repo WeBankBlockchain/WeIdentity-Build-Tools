@@ -88,6 +88,14 @@ public class RegistCpt {
         }
 
         if (StringUtils.isNotEmpty(cptDir)) {
+        	if(!cptDir.startsWith("/")) {
+        		
+        		//相对路径
+        		String temp = "tools/" + cptDir;
+        		System.out.println("sssssssssssssssss ---------> " + temp);
+        		cptDir = temp;
+        		
+        	}
             File file = new File(cptDir);
 
             if (!file.isDirectory()) {

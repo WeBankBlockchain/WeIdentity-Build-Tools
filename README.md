@@ -213,7 +213,7 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称为test。
 
 ``` 
-    ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
+    ./register_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
 
 ``` 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has
@@ -223,7 +223,7 @@ been successfully registed on blockchain”。注册成功。
 
 ``` 
 
-    ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 ``` 
 
@@ -234,14 +234,14 @@ been successfully registed on blockchain”。注册成功。
 如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥，只用指定cpt的路径即可。
 
 ``` 
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/
+    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/
 ``` 
 
 如果您是通过其他途径创建的weid，您需要自己指定私钥。
-假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
+假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名假设上传至test_data/single/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ``` 
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/ --private-key /home/test/private_key/ecdsa_key
+    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/ --private-key /home/test/private_key/ecdsa_key
 ``` 
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID
@@ -262,17 +262,16 @@ card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下
 此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO然后生成weidentity-cpt.jar，在创建credential的时候，可以直接使用POJO进行创建。同时也会根据您生成一个presentation
 policy模板。
 
-假如您需要将cpt id为1000和1001的cpt从区块链上拉取下来，并基于cpt
-1000和cpt 1001生成presentation policy的配置模板。
+假如您需要将cpt id为1000的cpt从区块链上拉取下来，并基于cpt
+1000生成presentation policy的配置模板。
 
 ``` 
-    ./cpt_to_pojo.sh --cpt-list 1000,1001
+    ./cpt_to_pojo.sh --cpt-list 1000
 ``` 
 
 注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的。
 
-执行命令大约需要20秒，如果执行没有报错，会在屏幕打印类似于“List:[[100,
-101]] are successfully transformed to pojo. List:[[]] are
+执行命令大约需要20秒，如果执行没有报错，会在屏幕打印类似于“List:[[1000]] are successfully transformed to pojo. List:[[]] are
 failed.”的信息，这条信息表明CPT ID为100和101的已经拉取成功。
 
 CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。

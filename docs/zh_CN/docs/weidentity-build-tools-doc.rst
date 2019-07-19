@@ -48,7 +48,7 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
     cd weid-build-tools   
     vim run.config   
 
-修改 ``blockchain.node.address`` 字段，填入区块链节点 IP 和
+修改 ``blockchain_address`` 字段，填入区块链节点 IP 和
 channelport，示例如下：
 
 .. code:: shell
@@ -126,7 +126,7 @@ channelport，示例如下：
     ./deploy.sh
 
 
-运行成功后，在控制台可以看到发布好的智能合约地址。
+运行成功后，在控制台可以看到发布好的智能合约地址，合约地址已经自动写入配置文件。
 
 ```bash
 
@@ -205,7 +205,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
     - 如果您是weidentity智能合约的发布者，您需要保证\ `章节1 <#section-1>`__\ 的所有步骤已经正确完成。
 
 如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain
-id，并正确的配置在weidentity-build-tools的`resources`
+id，并正确的配置在weid-build-tools的`resources`
 目录下的`fisco.properties` 里。 配置方法请参考\ `附录1 <#reference-2>`__\。
 
 ```
@@ -238,7 +238,7 @@ id，并正确的配置在weidentity-build-tools的`resources`
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称是test。
 ::
 
-    ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
+    ./register_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
 
@@ -247,7 +247,7 @@ id，并正确的配置在weidentity-build-tools的`resources`
 
 ::
 
-    ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 3.3 机构发布CPT
 ''''''''''''''''''''''''''''''
@@ -258,14 +258,14 @@ id，并正确的配置在weidentity-build-tools的`resources`
 
 ::
 
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
+    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/
 
 如果您是通过其他途径创建的weid，您需要自己指定私钥的位置。
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ::
 
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/ --private-key /home/test/private_key/ecdsa_key
+    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/ --private-key /home/test/private_key/ecdsa_key
 
 如果您的weid是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥。
 
@@ -290,17 +290,17 @@ id，并正确的配置在weidentity-build-tools的`resources`
 
 此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO，在创建credential的时候，可以直接使用POJO进行创建。同时也会根据您生成一个presentation policy模板。
 
-假如您需要将cpt id为1000和1001的cpt从区块链上拉取下来，并基于cpt 1000和cpt 1001生成presentation policy的配置模板。
+假如您需要将cpt id为1000的cpt从区块链上拉取下来，并基于cpt 1000生成presentation policy的配置模板。
 
 
 ::
 
-    ./cpt_to_pojo.sh --cpt-list 1000,1001
+    ./cpt_to_pojo.sh --cpt-list 1000
     
 
 注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的。
 
-执行命令大约需要20秒，如果执行没有报错，会在屏幕打印类似于“List:[[100, 101]] are successfully transformed to pojo. List:[[]] are failed.”的信息，这条信息表明CPT ID为100和101的已经拉取成功。
+执行命令大约需要20秒，如果执行没有报错，会在屏幕打印类似于“List:[[1000]] are successfully transformed to pojo. List:[[]] are failed.”的信息，这条信息表明CPT ID为100和101的已经拉取成功。
 
 CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
 

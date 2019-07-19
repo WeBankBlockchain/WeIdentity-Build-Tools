@@ -83,10 +83,9 @@ public class RegistAuthorityIssuer {
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         weIdPrivateKey.setPrivateKey(privateKey);
 
-        System.out.println(
-            "registering authorityissuer:" + weid + ", name is :"
-                + orgId);
+        
         if (StringUtils.isNotEmpty(weid)) {
+        	System.out.println("registering authorityissuer:" + weid + ", name is :"+ orgId);
             RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
             AuthorityIssuer authorityIssuer = new AuthorityIssuer();
             authorityIssuer.setName(orgId);
@@ -106,7 +105,8 @@ public class RegistAuthorityIssuer {
                     response.getErrorCode(),
                     response.getErrorMessage()
                 );
-                System.exit(1);
+                System.out.println("register wauthority issuer " + weid + " failed :" + response.getErrorMessage());
+                System.exit(response.getErrorCode());
             } else {
                 logger.info(
                     "[RegisterAuthorityIssuer] register wauthority issuer {} success.",

@@ -94,7 +94,7 @@ web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs
     ./compile.sh
 ``` 
 
-如果执行过程没报错，大约1分钟左右可以编译完成。
+如果执行过程没报错，大约半分钟左右可以编译完成。
 
 如果您不是发布智能合约的机构，您可以直接跳过后续步骤，直接进入章节3。
 
@@ -132,14 +132,13 @@ specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
 
 ### 2  weid-java-sdk 的集成
 
-#### 2.1 在您的应用工程中引入weid-java-sdk
+#### 2.1 JAVA应用工程中引入weid-java-sdk
 
 在您的应用工程的gradle文件中配置weid-java-sdk依赖：
 ```
+ 
+     compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
 
-    dependencies {
-        compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
-    }
 ```  
 
 #### 2.2 配置您的应用工程
@@ -172,9 +171,8 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 ```eval_rst
 .. note::
-    - 如果您是weidentity智能合约的发布者，您需要保证[章节1](#section-2)的所有步骤已经正确完成。
 
-    - 如果您不是weidentity的 能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，并正确的配置在weidentity-build-tools的 `resources` 目录下的`fisco.properties` 里。 配置方法请参考[附录1](#reference-2)。
+    - 只有weid智能合约发布机构可以注册权威机构，才能进行3.2节和3.3节的相关操作。
 ```
 
 此步骤提供快速创建Weidentity DID、注册Authority
@@ -201,11 +199,6 @@ issuer、发布CPT、拉取CPT并生成presentation policy的能力。
 在weid-build-tools/output/create_weid/目录下看到一些以0x开头的目录，找到跟刚刚生成的weid匹配的目录，里面包含了weid，公钥ecdsa_key.pub和私钥ecdsa_key。
 
 #### 3.2 注册权威机构（authority issuer）
-
-该步骤需要发布智能合约的机构来执行，需要使用[第2.4节](#section-2)中生成的私钥来注册权威机构。
-这个步骤会帮您将一个指定的weidentity DID注册为权威机构。
-如果您不是智能合约的发布者，您可以将您的weidentity
-DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称为test。
 
@@ -237,7 +230,27 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
 
 ``` 
 
-#### 3.3 机构发布CPT
+#### 3.3 注册特定类型机构（specific issuer）
+
+
+假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
+
+``` 
+  ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+``` 
+执行成功，则会打印以下信息。
+```
+
+    [RegisterIssuer] Adding WeIdentity DID did:weid:1:0xe10e52f6b7c6751bd03afc023b8e617d7fd0429c in type: college
+    specific issuers and types have been successfully registered on blockchain.
+```
+如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
+
+``` 
+   ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb
+``` 
+
+#### 3.4 机构发布CPT
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
@@ -247,6 +260,14 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
     ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 ``` 
 
+若执行成功，则会打印以下信息：
+```
+
+    [RegisterCpt] register cpt file:JsonSchema.json result ---> success. cpt id ---> 1000
+    [RegisterCpt] register cpt file:JsonSchema.json with success.
+    finished.
+```
+
 如果您是通过其他途径创建的weid，您需要自己指定私钥。
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名假设上传至test_data/single/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
@@ -254,74 +275,27 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
     ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --private-key /home/test/private_key/ecdsa_key
 ``` 
 
-执行命令大约需要10秒钟，假设我们要发布的CPT是ID
-card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
 
-``` 
-    [RegisterCpt] begin to register cpt file:cpt_ID_card.json
-    [RegisterCpt] result:{"errorCode":0,"errorMessage":"success","result":{"cptId":1000,"cptVersion":1}}
+#### 3.5 拉取CPT并生成presentation policy模板
 
-``` 
+.. note::
+    - 此步骤，可以帮使用者从区块链上拉取指定的已发布的CPT，并转化成POJO，同时也会根据您生成一个presentation policy模板。
 
-说明CPT文件cpt_ID_card.json成功发布到区块链上，且发布的ID为1000，后续我们可以用这个ID来查询我们发布的CPT。
-
-同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weidentity-build-tools/output/regist_cpt/目录下查看。
-
-#### 3.4 拉取CPT并生成presentation policy模板
-
-此步骤，可以帮使用者从区块链上拉取指定的CPT，并转化成POJO然后生成weidentity-cpt.jar，在创建credential的时候，可以直接使用POJO进行创建。同时也会根据您生成一个presentation
-policy模板。
-
-假如您需要将cpt id为1000的cpt从区块链上拉取下来，并基于cpt
-1000生成presentation policy的配置模板。
+假如您需要将cpt id为1000的cpt从区块链上拉取下来，并基于cpt 1000生成presentation policy的配置模板。
 
 ``` 
     ./cpt_to_pojo.sh --cpt-list 1000
 ``` 
 
-注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的，如要拉取多个CPT，多个CPT ID之间用逗号分隔。
-
-执行命令大约需要20秒，如果执行没有报错，会在屏幕打印类似于“List:[[1000]] are successfully transformed to pojo. List:[[]] are
-failed.”的信息，这条信息表明CPT ID为100和101的已经拉取成功。
-
-CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取。
-
+若执行成功，则会打印以下信息。
 ``` 
-    cd ../dist/app/
-    ls
-``` 
+ 
+    begin to generate pojo from cpt...
+    All cpt:[1000] are successfully transformed to pojo.
 
-直接将weidentity-cpt.jar拷贝至您的应用的classpath下即可使用。
-
-此步骤同时也会帮您生成一个默认的presentation
-policy的配置模板，您可以按您的需求来修改。
-
-``` 
-    cd ../../output/presentation_policy
-    ls
-``` 
-
-#### 3.5 注册特定类型机构（specific issuer）
-
-该步骤需要发布智能合约的机构来执行，需要使用[第2.4节](#section-2)中生成的私钥来注册各类特定类型的机构，如学校、医院、政府部门等。
-这个步骤会帮您将一个指定的weidentity DID注册为特定类型的某种机构。
-如果您不是智能合约的发布者，您可以将您的weidentity
-DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
-
-假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
-
-``` 
-  ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
-``` 
-
-执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been
-successfully registered on
-blockchain”。注册成功。如果类型不存在，此命令也会自动注册一个类型。
-
-如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
-
-``` 
-   ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb
+    the weidentity-cpt.jar can be found in /home/app/tonychen/test_gradle/weid-build-tools/dist/app/
+    begin to generate presentation policy ...
+    presentation policy template is successfully generated, you can find it at /home/app/tonychen/test_gradle/weid-build-tools/output/presentation_policy.
 ``` 
 
 

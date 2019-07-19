@@ -91,7 +91,8 @@ public class RegistCpt {
             File file = new File(cptDir);
 
             if (!file.isDirectory()) {
-                logger.error("failed.");
+                logger.error("no cpt was found in cpt :{}, please check your input.", file);
+                System.out.println("no cpt was found in cpt :" + file + ", please check your input.");
                 System.exit(1);
             }
             for (File f : file.listFiles()) {

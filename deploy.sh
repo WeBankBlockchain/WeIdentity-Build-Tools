@@ -53,7 +53,7 @@ function modify_config()
 function deploy_contract()
 {
 	echo " "
-    echo "begin to deploy contract..."
+    echo "begin to deploy contract, please wait....."
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
@@ -74,7 +74,6 @@ function deploy_contract()
     mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
     mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
     
-    echo "contract deployment done."
 }
 
 function deploy_system_cpt()

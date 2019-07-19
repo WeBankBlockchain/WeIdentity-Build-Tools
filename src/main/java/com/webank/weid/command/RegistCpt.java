@@ -92,7 +92,6 @@ public class RegistCpt {
         		
         		//相对路径
         		String temp = "tools/" + cptDir;
-        		System.out.println("sssssssssssssssss ---------> " + temp);
         		cptDir = temp;
         		
         	}
@@ -119,7 +118,7 @@ public class RegistCpt {
             if (!fileName.endsWith(".json")) {
                 return;
             }
-            System.out.println("[registerCpt] begin to register cpt file:" + fileName);
+            System.out.println("registering cpt file:" + fileName);
             jsonNode = JsonLoader.fromFile(cptFile);
             String cptJsonSchema = jsonNode.toString();
             CptStringArgs cptStringArgs = new CptStringArgs();
@@ -133,7 +132,7 @@ public class RegistCpt {
                 Integer cptId1 = Integer.valueOf(cptId);
                 response = cptService.registerCpt(cptStringArgs, cptId1);
             }
-            System.out.println("[RegisterCpt] result:" + DataToolUtils.serialize(response));
+            //System.out.println("[RegisterCpt] result:" + DataToolUtils.serialize(response));
             if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
                 logger.error("[RegisterCpt] load config faild. ErrorCode is:{}, msg :{}",
                     response.getErrorCode(),
@@ -142,7 +141,7 @@ public class RegistCpt {
                     "[RegisterCpt] register cpt file:" + fileName + "  result ---> failed. ");
             } else {
                 System.out.println(
-                    "[RegisterCpt] register cpt file:" + fileName + " result ---> success.");
+                    "[RegisterCpt] register cpt file:" + fileName + " result ---> success. cpt id ---> "+ response.getResult().getCptId());
             }
             String content = new StringBuffer()
                 .append(fileName)

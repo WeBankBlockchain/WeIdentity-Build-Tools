@@ -56,7 +56,7 @@ public class CreateWeId {
         }
         CreateWeIdDataResult result = response.getResult();
         String weId = result.getWeId();
-        System.out.println("weid is ------> " + weId);
+        //System.out.println("weid is ------> " + weId);
         String publicKey = result.getUserWeIdPublicKey().getPublicKey();
         String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
 

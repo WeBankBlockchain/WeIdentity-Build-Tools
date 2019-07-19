@@ -98,12 +98,11 @@ public class CptToPojo {
         }
 
         if (CollectionUtils.isEmpty(failedList)) {
-
             System.out
-                .println("All cpt:[" + succeedList + "] are successfully transformed to pojo.");
+                .println("All cpt:" + succeedList + " are successfully transformed to pojo.");
         } else {
             System.out.println(
-                "List:[" + succeedList + "] are successfully transformed to pojo, List:["
+                "cpt:" + succeedList + " are successfully transformed to pojo, List:["
                     + failedList + "] are failed.");
         }
 

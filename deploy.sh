@@ -1,7 +1,6 @@
 #!/bin/bash
 source ./script/common.inc
 source run.config
-echo "org_id:${org_id}"
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
@@ -17,6 +16,8 @@ function modify_config()
     	echo "deploy contract failed."
     	exit 1
     fi
+    echo "contract is deployed with success."
+    echo "===========================================."
     weid_address=$(cat weIdContract.address)
     echo "weid contract address is ${weid_address}"
     cpt_address=$(cat cptController.address)
@@ -27,6 +28,8 @@ function modify_config()
     echo "evidence contract address is ${evidence_address}"
     specificIssuer_address=$(cat specificIssuer.address)
     echo "specificIssuer contract address is ${specificIssuer_address}"
+    echo "===========================================."
+    echo ""
     
     export WEID_ADDRESS=${weid_address}
     export CPT_ADDRESS=${cpt_address}
@@ -45,12 +48,11 @@ function modify_config()
     #envsubst ${ORG_ID} < ${WEIDENTITY_CONFIG} >${WEIDENTITY_CONFIG_TMP}
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
    # cp -f ${WEIDENTITY_CONFIG_TMP} ${SOURCE_CODE_DIR}/resources/${WEIDENTITY_CONFIG}
-    echo "modify sdk config finished..."
 }
 
 function deploy_contract()
 {
-
+	echo " "
     echo "begin to deploy contract..."
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes

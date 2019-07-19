@@ -18,8 +18,9 @@ function cpt_to_pojo()
     echo "begin to generate pojo from cpt..."
     schema2pojo_tool_dir=${SOURCE_CODE_DIR}/jsonschema2pojo-1.0.0
     if [ ! -d ${schema2pojo_tool_dir} ];then 
-        wget https://github.com/joelittlejohn/jsonschema2pojo/releases/download/jsonschema2pojo-1.0.0/jsonschema2pojo-1.0.0.zip
-        unzip -o jsonschema2pojo-1.0.0.zip
+        cp ${SOURCE_CODE_DIR}/script/jsonschema2pojo-1.0.0.zip ./
+        unzip -o jsonschema2pojo-1.0.0.zip >/dev/null
+        	
     fi
  
     # 1.get cpt 
@@ -31,6 +32,12 @@ function cpt_to_pojo()
     build_classpath
 
     java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo $@
+    
+    if [ ! $? -eq 0 ]; then
+	    echo "get cpt faild, please check the log -> ../logs/error.log."
+	    exit $?;
+	fi
+	
     mv Cpt*.json ${cpt_dir}
     
     for cpt_file in ${cpt_dir}/*.json
@@ -41,7 +48,7 @@ function cpt_to_pojo()
     cp ${SOURCE_CODE_DIR}/script/cpt.build.gradle ${SOURCE_CODE_DIR}/cpt_dir/build.gradle
     cd ${cpt_dir}
 
-    gradle build
+    gradle build >/dev/null
 
 	if [ ! $? -eq 0 ]; then
     	echo "package cpt faild, please check the log -> ${SOURCE_CODE_DIR}/logs/error.log."

@@ -40,8 +40,7 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 `WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ ，该工具可以帮您发布智能合约和自动配置。
 
 
-
-2.2 配置区块链节点和机构信息
+1.2 配置区块链节点和机构信息
 ''''''''''''''''''''''''''''''''''''
 
 ::
@@ -54,13 +53,13 @@ channelport，示例如下：
 
 .. code:: shell
 
-    blockchain.node.address=10.10.10.10:20200
+    blockchain_address=10.10.10.10:20200
 
 如果需要配置多个区块链节点，用逗号分隔，示例如下：
 
 .. code:: shell
 
-    blockchain.node.address=10.10.10.10:20200,10.10.10.11:20200
+    blockchain_address=10.10.10.10:20200,10.10.10.11:20200
 
 
 配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
@@ -126,6 +125,7 @@ channelport，示例如下：
     chmod +x deploy.sh   
     ./deploy.sh
 
+如果运行成功，会在屏幕上打印各个智能合约的地址。
 
 会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub ，此私钥后续用于注册权威机构。
 

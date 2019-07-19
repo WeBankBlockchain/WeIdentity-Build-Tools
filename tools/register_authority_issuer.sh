@@ -18,13 +18,13 @@ cd ${SOURCE_CODE_DIR}
 
 build_classpath
 
-echo "begin to regist authority issuer, please wait..."
+echo "please wait..."
 private_key=${SOURCE_CODE_DIR}/output/admin/ecdsa_key
 java -cp "$CLASSPATH" com.webank.weid.command.RegistAuthorityIssuer $@ --private-key ${private_key}
 
 if [ ! $? -eq 0 ]; then
-    echo "regist authority issuer faild, please check."
+    echo "regist authority issuer faild, please check your input and see log ${SOURCE_CODE_DIR}/logs/all.log."
     exit $?
 fi
 
-echo "authority issuer has been successfully registed on blockchain."
+echo "success."

@@ -48,7 +48,7 @@ function cpt_to_pojo()
     	exit $?;
 	fi
 	
-	echo "the weidentity-cpt.jar path is ${SOURCE_CODE_DIR}/dist/app"
+	echo "the weidentity-cpt.jar can be found in ${SOURCE_CODE_DIR}/dist/app/"
 	
     cd ${SOURCE_CODE_DIR}
     

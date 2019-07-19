@@ -107,7 +107,7 @@ web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs
 
 运行成功后，在控制台可以看到发布好的智能合约地址。
 
-```bash
+```
 
 contract is deployed with success.
 ===========================================.
@@ -180,9 +180,9 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 此步骤提供快速创建Weidentity DID、注册Authority
 issuer、发布CPT、拉取CPT并生成presentation policy的能力。
 
-#### 3.1 创建您的Weidentiy DID
+#### 3.1 创建您的weid
 
-这个步骤会帮您快速创建一个weidentity DID。
+这个步骤会帮您快速创建一个weid。
 
 ``` 
     cd weid-build-tools/tools
@@ -190,14 +190,15 @@ issuer、发布CPT、拉取CPT并生成presentation policy的能力。
     ./create_weid.sh
 ``` 
 
-执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has
-been created”，并会打印出刚刚生成的weidentity
-did，同时在output目录weid-build-tools/output/create_weid/下生成对应的weidentity
-DID 以及公钥和私钥。
+若执行成功，则会打印以下信息，表明创建的weid是did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1。
 
-在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity
-DID匹配的目录，里面包含了weidentity
-DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key。
+``` 
+    new weid has been created ----> did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
+    the related private key and public key can be found at /home/app/tonychen/test_gradle/weid-build-tools/output/create_weid/0x405a7ae297fc6d6fb02fb548db64b29f08114ca1.
+``` 
+
+
+在weid-build-tools/output/create_weid/目录下看到一些以0x开头的目录，找到跟刚刚生成的weid匹配的目录，里面包含了weid，公钥ecdsa_key.pub和私钥ecdsa_key。
 
 #### 3.2 注册权威机构（authority issuer）
 
@@ -209,13 +210,18 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称为test。
 
 ``` 
-    ./register_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
+    ./register_authority_issuer.sh --org-id test --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb 
 
 ``` 
-执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has
-been successfully registed on blockchain”。注册成功。
+执行成功，则会打印以下信息：
+``` 
 
-如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
+    registering authorityissuer:did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb, name is :test
+    success.
+
+``` 
+
+如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 ``` 
 
@@ -223,21 +229,29 @@ been successfully registed on blockchain”。注册成功。
 
 ``` 
 
+执行成功，则会打印以下信息：
+``` 
+
+    removing authority issuer :did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb...
+    success.
+
+``` 
+
 #### 3.3 机构发布CPT
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
-如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥，只用指定cpt的路径即可。
+如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥。
 
 ``` 
-    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/
+    ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 ``` 
 
 如果您是通过其他途径创建的weid，您需要自己指定私钥。
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名假设上传至test_data/single/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ``` 
-    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/ --private-key /home/test/private_key/ecdsa_key
+    ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --private-key /home/test/private_key/ecdsa_key
 ``` 
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID
@@ -265,7 +279,7 @@ policy模板。
     ./cpt_to_pojo.sh --cpt-list 1000
 ``` 
 
-注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的。
+注：此处的CPT ID是机构已经发布到区块链上的，否则是拉取不成功的，如要拉取多个CPT，多个CPT ID之间用逗号分隔。
 
 执行命令大约需要20秒，如果执行没有报错，会在屏幕打印类似于“List:[[1000]] are successfully transformed to pojo. List:[[]] are
 failed.”的信息，这条信息表明CPT ID为100和101的已经拉取成功。
@@ -297,7 +311,7 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
 假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
 
 ``` 
-  ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --type college
+  ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 ``` 
 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“specific issuer has been
@@ -307,7 +321,7 @@ blockchain”。注册成功。如果类型不存在，此命令也会自动注�
 如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
 ``` 
-   ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
+   ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb
 ``` 
 
 

@@ -64,9 +64,8 @@ channelport，示例如下：
 
 配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
 
-如果您使用FISCO BCOS 1.3.x的版本，您需要将配置项配置为1，代表基于FISCO BCOS 1.x系列的版本进行配置。
+如果您使用FISCO BCOS 1.3.x的版本，您需要将配置项配置为1，如果是FISCO BCOS 2.0的版本，则项配置为2。
 
-如果您使用FISCO BCOS 2.0的版本，您需要将配置项配置为2，代表2.x系列的版本。
 
 .. code:: shell
 
@@ -103,8 +102,16 @@ channelport，示例如下：
 请参考\ `FISCO BCOS 2.0 web3sdk配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html>`__
 将证书文件 `` ca.crt``  `` node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
 
+.. raw:: html
+<div id="section-1">
+
 1.4 部署智能合约并自动生成配置文件
 ''''''''''''''''''''''''''''''
+
+.. raw:: html
+
+   </div>
+
 
 如果您是第一次使用本工具，您需要先进行编译：
 
@@ -130,14 +137,14 @@ channelport，示例如下：
 
 ::
 
-contract is deployed with success.
-===========================================.
-weid contract address is 0x4ba81103afbd5fc203db14322c3a48cd1abb7770
-cpt contract address is 0xb1f3f13f772f3fc04b27ad8c377def5bc0c94200
-authority issuer contract address is 0xabb97b3042d0f50b87eef3c49ffc8447560faf76
-evidence contract address is 0x8cc0de880394cbde18ca17f6ce2cf7af5c51891e
-specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
-===========================================.
+    contract is deployed with success.
+    ===========================================.
+    weid contract address is 0x4ba81103afbd5fc203db14322c3a48cd1abb7770
+    cpt contract address is 0xb1f3f13f772f3fc04b27ad8c377def5bc0c94200
+    authority issuer contract address is 0xabb97b3042d0f50b87eef3c49ffc8447560faf76
+    evidence contract address is 0x8cc0de880394cbde18ca17f6ce2cf7af5c51891e
+    specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
+    ===========================================.
 
 
 
@@ -174,7 +181,7 @@ specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
 
 
 您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以及
-``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 `` ca.crt``\  ， \ `` node.crt`` 和 \ ``node.key`` ，拷贝至您的应用的 ``resources``
+``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则是 ``ca.crt``\ ， \ ``node.crt`` 和 \ ``node.key`` ，拷贝至您的应用的 ``resources``
 目录下，weid-java-sdk会自动加载相应的资源文件。
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
@@ -184,9 +191,10 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 我们提供了一些快捷工具，可以帮您快速体验weid-java-sdk，请参考\ `章节3 <#section-3>`__\ .
 
 --------------
+
 .. raw:: html
 
-   <div id="section-3">
+<div id="section-3">
 
 3 快速使用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -218,31 +226,44 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
     chmod +x *.sh
     ./create_weid.sh
 
-执行命令大约需要5秒钟，如果执行完没有报错，会提示“new weidentity did has been created”，并会打印出刚刚生成的weidentity did，同时在output目录weid-build-tools/output/create_weid/下生成对应的weidentity DID
-以及公钥和私钥。
+若执行成功，则会打印以下信息，表明创建的weid是did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1。
 
-在目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weidentity DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key。
+::
+
+    new weid has been created ----> did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
+    the related private key and public key can be found at /home/app/tonychen/test_gradle/weid-build-tools/output/create_weid/0x405a7ae297fc6d6fb02fb548db64b29f08114ca1.
+
+
+在weid-build-tools/output/create_weid/目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weid，公钥ecdsa_key.pub和私钥ecdsa_key。
 
 3.2 注册权威机构（authority issuer）
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-该步骤需要发布智能合约的机构来执行，需要使用\ `第2.4节 <#section-2>`__\ 中生成的私钥来注册权威机构。
+该步骤需要发布智能合约的机构来执行，需要使用\ `第1.4节 <#section-2>`__\ 中生成的私钥来注册权威机构。
 这个步骤会帮您将一个指定的weidentity DID注册为权威机构。
 如果您不是智能合约的发布者，您可以将您的weidentity DID和机构名称发送给智能合约的发布者，以完成权威机构的注册。
 
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称是test。
 ::
 
-    ./register_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
+    ./register_authority_issuer.sh --org-id test --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
-执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has been successfully registed on blockchain”。注册成功。
+如果执行成功，会打印以下信息。
+::
 
+    registering authorityissuer:did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb, name is :test
+    success.
 
 如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
 
 ::
 
     ./register_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+
+::
+
+    removing authority issuer :did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb...
+    success.
 
 3.3 机构发布CPT
 ''''''''''''''''''''''''''''''
@@ -253,14 +274,14 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 ::
 
-    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/
+    ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 如果您是通过其他途径创建的weid，您需要自己指定私钥的位置。
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ::
 
-    ./register_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir test_data/single/ --private-key /home/test/private_key/ecdsa_key
+    ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --private-key /home/test/private_key/ecdsa_key
 
 如果您的weid是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥。
 

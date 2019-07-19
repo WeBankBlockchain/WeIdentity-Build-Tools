@@ -114,14 +114,15 @@ function clean_data()
 
 function check_node_cert(){
 
+	cd ${SOURCE_CODE_DIR}/resources 
 	if [ "${blockchain_fiscobcos_version}" = "1" ];then
         if [ ! -f  ca.crt -o ! -f  client.keystore ];then
-        echo "fisco bcos version is 1.3, ca.crt and client.keystore are needed."
+        echo "ERROR : fisco bcos version is 1.3, ca.crt and client.keystore are needed."
         exit 1
       fi
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
         if [ ! -f  ca.crt -o ! -f  node.crt -o ! -f  node.key ];then
-        echo "fisco bcos version is 2.0. ca.crt, node.crt and node.key are needed."
+        echo "ERROR : fisco bcos version is 2.0. ca.crt, node.crt and node.key are needed."
         exit 1
         fi
     else

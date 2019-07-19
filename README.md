@@ -9,32 +9,23 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 部署步骤
 --------
 
-### 1. 通过 maven 引入 weidentity-java-sdk 依赖
 
-在 `build.gradle` 文件中中添加相关的包依赖：
-
-    dependencies {
-        compile 'com.webank:weid-java-sdk:1.3.0'
-    }
-
-* * * * *
-
-<div id="section-2">
+<div id="section-1">
 
 
-### 2. 部署 WeIdentity 智能合约
+### 1. 部署 WeIdentity 智能合约
 </div>
 
-#### 2.1 下载安装部署工具
+#### 1.1 下载安装部署工具
 
 ``` 
     git clone https://github.com/WeBankFinTech/weid-build-tools.git 
 ``` 
 
 该工具默认会使用最新版本的
-[WeIdentity智能合约](https://github.com/WeBankFinTech/weid-contract)。该工具可以帮您编译智能合约、打包智能合约、发布智能合约和自动配置。
+[WeIdentity智能合约](https://github.com/WeBankFinTech/weid-contract)， 该工具可以帮您发布智能合约和自动配置。
 
-#### 2.2 配置区块链节点和机构信息
+#### 1.2 配置区块链节点和机构信息
 
     cd weid-build-tools   
     vim run.config   
@@ -43,13 +34,13 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 channelport(需要参考区块链节点的`config.json` 配置文件)，示例如下：
 
 ``` {.sourceCode .shell}
-blockchain.node.address=10.10.10.10:33034
+blockchain.node.address=10.10.10.10:20200
 ```
 
 如果需要配置多个区块链节点，用逗号分隔，示例如下：
 
 ``` {.sourceCode .shell}
-blockchain.node.address=10.10.10.10:33034,10.10.10.11:33034
+blockchain.node.address=10.10.10.10:20200,10.10.10.11:20200
 ```
 
 配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
@@ -62,12 +53,6 @@ BCOS 1.x系列的版本进行配置。
 
 ``` {.sourceCode .shell}
 blockchain_fiscobcos_version=2
-```
-
-默认地，我们配置为FISCO BCOS 1.3.x的版本，您可以结合您的实际情况修改。
-
-``` {.sourceCode .shell}
-blockchain_fiscobcos_version=1
 ```
 
 配置完区块链节点相关的信息后，我们还需要配置机构名称，该名称也被用作后续AMOP的通信标识。
@@ -85,21 +70,22 @@ id定义为1，则您可以配置为：
 chain_id=1
 ```
 
-#### 2.3 配置节点证书和秘钥文件
+#### 1.3 配置节点证书和秘钥文件
+
+``` {.sourceCode .shell} 
+cd resources
+    
+``` 
 
 如果您使用的是FISCO BCOS 1.3.x的版本，您可以 请参考[FISCO BCOS 1.3
 web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html)
-将证书文件 `ca.crt` 和 `client.keystore` 复制出来，拷贝至
-weid-build-tools 下面的 `resources`
-目录：`weid-build-tools/resources/`。
+将证书文件 `ca.crt` 和 `client.keystore` 复制出来，拷贝至当前目录下。
 
 如果您使用的是FISCO BCOS 2.0的版本，您可以 请参考[FISCO BCOS 2.0
 web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html)
-将证书文件 `ca.crt` `node.crt` 和 `node.key` 复制出来，拷贝至
-weid-build-tools 下面的 `resources`
-目录：`weid-build-tools/resources/`。
+将证书文件 `ca.crt` `node.crt` 和 `node.key` 复制出来，拷贝至当前目录下。
 
-#### 2.4 部署智能合约并自动生成配置文件
+#### 1.4 部署智能合约并自动生成配置文件
 
 如果您是第一次使用本工具，您需要先进行编译：
 
@@ -120,27 +106,52 @@ weid-build-tools 下面的 `resources`
     ./deploy.sh
 ``` 
 
-运行成功后，会自动在 `resources` 目录下生成 `fisco.properties`和
-`weidentity.properties`。并且自动将 weid-contract
-部署到区块链节点上，并将相应的智能合约地址也填入到 `fisco.properties`。
-同时，我们还会在weid-build-tools/output/admin目录下动态生成公私钥对。
+运行成功后，会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub
+，此私钥后续用于注册权威机构。
+
+至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成。
+
+
+### 2  weid-java-sdk 的集成
+
+#### 2.1 在您的应用工程中引入weid-java-sdk
+
+在您的应用工程的gradle文件中配置weid-java-sdk依赖：
+```
+
+    dependencies {
+        compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
+    }
+```  
+
+#### 2.2 配置您的应用工程
+
+将build-tools里配置好的配置文件拷贝至您的应用工程中：
 
 ``` 
-    cd output/admin
+    cd resources/
     ls
 ``` 
 
-您将看到私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub，并会自动将该私钥对应的地址注册为commit
-member，此私钥后续用于注册authority issuer。
+您可以将resources目录下刚刚生成的`fisco.properties`
+文件，`weidentity.properties` 文件，以及 `ca.crt`，`client.keystore`
+如果是FISCO BCOS 2.0，则是 `ca.crt` `node.crt` 和 `node.key`
+，拷贝至您的应用的 `resources`
+目录下，weid-java-sdk会自动加载相应的资源文件。
 
-<div id="section-3">
+现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
+相关接口请见：[WeIdentity JAVA
+SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html)
+
+我们提供了一些快捷工具，可以帮您快速体验weid-java-sdk，请参考[章节3](#section-4).
+<div id="section-4">
 
 ### 3 快速使用
 </div>
 
 在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
 
-如果您是weidentity智能合约的发布者，您需要保证[章节2](#section-2)的所有步骤已经正确完成。
+如果您是weidentity智能合约的发布者，您需要保证[章节1](#section-2)的所有步骤已经正确完成。
 
 如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain
 id，并正确的配置在weidentity-build-tools的`resources`
@@ -180,7 +191,7 @@ DID和机构名称发送给智能合约的发布者，以完成权威机构的�
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称为test。
 
 ``` 
-./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
+    ./regist_authority_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --org-id test
 
 ``` 
 执行命令大约需要5秒钟，如果执行没有报错，会提示“authority issuer has
@@ -189,7 +200,8 @@ been successfully registed on blockchain”。注册成功。
 如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
 
 ``` 
- ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+
+    ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 ``` 
 
@@ -199,11 +211,15 @@ been successfully registed on blockchain”。注册成功。
 
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private_key/key
 
+``` 
     ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt --private-key /home/test/private_key/key
+``` 
 
 如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥。
 
+``` 
     ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
+``` 
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID
 card，另假设文件名是cpt_ID_card.json，且已经上传到配置目录下。如果执行没报错，会在屏幕打印命令的执行情况：
@@ -276,22 +292,7 @@ blockchain”。注册成功。如果类型不存在，此命令也会自动注�
    ./register_specific_issuer.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 ``` 
 
-### 4 完成 weidentity-java-sdk 的集成
 
-``` 
-    cd weid-build-tools/resources
-    ls
-``` 
-
-您可以将resources目录下刚刚生成的`fisco.properties`
-文件，`weidentity.properties` 文件，以及 `ca.crt`，`client.keystore`
-如果是FISCO BCOS 2.0，则是 `ca.crt` `node.crt` 和 `node.key`
-，拷贝至您的应用的 `resources`
-目录下，weid-java-sdk会自动加载相应的资源文件。
-
-现在您可以使用 WeIdentity 开发您的区块链身份应用。weidentity-java-sdk
-相关接口请见：[WeIdentity JAVA
-SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html)
 
 * * * * *
 

@@ -1,3 +1,16 @@
+def gradleVer = "4"
+if (gradle.gradleVersion.startsWith("6")
+        || gradle.gradleVersion.startsWith("5")
+        || gradle.gradleVersion.startsWith("4.10")
+        || gradle.gradleVersion.startsWith("4.9")
+        || gradle.gradleVersion.startsWith("4.8")
+        || gradle.gradleVersion.startsWith("4.7")) {
+    println "Gradle with version >= 4.7 detected"
+    gradleVer = "5"
+} else {
+    println "Gradle with version < 4.7 detected"
+}
+
 apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -27,37 +40,58 @@ repositories {
 }
 
 List lombok = [
-    "org.projectlombok:lombok:1.16.14"
+        "org.projectlombok:lombok:1.16.14"
 ]
 
 List jcommander = [
-	"com.beust:jcommander:1.72"
+        "com.beust:jcommander:1.72"
 ]
 
 List apache_commons = [
-    "org.apache.commons:commons-collections4:4.1",
-    "org.apache.commons:commons-lang3:3.5",
-    "commons-cli:commons-cli:1.3.1"
+        "org.apache.commons:commons-collections4:4.1",
+        "org.apache.commons:commons-lang3:3.5",
+        "commons-cli:commons-cli:1.3.1",
+		"org.apache.logging.log4j:log4j-jcl:2.3"
 ]
 
 // In this section you declare the dependencies for your production and test code
 List jackson = [
-    "com.fasterxml.jackson.core:jackson-databind:2.8.8.1",
-    "com.github.fge:json-schema-validator:2.2.6",
-    "com.github.reinert:jjschema:1.16",
-    "com.google.zxing:core:3.3.0"
+        "com.fasterxml.jackson.core:jackson-databind:2.8.8.1",
+        "com.github.fge:json-schema-validator:2.2.6",
+        "com.github.reinert:jjschema:1.16",
+        "com.google.zxing:core:3.3.0"
 ]
 
-List weid = [
-    "com.webank:weid-java-sdk:1.3.0"
-]
+configurations {
+    localDeps
+}
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    if (gradle.startParameter.isOffline()) {
-        compile fileTree(dir: 'dist/lib', include: '*.jar')
-    } else {
-        compile lombok, apache_commons, jackson, weid, jcommander
+    localDeps 'org.projectlombok:lombok:1.16.14'
+    if (gradleVer.startsWith("4")) {
+        if (gradle.startParameter.isOffline()) {
+            compile fileTree(dir: 'dist/lib', include: '*.jar')
+        } else {
+            compile lombok, apache_commons, jackson, jcommander
+			compile("com.webank:weid-java-sdk:1.3.1.rc-2") {
+				exclude group:"org.slf4j", module: "slf4j-log4j12"
+            }
+        }
+    }
+    if (gradleVer.startsWith("5")) {
+        if (!gradle.startParameter.isOffline()) {
+            compileOnly 'org.projectlombok:lombok:1.16.14'
+            annotationProcessor 'org.projectlombok:lombok:1.16.14'
+            compile apache_commons, jackson, jcommander
+			compile("com.webank:weid-java-sdk:1.3.1.rc-2") {
+				exclude group:"org.slf4j", module: "slf4j-log4j12"
+            }
+        } else {
+            compileOnly files('dist/lib/lombok-1.16.14.jar')
+            annotationProcessor files('dist/lib/lombok-1.16.14.jar')
+            compile fileTree(dir: 'dist/lib', include: '*.jar')
+        }
     }
 }
 
@@ -82,6 +116,7 @@ jar {
     doLast {
         copy {
             from configurations.runtime
+            from configurations.localDeps
             into 'dist/lib'
         }
     }

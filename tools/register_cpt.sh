@@ -36,7 +36,7 @@ else
 fi
 
 if [ ! $? -eq 0 ]; then
-    echo "regist cpt faild, please check."
+    echo "regist cpt faild, please check your input and see log : ${SOURCE_CODE_DIR}/logs/all.log."
     exit $?
 fi
 
@@ -48,4 +48,4 @@ if [ -f regist_cpt.out ];then
 	mv regist_cpt.out ${SOURCE_CODE_DIR}/output/regist_cpt/
 fi
 
-echo "regist cpt finished."
+echo "finished."

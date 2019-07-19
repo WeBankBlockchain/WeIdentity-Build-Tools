@@ -83,10 +83,9 @@ public class RegistAuthorityIssuer {
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         weIdPrivateKey.setPrivateKey(privateKey);
 
-        System.out.println(
-            "[RegisterAuthorityIssuer] registering authorityissuer:" + weid + ", name is :"
-                + orgId);
+        
         if (StringUtils.isNotEmpty(weid)) {
+        	System.out.println("registering authorityissuer:" + weid + ", name is :"+ orgId);
             RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
             AuthorityIssuer authorityIssuer = new AuthorityIssuer();
             authorityIssuer.setName(orgId);
@@ -106,20 +105,18 @@ public class RegistAuthorityIssuer {
                     response.getErrorCode(),
                     response.getErrorMessage()
                 );
-                System.out.println(
-                    "[RegisterAuthorityIssuer] register authority issuer result ---> faild.");
-                System.exit(1);
+                System.out.println("register wauthority issuer " + weid + " failed :" + response.getErrorMessage());
+                System.exit(response.getErrorCode());
             } else {
                 logger.info(
                     "[RegisterAuthorityIssuer] register wauthority issuer {} success.",
                     weid
                 );
-                System.out.println(
-                    "[RegisterAuthorityIssuer] register authority issuer result ----> success.");
             }
         }
 
         if (StringUtils.isNotEmpty(removedIssuer)) {
+            System.out.println("removing authority issuer :" + removedIssuer + "...");
             RemoveAuthorityIssuerArgs removeAuthorityIssuerArgs = new RemoveAuthorityIssuerArgs();
             removeAuthorityIssuerArgs.setWeId(removedIssuer);
             removeAuthorityIssuerArgs.setWeIdPrivateKey(weIdPrivateKey);
@@ -138,14 +135,9 @@ public class RegistAuthorityIssuer {
                     .println("[RegisterAuthorityIssuer] remove faild. result is : " + response);
                 System.exit(1);
             }
-            System.out.println(
-                "[RegisterAuthorityIssuer] remove authority issuer with success. result is : "
-                    + response);
             System.exit(0);
-
         }
         System.exit(0);
-
     }
 
 }

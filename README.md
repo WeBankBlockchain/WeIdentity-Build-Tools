@@ -105,8 +105,28 @@ web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs
     ./deploy.sh
 ``` 
 
-运行成功后，会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub
-，此私钥后续用于注册权威机构。
+运行成功后，在控制台可以看到发布好的智能合约地址。
+
+```bash
+
+contract is deployed with success.
+===========================================.
+weid contract address is 0x4ba81103afbd5fc203db14322c3a48cd1abb7770
+cpt contract address is 0xb1f3f13f772f3fc04b27ad8c377def5bc0c94200
+authority issuer contract address is 0xabb97b3042d0f50b87eef3c49ffc8447560faf76
+evidence contract address is 0x8cc0de880394cbde18ca17f6ce2cf7af5c51891e
+specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
+===========================================.
+```
+
+```eval_rst
+.. important::
+
+  - 发布weid智能合约会同时会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub
+，此私钥后续用于注册权威机构，您可以将起保存到您的其他存储库里。
+
+```
+
 
 至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成。
 
@@ -142,7 +162,7 @@ web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs
 相关接口请见：[WeIdentity JAVA
 SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html)
 
-我们提供了一些快捷工具，可以帮您快速体验weid-java-sdk，请参考[章节3](#section-4).
+我们也提供了一些快捷工具，可以帮您快速使用weid-java-sdk，请参考[章节3](#section-4).
 
 <div id="section-4">
 
@@ -151,16 +171,18 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
 
-如果您是weidentity智能合约的发布者，您需要保证[章节1](#section-2)的所有步骤已经正确完成。
+```eval_rst
+.. note::
+    - 如果您是weidentity智能合约的发布者，您需要保证[章节1](#section-2)的所有步骤已经正确完成。
 
 如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain
 id，并正确的配置在weidentity-build-tools的`resources`
 目录下的`fisco.properties` 里。 配置方法请参考[附录1](#reference-2)。
 
+```
+
 此步骤提供快速创建Weidentity DID、注册Authority
-issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity
-DID、注册Authority issuer、发布CPT
-等动作也可以通过直接在应用里通过weid-java-sdk完成，您可以结合您的需要进行选择。
+issuer、发布CPT、拉取CPT并生成presentation policy的能力。
 
 #### 3.1 创建您的Weidentiy DID
 

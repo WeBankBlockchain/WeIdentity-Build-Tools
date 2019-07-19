@@ -30,8 +30,7 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
     cd weid-build-tools   
     vim run.config   
 
-修改 `blockchain.node.address` 字段，填入区块链节点 IP 和
-channelport(需要参考区块链节点的`config.json` 配置文件)，示例如下：
+修改 `blockchain.node.address` 字段，填入区块链节点 IP 和channelport，示例如下：
 
 ``` {.sourceCode .shell}
 blockchain.node.address=10.10.10.10:20200
@@ -209,16 +208,17 @@ been successfully registed on blockchain”。注册成功。
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
-假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt目录下，私钥文件路径为/home/test/private_key/key
+如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥，只用指定cpt的路径即可。
 
 ``` 
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt --private-key /home/test/private_key/key
+    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/
 ``` 
 
-如果您的weid是执行[3.1节](#section-3)生成的，您可以不用传入私钥。
+如果您是通过其他途径创建的weid，您需要自己指定私钥的位置。
+假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ``` 
-    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt
+    ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/ --private-key /home/test/private_key/ecdsa_key
 ``` 
 
 执行命令大约需要10秒钟，假设我们要发布的CPT是ID

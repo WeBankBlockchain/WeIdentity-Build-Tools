@@ -39,6 +39,8 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 该工具默认会使用最新版本的
 `WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ ，该工具可以帮您发布智能合约和自动配置。
 
+
+
 2.2 配置区块链节点和机构信息
 ''''''''''''''''''''''''''''''''''''
 
@@ -48,17 +50,17 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
     vim run.config   
 
 修改 ``blockchain.node.address`` 字段，填入区块链节点 IP 和
-channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示例如下：
+channelport，示例如下：
 
 .. code:: shell
 
-    blockchain.node.address=10.10.10.10:33034
+    blockchain.node.address=10.10.10.10:20200
 
 如果需要配置多个区块链节点，用逗号分隔，示例如下：
 
 .. code:: shell
 
-    blockchain.node.address=10.10.10.10:33034,10.10.10.11:33034
+    blockchain.node.address=10.10.10.10:20200,10.10.10.11:20200
 
 
 配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
@@ -71,11 +73,6 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
     blockchain_fiscobcos_version=2
 
-默认地，我们配置为FISCO BCOS 1.3.x的版本，您可以结合您的实际情况修改。
-
-.. code:: shell
-
-    blockchain_fiscobcos_version=1
 
 配置完区块链节点相关的信息后，我们还需要配置机构名称，该名称也被用作后续AMOP的通信标识。
 
@@ -129,7 +126,8 @@ channelport(需要参考区块链节点的\ ``config.json`` 配置文件)，示�
     chmod +x deploy.sh   
     ./deploy.sh
 
-运行成功后，会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub ，此私钥后续用于注册权威机构。
+
+会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub ，此私钥后续用于注册权威机构。
 
 至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成。
 

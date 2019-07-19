@@ -50,7 +50,8 @@ List jcommander = [
 List apache_commons = [
         "org.apache.commons:commons-collections4:4.1",
         "org.apache.commons:commons-lang3:3.5",
-        "commons-cli:commons-cli:1.3.1"
+        "commons-cli:commons-cli:1.3.1",
+		"org.apache.logging.log4j:log4j-jcl:2.3"
 ]
 
 // In this section you declare the dependencies for your production and test code
@@ -59,10 +60,6 @@ List jackson = [
         "com.github.fge:json-schema-validator:2.2.6",
         "com.github.reinert:jjschema:1.16",
         "com.google.zxing:core:3.3.0"
-]
-
-List weid = [
-        "com.webank:weid-java-sdk:1.3.1.rc-2"
 ]
 
 configurations {
@@ -76,14 +73,20 @@ dependencies {
         if (gradle.startParameter.isOffline()) {
             compile fileTree(dir: 'dist/lib', include: '*.jar')
         } else {
-            compile lombok, apache_commons, jackson, weid, jcommander
+            compile lombok, apache_commons, jackson, jcommander
+			compile("com.webank:weid-java-sdk:1.3.1.rc-2") {
+				exclude group:"org.slf4j", module: "slf4j-log4j12"
+            }
         }
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.16.14'
             annotationProcessor 'org.projectlombok:lombok:1.16.14'
-            compile apache_commons, jackson, weid, jcommander
+            compile apache_commons, jackson, jcommander
+			compile("com.webank:weid-java-sdk:1.3.1.rc-2") {
+				exclude group:"org.slf4j", module: "slf4j-log4j12"
+            }
         } else {
             compileOnly files('dist/lib/lombok-1.16.14.jar')
             annotationProcessor files('dist/lib/lombok-1.16.14.jar')

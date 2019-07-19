@@ -30,16 +30,16 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
     cd weid-build-tools   
     vim run.config   
 
-修改 `blockchain.node.address` 字段，填入区块链节点 IP 和channelport，示例如下：
+修改 `blockchain_address` 字段，填入区块链节点 IP 和channelport，示例如下：
 
 ``` {.sourceCode .shell}
-blockchain.node.address=127.0.0.1:20200
+blockchain_address=127.0.0.1:20200
 ```
 
 如果需要配置多个区块链节点，用逗号分隔，示例如下：
 
 ``` {.sourceCode .shell}
-blockchain.node.address=127.0.0.1:20200,10.10.10.11:20200
+blockchain_address=127.0.0.1:20200,10.10.10.11:20200
 ```
 
 配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
@@ -143,6 +143,7 @@ web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs
 SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html)
 
 我们提供了一些快捷工具，可以帮您快速体验weid-java-sdk，请参考[章节3](#section-4).
+
 <div id="section-4">
 
 ### 3 快速使用
@@ -214,7 +215,7 @@ been successfully registed on blockchain”。注册成功。
     ./regist_cpt.sh --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb --cpt-dir /home/test/cpt/
 ``` 
 
-如果您是通过其他途径创建的weid，您需要自己指定私钥的位置。
+如果您是通过其他途径创建的weid，您需要自己指定私钥。
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至/home/test/cpt/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ``` 

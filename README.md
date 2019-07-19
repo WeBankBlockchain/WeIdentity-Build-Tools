@@ -34,13 +34,13 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 channelport(需要参考区块链节点的`config.json` 配置文件)，示例如下：
 
 ``` {.sourceCode .shell}
-blockchain.node.address=10.10.10.10:33034
+blockchain.node.address=10.10.10.10:20200
 ```
 
 如果需要配置多个区块链节点，用逗号分隔，示例如下：
 
 ``` {.sourceCode .shell}
-blockchain.node.address=10.10.10.10:33034,10.10.10.11:33034
+blockchain.node.address=10.10.10.10:20200,10.10.10.11:20200
 ```
 
 配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
@@ -53,12 +53,6 @@ BCOS 1.x系列的版本进行配置。
 
 ``` {.sourceCode .shell}
 blockchain_fiscobcos_version=2
-```
-
-默认地，我们配置为FISCO BCOS 1.3.x的版本，您可以结合您的实际情况修改。
-
-``` {.sourceCode .shell}
-blockchain_fiscobcos_version=1
 ```
 
 配置完区块链节点相关的信息后，我们还需要配置机构名称，该名称也被用作后续AMOP的通信标识。

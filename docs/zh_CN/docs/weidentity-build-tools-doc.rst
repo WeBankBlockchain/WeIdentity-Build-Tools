@@ -128,7 +128,7 @@ channelport，示例如下：
 
 运行成功后，在控制台可以看到发布好的智能合约地址，合约地址已经自动写入配置文件。
 
-```bash
+::
 
 contract is deployed with success.
 ===========================================.
@@ -138,15 +138,14 @@ authority issuer contract address is 0xabb97b3042d0f50b87eef3c49ffc8447560faf76
 evidence contract address is 0x8cc0de880394cbde18ca17f6ce2cf7af5c51891e
 specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
 ===========================================.
-```
 
-```eval_rst
-.. important::
+
+
+.. note::
 
   - 发布weid智能合约会同时会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub
 ，此私钥后续用于注册权威机构，您可以将起保存到您的其他存储库里。
 
-```
 
 至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成。
 
@@ -200,15 +199,11 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
 
-```eval_rst
 .. note::
     - 如果您是weidentity智能合约的发布者，您需要保证\ `章节1 <#section-1>`__\ 的所有步骤已经正确完成。
+    - 如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，
+    并正确的配置在weid-build-tools的`resources` 目录下的`fisco.properties` 里。 配置方法请参考\ `附录1 <#reference-2>`__\。
 
-如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain
-id，并正确的配置在weid-build-tools的`resources`
-目录下的`fisco.properties` 里。 配置方法请参考\ `附录1 <#reference-2>`__\。
-
-```
 
 此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力。
 

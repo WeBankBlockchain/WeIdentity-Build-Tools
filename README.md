@@ -124,7 +124,6 @@ specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
 
   - 发布weid智能合约会同时会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub
 ，此私钥后续用于注册权威机构，您可以将起保存到您的其他存储库里。
-
 ```
 
 
@@ -175,10 +174,7 @@ SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 .. note::
     - 如果您是weidentity智能合约的发布者，您需要保证[章节1](#section-2)的所有步骤已经正确完成。
 
-如果您不是weidentity的智能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain
-id，并正确的配置在weidentity-build-tools的`resources`
-目录下的`fisco.properties` 里。 配置方法请参考[附录1](#reference-2)。
-
+    - 如果您不是weidentity的 能合约发布者，您需要确保已经获取到weidentity的智能合约地址和chain id，并正确的配置在weidentity-build-tools的 `resources` 目录下的`fisco.properties` 里。 配置方法请参考[附录1](#reference-2)。
 ```
 
 此步骤提供快速创建Weidentity DID、注册Authority

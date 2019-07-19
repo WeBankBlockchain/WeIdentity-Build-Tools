@@ -3,35 +3,25 @@
 
 .. _weidentity-build-tools-doc:
 
-WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式�?
+WeIdentity JAVA SDK安装部署文档（weid-build-tools方式�?
 ============================================================
 
 整体介绍
 --------
 
-  通过安装部署工具，您可以快�?�的在您的应用项目中集成weidentity-java-sdk�?
+  通过安装部署工具，您可以快�?�的在您的应用项目中集成weid-java-sdk�?
 
 部署步骤
 --------
 
-1. 通过 maven 引入 weidentity-java-sdk 依赖
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-�? ``build.gradle`` 文件中中添加相关的包依赖�?
-
-::
-
-    dependencies {
-        compile 'com.webank:weidentity-java-sdk:1.2.0'
-    }
 
 ####
 
 .. raw:: html
 
-   <div id="section-2">
+   <div id="section-1">
 
-2. 部署 WeIdentity 智能合约
+1. 部署 WeIdentity 智能合约
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -39,36 +29,38 @@ WeIdentity JAVA SDK安装部署文档（weidentity-build-tools方式�?
 
    </div>
 
-2.1 下载安装部署工具
+1.1 下载安装部署工具
 ''''''''''''''''''''''''''''''
 ::
 
-    git clone https://github.com/WeBankFinTech/weidentity-build-tools.git 
+    git clone https://github.com/WeBankFinTech/weid-build-tools.git
  
 
 该工具默认会使用�?新版本的
-`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ 。该工具可以帮您编译智能合约、打包智能合约�?�发布智能合约和自动配置�?
+`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ ，该工具可以帮您发布智能合约和自动配置�??
+
+
 
 2.2 配置区块链节点和机构信息
 ''''''''''''''''''''''''''''''''''''
 
 ::
 
-    cd weidentity-build-tools   
+    cd weid-build-tools   
     vim run.config   
 
 修改 ``blockchain.node.address`` 字段，填入区块链节点 IP �?
-channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示例如下：
+channelport，示例如下：
 
 .. code:: shell
 
-    blockchain.node.address=127.0.0.1:33034
+    blockchain.node.address=127.0.0.1:20200
 
 如果�?要配置多个区块链节点，用逗号分隔，示例如下：
 
 .. code:: shell
 
-    blockchain.node.address=127.0.0.1:33034,10.10.10.11:33034
+    blockchain.node.address=127.0.0.1:20200,10.10.10.11:20200
 
 
 配置完区块链节点信息后，您还�?要配置FISCO BCOS版本信息�?
@@ -81,11 +73,6 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
     blockchain_fiscobcos_version=2
 
-默认地，我们配置为FISCO BCOS 1.3.x的版本，您可以结合您的实际情况修改�??
-
-.. code:: shell
-
-    blockchain_fiscobcos_version=1
 
 配置完区块链节点相关的信息后，我们还�?要配置机构名称，该名称也被用作后续AMOP的�?�信标识�?
 
@@ -102,20 +89,22 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
     chain_id=1
 
-2.3 配置节点证书和秘钥文�?
+1.3 配置节点证书和秘钥文�?
 ''''''''''''''''''''''''''
+
+::
+
+    cd resources
 
 如果您使用的是FISCO BCOS 1.3.x的版本，您可�?
 请参考\ `FISCO BCOS 1.3 web3sdk配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__
-将证书文�? ``ca.crt`` �? ``client.keystore`` 复制出来，拷贝至 weidentity-build-tools 下面�? ``resources``
-目录：\ ``weidentity-build-tools/resources/``\ �?
+将证书文�? ``ca.crt`` �? ``client.keystore`` 复制出来，拷贝至当前目录�? �?
 
 如果您使用的是FISCO BCOS 2.0的版本，您可�?
 请参考\ `FISCO BCOS 2.0 web3sdk配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html>`__
-将证书文�? `` ca.crt``  `` node.crt`` �? ``node.key`` 复制出来，拷贝至 weidentity-build-tools 下面�? ``resources`` 
-目录：\ ``weidentity-build-tools/resources/``\ �?
+将证书文�? `` ca.crt``  `` node.crt`` �? ``node.key`` 复制出来，拷贝至当前目录下�??
 
-2.4 部署智能合约并自动生成配置文�?
+1.4 部署智能合约并自动生成配置文�?
 ''''''''''''''''''''''''''''''
 
 如果您是第一次使用本工具，您�?要先进行编译�?
@@ -137,20 +126,46 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
     chmod +x deploy.sh   
     ./deploy.sh
 
-运行成功后，会自动在 ``resources`` 目录下生�?
-``fisco.properties``\ �? ``weidentity.properties``\ 。并且自动将 weidentity-contract
-部署到区块链节点上，并将相应的智能合约地�?也填入到
-``fisco.properties``\ �?
-同时，我们还会在weidentity-build-tools/output/admin目录下动态生成公私钥对�??
+
+会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub ，此私钥后续用于注册权威机构�?
+
+至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成�??
+
+
+2 weid-java-sdk 的集�?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+2.1 在您的应用工程中引入weid-java-sdk
+'''''''''''''''''''''''''''''''''''''''''''''
+
+在您的应用工程的gradle文件中配置weid-java-sdk依赖�?
 
 ::
 
-    cd output/admin
+    dependencies {
+        compile 'com.webank:weid-java-sdk:1.3.1.rc-2'
+    }
+
+2.2 配置您的应用工程
+''''''''''''''''''''''''''''''''''''
+将build-tools里配置好的配置文件拷贝至您的应用工程中：
+::
+
+    cd resources/
     ls
 
-您将看到私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub，并会自动将该私钥对应的地址注册为commit member，此私钥后续用于注册authority issuer�?
+
+您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以�?
+``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则�? `` ca.crt``  `` node.crt`` �? ``node.key`` ，拷贝至您的应用�? ``resources``
+目录下，weid-java-sdk会自动加载相应的资源文件�?
+
+现在您可以使�? WeIdentity �?发您的区块链身份应用。weid-java-sdk
+相关接口请见：\ `WeIdentity JAVA
+SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__
 
 
+我们提供了一些快捷工具，可以帮您快�?�体验weid-java-sdk，请参�?�\ `章节3 <#section-3>`__\ .
+--------------
 .. raw:: html
 
    <div id="section-3">
@@ -166,13 +181,13 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成�??
 
-如果您是weidentity智能合约的发布�?�，您需要保证\ `章节2 <#section-2>`__\ 的所有步骤已经正确完成�??
+如果您是weidentity智能合约的发布�?�，您需要保证\ `章节1 <#section-1>`__\ 的所有步骤已经正确完成�??
 
-如果您不是weidentity的智能合约发布�?�，您需要确保已经获取到weidentity的智能合约地�?和chain id，并正确的配置在weidentity-build-tools的\ ``resources`` 目录下的\ ``fisco.properties`` 里�??
+如果您不是weidentity的智能合约发布�?�，您需要确保已经获取到weidentity的智能合约地�?和chain id，并正确的配置在weid-build-tools的\ ``resources`` 目录下的\ ``fisco.properties`` 里�??
 配置方法请参考\ `附录1 <#reference-2>`__\�?
 
 此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力，其中创建Weidentity DID、注册Authority issuer、发布CPT
-等动作也可以通过直接在应用里通过weidentity-java-sdk完成，您可以结合您的�?要进行�?�择�?
+等动作也可以通过直接在应用里通过weid-java-sdk完成，您可以结合您的�?要进行�?�择�?
 
 3.1 创建您的Weidentiy DID
 ''''''''''''''''''''''''''''''
@@ -181,11 +196,11 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 ::
 
-    cd weidentity-build-tools/tools
+    cd weid-build-tools/tools
     chmod +x *.sh
     ./create_weid.sh
 
-执行命令大约�?�?5秒钟，如果执行完没有报错，会提示“new weidentity did has been created”，并会打印出刚刚生成的weidentity did，同时在output目录weidentity-build-tools/output/create_weid/下生成对应的weidentity DID
+执行命令大约�?�?5秒钟，如果执行完没有报错，会提示“new weidentity did has been created”，并会打印出刚刚生成的weidentity did，同时在output目录weid-build-tools/output/create_weid/下生成对应的weidentity DID
 以及公钥和私钥�??
 
 在目录下看到�?些以0x�?头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weidentity DID文件weId，公钥ecdsa_key.pub和私钥ecdsa_key�?
@@ -207,6 +222,7 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
 如果您需要移除某个权威机构，前提是您是智能合约发布�?�或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb�?
 
 ::
+
     ./regist_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
 
 3.3 机构发布CPT
@@ -238,7 +254,7 @@ channelport(�?要参考区块链节点的\ ``config.json`` 配置文件)，示�
 
 说明CPT文件cpt_ID_card.json成功发布到区块链上，且发布的ID�?1000，后续我们可以用这个ID来查询我们发布的CPT�?
 
-同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weidentity-build-tools/output/regist_cpt/目录下查看�??
+同时，我们也会将发布CPT的结果以文件的形式记录下来，方便后续查询，您可以在weid-build-tools/output/regist_cpt/目录下查看�??
 
 
 3.4 拉取CPT并生成presentation policy模板
@@ -299,22 +315,6 @@ CPT转成POJO并生成的weidentity-cpt.jar可以到dist目录下获取�??
 ::
     ./register_specific_issuer.sh --remove-issuer did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb --type college
 
-4 完成 weidentity-java-sdk 的集�?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-::
-
-    cd weidentity-build-tools/resources
-    ls
-
-您可以将resources目录下刚刚生成的\ ``fisco.properties`` 文件，\ ``weidentity.properties`` 文件，以�?
-``ca.crt``\ ，\ ``client.keystore`` 如果是FISCO BCOS 2.0，则�? `` ca.crt``  `` node.crt`` �? ``node.key`` ，拷贝至您的应用�? ``resources``
-目录下，weidentity-java-sdk会自动加载相应的资源文件�?
-
-现在您可以使�? WeIdentity �?发您的区块链身份应用。weidentity-java-sdk
-相关接口请见：\ `WeIdentity JAVA
-SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__
-
---------------
 
 .. raw:: html
 
@@ -334,7 +334,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
 
 ::
 
-    cd weidentity-build-tools/resources/
+    cd weid-build-tools/resources/
     vim fisco.properties
 
 您可以看到配置内容，我们�?要将weidentity的智能合约地�?和chain id写入到指定配置项，找到以下配置项�?
@@ -360,7 +360,7 @@ SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/
     chain.id=1
 
 
-附录2 升级 weidentity-java-sdk
+附录2 升级 weid-java-sdk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 如果在后续weidentity java

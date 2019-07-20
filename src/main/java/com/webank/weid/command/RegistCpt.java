@@ -88,10 +88,18 @@ public class RegistCpt {
         }
 
         if (StringUtils.isNotEmpty(cptDir)) {
+        	if(!cptDir.startsWith("/")) {
+        		
+        		//相对路径
+        		String temp = "tools/" + cptDir;
+        		cptDir = temp;
+        		
+        	}
             File file = new File(cptDir);
 
             if (!file.isDirectory()) {
-                logger.error("failed.");
+                logger.error("no cpt was found in cpt :{}, please check your input.", file);
+                System.out.println("no cpt was found in cpt :" + file + ", please check your input.");
                 System.exit(1);
             }
             for (File f : file.listFiles()) {
@@ -110,7 +118,7 @@ public class RegistCpt {
             if (!fileName.endsWith(".json")) {
                 return;
             }
-            System.out.println("[registerCpt] begin to register cpt file:" + fileName);
+            System.out.println("registering cpt file:" + fileName);
             jsonNode = JsonLoader.fromFile(cptFile);
             String cptJsonSchema = jsonNode.toString();
             CptStringArgs cptStringArgs = new CptStringArgs();
@@ -124,7 +132,7 @@ public class RegistCpt {
                 Integer cptId1 = Integer.valueOf(cptId);
                 response = cptService.registerCpt(cptStringArgs, cptId1);
             }
-            System.out.println("[RegisterCpt] result:" + DataToolUtils.serialize(response));
+            //System.out.println("[RegisterCpt] result:" + DataToolUtils.serialize(response));
             if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
                 logger.error("[RegisterCpt] load config faild. ErrorCode is:{}, msg :{}",
                     response.getErrorCode(),
@@ -133,7 +141,7 @@ public class RegistCpt {
                     "[RegisterCpt] register cpt file:" + fileName + "  result ---> failed. ");
             } else {
                 System.out.println(
-                    "[RegisterCpt] register cpt file:" + fileName + " result ---> success.");
+                    "[RegisterCpt] register cpt file:" + fileName + " result ---> success. cpt id ---> "+ response.getResult().getCptId());
             }
             String content = new StringBuffer()
                 .append(fileName)

@@ -93,17 +93,19 @@ public class CptToPojo {
             }
         } catch (Exception e) {
             logger.error("[CptTools] execute with exception, {}", e);
-            System.out.println("[CptTools] execute with exception" + e);
+            System.out.println("[CptTools] execute failed.");
             System.exit(1);
         }
 
         if (CollectionUtils.isEmpty(failedList)) {
-
             System.out
-                .println("All cpt:[" + succeedList + "] are successfully transformed to pojo.");
+                .println("All cpt:" + succeedList + " are successfully transformed to pojo.");
+        } else if(CollectionUtils.isEmpty(succeedList)) {
+        	System.out.println("All cpt are failed to transformed to pojo.");
+        	System.exit(1);
         } else {
             System.out.println(
-                "List:[" + succeedList + "] are successfully transformed to pojo, List:["
+                "cpt:" + succeedList + " are successfully transformed to pojo, List:["
                     + failedList + "] are failed.");
         }
 

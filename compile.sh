@@ -10,8 +10,6 @@ if [[ "$@" == "--offline" ]];then
 fi
 
 #SOURCE_CODE_DIR=$(pwd)
-SOLC=$(which fisco-solc)
-WEB3J="${SOURCE_CODE_DIR}/script/web3sdk.sh"
 CONFIG_FILE=${SOURCE_CODE_DIR}/conf/run.config
 FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
 FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties

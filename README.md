@@ -27,10 +27,24 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 
 #### 1.2 配置区块链节点和机构信息
 
+weid-java-sdk可以同时支持FISCO BCOS 1.3版本和FISCO BCOS 2.0版本，请根据您的FISCO BCOS版本来选择[1.3版本配置方式](#sub-section-1) 或 [2.0版本配置方式](#sub-section-2) 。
+
+<div id="sub-section-1">
+
+##### 适配FISCO BCOS 1.3版本的配置方式
+</div>
+
+
++ 基本配置
+
+``` 
     cd weid-build-tools   
     vim run.config   
+``` 
+修改 `blockchain_address` 字段，填入区块链节点 IP 和channelport，示例如下：   
+.. note::
+    - channelport的配置可以参考\ `FISCO BCOS 配置项 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/web3sdk/config_web3sdk.html#java>`__ 进行配置。
 
-修改 `blockchain_address` 字段，填入区块链节点 IP 和channelport，示例如下：
 
 ``` {.sourceCode .shell}
 blockchain_address=10.10.10.10:20200
@@ -42,13 +56,7 @@ blockchain_address=10.10.10.10:20200
 blockchain_address=10.10.10.10:20200,10.10.10.11:20200
 ```
 
-配置完区块链节点信息后，您还需要配置FISCO BCOS版本信息：
-
-如果您使用FISCO BCOS 1.3.x的版本，您需要将配置项配置为1，代表基于FISCO
-BCOS 1.x系列的版本进行配置。
-
-如果您使用FISCO BCOS
-2.0的版本，您需要将配置项配置为2，代表2.x系列的版本。
+配置FISCO BCOS版本信息：
 
 ``` {.sourceCode .shell}
 blockchain_fiscobcos_version=2
@@ -69,22 +77,76 @@ id定义为1，则您可以配置为：
 chain_id=1
 ```
 
-#### 1.3 配置节点证书和秘钥文件
++ 节点证书和秘钥文件配置
 
 ``` {.sourceCode .shell} 
 cd resources
     
 ``` 
 
-如果您使用的是FISCO BCOS 1.3.x的版本，您可以 请参考[FISCO BCOS 1.3
-web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html)
+请参考[web3sdk客户端配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html)
 将证书文件 `ca.crt` 和 `client.keystore` 复制出来，拷贝至当前目录下。
 
-如果您使用的是FISCO BCOS 2.0的版本，您可以 请参考[FISCO BCOS 2.0
-web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html)
+
+
+<div id="sub-section-2">
+
+##### 适配FISCO BCOS 2.0版本的配置方式
+</div>
+
++ 基本配置
+
+``` 
+    cd weid-build-tools   
+    vim run.config   
+``` 
+修改 `blockchain_address` 字段，填入区块链节点 IP 和channelport，示例如下：   
+.. note::
+    - channelport的配置可以参考\ `FISCO BCOS 配置项 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/configuration.html#rpc>`__ 来进行配置。
+
+
+``` {.sourceCode .shell}
+blockchain_address=10.10.10.10:30303
+```
+
+如果需要配置多个区块链节点，用逗号分隔，示例如下：
+
+``` {.sourceCode .shell}
+blockchain_address=10.10.10.10:30303,10.10.10.11:30303
+```
+
+配置FISCO BCOS版本信息：
+
+``` {.sourceCode .shell}
+blockchain_fiscobcos_version=2
+```
+
+配置完区块链节点相关的信息后，我们还需要配置机构名称，该名称也被用作后续机构间的通信标识。
+
+假设您的机构名为test，您可以配置为：
+
+``` {.sourceCode .shell}
+org_id=test
+```
+
+配置chain id，该配置项用于标识您接入的区块链网络。 假设您的chain
+id定义为1，则您可以配置为：
+
+``` {.sourceCode .shell}
+chain_id=1
+```
+
+- 节点证书和秘钥文件配置
+
+``` {.sourceCode .shell} 
+cd resources
+    
+``` 
+
+请参考[web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html)
 将证书文件 `ca.crt` `node.crt` 和 `node.key` 复制出来，拷贝至当前目录下。
 
-#### 1.4 部署智能合约并自动生成配置文件
+#### 1.3 部署智能合约并自动生成配置文件
 
 如果您是第一次使用本工具，您需要先进行编译：
 
@@ -95,8 +157,6 @@ web3sdk配置](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs
 ``` 
 
 如果执行过程没报错，大约半分钟左右可以编译完成。
-
-如果您不是发布智能合约的机构，您可以直接跳过后续步骤，直接进入章节3。
 
 编译完成后，您可以执行脚本deploy.sh进行Weidentity智能合约的发布与自动配置。
 
@@ -122,6 +182,7 @@ specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
 ```eval_rst
 .. important::
 
+  - 发布weid智能合约的机构将会自动注册为委员会成员（commit member）。
   - 发布weid智能合约会同时会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub
 ，此私钥后续用于注册权威机构，您可以将起保存到您的其他存储库里。
 ```
@@ -158,7 +219,9 @@ specificIssuer contract address is 0xca5fe4a67da7e25a24d76d24efbf955c475ab9ca
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
 相关接口请见：[WeIdentity JAVA
-SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html)
+SDK文档](https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html)。
+
+[开发样例](https://github.com/WeBankFinTech/weid-sample/tree/develop)
 
 我们也提供了一些快捷工具，可以帮您快速使用weid-java-sdk，请参考[章节3](#section-4).
 
@@ -200,6 +263,9 @@ issuer、发布CPT、拉取CPT并生成presentation policy的能力。
 
 #### 3.2 注册权威机构（authority issuer）
 
+.. note::
+    - 只有委员会成员（commit member）可以进行本节操作，若您不是委员会成员，您可以将您的weid和机构id发给委员会成员，让其帮您注册成权威机构。
+
 假设您要注册的权威机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称为test。
 
 ``` 
@@ -232,6 +298,8 @@ issuer、发布CPT、拉取CPT并生成presentation policy的能力。
 
 #### 3.3 注册特定类型机构（specific issuer）
 
+.. note::
+    - 只有委员会成员（commit member）可以进行本节操作，若您不是委员会成员，您可以将您的weid和机构id发给委员会成员，让其帮您注册成权威机构。
 
 假设您要注册的机构的weid为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
 

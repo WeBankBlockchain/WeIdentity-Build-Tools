@@ -246,7 +246,7 @@ issuer、发布CPT、拉取CPT并生成presentation policy的能力。
 这个步骤会帮您快速创建一个weid。
 
 ``` 
-    cd weid-build-tools/tools
+    cd ../tools
     chmod +x *.sh
     ./create_weid.sh
 ``` 

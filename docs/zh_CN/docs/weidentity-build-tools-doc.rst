@@ -279,7 +279,7 @@ weid-java-sdk可以同时支持FISCO BCOS 1.3版本和FISCO BCOS 2.0版本，请
 
 ::
 
-    cd weid-build-tools/tools
+    cd ../tools
     chmod +x *.sh
     ./create_weid.sh
 

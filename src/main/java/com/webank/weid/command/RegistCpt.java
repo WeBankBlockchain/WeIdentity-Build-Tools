@@ -98,8 +98,8 @@ public class RegistCpt {
             File file = new File(cptDir);
 
             if (!file.isDirectory()) {
-                logger.error("no cpt was found in cpt :{}, please check your input.", file);
-                System.out.println("no cpt was found in cpt :" + file + ", please check your input.");
+                logger.error("no CPT was found in dir :{}, please check your input.", file);
+                System.out.println("no CPT was found in dir :" + file + ", please check your input.");
                 System.exit(1);
             }
             for (File f : file.listFiles()) {
@@ -118,7 +118,7 @@ public class RegistCpt {
             if (!fileName.endsWith(".json")) {
                 return;
             }
-            System.out.println("registering cpt file:" + fileName);
+            System.out.println("registering CPT file:" + fileName);
             jsonNode = JsonLoader.fromFile(cptFile);
             String cptJsonSchema = jsonNode.toString();
             CptStringArgs cptStringArgs = new CptStringArgs();
@@ -138,10 +138,10 @@ public class RegistCpt {
                     response.getErrorCode(),
                     response.getErrorMessage());
                 System.out.println(
-                    "[RegisterCpt] register cpt file:" + fileName + "  result ---> failed. ");
+                    "[RegisterCpt] register CPT file:" + fileName + "  result ---> failed. ");
             } else {
                 System.out.println(
-                    "[RegisterCpt] register cpt file:" + fileName + " result ---> success. cpt id ---> "+ response.getResult().getCptId());
+                    "[RegisterCpt] register CPT file:" + fileName + " result ---> success. cpt id ---> "+ response.getResult().getCptId());
             }
             String content = new StringBuffer()
                 .append(fileName)
@@ -151,7 +151,7 @@ public class RegistCpt {
                 .toString();
             FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
             System.out.println(
-                "[RegisterCpt] register cpt file:" + fileName + " with success.");
+                "[RegisterCpt] register CPT file:" + fileName + " with success.");
         } catch (IOException e) {
             logger.error("[RegisterCpt] load config faild. ", e);
             System.exit(1);

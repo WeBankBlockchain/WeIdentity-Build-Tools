@@ -12,7 +12,7 @@ WeIdentity JAVA SDK 安装部署工具（部署智能合约）
 一条区块链里，有多家机构，只需要一家机构部署 WeIdentity 智能合约，部署完成后，将智能合约地址给到其他机构即可。
 
 * 不部署 WeIdentity 智能合约的机构，参考本文档完成安装部署和集成。
-* 部署 WeIdentity 智能合约的机构，可以参考\ `WeIdentity Java SDK 安装部署工具（部署智能合约 <./weidentity-build-with-deploy.html>`__\ 。
+* 部署 WeIdentity 智能合约的机构，可以参考\ `WeIdentity Java SDK 安装部署工具（不部署智能合约 <./weidentity-build-without-deploy.html>`__\ 。
 
 
 部署步骤
@@ -91,9 +91,9 @@ weid-java-sdk 可以同时支持 FISCO BCOS 1.3 版本和 FISCO BCOS 2.0 版本�
 
     cd resources/
 
-FISCO BCOS 2.0请参考\ `2.0 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html#sdk>`__\将证书文件 ``ca.crt``， ``node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
+FISCO BCOS 2.0请参考\ `2.0 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html#sdk>`__\，将证书文件 ``ca.crt``， ``node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
 
-FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__\将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至当前目录下 。
+FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__\，将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至当前目录下 。
 
 
 1.3 部署智能合约并自动生成配置文件

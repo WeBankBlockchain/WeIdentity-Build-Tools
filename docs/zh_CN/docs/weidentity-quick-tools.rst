@@ -14,7 +14,7 @@ WeIdentity JAVA SDK 便捷使用工具
 部署步骤
 --------
 
-在使用之前，要确保您已完成 WeIdentity JAVA SDK 的安装部署，若您还没有完成，请参考\ `WeIdentity JAVA SDK 安装部署（WeIdentity智能合约发布机构使用） <./weidentity-build-without-deploy.html>`__\ 或者\ `WeIdentity JAVA SDK 安装部署（不发布WeIdentity智能合约） <./weidentity-build-with-deploy.html>`__\。
+在使用之前，要确保您已完成 WeIdentity JAVA SDK 的安装部署，若您还没有完成，请参考\ `WeIdentity JAVA SDK 安装部署（WeIdentity智能合约发布机构使用） <./weidentity-build-with-deploy.html>`__\ 或者\ `WeIdentity JAVA SDK 安装部署（不发布WeIdentity智能合约） <./weidentity-build-without-deploy.html>`__\。
 
 
 此步骤提供快速创建 WeIdentity DID、注册 Authority Issuer、发布 CPT、拉取 CPT 并生成 presentation policy 的能力。

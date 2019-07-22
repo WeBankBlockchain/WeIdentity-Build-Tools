@@ -3,13 +3,17 @@
 
 .. _weidentity-build-without-deploy:
 
-WeIdentity JAVA SDK 安装部署工具
+WeIdentity JAVA SDK 安装部署工具（不部署智能合约）
 ============================================================
 
 整体介绍
 --------
 
-    您可以以一个非 WeIdentity 智能合约发布者的身份来进行 WeIdentity JAVA SDK 安装部署以及便捷工具的使用。 若您需要发布 WeIdentity 智能合约，请参考\ `WeIdentity JAVA SDK 安装部署 （WeIdentity智能合约发布机构使用）<./weidentity-build-with-deploy.html>`__\ 。
+一条区块链里，有多家机构，只需要一家机构部署 WeIdentity 智能合约，部署完成后，将智能合约地址给到其他机构即可。
+
+* 部署 WeIdentity 智能合约的机构，参考本文档完成安装部署和集成。
+* 无需部署 WeIdentity 智能合约的机构，可以参考\ `WeIdentity Java SDK 安装部署工具（不部署智能合约 <./weidentity-build-with-deploy.html>`__\ 。
+
 
 部署步骤
 --------
@@ -25,9 +29,6 @@ WeIdentity JAVA SDK 安装部署工具
     git clone https://github.com/WeBankFinTech/weid-build-tools.git
  
 
-该工具默认会使用最新版本的
-`WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\，该工具可以帮您发布智能合约和自动配置。
-
 
 1.2  配置基本信息
 ''''''''''''''''''''''''''''''''''''
@@ -42,10 +43,10 @@ weid-java-sdk 可以同时支持 FISCO BCOS 1.3版本和 FISCO BCOS 2.0 版本�
     cd weid-build-tools   
     vim run.config   
 
-- 修改 ``blockchain_address`` 字段，填入区块链节点 IP 和 channelport，示例如下：
+- 配置区块链节点信息，填入区块链节点 IP 和 Channel端口，示例如下：
 
 .. note::
-    channelport 的配置可以参考\ `FISCO BCOS 2.0 配置文件 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/configuration.html#rpc>`__ 进行配置，FISCO BCOS 1.3可以参考 `FISCO BCOS 1.3 配置文件 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/web3sdk/config_web3sdk.html#java>`__ 进行配置。
+   区块链节点Channel端口说明见\ `FISCO BCOS 2.0配置文件说明 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/configuration.html#rpc>`__\ 或 `FISCO BCOS 1.3 配置文件说明 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/web3sdk/config_web3sdk.html#java>`__\ 。
 
 .. code:: shell
 
@@ -73,8 +74,7 @@ weid-java-sdk 可以同时支持 FISCO BCOS 1.3版本和 FISCO BCOS 2.0 版本�
 
     org_id=test
 
-配置 chain id，该配置项用于路由到不同的网络。
-假设您的 chain id 定义为1，则您可以配置为：
+- 配置 chain-id，该配置项用于路由到不同的网络，假设您的 chain-id 定义为1，则您可以配置为：
 
 .. code:: shell
 
@@ -89,9 +89,9 @@ weid-java-sdk 可以同时支持 FISCO BCOS 1.3版本和 FISCO BCOS 2.0 版本�
 
     cd resources/
 
-FISCO BCOS 2.0请参考\ `2.0 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html#sdk>`__将证书文件 ``ca.crt`` ， ``node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
+FISCO BCOS 2.0请参考\ `2.0 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html#sdk>`__\ 将证书文件 ``ca.crt``， ``node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
 
-FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至当前目录下 。
+FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__\ 将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至当前目录下 。
 
 
 1.3 部署智能合约并自动生成配置文件
@@ -114,7 +114,7 @@ FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documen
 
 1.4 配置您的配置文件
 
-您需要向发布WeIdentity智能合约的机构索要智能合约地址，并将对应的智能合约地址填入对应的项。
+您需要向发布 WeIdentity 智能合约的机构索要智能合约地址，并将对应的智能合约地址填入对应的项。
 
 ::
 
@@ -129,16 +129,18 @@ FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documen
 
     weid.contractaddress=0xabbc75543648af0861b14daa4f8582f28cd95f5e
 
-其他的 ``cpt.contractaddress`` ， ``issuer.contractaddress`` ， ``evidence.contractaddress`` 和 ``specificissuer.contractaddress`` 都进行对应的智能合约地址替换，完成后保存退出即可。
+其他的 ``cpt.contractaddress``， ``issuer.contractaddress``， ``evidence.contractaddress`` 和 ``specificissuer.contractaddress`` 都进行对应的智能合约地址替换，完成后保存退出即可。
 
 
 至此，您已经完成 weid-java-sdk 的安装部署，您可以开始您的 Java 应用集成以及便捷工具体验。
 
+.. note::
+     一条区块链里，有一家机构负责部署 WeIdentity 智能合约，部署成功后，会将上述智能合约地址给到其他机构。
 
 2 weid-java-sdk 的集成
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.1 在自己的Java应用工程中引入 weid-java-sdk
+2.1 在自己的Java应用中引入 weid-java-sdk
 '''''''''''''''''''''''''''''''''''''''''''''
 
 在自己的 Java 应用通过 ``build.gradle`` 引入，目前 weid-java-sdk 暂时只支持 gradle 方式引入。
@@ -148,19 +150,23 @@ FISCO BCOS 1.3请参考\ `1.3 web3sdk客户端配置 <https://fisco-bcos-documen
     compile("com.webank:weid-java-sdk:1.3.1-rc.3")
 
 
-2.2 配置您的应用工程
+2.2 配置您的Java应用
 '''''''''''''''''''''''''''''''''
-将 weid-build-tools 里配置好的配置文件拷贝至您的应用工程中：
+将 weid-build-tools 里配置好的配置文件拷贝至您的Java应用中：
 ::
 
     cd resources/
     ls
 
 
-您可以将 resources 目录下的所有文件拷贝至您的 Java 应用的 ``resources`` 目录下，weid-java-sdk 会自动加载相应的资源文件。
+您可以将 ``resources`` 目录下的所有文件拷贝至您的 Java 应用的 ``resources`` 目录下，weid-java-sdk 会自动加载相应的资源文件。
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk 相关接口请见：\ `WeIdentity JAVA SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__ 。
 
-我们也提供了一个基于WeID的 \ `开发样例 <https://github.com/WeBankFinTech/weid-sample/tree/develop>`__， 您可以参考。
+我们提供了一个基于WeID的 \ `开发样例 <https://github.com/WeBankFinTech/weid-sample/tree/develop>`__\， 您可以参考。
 
-我们也提供了一些快捷工具，可以帮您快速体验 weid-java-sdk，请参考\ `WeIdentity JAVA SDK 便捷工具 <./weidentity-quick-tools.html>`__\ 。
+
+3. WeIdentity JAVA SDK 便捷工具使用
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+我们提供了一些快捷工具，可以帮您快速体验 weid-java-sdk，请参考\ `WeIdentity JAVA SDK 便捷工具使用 <./weidentity-quick-tools.html>`__\。

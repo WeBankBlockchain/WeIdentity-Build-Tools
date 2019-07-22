@@ -12,7 +12,7 @@ WeIdentity JAVA SDK 安装部署工具（不部署智能合约）
 一条区块链里，有多家机构，只需要一家机构部署 WeIdentity 智能合约，部署完成后，将智能合约地址给到其他机构即可。
 
 * 部署 WeIdentity 智能合约的机构，参考本文档完成安装部署和集成。
-* 无需部署 WeIdentity 智能合约的机构，可以参考\ `WeIdentity Java SDK 安装部署工具（不部署智能合约 <./weidentity-build-with-deploy.html>`__\ 。
+* 无需部署 WeIdentity 智能合约的机构，可以参考\ `WeIdentity Java SDK 安装部署工具（部署智能合约 <./weidentity-build-with-deploy.html>`__\ 。
 
 
 部署步骤

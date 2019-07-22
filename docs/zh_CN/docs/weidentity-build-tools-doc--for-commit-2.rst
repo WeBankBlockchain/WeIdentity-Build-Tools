@@ -9,7 +9,7 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 整体介绍
 --------
 
-  通过安装部署工具，您可以快速的在您的应用项目中集成weid-java-sdk。
+  通过安装部署工具，您可以快速的在您的应用项目中集成weid-java-sdk，推荐使用FISCO BCOS 2.0。 
 
 部署步骤
 --------
@@ -38,72 +38,59 @@ WeIdentity JAVA SDK安装部署文档（weid-build-tools方式）
 `WeIdentity智能合约 <https://github.com/WeBankFinTech/weidentity-contract>`__\ ，该工具可以帮您发布智能合约和自动配置。
 
 
-1.2  配置基本信息
+1.2  修改配置文件
 ''''''''''''''''''''''''''''''''''''
-weid-java-sdk可以同时支持FISCO BCOS 1.3版本和FISCO BCOS 2.0版本。
-
-
-1.2.1  基本配置
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 ::
 
-    cd weid-build-tools   
-    vim run.config   
+    cd weid-build-tools/
 
-修改 ``blockchain_address`` 字段，填入区块链节点 IP 和channelport，示例如下：
+主要的配置文件 ``run.config`` ，配置一些运行时需要的一些参数.
 
-.. note::
-    - channelport的配置可以参考\ `FISCO BCOS 2.0 配置文件 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/configuration.html#rpc>`__ 进行配置，FISCO BCOS 1.3可以参考 `FISCO BCOS 1.3 配置文件 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/web3sdk/config_web3sdk.html#java>`__ 进行配置。
 
-.. code:: shell
+-  配置说明：
 
+ | ``blockchain_address`` ： 区块链节点 IP 和channel_listen_port， channel_listen_port的配置可以参考\ `FISCO BCOS 配置文件 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/configuration.html#rpc>`__ 进行配置，FISCO BCOS 1.3可以参考\ `FISCO BCOS 1.3 配置文件 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/web3sdk/config_web3sdk.html#java>`__ 进行配置。
+ | ``blockchain_fiscobcos_version`` ：对接的FISCO BCOS版本。
+ | ``org_id`` ：机构名称，该名称也被用作后续机构间的通信标识。
+ | ``chain_id`` ：用于标识您接入的区块链网络。
+ | ``jdbc_url``： 连接MYSQL的RUL。weid-java-sdk默认支持MYSQL作为存储，如果您的应用不使用MYSQL，可以不配置。
+ | ``jdbc_username``： 连接MYSQL的用户名， 如果您的应用不使用MYSQL，可以不配置。
+ | ``jdbc_password``： 连接MYSQL的密码， 如果您的应用不使用MYSQL，可以不配置。
+
+配置样例：
+::
+
+    #节点的连接串，节点IP为127.0.0.1，和channel_listen_port为20200。
     blockchain_address=127.0.0.1:20200
 
-如果需要配置多个区块链节点，用逗号分隔，示例如下：
-
-.. code:: shell
-
-    blockchain_address=127.0.0.1:20200,10.10.10.11:20200
-
-
-配置FISCO BCOS版本信息，如果您使用FISCO BCOS 2.0版本则配置为2，FISCO BCOS 1.3则配置为1：
-
-.. code:: shell
-
+    # 示FISCO BCOS的版本为2.0, 1则表示FISCO BCOS 1.3
     blockchain_fiscobcos_version=2
 
+    #机构名称
+    org_id=organizationA
 
-配置机构名称，该名称也被用作后续机构间的\ `AMOP <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/amop_protocol.html>`__ 通信标识。。
-
-假设您的机构名为test，您可以配置为：
-
-.. code:: shell
-
-    org_id=test
-
-配置chain id，该配置项用于标识您接入的区块链网络。
-假设您的chain id定义为1，则您可以配置为：
-
-.. code:: shell
-
+    #链标识
     chain_id=1
+    
+    #MYSQL的配置
+    jdbc_url=jdbc:mysql://127.0.0.1:3306/database
+    jdbc_username=user
+    jdbc_password=password
+ 
 
-保存退出，即完成基本配置。
-
-1.2.2 配置节点证书和秘钥文件
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+- 配置节点证书和秘钥文件
 
 ::
 
-    cd resources/
+    cd resources
 
-FISCO BCOS 2.0请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html#sdk>`__
+
+若您使用FISCO BCOS 2.0, 请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/sdk.html#sdk>`__
 将证书文件 ``ca.crt``  ``node.crt`` 和 ``node.key`` 复制出来，拷贝至当前目录下。
 
-FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__
+若您使用FISCO BCOS 1.3, 请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentation.readthedocs.io/zh_CN/release-1.3/docs/tools/web3sdk.html>`__
 将证书文件 ``ca.crt`` 和 ``client.keystore`` 复制出来，拷贝至当前目录下 。
-
 
 
 1.3 部署智能合约并自动生成配置文件
@@ -124,7 +111,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
 
 如果执行过程没报错，大约半分钟左右可以编译完成。
 
-编译完成后，您可以执行脚本deploy.sh进行WeIdentity智能合约的发布。
+编译完成后，您可以执行脚本deploy.sh进行Weidentity智能合约的发布与自动配置。
 
 ::
 
@@ -132,7 +119,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
     ./deploy.sh
 
 
-运行成功后，会打印以下信息：
+运行成功后，在控制台可以看到发布好的智能合约地址，合约地址已经自动写入配置文件。
 
 ::
 
@@ -148,20 +135,20 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
 
 
 .. note::
-  - 发布WeIdentity智能合约的机构将会自动注册为委员会成员（Committee member）。
-  - 发布WeIdentity智能合约会同时会在 ``weid-build-tools/output/admin`` 目录下动态生成私钥文件 ``ecdsa_key`` ，以及对应的公钥文件 ``ecdsa_key.pub`` ，此私钥后续用于注册权威机构，您可以将起保存到您的其他存储库里。
+  - 发布weid智能合约的机构将会自动注册为委员会成员（commit member）。
+  - 发布weid智能合约会同时会在weid-build-tools/output/admin目录下动态生成私钥文件ecdsa_key，以及对应的公钥文件ecdsa_key.pub，此私钥后续用于注册权威机构，您可以将起保存到您的其他存储库里。
 
 
-至此，您已经完成weid-java-sdk的安装部署，您可以开始您的Java应用集成以及便捷工具体验。
+至此，您已经完成weid-java-sdk的安装部署，您可以开始您的应用集成以及快速使用体验。
 
 
 2 weid-java-sdk 的集成
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.1 在自己的Java应用工程中引入weid-java-sdk
+2.1 JAVA应用工程中引入weid-java-sdk
 '''''''''''''''''''''''''''''''''''''''''''''
 
-在自己的Java应用通过build.gradle引入，目前weid-java-sdk暂时只支持gradle方式引入。
+通过gradle引入到java应用
 
 ::
 
@@ -170,14 +157,14 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
 
 2.2 配置您的应用工程
 ''''''''''''''''''''''''''''''''''''
-将weid-build-tools里配置好的配置文件拷贝至您的应用工程中：
+将build-tools里配置好的配置文件拷贝至您的应用工程中：
 ::
 
     cd resources/
     ls
 
 
-您可以将resources目录下的所有文件拷贝至您的Java应用的 ``resources`` 目录下，weid-java-sdk会自动加载相应的资源文件。
+您可以将resources目录下的所有文件拷贝至您的应用的配置文件目录下，weid-java-sdk会自动加载相应的资源文件。
 
 现在您可以使用 WeIdentity 开发您的区块链身份应用。weid-java-sdk
 相关接口请见：\ `WeIdentity JAVA SDK文档 <https://weidentity.readthedocs.io/projects/javasdk/zh_CN/latest/docs/weidentity-java-sdk-doc.html>`__ 。
@@ -192,22 +179,22 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
    <div id="section-3">
 
 
-3 使用weid-build-tools提供的便捷工具
+3 快速使用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. raw:: html
 
    </div>
 
-在进行这个章节的操作之前，要确保WeIdentity的智能合约已经发布完成。
+在进行这个章节的操作之前，要确保weidentity的智能合约已经发布完成。
 
 
-此步骤提供快速创建WeIdentity DID、注册Authority issuer、发布CPT、拉取CPT并生成presentation policy的能力。
+此步骤提供快速创建Weidentity DID、注册Authority issuer、发布CPT、拉取CPT并编译成weidentity-cpt.jar的能力。
 
-3.1 创建您的WeIdentity DID
+3.1 创建您的Weidentiy DID
 ''''''''''''''''''''''''''''''
 
-这个步骤会帮您快速创建一个WeIdentity DID。
+这个步骤会帮您快速创建一个weidentity DID。
 
 ::
 
@@ -215,7 +202,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
     chmod +x *.sh
     ./create_weid.sh
 
-若执行成功，则会打印以下信息，表明创建的WeIdentity DID是did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1。
+若执行成功，则会打印以下信息，表明创建的weid是did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1。
 
 ::
 
@@ -223,86 +210,86 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
     the related private key and public key can be found at /home/app/tonychen/test_gradle/weid-build-tools/output/create_weid/0x405a7ae297fc6d6fb02fb548db64b29f08114ca1.
 
 
-在weid-build-tools/output/create_weid/目录下看到一些以0x开头的目录，找到跟刚刚生成的WeIdentity DID匹配的目录，里面包含了weid，公钥ecdsa_key.pub和私钥ecdsa_key。
+在weid-build-tools/output/create_weid/目录下看到一些以0x开头的目录，找到跟刚刚生成的weidentity DID匹配的目录，里面包含了weid，公钥ecdsa_key.pub和私钥ecdsa_key。
 
-3.2 注册Authority Issuer(权威凭证发行者)
+3.2 注册权威机构（authority issuer）
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 .. note::
-    - 只有委员会成员（committee member）可以进行本节操作，若您不是委员会成员，您可以将您的WeIdentity DID和机构名称发给委员会成员，让其帮您注册成权威机构。
+    - 只有委员会成员（commit member）可以进行本节操作，若您不是委员会成员，您可以将您的weid和机构id发给委员会成员，让其帮您注册成权威机构。
 
-- 注册Authority Issuer
+- 注册权威机构
 
-假设您要注册的Authority Issuer的WeIdentity DID为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，机构名称是test。
+假设您要注册的权威机构的weid为did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1，机构名称是test。
 ::
 
-    ./register_authority_issuer.sh --org-id test --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_authority_issuer.sh --org-id test --weid did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 如果执行成功，会打印以下信息。
 ::
 
-    registering authorityissuer:did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb, name is :test
+    registering authorityissuer:did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1, name is :test
     success.
 
-- 移除Authority Issuer
+- 移除权威机构
 
-如果您需要移除某个Authority Issuer，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb：
+如果您需要移除某个权威机构，前提是您是智能合约发布者或者您有相应的权限，比如您要移除did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 ::
 
-    ./register_authority_issuer.sh --remove-issuer did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_authority_issuer.sh --remove-issuer did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 若执行成功，则会打印以下信息。
 ::
 
-    removing authority issuer :did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb...
+    removing authority issuer :did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1...
     success.
 
 
-3.3 注册Specific issuer(特定类型机构)
+3.3 注册特定类型机构（specific issuer）
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 .. note::
-    - 只有委员会成员（Committee member）可以进行本节操作，若您不是委员会成员，您可以将您的WeIdentity DID和机构id发给委员会成员，让其帮您注册成权威机构。
+    - 只有委员会成员（commit member）可以进行本节操作，若您不是委员会成员，您可以将您的weid和机构id发给委员会成员，让其帮您注册成权威机构。
 
 - 注册特定类型机构
 
-假设您要注册的机构的WeIdentity DID为did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，注册类型为college，只需执行此下命令：
+假设您要注册的机构的weid为did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1，注册类型为college，只需执行此下命令：
 
 ::
 
-    ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_specific_issuer.sh --type college --weid did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 执行成功，则会打印以下信息。
 ::
 
-    [RegisterIssuer] Adding WeIdentity DID did:weid:1:0xe10e52f6b7c6751bd03afc023b8e617d7fd0429c in type: college
+    [RegisterIssuer] Adding WeIdentity DID did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1 in type: college
     specific issuers and types have been successfully registered on blockchain.
 
-如果您需要注册多个机构，请将其WeIdentity DID用分号分割开，如下所示：
+如果您需要注册多个机构，请将其DID用分号分割开，如下所示：
 
 ::
 
-    ./register_specific_issuer.sh --type college --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_specific_issuer.sh --type college --weid did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1;did:weid:0x6efd256d02c1a27675de085b86989fa2ac1baddb
 
 - 移除特定类型机构
 
-比如您要从college类型中移除did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb：
+比如您要从college类型中移除did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 ::
 
-    ./register_specific_issuer.sh --type college --remove-issuer did:weid:1:0x6efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_specific_issuer.sh --type college --remove-issuer did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 3.4 机构发布CPT
 ''''''''''''''''''''''''''''''
 
 此步骤会帮助机构发布指定的CPT到区块链上。
 
-如果您的WeIdentity DID是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥，只用指定cpt的路径即可。
+如果您的weid是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥，只用指定cpt的路径（test_data/single/目录下已经有测试数据）和发布机构的weid即可。
 
 ::
 
-    ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb
+    ./register_cpt.sh --cpt-dir test_data/single/ --weid did:weid:1:0x405a7ae297fc6d6fb02fb548db64b29f08114ca1
 
 若执行成功，则会打印以下信息：
 ::
@@ -311,7 +298,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
     [RegisterCpt] register cpt file:JsonSchema.json with success.
     finished.
 
-如果您是通过其他途径创建的WeIdentity DID，您需要自己指定私钥的位置。
+如果您是通过其他途径创建的weid，您需要自己指定私钥的位置。
 假如机构的weid是did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的cpt都以.json后缀命名上传至test_data/single/目录下，私钥文件路径为/home/test/private_key/ecdsa_key
 
 ::
@@ -351,7 +338,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
 
 .. raw:: html
 
-   <div id="reference-2">
+   <div id="reference-1">
 
 
 附录1 手工配置fisco.properties
@@ -361,7 +348,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
 
    </div>
 
-前提是您已经完成\ `章节1 <#section-2>`__\的步骤。
+前提是您已经完成\ `章节1 <#section-1>`__\的步骤。
 
 编辑fisco.properties：
 
@@ -370,7 +357,7 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
     cd weid-build-tools/resources/
     vim fisco.properties
 
-您可以看到配置内容，我们需要将WeIdentity的智能合约地址和chain id写入到指定配置项，找到以下配置项：
+您可以看到配置内容，我们需要将weidentity的智能合约地址和chain id写入到指定配置项，找到以下配置项：
 
 您需要将每个配置项替换成对应的智能合约地址，比如，如果weid Contract的发布地址是0xabbc75543648af0861b14daa4f8582f28cd95f5e，
 您需要将“weId.contractaddress”对应的0x0替换成0xabbc75543648af0861b14daa4f8582f28cd95f5e，变成以下内容：
@@ -398,4 +385,3 @@ FISCO BCOS 1.3请参考\ `web3sdk客户端配置 <https://fisco-bcos-documentati
 
 如果在后续weidentity java
 sdk出了新的版本，您希望将您现有的版本升级为新版本，或者回退到以前的版本，您可以手工将您的build.gradle里配置的版本改为您想要的版本，然后重新执行以上的步骤即可。默认的，您依赖的特定版本的weidentity-java-sdk会依赖对应的版本的weidentity智能合约，如果您要定制您的智能合约版本，您可以手工替换智能合约的jar包。
-

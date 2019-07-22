@@ -9,8 +9,8 @@ issuer.contractaddress=${ISSUER_ADDRESS}
 evidence.contractaddress=${EVIDENCE_ADDRESS}
 specificissuer.contractaddress=${SPECIFICISSUER_ADDRESS}
 
+#chain ID
 chain.id=${CHAIN_ID}
-group.id=1
 
 # Blockchain connection params. Do NOT change these unless you are troubleshooting!
 web3sdk.timeout=10000
@@ -27,3 +27,7 @@ v1.key-store-password=123456
 v2.ca-crt-path=ca.crt
 v2.node-crt-path=node.crt
 v2.node-key-path=node.key
+
+# Fisco-Bcos 2.x params, including Group ID and Encrypt Type
+group.id=1
+encrypt.type=0

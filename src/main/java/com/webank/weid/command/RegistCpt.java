@@ -22,13 +22,13 @@ package com.webank.weid.command;
 import java.io.File;
 import java.io.IOException;
 
-import com.beust.jcommander.JCommander;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JsonLoader;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.protocol.base.CptBaseInfo;
@@ -37,8 +37,9 @@ import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.CptService;
+import com.webank.weid.rpc.WeIdService;
 import com.webank.weid.service.impl.CptServiceImpl;
-import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.util.FileUtils;
 
 /**
@@ -53,6 +54,7 @@ public class RegistCpt {
 
     private static CptService cptService = new CptServiceImpl();
 
+    private static WeIdService weIdService = new WeIdServiceImpl();
     /**
      * @param args
      */
@@ -69,14 +71,22 @@ public class RegistCpt {
             .build()
             .parse(args);
 
-        String weid = commandArgs.getWeid();
+        String weId = commandArgs.getWeid();
+        
+        ResponseData<Boolean> resp = weIdService.isWeIdExist(weId);
+        if(!resp.getResult()) {
+        	logger.error("[RegisterCpt] weid ---> {} does not exist.", weId);
+        	System.out.println("[RegisterCpt] Error: the WeId ---> " + weId + " does not exist.");
+            System.exit(1);
+        }
+        
         String cptDir = commandArgs.getCptDir();
         String privateKeyFile = commandArgs.getPrivateKey();
         String cptId = commandArgs.getCptId();
         String cptFile = commandArgs.getCptFile();
 
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
-        weIdAuthentication.setWeId(weid);
+        weIdAuthentication.setWeId(weId);
         if(!privateKeyFile.startsWith("/")) {
 
             //相对路径
@@ -106,7 +116,7 @@ public class RegistCpt {
 
             if (!file.isDirectory()) {
                 logger.error("no CPT was found in dir :{}, please check your input.", file);
-                System.out.println("no CPT was found in dir :" + file + ", please check your input.");
+                System.out.println("[RegisterCpt] no CPT was found in dir :" + file + ", please check your input.");
                 System.exit(1);
             }
             for (File f : file.listFiles()) {

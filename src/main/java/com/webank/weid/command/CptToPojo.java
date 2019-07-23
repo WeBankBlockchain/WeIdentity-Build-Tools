@@ -82,6 +82,7 @@ public class CptToPojo {
                     logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
                         response.getErrorCode(), response.getErrorMessage());
                     failedList.add(cptId);
+                    System.out.println("[CptToPojo] Error: get CPT ---> "+cptId+" failed. reason is ---> "+ response.getErrorMessage());
                     continue;
                 }
                 Cpt cpt = response.getResult();
@@ -92,16 +93,16 @@ public class CptToPojo {
                 succeedList.add(String.valueOf(cpt.getCptId()));
             }
         } catch (Exception e) {
-            logger.error("[CptTools] execute with exception, {}", e);
-            System.out.println("[CptTools] execute failed.");
+            logger.error("[CptToPojo] execute with exception, {}", e);
+            System.out.println("[CptToPojo] execute failed.");
             System.exit(1);
         }
 
         if (CollectionUtils.isEmpty(failedList)) {
             System.out
-                .println("All cpt:" + succeedList + " are successfully transformed to pojo.");
+                .println("[CptToPojo]All cpt ---> " + succeedList + " are successfully transformed to pojo.");
         } else if(CollectionUtils.isEmpty(succeedList)) {
-        	System.out.println("All cpt are failed to transformed to pojo.");
+        	System.out.println("[CptToPojo] Error: All cpt are failed to transformed to pojo.");
         	System.exit(1);
         } else {
             System.out.println(

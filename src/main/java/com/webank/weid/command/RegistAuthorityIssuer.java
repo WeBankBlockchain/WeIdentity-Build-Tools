@@ -85,7 +85,7 @@ public class RegistAuthorityIssuer {
 
         
         if (StringUtils.isNotEmpty(weid)) {
-        	System.out.println("registering authorityissuer:" + weid + ", name is :"+ orgId);
+        	System.out.println("registering authorityissuer ---> " + weid + ", name is :"+ orgId);
             RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
             AuthorityIssuer authorityIssuer = new AuthorityIssuer();
             authorityIssuer.setName(orgId);
@@ -116,7 +116,7 @@ public class RegistAuthorityIssuer {
         }
 
         if (StringUtils.isNotEmpty(removedIssuer)) {
-            System.out.println("removing authority issuer :" + removedIssuer + "...");
+            System.out.println("removing authority issuer ---> " + removedIssuer + "...");
             RemoveAuthorityIssuerArgs removeAuthorityIssuerArgs = new RemoveAuthorityIssuerArgs();
             removeAuthorityIssuerArgs.setWeId(removedIssuer);
             removeAuthorityIssuerArgs.setWeIdPrivateKey(weIdPrivateKey);

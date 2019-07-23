@@ -19,8 +19,18 @@ WeIdentity JAVA SDK 便捷使用工具
 
 此步骤提供快速创建 WeIdentity DID、注册 Authority Issuer、发布 CPT、拉取 CPT 并生成 presentation policy 的能力。
 
+
+.. raw:: html
+
+   <div id="section-1">
+
 1 创建您的 WeIdentity DID
 ''''''''''''''''''''''''''''''
+
+.. raw:: html
+
+   </div>
+
 
 这个步骤会帮您快速创建一个 WeIdentity DID。
 
@@ -42,7 +52,7 @@ WeIdentity JAVA SDK 便捷使用工具
 在 ``weid-build-tools/output/create_weid/`` 目录下看到一些以 0x 开头的目录，找到跟刚刚生成的 WeIdentity DID 匹配的目录，里面包含了 WeIdentity DID，公钥 ``ecdsa_key.pub`` 和私钥 ``ecdsa_key``。
 
 2 注册 Authority Issuer (权威凭证发行者)
-''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''
 
 .. note::
     只有 Committee Member（委员会机构成员）可以进行本节操作，若您不是 Committee Member，您可以将您的 WeIdentity DID 和机构名称发给 Committee Member，让其帮您注册成 Authority Issuer。
@@ -114,7 +124,7 @@ WeIdentity JAVA SDK 便捷使用工具
 
 此步骤会帮助机构发布指定的 CPT 到区块链上。
 
-如果您的 WeIdentity DID 是执行\ `3.1节 <#section-3>`__\生成的，您可以不用传入私钥，只用指定 CPT 的路径即可。
+如果您的 WeIdentity DID 是执行\ `第1节 <#section-1>`__\生成的，您可以不用传入私钥，只用指定 CPT 的路径即可。
 
 ::
 

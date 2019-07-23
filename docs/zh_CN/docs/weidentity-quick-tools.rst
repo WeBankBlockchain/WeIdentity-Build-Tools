@@ -128,7 +128,7 @@ WeIdentity JAVA SDK 便捷使用工具
 如果您的 WeIdentity DID 是执行\ `第1节 <#section-1>`__\生成的，您可以不用传入私钥，只用指定 CPT 的路径和 WeID 即可。
 
 .. note::
-     以下样例中的 ``test_data/single/``已预置测试CPT。您也可以更改为其他包含您CPT的目录。
+     以下样例中的 ``test_data/single/`` 已预置测试CPT。您也可以更改为其他包含您CPT的目录。
 
 ::
 

@@ -77,6 +77,13 @@ public class RegistCpt {
 
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
         weIdAuthentication.setWeId(weid);
+        if(!privateKeyFile.startsWith("/")) {
+
+            //相对路径
+            String temp = "tools/" + privateKeyFile;
+            privateKeyFile = temp;
+
+        }
         String privateKey = FileUtils.readFile(privateKeyFile);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         weIdPrivateKey.setPrivateKey(privateKey);

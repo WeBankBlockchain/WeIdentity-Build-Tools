@@ -7,9 +7,9 @@ blockchain.orgid=${ORG_ID}
 datasource.name=datasource1
 
 # The configuration of each data source is prefixed by the name of the data source.
-datasource1.jdbc.url=${JDBC_URL}?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
-datasource1.jdbc.username=${JDBC_USERNAME}
-datasource1.jdbc.password=${JDBC_PASSWORD}
+datasource1.jdbc.url=jdbc:mysql://0.0.0.0:3306/database?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+datasource1.jdbc.username=user
+datasource1.jdbc.password=passwd
 datasource1.jdbc.maxActive=50
 datasource1.jdbc.minIdle=5
 datasource1.jdbc.maxIdle=5

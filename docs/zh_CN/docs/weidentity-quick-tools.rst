@@ -124,7 +124,11 @@ WeIdentity JAVA SDK 便捷使用工具
 
 此步骤会帮助机构发布指定的 CPT 到区块链上。
 
-如果您的 WeIdentity DID 是执行\ `第1节 <#section-1>`__\生成的，您可以不用传入私钥，只用指定 CPT 的路径即可。
+
+如果您的 WeIdentity DID 是执行\ `第1节 <#section-1>`__\生成的，您可以不用传入私钥，只用指定 CPT 的路径和 WeID 即可。
+
+.. note::
+     以下样例中的 ``test_data/single/`` 已预置测试CPT。您也可以更改为其他包含您CPT的目录。
 
 ::
 
@@ -138,7 +142,7 @@ WeIdentity JAVA SDK 便捷使用工具
     finished.
 
 如果您是通过其他途径创建的 WeIdentity DID，您需要自己指定私钥的位置。
-假如机构的 WeID 是 did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，需要注册的 CPT 都以 .json 后缀命名上传至 ``test_data/single/`` 目录下，私钥文件路径为 ``/home/test/private_key/ecdsa_key``
+假如机构的 WeID 是 did:weid:1:0x5efd256d02c1a27675de085b86989fa2ac1baddb，私钥文件路径为 ``/home/test/private_key/ecdsa_key``：
 
 ::
 

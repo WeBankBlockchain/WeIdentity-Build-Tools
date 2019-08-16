@@ -67,7 +67,7 @@ function generate_presentation_policy()
 	
 	build_classpath
 	
-	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy $@ --org-id ${org_id}
+	java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo $@
 	
 	presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
 	if [ ! -d ${presentation_policy} ];then
@@ -84,13 +84,18 @@ function generate_presentation_policy()
     
 }
 
+
 function main()
 {
     check_jdk
     
     cpt_to_pojo $@
     
-	generate_presentation_policy $@
+    
+    if [ "$1" = "--cpt-list" ] then
+        generate_presentation_policy $@
+    fi
+	
 }
 
 main $@

@@ -47,4 +47,7 @@ public class CommandArgs {
 
     @Parameter(names = "--policy-id", description = "policy id")
     private String policyId;
+    
+    @Parameter(names = "--policy-file", description = "policy file name")
+    private String policyFileName;
 }

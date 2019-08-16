@@ -21,18 +21,21 @@
 package com.webank.weid.command;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.beust.jcommander.JCommander;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
+import com.webank.weid.protocol.base.ClaimPolicy;
 import com.webank.weid.protocol.base.Cpt;
+import com.webank.weid.protocol.base.PresentationPolicyE;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.CptService;
 import com.webank.weid.service.impl.CptServiceImpl;
@@ -54,7 +57,7 @@ public class CptToPojo {
 
         //1. get cpt list
         if (args == null || args.length < 2) {
-            System.out.println("[CptTools] input parameters error, please check your input!");
+            System.out.println("[CptToPojo] input parameters error, please check your input!");
             System.exit(1);
         }
 
@@ -65,12 +68,31 @@ public class CptToPojo {
             .parse(args);
 
         String cptStr = commandArgs.getCptIdList();
-        if (StringUtils.isEmpty(cptStr)) {
-            System.out.println("[CptTools] input parameters error, please check your input!");
+        String policyFile = commandArgs.getPolicyFileName();
+        
+        if (StringUtils.isEmpty(cptStr) && StringUtils.isEmpty(policyFile)) {
+            System.out.println("[CptToPojo] input parameters error, please check your input!");
             System.exit(1);
         }
+        
+        if (StringUtils.isNotEmpty(cptStr) && StringUtils.isNotEmpty(policyFile)) {
+            System.out.println("[CptToPojo] input parameters error, please check your input!");
+            System.exit(1);
+        }
+        
+        if(StringUtils.isNotEmpty(cptStr)) {
+        	generateCptFileById(cptStr);
+        }
+        if(StringUtils.isNotEmpty(policyFile)) {
+        	generateCptFileByPolicy(policyFile);
+        }
 
-        List<String> succeedList = new ArrayList<>();
+        //3. exit with success.
+        System.exit(0);
+    }
+
+    private static void generateCptFileById(String cptStr) {
+    	List<String> succeedList = new ArrayList<>();
         List<String> failedList = new ArrayList<>();
         try {
 
@@ -79,8 +101,11 @@ public class CptToPojo {
             for (String cptId : cptList) {
                 ResponseData<Cpt> response = cptService.queryCpt(Integer.valueOf(cptId));
                 if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-                    logger.error("Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", cptId,
-                        response.getErrorCode(), response.getErrorMessage());
+                    logger.error(
+                    	"Query CPT :{} failed. ErrorCode is:{},ErrorMessage:{}", 
+                    	cptId,
+                        response.getErrorCode(), 
+                        response.getErrorMessage());
                     failedList.add(cptId);
                     System.out.println("[CptToPojo] Error: get CPT ---> "+cptId+" failed. reason is ---> "+ response.getErrorMessage());
                     continue;
@@ -110,8 +135,50 @@ public class CptToPojo {
                     + failedList + "] are failed.");
         }
 
-        //3. exit with success.
-        System.exit(0);
     }
-
+    /**
+     * convert policy to cpt pojo.
+     * 
+     * @param policyFile the policy file
+     */
+    private static void generateCptFileByPolicy(String policyFile) {
+    	
+    	PresentationPolicyE policyE = PresentationPolicyE.create(policyFile);
+    	if(policyE == null) {
+    		return;
+    	}
+    	Map<Integer, ClaimPolicy>policy = policyE.getPolicy();
+    	for(Map.Entry<Integer, ClaimPolicy>entry : policy.entrySet()) {
+    		Integer cptId = entry.getKey();
+    		ResponseData<Cpt>resp = cptService.queryCpt(cptId);
+    		Cpt cpt = resp.getResult();
+    		Map<String,Object>cptMap = cpt.getCptJsonSchema();
+    		
+    		ClaimPolicy claimPolicy = entry.getValue();
+    		String fieldsToBeDisclosed = claimPolicy.getFieldsToBeDisclosed();
+    		HashMap<String,Object> disclosedMap = DataToolUtils.deserialize(fieldsToBeDisclosed, HashMap.class);
+    		generateCptMap(disclosedMap,cptMap);
+    		String cptJson = DataToolUtils.serialize(cptMap);
+            String fileName = "Cpt" + String.valueOf(cpt.getCptId()) + "-policy"+policyE.getId()+".json";
+            FileUtils.writeToFile(cptJson, fileName, FileOperator.OVERWRITE);
+    	}
+    	
+    }
+    
+    private static void generateCptMap(Map<String,Object> disclosedMap, Map<String, Object>cptMap) {
+    	
+    	for(Map.Entry<String,Object>en:disclosedMap.entrySet()) {
+    		String k = en.getKey();
+    		Object v = en.getValue();
+    		
+    		Object cptMapV = cptMap.get(k);
+			if(v instanceof Map) {
+				generateCptMap((HashMap)v,(HashMap)cptMapV);
+			}else {
+				if(String.valueOf(v).equals("0")) {
+					cptMap.remove(k);
+				}
+			}
+		}
+    }
 }

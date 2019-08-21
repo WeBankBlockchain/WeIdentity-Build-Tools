@@ -49,8 +49,10 @@ public class CreateWeId {
 
         ResponseData<CreateWeIdDataResult> response = weIdService.createWeId();
         if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-            logger.error("[CreateWeId] create WeID faild. error code : {}, error msg :{}",
-                response.getErrorCode(), response.getErrorMessage());
+            logger.error(
+                "[CreateWeId] create WeID faild. error code : {}, error msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
             System.out.println("[CreateWeId] create WeID failed.");
             System.exit(1);
         }

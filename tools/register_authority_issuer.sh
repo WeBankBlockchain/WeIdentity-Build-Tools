@@ -27,4 +27,4 @@ if [ ! $? -eq 0 ]; then
     exit $?
 fi
 
-echo "success."
+echo "Execute succeed."

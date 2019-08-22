@@ -28,7 +28,8 @@ else
 	elif [ "$5" = "--weid" ] ;then
 		weid=$6
 	else
-		echo "a weid is needed."
+		echo "Input error, a WeID is needed."
+		exit 1
 	fi
     we_address=`echo $weid|awk -F":" '{print $4}' `    
     private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
@@ -36,7 +37,7 @@ else
 fi
 
 if [ ! $? -eq 0 ]; then
-    echo "regist cpt faild, please check your input and see log : ${SOURCE_CODE_DIR}/logs/all.log."
+    echo "Regist cpt faild, please check your input and see log : ${SOURCE_CODE_DIR}/logs/all.log."
     exit $?
 fi
 
@@ -48,4 +49,4 @@ if [ -f regist_cpt.out ];then
 	mv regist_cpt.out ${SOURCE_CODE_DIR}/output/regist_cpt/
 fi
 
-echo "finished."
+echo "Execute succeed."

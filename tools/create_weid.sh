@@ -7,11 +7,11 @@ cd ${SOURCE_CODE_DIR}
 
 build_classpath
 
-echo "creating weid, please wait..."
+echo "Creating WeID, please wait..."
 java -cp "$CLASSPATH" com.webank.weid.command.CreateWeId
 
 if [ ! $? -eq 0 ]; then
-    echo "Create weid faild, please check the log -> ../logs/error.log."
+    echo "Create WeID faild, please check the log -> ../logs/error.log."
     exit $?;
 fi
 
@@ -22,7 +22,7 @@ fi
 
 if [ -f "weid" ];then
     weid=$(cat weid)
-	echo "new weid has been created ----> $weid"
+	echo "New weid has been created ----> $weid"
     OLD_IFS="$IFS"
     IFS=":"
     array=($weid)
@@ -34,4 +34,4 @@ if [ -f "weid" ];then
     mv weid ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
 fi
 
-echo "the related private key and public key can be found at ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}."
+echo "The related private key and public key can be found at ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}."

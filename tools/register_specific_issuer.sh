@@ -26,14 +26,14 @@ cd ${SOURCE_CODE_DIR}
 
 build_classpath
 
-echo "begin to register specific issuers and types, please wait..."
+echo "Begin to register specific issuers and types, please wait..."
 
 private_key=${SOURCE_CODE_DIR}/output/admin/ecdsa_key
 java -cp "$CLASSPATH" com.webank.weid.command.RegisterSpecificIssuer $@ --private-key ${private_key}
 
 if [ ! $? -eq 0 ]; then
-    echo "register specific issuers and types failed, please check error logs for details."
+    echo "Register specific issuers and types failed, please check error logs for details."
     exit $?
 fi
 
-echo "specific issuers and types have been successfully registered on blockchain."
+echo "Specific issuers and types have been successfully registered on blockchain."

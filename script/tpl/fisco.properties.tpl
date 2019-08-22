@@ -13,7 +13,7 @@ specificissuer.contractaddress=${SPECIFICISSUER_ADDRESS}
 chain.id=${CHAIN_ID}
 
 # Blockchain connection params. Do NOT change these unless you are troubleshooting!
-web3sdk.timeout=10000
+web3sdk.timeout=8
 web3sdk.core-pool-size=100
 web3sdk.max-pool-size=200
 web3sdk.queue-capacity=1000

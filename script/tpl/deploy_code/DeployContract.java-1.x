@@ -131,7 +131,8 @@ public class DeployContract {
             service.run();
         } catch (Exception e) {
             logger.error("[DeployContract] Service init failed. ", e);
-            return false;
+            System.out.println("[DeployContract] Error: init web3j failed, please check your FISCO BCOS node ip, channel_listen_port and node cert.");
+            System.exit(1);
         }
 
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();

@@ -120,7 +120,8 @@ public class DeployContract {
             service.run();
         } catch (Exception e) {
             logger.error("[WeServiceImplV2] Service init failed. ", e);
-            throw new InitWeb3jException(e);
+            System.out.println("[DeployContract] Error: init web3j failed, please check your FISCO BCOS node ip, channel_listen_port and node cert.");
+            System.exit(1);
         }
 
         ChannelEthereumService channelEthereumService = new ChannelEthereumService();
@@ -142,7 +143,8 @@ public class DeployContract {
 
         if (null == credentials) {
             logger.error("[BaseService] credentials init failed.");
-            return false;
+            System.out.println("[DeployContract] Error: credentials init failed, try to re-run.");
+            System.exit(1);
         }
 
         return true;

@@ -114,6 +114,10 @@ jar {
     exclude '**/*.properties'
 
     doLast {
+     	copy {
+            from file('resources/')
+            into 'dist/conf'
+        }
         copy {
             from configurations.runtime
             from configurations.localDeps

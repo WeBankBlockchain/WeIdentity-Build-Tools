@@ -1,25 +1,25 @@
 {
 	"properties": {
-		"weid": {
+		"id": {
 			"type": "string",
-			"description": "the weid of certificate owner"
+			"description": "the WeID of the owner"
 		},
 		"name": {
 			"type": "string",
-			"description": "the name of certificate owner"
+			"description": "the name of object"
 		},
 		"meta": {
 			"type": "object",
 			"properties": {
-				"code": {
-					"type": "number",
+				"id": {
+					"type": "string",
 					"description": "code"
 				},
-				"error": {
+				"context": {
 					"type": "string",
 					"description": "error"
 				},
-				"info": {
+				"date": {
 					"type": "string",
 					"description": "info"
 				}
@@ -32,7 +32,7 @@
 					"type": "string",
 					"description": "info"
 				},
-				"sipTellAddress": {
+				"address": {
 					"type": "string",
 					"description": "sipTellAddress"
 				},

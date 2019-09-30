@@ -74,7 +74,7 @@ dependencies {
             compile fileTree(dir: 'dist/lib', include: '*.jar')
         } else {
             compile lombok, apache_commons, jackson, jcommander
-			compile("com.webank:weid-java-sdk:1.3.1-rc.3") {
+			compile("com.webank:weid-java-sdk:1.4.0") {
 				exclude group:"org.slf4j", module: "slf4j-log4j12"
             }
         }
@@ -84,7 +84,7 @@ dependencies {
             compileOnly 'org.projectlombok:lombok:1.16.14'
             annotationProcessor 'org.projectlombok:lombok:1.16.14'
             compile apache_commons, jackson, jcommander
-			compile("com.webank:weid-java-sdk:1.3.1-rc.3") {
+			compile("com.webank:weid-java-sdk:1.4.0") {
 				exclude group:"org.slf4j", module: "slf4j-log4j12"
             }
         } else {
@@ -114,10 +114,36 @@ jar {
     exclude '**/*.properties'
 
     doLast {
-        copy {
-            from configurations.runtime
-            from configurations.localDeps
-            into 'dist/lib'
+        def f = new File('dist/lib/NotoSansCJKtc-Regular.ttf')
+        if (f.exists() && f.size() > 100) {
+            println "Font file already exists, distributing.."
+            copy {
+                from file('dist/lib/NotoSansCJKtc-Regular.ttf')
+                into 'resources/'
+            }
+        }
+     	copy {
+            from file('resources/')
+            into 'dist/conf'
+        }
+        if (!gradle.startParameter.isOffline()) {
+            if (!f.exists() || (f.exists() && f.size() < 100)) {
+                println "Font file does not exist, starting to download and distribute.."
+                new URL('https://github.com/WeBankFinTech/WeIdentity/raw/master/context/NotoSansCJKtc-Regular.ttf').withInputStream { i ->
+                    f.withOutputStream {
+                        it << i
+                    }
+                }
+                copy {
+                    from file('dist/lib/NotoSansCJKtc-Regular.ttf')
+                    into 'resources/'
+                }
+            }
+            copy {
+                from configurations.runtime
+                from configurations.localDeps
+                into 'dist/lib'
+            }
         }
     }
 }

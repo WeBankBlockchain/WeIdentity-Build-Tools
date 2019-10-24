@@ -68,7 +68,7 @@ configurations {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    localDeps 'org.projectlombok:lombok:1.16.14'
+    localDeps 'org.projectlombok:lombok:1.18.10'
     if (gradleVer.startsWith("4")) {
         if (gradle.startParameter.isOffline()) {
             compile fileTree(dir: 'dist/lib', include: '*.jar')
@@ -81,15 +81,15 @@ dependencies {
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
-            compileOnly 'org.projectlombok:lombok:1.16.14'
-            annotationProcessor 'org.projectlombok:lombok:1.16.14'
+            compileOnly 'org.projectlombok:lombok:1.18.10'
+            annotationProcessor 'org.projectlombok:lombok:1.18.10'
             compile apache_commons, jackson, jcommander
 			compile("com.webank:weid-java-sdk:1.4.0") {
 				exclude group:"org.slf4j", module: "slf4j-log4j12"
             }
         } else {
-            compileOnly files('dist/lib/lombok-1.16.14.jar')
-            annotationProcessor files('dist/lib/lombok-1.16.14.jar')
+            compileOnly files('dist/lib/lombok-1.18.10.jar')
+            annotationProcessor files('dist/lib/lombok-1.18.10.jar')
             compile fileTree(dir: 'dist/lib', include: '*.jar')
         }
     }
@@ -129,7 +129,7 @@ jar {
         if (!gradle.startParameter.isOffline()) {
             if (!f.exists() || (f.exists() && f.size() < 100)) {
                 println "Font file does not exist, starting to download and distribute.."
-                new URL('https://github.com/WeBankFinTech/WeIdentity/raw/master/context/NotoSansCJKtc-Regular.ttf').withInputStream { i ->
+                new URL('https://github.com/WeBankFinTech/WeIdentity/blob/master/dist/lib/NotoSansCJKtc-Regular.ttf').withInputStream { i ->
                     f.withOutputStream {
                         it << i
                     }

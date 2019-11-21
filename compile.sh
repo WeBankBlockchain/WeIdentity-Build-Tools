@@ -9,6 +9,18 @@ if [[ "$@" == "--offline" ]];then
     echo "Compile in offline mode.."
 fi
 
+if [ ! -d dist/ ];then
+    mkdir dist
+fi
+if [ ! -d dist/lib ];then
+    mkdir dist/lib
+fi
+if [ ! -d dist/lib/NotoSansCJKtc-Regulat.ttf ];then
+    cd dist/lib
+    touch NotoSansCJKtc-Regular.ttf
+    cd ../..
+fi
+
 #SOURCE_CODE_DIR=$(pwd)
 CONFIG_FILE=${SOURCE_CODE_DIR}/conf/run.config
 FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl

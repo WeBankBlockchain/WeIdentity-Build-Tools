@@ -137,7 +137,7 @@ function main()
     check_node_cert
     deploy_contract
     modify_config
-    #deploy_system_cpt
+    deploy_system_cpt
     clean_data
 }
 

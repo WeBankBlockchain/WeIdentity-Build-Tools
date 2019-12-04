@@ -19,7 +19,7 @@ fi
 echo "begin to regist cpt, please wait..."
 
 if [ "$1" = "--private-key" ] || [ "$3" = "--private-key" ] || [ "$5" = "--private-key" ];then
-    java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@
 else
 	if [ "$1" = "--weid" ] ;then
 		weid=$2
@@ -33,7 +33,7 @@ else
 	fi
     we_address=`echo $weid|awk -F":" '{print $4}' `    
     private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
-    java -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@ --private-key ${private_key}
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@ --private-key ${private_key}
 fi
 
 if [ ! $? -eq 0 ]; then

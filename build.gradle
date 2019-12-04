@@ -40,7 +40,7 @@ repositories {
 }
 
 List lombok = [
-        "org.projectlombok:lombok:1.16.14"
+        "org.projectlombok:lombok:1.18.10"
 ]
 
 List jcommander = [
@@ -56,7 +56,7 @@ List apache_commons = [
 
 // In this section you declare the dependencies for your production and test code
 List jackson = [
-        "com.fasterxml.jackson.core:jackson-databind:2.8.8.1",
+        "com.fasterxml.jackson.core:jackson-databind:2.10.0",
         "com.github.fge:json-schema-validator:2.2.6",
         "com.google.zxing:core:3.3.0"
 ]
@@ -67,7 +67,7 @@ configurations {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    localDeps 'org.projectlombok:lombok:1.18.10'
+    localDeps lombok
     if (gradleVer.startsWith("4")) {
         if (gradle.startParameter.isOffline()) {
             compile fileTree(dir: 'dist/lib', include: '*.jar')

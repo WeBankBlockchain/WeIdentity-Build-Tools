@@ -25,7 +25,7 @@ function generate_cpt_file()
     
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.command.CptToPojo $@
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.CptToPojo $@
     
     if [ ! $? -eq 0 ]; then
 	    echo "get cpt faild, please check the log -> ../logs/error.log."

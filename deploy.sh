@@ -57,7 +57,7 @@ function deploy_contract()
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
-    java -cp "$CLASSPATH" com.webank.weid.command.DeployContract
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.DeployContract
     
     if [ ! $? -eq 0 ]; then
         echo "deploy contract failed, please check."
@@ -81,7 +81,7 @@ function deploy_system_cpt()
     echo "begin to deploy system contract..."
     cd ${SOURCE_CODE_DIR}
     build_classpath
-    java -cp "$CLASSPATH" com.webank.weid.command.DeploySystemCpt
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.DeploySystemCpt
 
     if [ ! $? -eq 0 ]; then
         echo "deploy system cpt failed, please check."

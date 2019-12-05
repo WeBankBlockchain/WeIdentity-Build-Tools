@@ -19,7 +19,7 @@ function check_command()
 
     build_classpath
 
-    java -cp "$CLASSPATH" com.webank.weid.app.AppCommand $@
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.app.AppCommand $@
     
     if [ ! $? -eq 0 ]; then
         echo "check faild, please see the log -> ${SOURCE_CODE_DIR}/logs/error.log."

@@ -69,6 +69,7 @@ public class GeneratePolicy {
         String cptStr = commandArgs.getCptIdList();
         String orgId = commandArgs.getOrgId();
         String policyId = commandArgs.getPolicyId();
+        String policyType = commandArgs.getType();//original，zkp
 
         String[] cptList = StringUtils.splitByWholeSeparator(cptStr, ",");
 
@@ -87,7 +88,15 @@ public class GeneratePolicy {
                 break;
             }
         }
-
+        
+        boolean isZkp = false;
+        policyE.setVersion(1);
+        if (!"original".equals(policyType)) {
+            policyType = "zkp";
+            isZkp = true;
+            policyE.setVersion(2);
+        }
+        
         Map<Integer, ClaimPolicy> policy = new HashMap<>();
         for (String cptId : cptList) {
             String className = "com.webank.weid.cpt." + "Cpt" + cptId;
@@ -99,7 +108,19 @@ public class GeneratePolicy {
                 String s = DataToolUtils.serialize(obj);
                 Map m = DataToolUtils.deserialize(s, HashMap.class);
                 generatePolicy(m);
-                String defaultDisclosure = DataToolUtils.serialize(m);
+                Map claimPolicyMap = new LinkedHashMap<String, Object>();
+                if (isZkp) {
+                    claimPolicyMap.put("claim", m);
+                    claimPolicyMap.put("id", 0);
+                    claimPolicyMap.put("cptId", 0);
+                    claimPolicyMap.put("context", 0);
+                    claimPolicyMap.put("issuer", 0);
+                    claimPolicyMap.put("issuanceDate", 0);
+                    claimPolicyMap.put("expirationDate", 0);
+                } else {
+                    claimPolicyMap.putAll(m);
+                }
+                String defaultDisclosure = DataToolUtils.serialize(claimPolicyMap);
                 ClaimPolicy claimPolicy = new ClaimPolicy();
                 claimPolicy.setFieldsToBeDisclosed(defaultDisclosure);
                 policy.put(Integer.valueOf(cptId), claimPolicy);
@@ -119,13 +140,13 @@ public class GeneratePolicy {
             LinkedHashMap<String, Object> policyEMap = 
                 ConfigUtils.objToMap(policyE, LinkedHashMap.class);
             Map<String, Object> policy1 = (HashMap<String, Object>) policyEMap.get("policy");
+            policyEMap.put("policyType", policyType);
             for (Map.Entry<String, Object> entry : policy1.entrySet()) {
                 HashMap<String, Object> claimPolicyMap = (HashMap<String, Object>) entry.getValue();
                 HashMap<String, Object> disclosureMap = DataToolUtils
-                    .deserialize((String) claimPolicyMap.get("fieldsToBeDisclosed"), HashMap.class);
+                    .deserialize((String) claimPolicyMap.get("fieldsToBeDisclosed"), LinkedHashMap.class);
                 claimPolicyMap.put("fieldsToBeDisclosed", disclosureMap);
             }
-            
             Map<String, String> extraMap = new HashMap<>();
             extraMap.put("extra1", "");
             extraMap.put("extra2", "");

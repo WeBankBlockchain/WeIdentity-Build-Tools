@@ -2,8 +2,7 @@
 
 set -e
 SOURCE_CODE_DIR=$(pwd)
-JAVA_OPTS='-Djdk.tls.namedGroups="secp256k1"'
-
+JAVA_OPTS='-Djdk.tls.namedGroups="secp256r1,secp256k1"'
 function check_jdk()
 {
     echo "Begin to check jdk..."

@@ -2,7 +2,7 @@
 
 classpathDir="./dist/conf"
 libDir="./dist/lib"
-JAVA_OPTS='-Djdk.tls.namedGroups="secp256k1"'
+JAVA_OPTS='-Djdk.tls.namedGroups="secp256r1,secp256k1"'
 set -- `getopt c:l: "$@"`
 while [ -n "$1" ]
 do

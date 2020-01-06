@@ -24,26 +24,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fisco.bcos.channel.client.Service;
+import org.fisco.bcos.channel.handler.ChannelConnections;
+import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.ECKeyPair;
 import org.fisco.bcos.web3j.protocol.Web3j;
 import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.fisco.bcos.channel.client.ChannelPushCallback;
-import org.fisco.bcos.channel.client.Service;
-import org.fisco.bcos.channel.dto.ChannelRequest;
-import org.fisco.bcos.channel.dto.ChannelResponse;
-import org.fisco.bcos.channel.handler.ChannelConnections;
-import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
-import org.fisco.bcos.web3j.crypto.Credentials;
-import org.fisco.bcos.web3j.crypto.ECKeyPair;
-import org.fisco.bcos.web3j.crypto.gm.GenCredential;
-import org.fisco.bcos.web3j.protocol.Web3j;
-import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
-import org.fisco.bcos.web3j.protocol.core.methods.response.BlockNumber;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.protocol.base.WeIdAuthentication;
@@ -56,7 +46,6 @@ import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.TransactionUtils;
 import com.webank.weid.util.WeIdUtils;
 
 /**
@@ -161,9 +150,14 @@ public class DeploySystemCpt {
         // connect key and string
         ChannelConnections channelConnections = new ChannelConnections();
         channelConnections.setGroupId(groupId);
-        channelConnections.setCaCertPath("classpath:" + fiscoConfig.getV2CaCrtPath());
-        channelConnections.setNodeCaPath("classpath:" + fiscoConfig.getV2NodeCrtPath());
-        channelConnections.setNodeKeyPath("classpath:" + fiscoConfig.getV2NodeKeyPath());
+        
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        channelConnections
+            .setCaCert(resolver.getResource("classpath:" + fiscoConfig.getV2CaCrtPath()));
+        channelConnections
+            .setSslCert(resolver.getResource("classpath:" + fiscoConfig.getV2NodeCrtPath()));
+        channelConnections
+            .setSslKey(resolver.getResource("classpath:" + fiscoConfig.getV2NodeKeyPath()));
         channelConnections.setConnectionsStr(Arrays.asList(fiscoConfig.getNodes().split(",")));
         GroupChannelConnectionsConfig connectionsConfig = new GroupChannelConnectionsConfig();
         connectionsConfig.setAllChannelConnections(Arrays.asList(channelConnections));
@@ -200,7 +194,7 @@ public class DeploySystemCpt {
         weIdAuthentication.setWeId(weId);
         cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 
-        List<Integer> cptIdList = Arrays.asList(101, 102, 103, 106, 107);
+        List<Integer> cptIdList = Arrays.asList(107, 110, 111);
         CptServiceImpl cptService = new CptServiceImpl();
         for (Integer cptId : cptIdList) {
             String cptJsonSchema = DataToolUtils.generateDefaultCptJsonSchema(cptId);

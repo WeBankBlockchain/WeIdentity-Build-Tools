@@ -153,7 +153,7 @@ public class DeploySystemCpt {
         weIdAuthentication.setWeId(weId);
         cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 
-        List<Integer> cptIdList = Arrays.asList(101, 102, 103);
+        List<Integer> cptIdList = Arrays.asList(107, 110, 111);
         CptServiceImpl cptService = new CptServiceImpl();
         for (Integer cptId : cptIdList) {
             String cptJsonSchema = DataToolUtils.generateDefaultCptJsonSchema(cptId);

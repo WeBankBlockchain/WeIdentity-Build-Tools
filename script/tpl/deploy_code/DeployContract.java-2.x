@@ -39,6 +39,7 @@ import org.fisco.bcos.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.webank.weid.config.FiscoConfig;
@@ -162,9 +163,13 @@ public class DeployContract {
         // connect key and string
         ChannelConnections channelConnections = new ChannelConnections();
         channelConnections.setGroupId(groupId);
-        channelConnections.setCaCertPath("classpath:" + fiscoConfig.getV2CaCrtPath());
-        channelConnections.setNodeCaPath("classpath:" + fiscoConfig.getV2NodeCrtPath());
-        channelConnections.setNodeKeyPath("classpath:" + fiscoConfig.getV2NodeKeyPath());
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        channelConnections
+            .setCaCert(resolver.getResource("classpath:" + fiscoConfig.getV2CaCrtPath()));
+        channelConnections
+            .setSslCert(resolver.getResource("classpath:" + fiscoConfig.getV2NodeCrtPath()));
+        channelConnections
+            .setSslKey(resolver.getResource("classpath:" + fiscoConfig.getV2NodeKeyPath()));
         channelConnections.setConnectionsStr(Arrays.asList(fiscoConfig.getNodes().split(",")));
         GroupChannelConnectionsConfig connectionsConfig = new GroupChannelConnectionsConfig();
         connectionsConfig.setAllChannelConnections(Arrays.asList(channelConnections));

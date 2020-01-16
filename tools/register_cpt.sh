@@ -2,7 +2,7 @@
 
 cd ..
 source ./script/common.inc
-
+source ./run.config
 cd ${SOURCE_CODE_DIR}
 
 if [ $# -lt 4 ] ;then
@@ -32,7 +32,7 @@ else
 		exit 1
 	fi
     we_address=`echo $weid|awk -F":" '{print $4}' `    
-    private_key=${SOURCE_CODE_DIR}/output/create_weid/${we_address}/ecdsa_key
+    private_key=${SOURCE_CODE_DIR}/output/create_weid/${cns_follow}/${we_address}/ecdsa_key
     java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@ --private-key ${private_key}
 fi
 
@@ -41,12 +41,12 @@ if [ ! $? -eq 0 ]; then
     exit $?
 fi
 
-if [ ! -d ${SOURCE_CODE_DIR}/output/regist_cpt ];then
-	mkdir -p  ${SOURCE_CODE_DIR}/output/regist_cpt
-fi
+#if [ ! -d ${SOURCE_CODE_DIR}/output/regist_cpt ];then
+#	mkdir -p  ${SOURCE_CODE_DIR}/output/regist_cpt
+#fi
 
-if [ -f regist_cpt.out ];then
-	mv regist_cpt.out ${SOURCE_CODE_DIR}/output/regist_cpt/
-fi
+#if [ -f regist_cpt.out ];then
+#	mv regist_cpt.out ${SOURCE_CODE_DIR}/output/regist_cpt/
+#fi
 
 echo "Execute succeed."

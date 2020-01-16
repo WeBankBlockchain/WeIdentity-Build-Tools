@@ -15,23 +15,6 @@ if [ ! $? -eq 0 ]; then
     exit $?;
 fi
 
- if [ ! -d ${SOURCE_CODE_DIR}/output/create_weid ];then
-        
-        mkdir -p ${SOURCE_CODE_DIR}/output/create_weid
-fi
-
 if [ -f "weid" ];then
-    weid=$(cat weid)
-	echo "New weid has been created ----> $weid"
-    OLD_IFS="$IFS"
-    IFS=":"
-    array=($weid)
-    IFS="$OLD_IFS"
-    weid_address=${array[3]}
-    mkdir -p ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}
-    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
-    mv ecdsa_key ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
-    mv weid ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}/
+    rm weid
 fi
-
-echo "The related private key and public key can be found at ${SOURCE_CODE_DIR}/output/create_weid/${weid_address}."

@@ -4,14 +4,10 @@ source run.config
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
-FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
-FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
-FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
 
-function modify_config()
+function show_address()
 {
     cd ${SOURCE_CODE_DIR}
-    echo "begin to modify sdk config..."
     if [ ! -f weIdContract.address ];then
     	echo "deploy contract failed."
     	exit 1
@@ -30,24 +26,6 @@ function modify_config()
     echo "specificIssuer contract address is ${specificIssuer_address}"
     echo "===========================================."
     echo ""
-    
-    export WEID_ADDRESS=${weid_address}
-    export CPT_ADDRESS=${cpt_address}
-    export ISSUER_ADDRESS=${issuer_address}
-    export EVIDENCE_ADDRESS=${evidence_address}
-    export SPECIFICISSUER_ADDRESS=${specificIssuer_address}
-    #export ORG_ID=${org_id}
-    export CHAIN_ID=${chain_id}
-    export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
-    MYVARS='${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}:${CHAIN_ID}:${FISCO_BCOS_VERSION}'
-    
-    if [ -f ${FISCO_XML_CONFIG} ];then
-        rm ${FISCO_XML_CONFIG}
-    fi
-    envsubst ${MYVARS} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
-    #envsubst ${ORG_ID} < ${WEIDENTITY_CONFIG} >${WEIDENTITY_CONFIG_TMP}
-    cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
-   # cp -f ${WEIDENTITY_CONFIG_TMP} ${SOURCE_CODE_DIR}/resources/${WEIDENTITY_CONFIG}
 }
 
 function deploy_contract()
@@ -57,7 +35,7 @@ function deploy_contract()
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
-    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.DeployContract
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.DeployContract $@
     
     if [ ! $? -eq 0 ]; then
         echo "deploy contract failed, please check."
@@ -65,14 +43,19 @@ function deploy_contract()
     fi
     
 
-    if [ -d ${SOURCE_CODE_DIR}/output/admin ];then
-        
-        rm -rf ${SOURCE_CODE_DIR}/output/admin
-    fi
-    mkdir -p ${SOURCE_CODE_DIR}/output/admin
-
-    mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
-    mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
+    #if [ -d ${SOURCE_CODE_DIR}/output/admin ];then
+    #    rm -rf ${SOURCE_CODE_DIR}/output/admin
+    #fi
+    #mkdir -p ${SOURCE_CODE_DIR}/output/admin
+    
+    #the copy action in deploy contract
+    #mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
+    #mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
+    
+    rm -f ecdsa_key
+    rm -f ecdsa_key.pub
+    rm -f hash
+    rm -f weid
     
 }
 
@@ -135,10 +118,12 @@ function main()
 {
     check_jdk
     check_node_cert
-    deploy_contract
-    modify_config
-    deploy_system_cpt
+    deploy_contract $@
+    show_address
+    #modify_config
+    # deploy systemCpt in deploy contract
+    #deploy_system_cpt
     clean_data
 }
 
-main
+main $@

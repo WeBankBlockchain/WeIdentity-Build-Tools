@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeId-Web-Tool</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <script src="dist/js/include.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <!-- menu-->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <include src="common/menu.html?open=1&level=1"></include>
+  </aside>
+  <include src="common/nav.html"></include>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">功能管理</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">主页</a></li>
+              <li class="breadcrumb-item active">CNS</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="card-footer">
+        <div class="form-group row" style="margin-bottom:0rem">
+         <label for="orgId" class="col-form-label">机构Id：</label>
+         <div class="col-sm-2">
+           <input type="email" class="form-control" id="orgId" placeholder="orgId">
+         </div>
+         <button type="button" id="checkCnsBtn" class="btn btn-inline btn-primary btn-flat" style="margin-left: 1rem;">检查CNS</button>
+        </div>
+      </div>
+      <br />
+      <div id="data-div">
+          <div id="data-fluid" class="container-fluid display-none">
+             <div class="row">
+                 <div class="col-12">
+                   <!-- Default box -->
+                   <div class="card collapsed-card">
+                     <div class="card-header" cns-use="${cnsUse}">
+                       <h3 class="card-title">
+                       ${index}#   机构：${orgId} 
+                       &nbsp;&nbsp;<button type="button" use-btn="${cnsUse}" onclick="enableCns(this,'${orgId}')" class="btn btn-sm btn-inline btn-primary btn-flat">启用</button>      
+                      </h3>
+                       <div class="card-tools">
+                         <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                           <i class="fas fa-plus"></i></button>
+                       </div>
+                     </div>
+                     <div class="card-body">
+                       <div class="row">
+                         <div class="col-12">
+                           <div class="card">
+                             <!-- /.card-header -->
+                             <div class="card-body table-responsive p-0">
+                               <table class="table table-hover">
+                                 <tbody>
+                                   <tr>
+                                     <td>weId.contractaddress</td>
+                                     <td>${weIdAddress}</td>
+                                   </tr>
+                                   <tr>
+                                     <td>cpt.contractaddress</td>
+                                     <td>${cptAddress}</td>
+                                   </tr>
+                                   <tr>
+                                     <td>issuer.contractaddress</td>
+                                     <td>${authorityAddress}</td>
+                                   </tr>
+                                   <tr>
+                                     <td>evidence.contractaddress</td>
+                                     <td>${evidenceAddress}</td>
+                                   </tr>
+                                   <tr>
+                                     <td>specificissuer.contractaddress</td>
+                                     <td>${specificAddress}</td>
+                                   </tr>
+                                 </tbody>
+                               </table>
+                             </div>
+                             <!-- /.card-body -->
+                           </div>
+                           <!-- /.card -->
+                         </div>
+                       </div>
+                     </div>
+                     <!-- /.card-body -->
+                     <!-- /.card-footer-->
+                   </div>
+                   <!-- /.card -->
+                 </div>
+             </div>
+          </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /foot -->
+  <include src="common/foot.html"></include>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+<script src="js/checkConfig.js"></script>
+<script src="js/cns.js"></script>
+</body>
+</html>

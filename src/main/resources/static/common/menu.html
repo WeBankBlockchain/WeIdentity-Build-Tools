@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="index.html" class="brand-link">
+      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+           style="opacity: .8">
+      <span class="brand-text font-weight-light">weid-build-tool</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar Menu -->
+      <nav id="menuNav" class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+         <li class="nav-item  menu-open">
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="index.html" class="nav-link">
+                  <i id = "i-account" class="far fa-circle nav-icon"></i>
+                  <p>配置admin账户</p>
+                </a>
+              </li>
+              <li class="nav-item" >
+                <a href="nodeConfig.html" class="nav-link" >
+                  <i id = "i-node" class="far fa-circle nav-icon"></i>
+                  <p>配置区块链节点</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="dbConfig.html" class="nav-link">
+                  <i id = "i-db" class="far fa-circle nav-icon"></i>
+                  <p>配置数据库</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
+          <li class="nav-item has-treeview menu-open">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+                功能管理
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="deploy.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>部署合约</p>
+                </a>
+              </li>
+<!--               <li class="nav-item">
+                <a href="cns.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>CNS</p>
+                </a>
+              </li> -->
+              <li class="nav-item">
+                <a href="createWeid.html" title="WeIdentity DID" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>身份标识</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="registerIssuer.html" title="Authority Issuer" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>权威凭证发布者</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="registerSpecific.html" title="Specific Issuer" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>特定类型的发行者</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="cptList.html" title="CPT" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>凭证声明类型</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="cptToPojoList.html" title="CPT TO POJO" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>凭证声明类型转JAVA实体</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+  </body>
+</html>
+<script>
+$(document).ready(function(){
+	var url = window.location.pathname;
+	url = url.substring(1);
+	$("#menuNav ul li a").each(function(){
+		var navUrl = $(this).attr("href");
+		$(this).removeClass("active");
+		if (navUrl == url) {
+			$(this).addClass("active");
+		}
+	});
+	$("#menuNav > ul > li[class*=has-treeview]").each(function(){
+		var navA = $(this).find("a");
+		if(navA.length > 1) {
+			var $this = this;
+			$(this).removeClass("menu-open");
+			navA.each(function(){
+	            var navUrl = $(this).attr("href");
+	            if (navUrl == url) {
+	            	$($this).addClass("menu-open");
+	            }
+	        });
+		}
+	});
+	checkAdmin();
+	//加载状态
+	function checkAdmin() {
+		$.get("checkAdmin",function(data,status){
+	        if (data != "") {
+	            $("#i-account").removeClass("fa-circle");
+	            $("#i-account").addClass("fa-check-circle");
+	        }
+	        checkNode();
+	    });
+	}
+	
+	function checkNode() {
+		$.get("nodeCheckState",function(data,status){
+            if(data) {//检查成功
+                $("#i-node").removeClass("fa-circle");
+                $("#i-node").addClass("fa-check-circle");
+            }
+            checkDb();
+        })
+	}
+	
+	function checkDb() {
+		$.get("dbCheckState",function(data,status){
+            if(data) {//检查成功
+                $("#i-db").removeClass("fa-circle");
+                $("#i-db").addClass("fa-check-circle");
+            }
+         });
+	}
+})
+
+</script>

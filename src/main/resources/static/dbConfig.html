@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeId-Web-Tool</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link href="plugins/enjoyhint/enjoyhint.css" rel="stylesheet">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <style>
+    .form-group span{
+        font-size:12px;
+        color:red;
+        display: none;
+        float: right;
+    }
+  </style>
+  <script src="dist/js/include.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <!-- menu-->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <include src="common/menu.html?open=1&level=1"></include>
+  </aside>
+  <include src="common/nav.html"></include>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">配置管理</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">主页</a></li>
+              <li class="breadcrumb-item active">基础配置</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="col-md-6 offset-md-3">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">数据库配置</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form role="form" id="dbForm">
+                <div id="dbFormDiv" class="card-body">
+                <div class="form-group">
+                        <label for="version">数据库类型</label> <span style="display: inline;">目前暂只支持MySql数据库</span>
+                        <select  id="version" id="version" name="version" class="form-control">
+                          <option value="mysql">MYSQL</option>
+                          <!-- <option value="1">FISCO-BCOS 1.X</option> -->
+                        </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">数据库IP:PORT</label>
+                    <input type="text" class="form-control" id="mysql_address" placeholder="IP:PORT">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">数据库名称</label>
+                    <input type="text" class="form-control" id="mysql_database" placeholder="Enter DataBseName">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">数据库用户名</label>
+                    <input type="text" class="form-control" id="mysql_username" placeholder="Enter username">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">数据库密码</label>
+                    <input type="password" class="form-control" id="mysql_password" placeholder="Enter password">
+                  </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
+                </div>
+              </form>
+            </div>
+            <!-- /.card -->
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">温馨提示</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="checkBody" class="modal-body">
+          <p>配置检查中..&hellip;</p>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭Close</button>
+          <button type="button" id="configBtn" onclick="goConfig(this)" class="btn btn-primary disabled">前往合约部署</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /foot -->
+  <include src="common/foot.html"></include>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="plugins/jquery/jquery.cookie.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="plugins/enjoyhint/enjoyhint.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+<script src="js/dbConfig.js"></script>
+</body>
+</html>

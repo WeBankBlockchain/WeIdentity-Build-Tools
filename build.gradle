@@ -1,3 +1,9 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.2.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+}
+
 def gradleVer = "4"
 if (gradle.gradleVersion.startsWith("6")
         || gradle.gradleVersion.startsWith("5")
@@ -15,7 +21,6 @@ apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-
 version = "1.0.7"
 
 // Specify JDK version - may vary in different scenarios
@@ -51,47 +56,55 @@ List apache_commons = [
         "org.apache.commons:commons-collections4:4.1",
         "org.apache.commons:commons-lang3:3.5",
         "commons-cli:commons-cli:1.3.1",
-		"org.apache.logging.log4j:log4j-jcl:2.3"
+		"org.apache.logging.log4j:log4j-jcl:2.12.0"
 ]
 
 // In this section you declare the dependencies for your production and test code
 List jackson = [
         "com.fasterxml.jackson.core:jackson-databind:2.10.0",
         "com.github.fge:json-schema-validator:2.2.6",
-        "com.google.zxing:core:3.3.0"
+        "com.google.zxing:core:3.3.0",
+        "org.jsonschema2pojo:jsonschema2pojo-core:1.0.1"
+]
+
+List protobuf = [
+        "com.google.protobuf:protobuf-java:3.9.1"
 ]
 
 configurations {
-    localDeps
+   localDeps
+   all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
+   all*.exclude group: "ch.qos.logback"
+   all*.exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
 }
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
     localDeps lombok
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile("org.springframework.boot:spring-boot-devtools")
+    compile("org.springframework.boot:spring-boot-starter-websocket")
+    
     if (gradleVer.startsWith("4")) {
-        if (gradle.startParameter.isOffline()) {
-            compile fileTree(dir: 'dist/lib', include: '*.jar')
-        } else {
-            compile lombok, apache_commons, jackson, jcommander
-			compile("com.webank:weid-java-sdk:1.5.0") {
-				exclude group:"org.slf4j", module: "slf4j-log4j12"
-            }
+        if (!gradle.startParameter.isOffline()) {
+            compile lombok, apache_commons, jackson, jcommander, protobuf
+            compile("com.webank:weid-java-sdk:${weidSdkVersion}")
         }
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.18.10'
             annotationProcessor 'org.projectlombok:lombok:1.18.10'
-            compile apache_commons, jackson, jcommander
-			compile("com.webank:weid-java-sdk:1.5.0") {
-				exclude group:"org.slf4j", module: "slf4j-log4j12"
-            }
+            compile apache_commons, jackson, jcommander, protobuf
+			compile("com.webank:weid-java-sdk:${weidSdkVersion}")
         } else {
             compileOnly files('dist/lib/lombok-1.18.10.jar')
             annotationProcessor files('dist/lib/lombok-1.18.10.jar')
-            compile fileTree(dir: 'dist/lib', include: '*.jar')
         }
     }
+    compile("com.webank:weid-contract-java:1.2.15")
+    compile("net.sf.oval:oval:1.90")
+    compile fileTree(dir: 'ext', include: '*.jar')
 }
 
 sourceSets {
@@ -105,16 +118,24 @@ sourceSets {
     }
 }
 
+bootRun {
+   systemProperty "jdk.tls.namedGroups", "${jdkTlsNamedGroups}"
+}
+
 jar {
+    enabled = true
     destinationDir file('dist/app')
     archiveName project.name + '-' + version + '.jar'
-
-    exclude '**/*.xml'
-    exclude '**/*.properties'
-
+    classifier = 'boot'
+    excludes = ["*.jar","*.key","*.ttf","*.crt","*.xml","*.properties"]
+    
     doLast {
         copy {
-            from file('dist/lib/NotoSansCJKtc-Regular.ttf')
+            from file('ext/NotoSansCJKtc-Regular.ttf')
+            into 'resources/'
+        }
+        copy {
+            from file('src/main/resources/log4j2.xml')
             into 'resources/'
         }
      	copy {

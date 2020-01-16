@@ -1,7 +1,8 @@
 #!/bin/bash
 
+source ./run.config
 TOP_PATH=$(pwd)
-WEID_PREFIX="did:weid:1:"
+WEID_PREFIX="did:weid:"
 CREATE_WEID=
 WEID_ADDRESS=
 
@@ -15,11 +16,11 @@ function create_weid(){
     chmod +x *.sh
     ./create_weid.sh
     
-    if [ $? -eq 0 ] && [ -d "$TOP_PATH/output/create_weid/" ];then
-        cd $TOP_PATH/output/create_weid/
+    if [ $? -eq 0 ] ;then
+        cd $TOP_PATH/output/create_weid/${cns_follow}
         WEID_ADDRESS=$(ls -l | awk '/^d/{print $NF}')
-        CREATE_WEID=$WEID_PREFIX$WEID_ADDRESS
-        echo "create_weid : $CREATE_WEID"
+        CREATE_WEID=$WEID_PREFIX${chain_id}:$WEID_ADDRESS
+        echo "create_weid success"
         cd $TOP_PATH/tools
     else
         echo "create_weid failed."
@@ -30,7 +31,7 @@ function create_weid(){
 
 function regist_authority_issuer(){
     echo "begin to regist authority issuer..."
-    ./regist_authority_issuer.sh --weid $CREATE_WEID --org-id test
+    ./register_authority_issuer.sh --weid $CREATE_WEID --org-id test
     if [ $? -ne 0 ];then
         echo "regist authority issuer failed."
         exit $?
@@ -38,7 +39,7 @@ function regist_authority_issuer(){
     echo "regist authority issuer finished."
     
     echo "begin to remove authority issuer..."
-    ./regist_authority_issuer.sh --remove-issuer $CREATE_WEID 
+    ./register_authority_issuer.sh --remove-issuer $CREATE_WEID 
     if [ $? -ne 0 ];then
         echo "remove authority issuer failed."
         exit $?
@@ -46,7 +47,7 @@ function regist_authority_issuer(){
     echo "remove authority issuer finished."
     
     echo "begin to regist authority issuer..."
-    ./regist_authority_issuer.sh --weid $CREATE_WEID --org-id test
+    ./register_authority_issuer.sh --weid $CREATE_WEID --org-id test
     if [ $? -ne 0 ];then
         echo "regist authority issuer failed."
         exit $?
@@ -56,7 +57,7 @@ function regist_authority_issuer(){
 
 function regist_cpt(){
     echo "begin to regist designated cpt, cptId is '9999'..."
-    ./regist_cpt.sh --weid $CREATE_WEID --cpt-dir $TOP_PATH/tools/test_data/single/ --cpt-id 9999
+    ./register_cpt.sh --weid $CREATE_WEID --cpt-dir test_data/single/ --cpt-id 9999
     if [ $? -eq 0 ] && [ -e "$TOP_PATH/output/regist_cpt/regist_cpt.out" ];then
         echo "regist designated cptId of '9999' success"
     else
@@ -66,7 +67,7 @@ function regist_cpt(){
     echo "regist designated cpt finished."
     
     echo "begin to regist single cpt..."
-    ./regist_cpt.sh --weid $CREATE_WEID --cpt-dir $TOP_PATH/tools/test_data/single/
+    ./register_cpt.sh --weid $CREATE_WEID --cpt-dir test_data/single/
     if [ $? -eq 0 ] && [ -e "$TOP_PATH/output/regist_cpt/regist_cpt.out" ];then
         echo "regist single cpt success"
     else
@@ -76,7 +77,7 @@ function regist_cpt(){
     echo "regist single cpt finished."
     
     echo "begin to regist single cpt with privateKey..."    
-    ./regist_cpt.sh --weid $CREATE_WEID --cpt-dir $TOP_PATH/tools/test_data/single/ --private-key $TOP_PATH/output/create_weid/$WEID_ADDRESS/ecdsa_key
+    ./register_cpt.sh --weid $CREATE_WEID --cpt-dir test_data/single/ --private-key $TOP_PATH/output/create_weid/${cns_follow}/$WEID_ADDRESS/ecdsa_key
     if [ $? -eq 0 ];then
         echo "regist single cpt with privateKey success"
     else
@@ -86,7 +87,7 @@ function regist_cpt(){
     echo "regist single cpt with privateKey finished."
     
     echo "begin to regist batch cpt..."
-    ./regist_cpt.sh --weid $CREATE_WEID --cpt-dir $TOP_PATH/tools/test_data/batch/
+    ./register_cpt.sh --weid $CREATE_WEID --cpt-dir test_data/batch/
     if [ $? -eq 0 ] && [ -e "$TOP_PATH/output/regist_cpt/regist_cpt.out" ];then
         echo "regist batch cpt success"
     else

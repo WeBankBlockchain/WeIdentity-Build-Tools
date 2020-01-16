@@ -19,16 +19,14 @@
 
 package com.webank.weid.command;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.protocol.response.CreateWeIdDataResult;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.impl.WeIdServiceImpl;
-import com.webank.weid.util.FileUtils;
+import com.webank.weid.constant.DataFrom;
+import com.webank.weid.service.BuildToolService;
+import com.webank.weid.util.WeIdUtils;
 
 /**
  * @author tonychen 2019/4/11
@@ -40,33 +38,20 @@ public class CreateWeId {
      */
     private static final Logger logger = LoggerFactory.getLogger(CreateWeId.class);
 
-    private static WeIdService weIdService = new WeIdServiceImpl();
+    private static BuildToolService buildToolService = new BuildToolService();
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-
-        ResponseData<CreateWeIdDataResult> response = weIdService.createWeId();
-        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-            logger.error(
-                "[CreateWeId] create WeID faild. error code : {}, error msg :{}",
-                response.getErrorCode(),
-                response.getErrorMessage());
-            System.out.println("[CreateWeId] create WeID failed.");
-            System.exit(1);
+        logger.info("[CreateWeId] begin create weId.");
+        String weId = buildToolService.createWeId(DataFrom.COMMAND);
+        File weIdFile = buildToolService.getWeidDir(WeIdUtils.convertWeIdToAddress(weId));
+        if (weIdFile.exists()) {
+            System.out.println("New weid has been created ---->" + weId);
+            System.out.println("The related private key and public key can be found at " 
+                + weIdFile.getAbsolutePath());
         }
-        CreateWeIdDataResult result = response.getResult();
-        String weId = result.getWeId();
-        //System.out.println("weid is ------> " + weId);
-        String publicKey = result.getUserWeIdPublicKey().getPublicKey();
-        String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
-
-        //write weId, publicKey and privateKey to output dir
-        FileUtils.writeToFile(weId, "weid", FileOperator.OVERWRITE);
-        FileUtils.writeToFile(publicKey, "ecdsa_key.pub", FileOperator.OVERWRITE);
-        FileUtils.writeToFile(privateKey, "ecdsa_key", FileOperator.OVERWRITE);
-
         System.exit(0);
     }
 

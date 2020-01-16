@@ -27,18 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.protocol.base.CptBaseInfo;
+import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.DataFrom;
+import com.webank.weid.dto.CptFile;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.CptService;
 import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.util.FileUtils;
 
@@ -52,7 +48,7 @@ public class RegistCpt {
      */
     private static final Logger logger = LoggerFactory.getLogger(RegistCpt.class);
 
-    private static CptService cptService = new CptServiceImpl();
+    private static BuildToolService buildToolService = new BuildToolService();
 
     private static WeIdService weIdService = new WeIdServiceImpl();
     /**
@@ -84,15 +80,13 @@ public class RegistCpt {
         String privateKeyFile = commandArgs.getPrivateKey();
         String cptId = commandArgs.getCptId();
         String cptFile = commandArgs.getCptFile();
-
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
         weIdAuthentication.setWeId(weId);
-        if(!privateKeyFile.startsWith("/")) {
-
+        String osName = System.getProperty("os.name").toLowerCase();
+        if(!privateKeyFile.startsWith("/") && !osName.contains("windows")) {
             //相对路径
             String temp = "tools/" + privateKeyFile;
             privateKeyFile = temp;
-
         }
         String privateKey = FileUtils.readFile(privateKeyFile);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
@@ -101,78 +95,49 @@ public class RegistCpt {
 
         if (StringUtils.isNotEmpty(cptFile)) {
             File cptFile1 = new File(cptFile);
-            registerCpt(cptFile1, cptId, weIdAuthentication);
+            try {
+                registerCpt(cptFile1, weIdAuthentication, cptId);
+            } catch (IOException e) {
+                logger.error("register Cpt has error.", e);
+                System.exit(1);
+            }
         }
 
         if (StringUtils.isNotEmpty(cptDir)) {
         	if(!cptDir.startsWith("/")) {
-        		
         		//相对路径
         		String temp = "tools/" + cptDir;
         		cptDir = temp;
-        		
         	}
             File file = new File(cptDir);
-
             if (!file.isDirectory()) {
                 logger.error("no CPT was found in dir :{}, please check your input.", file);
                 System.out.println("[RegisterCpt] no CPT was found in dir :" + file + ", please check your input.");
                 System.exit(1);
             }
             for (File f : file.listFiles()) {
-                registerCpt(f, cptId, weIdAuthentication);
+                try {
+                    registerCpt(f, weIdAuthentication, cptId);
+                } catch (IOException e) {
+                    logger.error("register Cpt has error.", e);
+                    System.exit(1);
+                }
             }
         }
-
         System.exit(0);
     }
-
-    private static void registerCpt(File cptFile, String cptId,
-        WeIdAuthentication weIdAuthentication) {
-        JsonNode jsonNode;
-        try {
-            String fileName = cptFile.getName();
-            if (!fileName.endsWith(".json")) {
-                return;
-            }
-            System.out.println("registering CPT file:" + fileName);
-            jsonNode = JsonLoader.fromFile(cptFile);
-            String cptJsonSchema = jsonNode.toString();
-            CptStringArgs cptStringArgs = new CptStringArgs();
-            cptStringArgs.setCptJsonSchema(cptJsonSchema);
-            cptStringArgs.setWeIdAuthentication(weIdAuthentication);
-
-            ResponseData<CptBaseInfo> response;
-            if (StringUtils.isEmpty(cptId)) {
-                response = cptService.registerCpt(cptStringArgs);
-            } else {
-                Integer cptId1 = Integer.valueOf(cptId);
-                response = cptService.registerCpt(cptStringArgs, cptId1);
-            }
-            //System.out.println("[RegisterCpt] result:" + DataToolUtils.serialize(response));
-            if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
-                logger.error("[RegisterCpt] load config faild. ErrorCode is:{}, msg :{}",
-                    response.getErrorCode(),
-                    response.getErrorMessage());
-                System.out.println(
-                    "[RegisterCpt] register CPT file:" + fileName + "  result ---> failed. ");
-            } else {
-                System.out.println(
-                    "[RegisterCpt] register CPT file:" + fileName + " result ---> success. cpt id ---> "+ response.getResult().getCptId());
-            }
-            String content = new StringBuffer()
-                .append(fileName)
-                .append("=")
-                .append(String.valueOf(response.getResult().getCptId()))
-                .append("\r\n")
-                .toString();
-            FileUtils.writeToFile(content, "regist_cpt.out", FileOperator.APPEND);
-            System.out.println(
-                "[RegisterCpt] register CPT file:" + fileName + " with success.");
-        } catch (IOException e) {
-            logger.error("[RegisterCpt] load config faild. ", e);
-            System.exit(1);
+    
+    private static void registerCpt(
+        File cptFile,
+        WeIdAuthentication callerAuth, 
+        String cptId) throws IOException {
+        
+        CptFile result = buildToolService.registerCpt(cptFile, callerAuth, cptId, DataFrom.COMMAND);
+        System.out.print("[RegisterCpt] register cpt file:" + result.getCptFileName());
+        if (BuildToolsConstant.SUCCESS.equals(result.getMessage())) {
+            System.out.println("result ---> success. cpt id ---> " + result.getCptId());
+        } else {
+            System.out.println("result ---> fail. message ---> " + result.getMessage());
         }
     }
-
 }

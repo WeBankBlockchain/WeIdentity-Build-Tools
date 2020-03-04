@@ -15,11 +15,6 @@ fi
 if [ ! -d dist/lib ];then
     mkdir dist/lib
 fi
-if [ ! -d dist/lib/NotoSansCJKtc-Regulat.ttf ];then
-    cd dist/lib
-    touch NotoSansCJKtc-Regular.ttf
-    cd ../..
-fi
 
 #SOURCE_CODE_DIR=$(pwd)
 CONFIG_FILE=${SOURCE_CODE_DIR}/conf/run.config
@@ -155,8 +150,19 @@ function check_parameter()
     fi
 }
 
+function check_font()
+{
+  md5file=`cat dist/lib/NotoSansCJKtc-Regular.md5`
+  md5font=`md5sum dist/lib/NotoSansCJKtc-Regular.ttf | cut -d ' ' -f1`
+  if [ "$md5file" != "$md5font" ];then
+    echo "font file is broken."
+    exit 1
+  fi
+}
+
 function main()
 {
+    check_font
     check_parameter
     setup
     check_jdk

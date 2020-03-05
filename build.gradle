@@ -113,31 +113,15 @@ jar {
     exclude '**/*.properties'
 
     doLast {
-        def f = new File('dist/lib/NotoSansCJKtc-Regular.ttf')
-        if (f.exists() && f.size() > 100) {
-            println "Font file already exists, distributing.."
-            copy {
-                from file('dist/lib/NotoSansCJKtc-Regular.ttf')
-                into 'resources/'
-            }
+        copy {
+            from file('dist/lib/NotoSansCJKtc-Regular.ttf')
+            into 'resources/'
         }
      	copy {
             from file('resources/')
             into 'dist/conf'
         }
         if (!gradle.startParameter.isOffline()) {
-            if (!f.exists() || (f.exists() && f.size() < 100)) {
-                println "Font file does not exist, starting to download and distribute.."
-                new URL('https://github.com/WeBankFinTech/WeIdentity/blob/master/dist/lib/NotoSansCJKtc-Regular.ttf').withInputStream { i ->
-                    f.withOutputStream {
-                        it << i
-                    }
-                }
-                copy {
-                    from file('dist/lib/NotoSansCJKtc-Regular.ttf')
-                    into 'resources/'
-                }
-            }
             copy {
                 from configurations.runtime
                 from configurations.localDeps

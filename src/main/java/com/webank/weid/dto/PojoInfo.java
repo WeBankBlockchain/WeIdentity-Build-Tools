@@ -17,6 +17,7 @@ public class PojoInfo extends BaseDto {
         for (Integer integer : cptIds) {
             s.append(integer).append(",");
         }
+        s.deleteCharAt(s.length() - 1);
         this.showCptIds = super.getHideValue(s.toString(), 20, 0);
     }
 }

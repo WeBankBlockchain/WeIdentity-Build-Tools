@@ -154,6 +154,7 @@ function check_font()
     echo "font file is broken."
     exit 1
   fi
+  echo "font check successs."
 }
 
 function main()

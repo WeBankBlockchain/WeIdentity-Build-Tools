@@ -51,6 +51,7 @@ import com.webank.weid.contract.v2.CommitteeMemberController;
 import com.webank.weid.contract.v2.CommitteeMemberData;
 import com.webank.weid.contract.v2.CptController;
 import com.webank.weid.contract.v2.CptData;
+import com.webank.weid.contract.v2.EvidenceContract;
 import com.webank.weid.contract.v2.EvidenceFactory;
 import com.webank.weid.contract.v2.RoleController;
 import com.webank.weid.contract.v2.SpecificIssuerController;
@@ -211,7 +212,27 @@ public class DeployContract {
                 roleControllerAddress
             );
         }
-        deployEvidenceContracts();
+        deployEvidenceContractsNew();
+    }
+
+    private static String deployEvidenceContractsNew() {
+        if (web3j == null) {
+            loadConfig();
+        }
+        try {
+            EvidenceContract evidenceContract =
+                EvidenceContract.deploy(
+                    web3j,
+                    credentials,
+                    new StaticGasProvider(WeIdConstant.GAS_PRICE, WeIdConstant.GAS_LIMIT)
+                ).send();
+            String evidenceContractAddress = evidenceContract.getContractAddress();
+            FileUtils.writeToFile(evidenceContractAddress, "evidenceController.address", FileOperator.OVERWRITE);
+            return evidenceContractAddress;
+        } catch (Exception e) {
+            logger.error("EvidenceFactory deploy exception", e);
+        }
+        return StringUtils.EMPTY;
     }
 
     private static String deployRoleControllerContracts() {

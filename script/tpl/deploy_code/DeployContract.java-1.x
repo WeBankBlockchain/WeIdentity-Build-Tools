@@ -51,6 +51,7 @@ import com.webank.weid.contract.v1.CommitteeMemberController;
 import com.webank.weid.contract.v1.CommitteeMemberData;
 import com.webank.weid.contract.v1.CptController;
 import com.webank.weid.contract.v1.CptData;
+import com.webank.weid.contract.v1.EvidenceContract;
 import com.webank.weid.contract.v1.EvidenceFactory;
 import com.webank.weid.contract.v1.RoleController;
 import com.webank.weid.contract.v1.SpecificIssuerController;
@@ -169,7 +170,32 @@ public class DeployContract {
             deployCptContracts(authorityIssuerDataAddress, weIdContractAddress,
                 roleControllerAddress);
         }
-        deployEvidenceContracts();
+        deployEvidenceContractsNew();
+    }
+
+    private static String deployEvidenceContractsNew() {
+            if (web3j == null) {
+                loadConfig();
+            }
+        try {
+            Future<EvidenceContract> f =
+                EvidenceContract.deploy(
+                    web3j,
+                    credentials,
+                    WeIdConstant.GAS_PRICE,
+                    WeIdConstant.GAS_LIMIT,
+                    WeIdConstant.INILITIAL_VALUE
+                );
+            EvidenceContract evidenceContract = f
+                .get(DEFAULT_DEPLOY_CONTRACTS_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+            String evidenceContractAddress = evidenceContract.getContractAddress();
+            FileUtils.writeToFile(evidenceContractAddress, "evidenceController.address",
+                FileOperator.OVERWRITE);
+            return evidenceContractAddress;
+        } catch (Exception e) {
+            logger.error("EvidenceFactory deploy exception", e);
+        }
+        return StringUtils.EMPTY;
     }
 
     private static String deployWeIdContract() {

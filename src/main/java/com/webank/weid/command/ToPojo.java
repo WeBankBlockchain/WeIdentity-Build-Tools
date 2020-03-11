@@ -113,6 +113,10 @@ public class ToPojo {
                 buildToolService.generateJavaCodeByCpt(cptFile, cptId, pojoId, "cpt");
                 cptIdList.add(cptId);
             }
+            if (cptIdList.size() == 0) {
+                System.out.println("[CptToPojo] no CPT founds.");
+                System.exit(1);
+            }
             Integer[] cptIds = cptIdList.toArray(new Integer[cptIdList.size()]);
             File sourceFile = buildToolService.getSourceFile(pojoId);
             buildToolService.createJar(sourceFile, cptIds, "cpt", DataFrom.COMMAND);

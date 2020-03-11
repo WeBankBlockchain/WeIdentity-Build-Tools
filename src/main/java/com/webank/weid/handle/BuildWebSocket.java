@@ -1,7 +1,5 @@
 package com.webank.weid.handle;
 
-import java.io.File;
-
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -21,11 +19,6 @@ public class BuildWebSocket {
     
    // 与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
-
-    public BuildWebSocket() {
-        String logRootPath = new File("logs").getAbsolutePath();
-        SocketManager.startListening(logRootPath);
-    }
 
     public Session getSession() {
         return session;

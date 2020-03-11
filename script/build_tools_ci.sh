@@ -17,7 +17,7 @@ function create_weid(){
     ./create_weid.sh
     
     if [ $? -eq 0 ] ;then
-        cd $TOP_PATH/output/create_weid/${cns_follow}
+        cd $TOP_PATH/output/create_weid/${cns_contract_follow}
         WEID_ADDRESS=$(ls -l | awk '/^d/{print $NF}')
         CREATE_WEID=$WEID_PREFIX${chain_id}:$WEID_ADDRESS
         echo "create_weid success"
@@ -77,7 +77,7 @@ function regist_cpt(){
     echo "regist single cpt finished."
     
     echo "begin to regist single cpt with privateKey..."    
-    ./register_cpt.sh --weid $CREATE_WEID --cpt-dir test_data/single/ --private-key $TOP_PATH/output/create_weid/${cns_follow}/$WEID_ADDRESS/ecdsa_key
+    ./register_cpt.sh --weid $CREATE_WEID --cpt-dir test_data/single/ --private-key $TOP_PATH/output/create_weid/${cns_contract_follow}/$WEID_ADDRESS/ecdsa_key
     if [ $? -eq 0 ];then
         echo "regist single cpt with privateKey success"
     else

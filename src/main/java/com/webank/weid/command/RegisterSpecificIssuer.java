@@ -85,7 +85,7 @@ public class RegisterSpecificIssuer {
 
         if (!StringUtils.isEmpty(weid)) {
             // Add the DIDs into this type
-            List<String> weIdList = Arrays.asList(weid.split(";"));
+            List<String> weIdList = Arrays.asList(weid.split(","));
             for (String weId : weIdList) {
                 System.out.println("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
                 logger.info("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
@@ -100,7 +100,7 @@ public class RegisterSpecificIssuer {
         
         if (!StringUtils.isEmpty(removedIssuer)) {
             // Remove the DIDs from this type
-            List<String> weIdList = Arrays.asList(removedIssuer.split(";"));
+            List<String> weIdList = Arrays.asList(removedIssuer.split(","));
             for (String weId : weIdList) {
                 System.out.println("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
                 logger.info("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);

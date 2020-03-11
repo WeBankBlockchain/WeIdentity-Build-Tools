@@ -82,7 +82,7 @@ function compile()
     export CHAIN_ID=${chain_id}
     export CNS_PROFILE_ACTIVE=${cns_profile_active}
     export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
-    export CNS_CONTRACT_FOLLOW=${cns_follow}
+    export CNS_CONTRACT_FOLLOW=${cns_contract_follow}
     FISCOVAS='${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_CONTRACT_FOLLOW}:${CNS_PROFILE_ACTIVE}'
     envsubst ${FISCOVAS}} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
@@ -142,6 +142,30 @@ function check_parameter()
     fi
     if [ -z ${chain_id} ];then
         echo "chain id is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_address} ];then
+        echo "mysql_address is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_database} ];then
+        echo "mysql_database is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_username} ];then
+        echo "mysql_username is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_password} ];then
+        echo "mysql_password is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${cns_profile_active} ];then
+        echo "cns_profile_active is empty, please check the config."
+        exit 1
+    fi
+    if [ "${cns_profile_active}" != "prd" ] &&  [ "${cns_profile_active}" != "stg" ] && [ "${cns_profile_active}" != "dev" ];then
+        echo "the value of cns_profile_active error, please input: prd, stg, dev"
         exit 1
     fi
 }

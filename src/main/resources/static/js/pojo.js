@@ -1,0 +1,142 @@
+$(document).ready(function(){
+	bsCustomFileInput.init();
+	if (isReady) {
+    	loadData();
+    }
+    
+    $("#downPolicy").click(function(){
+    	var pojoId = $("#pojoId").val();
+    	var fromType = $("#fromType").val();
+    	var cptIds = [];
+        $('input[name="cptId"]:checked').each(function(){
+        	cptIds.push($(this).val());
+        });
+        if (cptIds.length == 0) {
+        	$("#messageBody").html("<p>请选择需要包含的CPT</p>");
+    		$("#modal-message").modal();
+    		return;
+        }
+        var policyType= $("#policyType").val();
+        var policyId = $("#policyId").val();
+        var param = "pojoId="+pojoId +"&policyType="+policyType+"&policyId="+policyId;
+        var cptId_value = "";
+        for (var i = 0; i < cptIds.length; i++) {
+        	cptId_value += cptIds[i]+",";
+		}
+        cptId_value = cptId_value.substring(0, cptId_value.length - 1);
+        param += "&cptIds=" + cptId_value;
+        param += "&fromType=" + fromType;
+        window.location.href="downPolicy?" + param;
+        $("#modal-down-policy").modal("hide");
+    })
+    //json编辑器
+    var options = {
+		mode: 'code',
+		modes: ['code', 'tree'], // allowed modes
+		onError: function (err) {
+			alert(err.toString());
+		}
+	};
+	var editor = new JSONEditor(jQuery("#jsonContent").get(0), options);
+    $("#policyToPojoBtn").click(function(){
+    	$("#modal-policy-to-pojo").modal();
+    })
+    
+    $("#policyJsonFile").change(function(){
+    	var file = $("#policyJsonFile")[0].files[0];
+    	let reader = new FileReader();
+        reader.readAsText(file, 'utf-8');
+        reader.onload = function(e, rs) {
+          editor.set(JSON.parse(e.target.result));
+        };
+    })
+    
+    $("#policyToPojo").click(function(){
+    	try {
+    		var thisObj = this;
+    		var disabled = $(thisObj).attr("class").indexOf("disabled");
+            if(disabled > 0) return;
+    		var policy = JSON.stringify(editor.get());
+    		var formData = new FormData();
+		    formData.append("policy", policy);
+		    var btnValue = $(thisObj).html();
+		    $(thisObj).html("转换中，请稍后...");
+		    $(thisObj).addClass("disabled");
+    		$.ajax({
+    	        url:'policyToPojo', /*接口域名地址*/
+    	        type:'post',
+    	        data: formData,
+    	        contentType: false,
+    	        processData: false,
+    	        success:function(res) {
+    	        	if (res=="success") {
+    	            	//检查节点是否正确
+    	            	$("#messageBody").html("<p>披露策略转JAVA实体<span class='success-span'>成功</span>。</p>");
+    	            	loadData();
+    	            } else if (res=="fail") {
+    	            	$("#messageBody").html("<p>披露策略转JAVA实体<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+    	            } else {
+    	            	$("#messageBody").html("<p>"+res+"</p>");
+    	            }
+    	        	$("#modal-message").modal();
+    	        	$(thisObj).html(btnValue);
+    	            $(thisObj).removeClass("disabled");
+    	        }
+    	    })
+    		
+    	} catch (e) {
+    		$("#messageBody").html("<pre>Error：" + e.message + "</pre>");
+    		$("#modal-message").modal();
+    	}
+    })
+    
+});
+var template = $("#data-tbody").html();
+var  table;
+function loadData() {
+	 //加载部署数据
+	$.get("getPojoList",function(data,status){
+		if(table != null) {
+			table.destroy();
+		}
+		$("#data-tbody").renderData(template,data);
+		table = $('#example2').DataTable({
+		  "paging": true,
+		  "lengthChange": false,
+		  "searching": true,
+		  "ordering": true,
+		  "info": false,
+		  "autoWidth": false,
+		  "oLanguage": {
+			  "sZeroRecords": "对不起，查询不到任何相关数据",
+  	    	  "oPaginate": {
+	            "sFirst":    "第一页",
+	            "sPrevious": " 上一页 ",
+	            "sNext":     " 下一页 ",
+	            "sLast":     " 最后一页 "
+	          }
+		  }
+		});
+	})
+}
+
+function downCptJar(pojoId) {
+	$.confirm("确定下载该JAVA实体包吗?",function(){
+		window.location.href="downPojoJar/" + pojoId;
+    })
+}
+var cptId_checkbox_template = $("#cptId_Div").html();
+function downPolicy(pojoId,cptIdstr,fromType) {
+	$("#pojoId").val(pojoId);
+	$("#fromType").val(fromType);
+	var cptIds = cptIdstr.split(",");
+	var data = [];
+	for (var i = 0; i < cptIds.length; i++) {
+		var param = {};
+		param["cptId"] = cptIds[i];
+		data.push(param);
+	}
+	$("#cptId_Div").renderData(cptId_checkbox_template,data);
+    $("#modal-down-policy").modal();
+}
+

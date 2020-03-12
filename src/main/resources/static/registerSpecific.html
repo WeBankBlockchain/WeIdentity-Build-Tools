@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeId-Web-Tool</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <script src="dist/js/include.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <!-- menu-->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <include src="common/menu.html?open=1&level=1"></include>
+  </aside>
+  <include src="common/nav.html"></include>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">功能管理</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">主页</a></li>
+              <li class="breadcrumb-item active">特定类型的发行者</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="card-footer">
+        <button type="button" id="registerIssuerTypeBtn" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat">注册特定类型的发行者</button>
+      </div>
+      <br />
+      <div id="data-div">
+          <div id="data-fluid" class="container-fluid display-none">
+             <div class="row">
+                 <div class="col-12">
+                   <!-- Default box -->
+                   <div id="card${index}" class="card collapsed-card">
+                     <div class="card-header">
+                       <h3 class="card-title">
+                       ${index}#  <button type="button" id="addIssuerTypeBtn" onclick="addIssuerTypeBtn('${type}')" title="add weId to this Specific type" class="btn btn-inline btn-primary btn-flat btn-sm">将WeID注册为这个特定类型的发行者</button> 
+                       &nbsp;&nbsp;&nbsp;&nbsp;特定类型的发行者: ${type}  
+                      </h3>
+                       <div class="card-tools">
+                         <button type="button" id="btn${index}" value="${type}" onclick="collapse(this, '${type}' , 'div${index}')" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                           <i class="fas fa-plus"></i></button>
+                       </div>
+                     </div>
+                     <div id="div${index}" class="card-body">
+                     </div>
+                     <!-- /.card-footer-->
+                   </div>
+                   <!-- /.card -->
+                 </div>
+             </div>
+          </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  
+  <div class="modal fade" id="modal-register-issue-type">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">注册特定类型的发行者</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <div class="form-group">
+              <label for="addIssuerType">特定类型</label>
+              <input type="text" class="form-control" id="addIssuerType" placeholder="Enter issuer type">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="registerBtn" class="btn btn-block btn-primary btn-flat">注册</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  
+  <div class="modal fade" id="modal-add-to-issueType">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">将WeID注册为这个特定类型的发行者</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <div class="form-group">
+              <label for="addIssuerWeId">weId</label>
+              <input type="text" class="form-control" id="addIssuerWeId"  placeholder="Enter weId">
+            </div>
+            <div class="form-group">
+              <label for="registerIssuerName">特定类型</label>
+              <input type="text" class="form-control" id="issuerType" readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="addToIssuerType" class="btn btn-block btn-primary btn-flat">注册</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /foot -->
+  <include src="common/foot.html"></include>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../../plugins/datatables/jquery.dataTables.js"></script>
+<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+<script src="js/checkConfig.js"></script>
+<script src="js/registerSpecific.js"></script>
+</body>
+</html>

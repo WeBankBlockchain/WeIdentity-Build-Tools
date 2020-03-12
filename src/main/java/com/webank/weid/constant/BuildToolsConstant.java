@@ -47,5 +47,11 @@ public final class BuildToolsConstant {
      * UTF-8.
      */
     public static final String UTF_8 = "UTF-8";
+    
+    public static final String CPT_JAR_NAME = "weidentity-cpt.jar";
+    
+    public static final String SUCCESS = "success";
+    
+    public static final String FAIL = "fail";
 
 }

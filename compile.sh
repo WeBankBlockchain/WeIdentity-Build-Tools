@@ -79,30 +79,26 @@ function compile()
     done
     
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
-    export WEID_ADDRESS="0x0"
-    export CPT_ADDRESS="0x0"
-    export ISSUER_ADDRESS="0x0"
-    export EVIDENCE_ADDRESS="0x0"
-    export SPECIFICISSUER_ADDRESS="0x0"
     export CHAIN_ID=${chain_id}
+    export CNS_PROFILE_ACTIVE=${cns_profile_active}
     export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
-    MYVARS='${BLOCKCHIAN_NODE_INFO}:${WEID_ADDRESS}:${CPT_ADDRESS}:${ISSUER_ADDRESS}:${EVIDENCE_ADDRESS}:${SPECIFICISSUER_ADDRESS}:${FISCO_BCOS_VERSION}'
-    FISCOVAS='${CHAIN_ID}:${FISCO_BCOS_VERSION}'
+    export CNS_CONTRACT_FOLLOW=${cns_follow}
+    FISCOVAS='${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_CONTRACT_FOLLOW}:${CNS_PROFILE_ACTIVE}'
     envsubst ${FISCOVAS}} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}
     fi
     cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
-    cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
-    #cp ${SOURCE_CODE_DIR}/script/tpl/weidentity.properties ${SOURCE_CODE_DIR}/resources
+    #cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
     cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     
     #modify weidentity properties
     export ORG_ID=${org_id}
-    export JDBC_URL=${jdbc_url}
-    export JDBC_USERNAME=${jdbc_username}
-    export JDBC_PASSWORD=${jdbc_password}
-    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${JDBC_URL}:${JDBC_USERNAME}:${JDBC_PASSWORD}'
+    export MYSQL_ADDRESS=${mysql_address}
+    export MYSQL_DATABASE=${mysql_database}
+    export MYSQL_USERNAME=${mysql_username}
+    export MYSQL_PASSWORD=${mysql_password}
+    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
     envsubst ${VARS} < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
     cp  ${WEIDENTITY_CONFIG} ${SOURCE_CODE_DIR}/resources
     
@@ -148,23 +144,48 @@ function check_parameter()
         echo "chain id is empty, please check the config."
         exit 1
     fi
+    if [ -z ${mysql_address} ];then
+        echo "mysql_address is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_database} ];then
+        echo "mysql_database is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_username} ];then
+        echo "mysql_username is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${mysql_password} ];then
+        echo "mysql_password is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${cns_profile_active} ];then
+        echo "cns_profile_active is empty, please check the config."
+        exit 1
+    fi
+    if [ "${cns_profile_active}" != "prd" ] &&  [ "${cns_profile_active}" != "stg" ] && [ "${cns_profile_active}" != "dev" ];then
+        echo "the value of cns_profile_active error, please input: prd, stg, dev"
+        exit 1
+    fi
 }
 
 function check_font()
 {
-  md5file=`cat dist/lib/NotoSansCJKtc-Regular.md5`
-  md5font=`md5sum dist/lib/NotoSansCJKtc-Regular.ttf | cut -d ' ' -f1`
+  md5file=`cat ext/NotoSansCJKtc-Regular.md5`
+  md5font=`md5sum ext/NotoSansCJKtc-Regular.ttf | cut -d ' ' -f1`
   if [ "$md5file" != "$md5font" ];then
     echo "font file is broken."
     exit 1
   fi
+  echo "font check successs."
 }
 
 function main()
 {
     check_font
     check_parameter
-    setup
+    # setup
     check_jdk
     compile
     clean_config

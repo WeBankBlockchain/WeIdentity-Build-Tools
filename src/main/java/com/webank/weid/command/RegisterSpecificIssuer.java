@@ -19,23 +19,17 @@
 
 package com.webank.weid.command;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import com.beust.jcommander.JCommander;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.webank.weid.protocol.base.WeIdAuthentication;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.AuthorityIssuerService;
-import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.WeIdUtils;
+import com.beust.jcommander.JCommander;
+import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.DataFrom;
+import com.webank.weid.service.BuildToolService;
 
 /**
  * @author chaoxinhu 2019.5.26
@@ -44,14 +38,14 @@ public class RegisterSpecificIssuer {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterSpecificIssuer.class);
 
-    private static AuthorityIssuerService authorityIssuerService = new AuthorityIssuerServiceImpl();
+    private static BuildToolService buildToolService = new BuildToolService();
 
     /**
      *
      */
     public static void main(String[] args) {
 
-        if (args == null || args.length < 4) {
+        if (args == null || args.length < 2) {
             logger.error("[RegisterIssuer] input parameters error, please check your input!");
             System.exit(1);
         }
@@ -65,12 +59,6 @@ public class RegisterSpecificIssuer {
         //config file path
         String weid = commandArgs.getWeid();
         String type = commandArgs.getType();
-        String privateKeyFile = commandArgs.getPrivateKey();//privateKey
-        if (StringUtils.isEmpty(privateKeyFile)) {
-            System.out.println("[RegisterIssuer] Failed to load private key. Abort.");
-            logger.error("[RegisterIssuer] Failed to load private key. Abort.");
-            System.exit(1);
-        }
         String removedIssuer = commandArgs.getRemovedIssuer();
 
         if (StringUtils.isEmpty(type)) {
@@ -91,32 +79,20 @@ public class RegisterSpecificIssuer {
         	System.exit(1);
         } 
 
-        String privateKey = FileUtils.readFile(privateKeyFile);
-        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
-        weIdPrivateKey.setPrivateKey(privateKey);
-        WeIdAuthentication callerAuth = new WeIdAuthentication();
-        callerAuth.setWeIdPrivateKey(weIdPrivateKey);
-        callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(
-            DataToolUtils.publicKeyFromPrivate(new BigInteger(privateKey)).toString()));
-
         // Register this issuer type anyway
         logger.info("[RegisterIssuer] Registering issuer type with best effort: " + type);
-        ResponseData<Boolean> responseData = authorityIssuerService
-            .registerIssuerType(callerAuth, type);
+        String message = buildToolService.registerIssuerType(type, DataFrom.COMMAND);
 
         if (!StringUtils.isEmpty(weid)) {
             // Add the DIDs into this type
-            List<String> weIdList = Arrays.asList(weid.split(";"));
+            List<String> weIdList = Arrays.asList(weid.split(","));
             for (String weId : weIdList) {
                 System.out.println("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
                 logger.info("[RegisterIssuer] Adding WeIdentity DID " + weId + " in type: " + type);
-                ResponseData<Boolean> response = authorityIssuerService
-                    .addIssuerIntoIssuerType(callerAuth, type, weId);
-                if (!response.getResult()) {
-                    System.out.println(
-                        "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
-                    logger.error(
-                        "[RegisterIssuer] Add FAILED: " + response.getErrorMessage());
+                message = buildToolService.addIssuerIntoIssuerType(type, weId);
+                if (!BuildToolsConstant.SUCCESS.equals(message)) {
+                    System.out.println("[RegisterIssuer] Add FAILED: " + message);
+                    logger.error("[RegisterIssuer] Add FAILED: " + message);
                     System.exit(1);
                 }
             }
@@ -124,17 +100,14 @@ public class RegisterSpecificIssuer {
         
         if (!StringUtils.isEmpty(removedIssuer)) {
             // Remove the DIDs from this type
-            List<String> weIdList = Arrays.asList(removedIssuer.split(";"));
+            List<String> weIdList = Arrays.asList(removedIssuer.split(","));
             for (String weId : weIdList) {
                 System.out.println("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
                 logger.info("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
-                ResponseData<Boolean> response = authorityIssuerService
-                    .removeIssuerFromIssuerType(callerAuth, type, weId);
-                if (!response.getResult()) {
-                    System.out.println(
-                        "[RegisterIssuer] Remove FAILED: " + response.getErrorMessage());
-                    logger.error(
-                        "[RegisterIssuer] Remove FAILED: " + response.getErrorMessage());
+                message = buildToolService.removeIssuerFromIssuerType(type, weId);
+                if (!BuildToolsConstant.SUCCESS.equals(message)) {
+                    System.out.println("[RegisterIssuer] Remove FAILED: " + message);
+                    logger.error("[RegisterIssuer] Remove FAILED: " + message);
                     System.exit(1);
                 }
             }

@@ -12,8 +12,13 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SocketManager {
+    
+    private static final Logger logger = LoggerFactory.getLogger(SocketManager.class);
+    
     // 用来记录当前在线连接数
     private static volatile int onlineCount = 0;
 
@@ -21,36 +26,50 @@ public class SocketManager {
     private static volatile long lines = 0L;
 
     // 判断是否是第一次加载
-    private static volatile boolean isFirstRunning = true;
+    private static volatile boolean running = false;
 
     // concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象
     // 若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
     public static CopyOnWriteArraySet<BuildWebSocket> webSocketSet = new CopyOnWriteArraySet<>();
+    
+    private static FileAlterationMonitor monitor;
+    
+    private static String rootDir;
+    
+    static {
+        rootDir = new File("logs").getAbsolutePath();
+        System.out.println("rootDir:" + rootDir);
+    }
 
     // 开启监听
-    public static synchronized void startListening(String rootDir) {
-        if (!isFirstRunning) {
+    public static synchronized void startListening() {
+        File file = new File(rootDir);
+        if (!file.exists()) {
+            logger.error("[startListening] the monitor path not exists.");
             return;
         }
-        System.out.println("rootDir:" + rootDir);
+        
+        if (running) {
+            return;
+        }
         // 监控目录
         // 轮询间隔 1 秒
-        long interval = TimeUnit.SECONDS.toMillis(1);
+        long interval = TimeUnit.SECONDS.toMillis(5);
         // 创建一个文件观察器用于处理文件的格式
         FileAlterationObserver observer = new FileAlterationObserver(
-                rootDir,
-                FileFilterUtils.and(
-                        FileFilterUtils.suffixFileFilter("all.log")),  //过滤文件格式
-                null);
+            rootDir,
+            FileFilterUtils.and(
+                FileFilterUtils.suffixFileFilter("all.log")),  //过滤文件格式
+            null);
         observer.addListener(new LogListener());
         // 创建文件变化监听器
-        FileAlterationMonitor monitor = new FileAlterationMonitor(interval, observer);
+        monitor = new FileAlterationMonitor(interval, observer);
         // 开始监控
         try {
             monitor.start();
-            isFirstRunning = false;
+            running = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[startListening] the monitor start error.", e);
         }
     }
 
@@ -59,11 +78,23 @@ public class SocketManager {
     }
 
     public static synchronized void addOnlineCount() {
+        if (onlineCount == 0) {
+            startListening();
+        }
         onlineCount++;
+        
     }
 
     public static synchronized void subOnlineCount() {
         onlineCount--;
+        if (onlineCount == 0) {
+            try {
+                monitor.stop();
+                running = false;
+            } catch (Exception e) {
+                logger.error("[subOnlineCount] stop the monitor error.", e);
+            }
+        }
     }
 
     private static class LogListener extends FileAlterationListenerAdaptor {
@@ -76,12 +107,12 @@ public class SocketManager {
                 br = new BufferedReader(isr);
                 if (br.ready()) {
                     lines += br.lines()
-                            .skip(lines <= 0L ? 0L : lines)
-                            .peek(LogListener::sendMsgToAll)
-                            .count();
+                        .skip(lines <= 0L ? 0L : lines)
+                        .peek(LogListener::sendMsgToAll)
+                        .count();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("[onFileChange] read the log file error.", e);
             }
         }
 
@@ -90,11 +121,10 @@ public class SocketManager {
                 try {
                     item.getSession().getBasicRemote().sendText(msg);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error("[sendMsgToAll] send message error.", ex);
                 }
             });
         }
-
     }
 }
 

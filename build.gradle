@@ -41,6 +41,7 @@ repositories {
             url "http://maven.aliyun.com/nexus/content/groups/public/"
         }
         maven { url "https://dl.bintray.com/ethereum/maven/" }
+        maven { url "https://oss.sonatype.org/content/groups/public/" }
     }
 }
 
@@ -102,8 +103,6 @@ dependencies {
             annotationProcessor files('dist/lib/lombok-1.18.10.jar')
         }
     }
-    compile("com.webank:weid-contract-java:1.2.15")
-    compile("net.sf.oval:oval:1.90")
     compile fileTree(dir: 'ext', include: '*.jar')
 }
 

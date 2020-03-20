@@ -4,6 +4,15 @@ source run.config
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
+applicationFile=${SOURCE_CODE_DIR}/src/main/resources/application.properties
+port=$(grep "server\.port" $applicationFile |awk -F "=" '{print $2}')
+
+function reloadAddressForWeb() {
+    export WEB_PID=`ps aux|grep "BuildToolApplication" | grep -v grep|awk '{print $2}'|head -1`
+    if [ -n "$WEB_PID" ];then
+        curl http://localhost:${port}/reloadAddress
+    fi
+}
 
 function show_address()
 {
@@ -124,6 +133,7 @@ function main()
     # deploy systemCpt in deploy contract
     #deploy_system_cpt
     clean_data
+    reloadAddressForWeb
 }
 
 main $@

@@ -54,7 +54,7 @@ public class SocketManager {
         }
         // 监控目录
         // 轮询间隔 1 秒
-        long interval = TimeUnit.SECONDS.toMillis(5);
+        long interval = TimeUnit.SECONDS.toMillis(1);
         // 创建一个文件观察器用于处理文件的格式
         FileAlterationObserver observer = new FileAlterationObserver(
             rootDir,

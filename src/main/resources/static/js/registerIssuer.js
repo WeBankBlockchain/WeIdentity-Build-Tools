@@ -16,13 +16,21 @@ $(document).ready(function(){
         }
         var name = $.trim($("#registerIssuerName").val());
         if (name.length == 0) {
-        	 $("#messageBody").html("<p>请输入issuer Name。</p>");
+        	 $("#messageBody").html("<p>请输入权威机构名称。</p>");
         	 $("#modal-message").modal();
     		return;
     	}
+        if (name.indexOf("@") == 0) {
+        	$("#messageBody").html("<p>权威机构名称输入非法。</p>");
+	       	$("#modal-message").modal();
+	   		return;
+        }
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
-        $.get("registerIssuer/"+weId+"/"+name ,function(value,status){
+        var formData = {};
+	    formData.weId = weId;
+	    formData.name = name;
+        $.post("registerIssuer", formData ,function(value,status){
         	if (value == "success") {
                 $("#messageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
                 loadData();
@@ -82,7 +90,9 @@ function removeIssuer(obj, weId) {
 	    if(disabled > 0) return;
 	    $(obj).addClass("disabled");
 	    $(obj).html("删除中,  请稍等...");
-		$.get("removeIssuer/"+weId ,function(value,status){
+	    var formData = {};
+	    formData.weId = weId;
+		$.post("removeIssuer", formData, function(value,status){
 			if (value == "success") {
 	            $("#messageBody").html("<p>删除<span class='success-span'>成功</span>。</p>");
 	            loadData();

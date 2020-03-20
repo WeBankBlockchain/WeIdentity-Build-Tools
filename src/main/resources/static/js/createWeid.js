@@ -36,9 +36,17 @@ $(document).ready(function(){
         	 $("#modal-message").modal();
     		return;
     	}
+        if (name.indexOf("@") == 0) {
+        	$("#messageBody").html("<p>权威机构名称输入非法。</p>");
+	       	$("#modal-message").modal();
+	   		return;
+        }
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
-        $.get("registerIssuer/"+weId+"/"+name ,function(value,status){
+        var formData = {};
+	    formData.weId = weId;
+	    formData.name = name;
+        $.post("registerIssuer", formData, function(value,status){
             if (value == "success") {
                 $("#messageBody").html("<p>权威凭证发行者注册<span class='success-span'>成功</span>。</p>");
                 loadData();
@@ -68,7 +76,10 @@ $(document).ready(function(){
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
-        $.get("addIssuerIntoIssuerType/"+type+"/"+weId ,function(value,status){
+        var formData = {};
+	    formData.weId = weId;
+	    formData.issuerType = type;
+        $.post("addIssuerIntoIssuerType", formData, function(value,status){
             if (value == "success") {
                 $("#messageBody").html("<p>特定类型的发行者注册<span class='success-span'>成功</span>。</p>");
                 loadData();

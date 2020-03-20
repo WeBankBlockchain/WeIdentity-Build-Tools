@@ -81,10 +81,11 @@ $(document).ready(function(){
 	    	$("#modal-message").modal();
 	    	return;
 	    }
+	    var cptId = $("#nodeForm  #registerCptId").val();
 	    var formData = new FormData();
 	    formData.append("fileName", file.name);
 	    formData.append("cptJson", cptJson);
-	    formData.append("cptId", $("#nodeForm  #registerCptId").val());
+	    formData.append("cptId", cptId);
 	    var btnValue = $(thisObj).html();
 	    $(thisObj).html("凭证的声明类型注册中，请稍后...");
 	    $(thisObj).addClass("disabled");

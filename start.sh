@@ -47,7 +47,7 @@ do
     checkServer
     sleep 1
     count=$(expr $count + 1)
-    if [ $count == 10 ]; then
+    if [ $count == 30 ]; then
         echo "."
         break;
     fi
@@ -60,5 +60,9 @@ if [ ${running} = true ];then
     echo "the server start successfully."
     echo "the server url:  http://localhost:"${port}"/index.html"
 else 
+    if [ $count == 30 ]; then
+        echo "the server start timeout, please restart the server."
+        exit 1;
+    fi
     echo "the server start error, please check the log."
 fi

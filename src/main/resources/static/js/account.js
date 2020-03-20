@@ -87,10 +87,7 @@ $(document).ready(function(){
 			}
 		});
 		var enjoyhint_script_steps = [{
-		    'next #AccountDiv': "请点击【系统自动创建公私钥】或 【自行上传公私钥】",
-		    'nextButton': {
-		        text: "确定"
-		    }
+		    'click #createDiv': "请点击【系统自动创建公私钥】或 【自行上传公私钥1】"
 		}];
 		enjoyhint_instance.set(enjoyhint_script_steps);
 		enjoyhint_instance.run();

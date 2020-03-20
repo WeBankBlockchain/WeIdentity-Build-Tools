@@ -97,7 +97,7 @@ public class RegistCpt {
             File cptFile1 = new File(cptFile);
             try {
                 registerCpt(cptFile1, weIdAuthentication, cptId);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("register Cpt has error.", e);
                 System.exit(1);
             }
@@ -118,7 +118,7 @@ public class RegistCpt {
             for (File f : file.listFiles()) {
                 try {
                     registerCpt(f, weIdAuthentication, cptId);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     logger.error("register Cpt has error.", e);
                     System.exit(1);
                 }

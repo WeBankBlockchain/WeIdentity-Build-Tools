@@ -14,9 +14,16 @@ $(document).ready(function(){
         	 $("#modal-message").modal();
     		return;
     	}
+        if (type.indexOf("@") == 0) {
+        	$("#messageBody").html("<p>输入非法的issuer type。</p>");
+	       	$("#modal-message").modal();
+	   		return;
+        }
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
-        $.get("registerIssuerType/"+type ,function(value,status){
+        var formData = {};
+	    formData.issuerType = type;
+    	$.post(escape("registerIssuerType"), formData, function(value,status){
         	if (value == "success") {
                 $("#messageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
                 loadData();
@@ -49,7 +56,10 @@ $(document).ready(function(){
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
         $($this).html("添加中,  请稍等...");
-        $.get("addIssuerIntoIssuerType/"+type+"/"+weId ,function(value,status){
+        var formData = {};
+	    formData.issuerType = type;
+	    formData.weId = weId;
+        $.post("addIssuerIntoIssuerType", formData, function(value,status){
             if (value == "success") {
                 $("#messageBody").html("<p>添加<span class='success-span'>成功</span>。</p>");
                 loadData();
@@ -85,7 +95,9 @@ function loadData() {
 function collapse(thisObj, type, contain) {
 	var plus = $(thisObj).find("i").attr("class").indexOf("fa-plus");
 	if(plus > 0) {
-		$.get("getAllIssuerInType/"+type ,function(data,status){
+		var formData = {};
+	    formData.issuerType = type;
+		$.post("getAllIssuerInType", formData ,function(data,status){
 			var html = "<table id='table" + contain + "' class='table table-bordered table-hover' style='line-height: 40px;'>";
 			html +="<thead><tr><th title='WeIdentity DID'>weId</th><th width='250px'>操作</th></tr></thead><tbody>";
 			for(var i = 0; i < data.length; i++) {
@@ -110,7 +122,6 @@ function collapse(thisObj, type, contain) {
 		            "sLast":     " 最后一页 "
 		          }
 	  	      },
-	  	      
 	  	    });
         })
 	}
@@ -123,7 +134,10 @@ function  removeIssuerFromIssuerType(thisObj, type, weId) {
 	    if(disabled > 0) return;
 	    $($this).addClass("disabled");
 	    $($this).html("删除中,  请稍等...");
-	    $.get("removeIssuerFromIssuerType/"+type+"/"+weId ,function(value,status){
+	    var formData = {};
+	    formData.issuerType = type;
+	    formData.weId = weId;
+	    $.post("removeIssuerFromIssuerType", formData ,function(value,status){
 	        if (value == "success") {
 	            $("#messageBody").html("<p>删除<span class='success-span'>成功</span>。</p>");
 	            loadData();

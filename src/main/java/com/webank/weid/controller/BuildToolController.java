@@ -138,13 +138,19 @@ public class BuildToolController {
             //节点启用新hash并停用原hash
             deployService.enableHash(hash, fiscoConfig);
             //重新加载合约地址
-            configService.reloadAddress();
+            reloadAddress();
             logger.info("[enableHash] enable the hash {} successFully.", hash);
             return true;
         } catch (Exception e) {
             logger.error("[enableHash] the contract depoly error.", e);
             return false;
         }
+    }
+    
+    @Description("此接口用于给命令版本部署后，重载合约地址")
+    @GetMapping("/reloadAddress")
+    public void reloadAddress() {
+        configService.reloadAddress();
     }
     
     @GetMapping("/deploySystemCpt/{hash}")
@@ -303,10 +309,11 @@ public class BuildToolController {
     }
     
     @Description("注册issuer")
-    @GetMapping("/registerIssuer/{weId}/{name}")
+    @PostMapping("/registerIssuer")
     public String registerIssuer(
-        @PathVariable("weId") String weId, 
-        @PathVariable("name") String name) {
+        @RequestParam("weId") String weId, 
+        @RequestParam("name") String name
+    ) {
 
         try {
             return buildToolService.registerIssuer(weId, name, DataFrom.WEB);
@@ -322,10 +329,8 @@ public class BuildToolController {
     }
     
     @Description("移除issuer")
-    @GetMapping("/removeIssuer/{weId}")
-    public String removeIssuer(
-        @PathVariable("weId") String weId) {
-
+    @PostMapping("/removeIssuer")
+    public String removeIssuer(@RequestParam("weId") String weId) {
         try {
             return buildToolService.removeIssuer(weId);
         } catch (Exception e) {
@@ -335,8 +340,8 @@ public class BuildToolController {
     }
     
     @Description("注册issuer type")
-    @GetMapping("/registerIssuerType/{type}")
-    public String registerIssuerType(@PathVariable("type") String type) {
+    @PostMapping("/registerIssuerType")
+    public String registerIssuerType(@RequestParam("issuerType") String type) {
 
         try {
             return buildToolService.registerIssuerType(type, DataFrom.WEB);
@@ -353,24 +358,25 @@ public class BuildToolController {
     }
     
     @Description("查询issuer成员列表")
-    @GetMapping("/getAllIssuerInType/{type}")
-    public List<String> getAllIssuerInType(@PathVariable("type") String type) {
+    @PostMapping("/getAllIssuerInType")
+    public List<String> getAllIssuerInType(@RequestParam("issuerType") String type) {
         return buildToolService.getAllSpecificTypeIssuerList(type);
     }
     
     @Description("向IssuerType中添加成员")
-    @GetMapping("/addIssuerIntoIssuerType/{type}/{weId}")
+    @PostMapping("/addIssuerIntoIssuerType")
     public String addIssuerIntoIssuerType(
-        @PathVariable("type") String type,
-        @PathVariable("weId") String weId) {
+        @RequestParam("issuerType") String type,
+        @RequestParam("weId") String weId
+    ) {
         return buildToolService.addIssuerIntoIssuerType(type, weId);
     }
     
     @Description("移除IssuerType中的成员")
-    @GetMapping("/removeIssuerFromIssuerType/{type}/{weId}")
+    @PostMapping("/removeIssuerFromIssuerType")
     public String removeIssuerFromIssuerType(
-        @PathVariable("type") String type,
-        @PathVariable("weId") String weId) {
+        @RequestParam("issuerType") String type,
+        @RequestParam("weId") String weId) {
         return buildToolService.removeIssuerFromIssuerType(type, weId);
     }
     
@@ -389,7 +395,7 @@ public class BuildToolController {
         String cptId = request.getParameter("cptId");
         try {
             return buildToolService.registerCpt(targetFIle, weId, cptId, DataFrom.WEB);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("[registerCpt] register cpt has error.", e);
         } finally {
             FileUtils.delete(targetFIle);

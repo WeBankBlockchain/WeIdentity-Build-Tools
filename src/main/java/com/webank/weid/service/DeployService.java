@@ -164,8 +164,6 @@ public class DeployService {
     }
     
     public LinkedList<CnsInfo> getDeployList() {
-        //重新reload一次配置，解决由于command部署,没有刷新配置到内存问题
-        PropertyUtils.reload();
         String currentHash = ConfigUtils.getCurrentHash();
         LinkedList<CnsInfo> dataList = new LinkedList<CnsInfo>();
         //如果没有部署databuket则直接返回

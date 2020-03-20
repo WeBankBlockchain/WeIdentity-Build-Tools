@@ -163,6 +163,7 @@ function deploySystemCpt(hash, deployBtn, enableBtn) {
 	$.get("deploySystemCpt/" + hash,function(value,status){
 		if (value) {
 			$("#messageBody").html($("#messageBody").html() + "<p>系统CPT部署<span class='success-span'>成功</span>。</p>");
+			$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
 			loadData();
 		} else {
 			$("#messageBody").html($("#messageBody").html() + "<p>系统CPT部署<span class='fail-span'>失败</span>，请联系管理员。</p>");

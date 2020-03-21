@@ -16,3 +16,4 @@ fi
 gradle clean build
 
 chmod u+x start.sh
+chmod u+x stop.sh

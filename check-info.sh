@@ -1,6 +1,6 @@
 #!/bin/bash
 
-classpathDir="./dist/conf"
+classpathDir="./resources"
 libDir="./dist/lib"
 JAVA_OPTS='-Djdk.tls.namedGroups="secp256r1,secp256k1"'
 set -- `getopt c:l: "$@"`
@@ -181,6 +181,7 @@ function check_user_config() {
 	    echo begin test $var
 		ip=`echo $var | cut -d : -f 1`
 		port=`echo $var | cut -d : -f 2`
+		port=$(echo $port | sed -e 's/\r//g')
 		result=`echo -e "\n" | timeout 5 telnet $ip $port 2>/dev/null | grep Connected | wc -l`
 		if [ $result -eq 1 ]; then
 			echo "Network is Open."
@@ -290,6 +291,7 @@ function check_node_version() {
 
 function get_the_version() {
 	sdk_version=$1
+	sdk_version=${sdk_version/-SNAPSHOT/}
 	sdk_version=${sdk_version/.rc-/}
 	sdk_version=${sdk_version##*-}
 	sdk_version=${sdk_version%.jar}

@@ -56,7 +56,6 @@ public class ConfigService {
             if (string.startsWith("#") || string.indexOf("=") == -1) {
                 continue;
             }
-            logger.info("[loadConfig] {}", string);
             String[] values = string.split("=");
             if (values.length == 2) {
                 map.put(values[0], values[1]);
@@ -81,7 +80,6 @@ public class ConfigService {
                 buffer.append(string).append("\n");
                 continue;
             }
-            logger.info("[loadConfig] {}", string);
             if (string.startsWith("blockchain_address")) {
                 buffer.append("blockchain_address=").append(address).append("\n");
             } else if (string.startsWith("blockchain_fiscobcos_version")) {
@@ -109,7 +107,6 @@ public class ConfigService {
                 buffer.append(string).append("\n");
                 continue;
             }
-            logger.info("[loadConfig] {}", string);
             if (string.startsWith("mysql_address")) {
                 buffer.append("mysql_address=").append(address).append("\n");
             } else if (string.startsWith("mysql_database")) {

@@ -362,8 +362,9 @@ public class BuildToolService {
                 "[registerIssuerType] register issuer type {} success.",
                 type
             );
+            String id = DataToolUtils.getUuId32();
             //文件落地处理,每注册一个issuerType 记录一个文件
-            File issuerTypeFile = new File(ISSUER_TYPE_PATH + "/" + ConfigUtils.getCurrentHash(), type);
+            File issuerTypeFile = new File(ISSUER_TYPE_PATH + "/" + ConfigUtils.getCurrentHash(), id);
             IssuerType info = buildIssuerType(type, from);
             String data = DataToolUtils.serialize(info);
             FileUtils.writeToFile(data, issuerTypeFile.getAbsolutePath(), FileOperator.OVERWRITE);

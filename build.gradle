@@ -83,7 +83,7 @@ configurations {
 dependencies {
     localDeps lombok
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile("org.springframework.boot:spring-boot-devtools")
+    //compile("org.springframework.boot:spring-boot-devtools")
     compile("org.springframework.boot:spring-boot-starter-websocket")
     
     if (gradleVer.startsWith("4")) {

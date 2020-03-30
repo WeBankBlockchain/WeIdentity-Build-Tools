@@ -24,7 +24,7 @@ checkServer() {
 }
 
 #begin build classpath
-build_classpath
+CLASSPATH=${SOURCE_CODE_DIR}/resources:${SOURCE_CODE_DIR}/dist/app/*:${SOURCE_CODE_DIR}/dist/lib/*
 
 #set the application.properties in to classpath
 CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/src/main/resources/

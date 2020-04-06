@@ -32,8 +32,8 @@ CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/src/main/resources/
 getPid;
 
 if [ -n "$buildTool_pid" ];then
-   kill -9 $buildTool_pid
-   buildTool_pid=
+   echo "the server already started, pid = "$buildTool_pid
+   exit 1
 fi
 
 #start the application

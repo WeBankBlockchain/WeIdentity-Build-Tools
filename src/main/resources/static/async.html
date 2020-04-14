@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeId-Web-Tool</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="plugins/dcalendar/bootstrap-datetimepicker.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <script src="dist/js/include.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <!-- menu-->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <include src="common/menu.html?open=1&level=1"></include>
+  </aside>
+  <include src="common/nav.html"></include>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">异步上链</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">主页</a></li>
+              <li class="breadcrumb-item active">异步记录</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="card-footer">
+        <div class="form-group row">
+           <label for="version" class="col-sm-0 col-form-label">任务日期</label>
+           <div class="col-sm-2">
+              <input type="text" class="form-control" id="dataTime" placeholder="yyyy-MM-dd">
+           </div>
+           <label for="version" class="col-sm-0 col-form-label">任务状态</label>
+           <div class="col-sm-2">
+              <select  id="status" name="status" class="form-control">
+                <option value="-1">全部</option>
+                <option value="1">处理中</option>
+                <option value="2">处理成功</option>
+                <option value="3">处理失败</option>
+              </select>
+           </div>
+           <div class="col-sm-1">
+             <button type="button" onclick="query()" title="查询异步处理记录" class="btn btn-inline btn-primary btn-flat"> 查询 </button>
+           </div>
+           <div class="col-sm-2">
+                <input type="hidden" id="asyncStatus" />
+                <button type="button" id="doEnableAsyncBtn" onclick="doEnableAsync(this)" title="开启/关闭异步上链" class="btn btn-inline btn-primary btn-flat">启用异步上链</button>
+           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="example2" class="table table-bordered table-hover" style="text-align: center;">
+                <thead>
+                <tr>
+                  <th>任务日期</th>
+                  <th>任务状态</th>
+                  <th>总记录数</th>
+                  <th>成功数</th>
+                  <th>失败数</th>
+                  <th width="100px">操作</th>
+                </tr>
+                </thead>
+                <tbody style="line-height: 30px">
+                </tbody>
+              </table>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /foot -->
+  <include src="common/foot.html"></include>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="plugins/dcalendar/bootstrap-datetimepicker.min.js"></script>
+<script src="plugins/dcalendar/bootstrap-datetimepicker.zh-CN.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+<script src="js/checkConfig.js"></script>
+<script src="js/async.js"></script>
+
+</body>
+</html>

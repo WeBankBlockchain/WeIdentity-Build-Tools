@@ -25,11 +25,12 @@ nodes=${BLOCKCHIAN_NODE_INFO}
 datasource.name=datasource1
 
 # The configuration of each data source is prefixed by the name of the data source.
-datasource1.jdbc.url=jdbc:mysql://${MYSQL_ADDRESS}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+datasource1.jdbc.url=jdbc:mysql://${MYSQL_ADDRESS}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&rewriteBatchedStatements=true
 datasource1.jdbc.driver=com.mysql.cj.jdbc.Driver
 datasource1.jdbc.username=${MYSQL_USERNAME}
 datasource1.jdbc.password=${MYSQL_PASSWORD}
 datasource1.jdbc.maxActive=50
+datasource1.jdbc.initialSize=5
 datasource1.jdbc.minIdle=5
 datasource1.jdbc.maxIdle=5
 datasource1.jdbc.maxWait=10000
@@ -54,7 +55,7 @@ datasource1.jdbc.minEvictableIdleTimeMillis=1800000
 
 # the default domain
 domain.defaultInfo=datasource1:default_info
-domain.defaultInfo.timeout=86400000
+domain.defaultInfo.timeout=31556908799941
 
 # the domain for save encrypt Key
 domain.encryptKey=datasource1:encrypt_key_info

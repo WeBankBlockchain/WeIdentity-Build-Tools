@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,17 @@ import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
+import com.webank.weid.constant.ParamKeyConstant;
 import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.dto.AsyncInfo;
+import com.webank.weid.dto.BinLog;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.dto.CptInfo;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.Issuer;
 import com.webank.weid.dto.IssuerType;
+import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.protocol.response.ResponseData;
@@ -42,6 +48,8 @@ import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.DeployService;
+import com.webank.weid.service.TransactionService;
+import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
@@ -67,6 +75,9 @@ public class BuildToolController {
     
     @Autowired
     ConfigService configService;
+    
+    @Autowired
+    TransactionService transactionService;
     
     @Value("${weid.build.tools.down:false}")
     private String isDownFile;
@@ -475,4 +486,74 @@ public class BuildToolController {
         return buildToolService.getPojoList();
     }
     
+    @Description("查询交易列表")
+    @PostMapping("/getBinLogList")
+    public PageDto<BinLog> getBinLogList(
+        @RequestParam(value = "batch") int batch,
+        @RequestParam(value = "status") int status,
+        @RequestParam(value = "iDisplayStart") int iDisplayStart,
+        @RequestParam(value = "iDisplayLength") int iDisplayLength
+    ) {
+        PageDto<BinLog> pageDto = new PageDto<BinLog>(iDisplayStart, iDisplayLength);
+        BinLog binLog = new BinLog();
+        binLog.setBatch(batch);
+        binLog.setStatus(status);
+        transactionService.queryBinLogList(pageDto, binLog);
+        return pageDto;
+    }
+    
+    @Description("单条binlog重试, 暂时不做单条重试，因为涉及比较复杂，需要考虑多人同时重试，异步处理正在重试")
+    //@PostMapping("/reTryTransaction")
+    public boolean reTryTransaction(
+        @RequestParam(value = "requestId") int requestId
+    ) {
+        return transactionService.reTryTransaction(requestId);
+    }
+    
+    @Description("查询异步记录列表")
+    @PostMapping("/getAsyncList")
+    public PageDto<AsyncInfo> getAsyncList(
+        @RequestParam(value = "dataTime") int dataTime,
+        @RequestParam(value = "status") int status,
+        @RequestParam(value = "iDisplayStart") int iDisplayStart,
+        @RequestParam(value = "iDisplayLength") int iDisplayLength
+    ) {
+        PageDto<AsyncInfo> pageDto = new PageDto<AsyncInfo>(iDisplayStart, iDisplayLength);
+        AsyncInfo asyncInfo = new AsyncInfo();
+        asyncInfo.setDataTime(dataTime);
+        asyncInfo.setStatus(status);
+        transactionService.queryAsyncList(pageDto, asyncInfo);
+        return pageDto;
+    }
+    
+    @Description("异步任务重试")
+    @PostMapping("/reTryAsyn")
+    public boolean reTryAsyn(
+        @RequestParam(value = "dataTime") int dataTime
+    ) {
+        // 异步调度
+        transactionService.reTrybatchTransaction(dataTime);
+        return true;
+    }
+    
+    @Description("检查是否已开启异步上链")
+    @PostMapping("/chekEnableAsync")
+    public boolean chekEnableAsync() {
+        String offLine = PropertiesService.getInstance().getProperty(ParamKeyConstant.ENABLE_OFFLINE);
+        if (StringUtils.isBlank(offLine)) {
+            return false;
+        }
+        return Boolean.valueOf(offLine);
+    }
+    
+    @Description("修改异步上链状态")
+    @PostMapping("/doEnableAsync")
+    public boolean doEnableAsync(
+        @RequestParam(value = "enable") boolean enable
+    ) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(ParamKeyConstant.ENABLE_OFFLINE, String.valueOf(enable));
+        PropertiesService.getInstance().addProperties(map);
+        return chekEnableAsync();
+    }
 }

@@ -53,4 +53,10 @@ public class CommandArgs {
     
     @Parameter(names = "--policy-file", description = "policy file name")
     private String policyFileName;
+    
+    @Parameter(names = "--async-status", description = "async status")
+    private String asyncStatus;
+
+    @Parameter(names = "--data-time", description = "data time")
+    private String dataTime;
 }

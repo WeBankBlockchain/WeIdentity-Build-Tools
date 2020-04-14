@@ -39,7 +39,6 @@ import com.webank.weid.service.impl.engine.EngineFactory;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.PropertyUtils;
 import com.webank.weid.util.WeIdUtils;
 
 @Service
@@ -65,7 +64,7 @@ public class DeployService {
     }
     
     private BuildToolService buildToolService = new BuildToolService();
-    
+    private DataBaseService dataBaseService = new DataBaseService();
     public DataBucketServiceEngine getDataBucket() {
         if (dataBucket == null) {
             dataBucket =  EngineFactory.createDataBucketServiceEngine();
@@ -89,6 +88,8 @@ public class DeployService {
         //开始保存文件
         //将私钥移动到/output/admin中
         copyEcdsa();
+        //TODO 初始化系统需要的表, 暂时先放这步，未来存放系统配置的表得独立先初始化出来
+        dataBaseService.initDataBase();
         return saveDeployInfo(fiscoConfig, from);
     }
     

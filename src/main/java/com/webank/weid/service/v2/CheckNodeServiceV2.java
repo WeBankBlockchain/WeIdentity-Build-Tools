@@ -56,12 +56,13 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
             try {
                 number = this.getBlockNumber(web3j);
                 logger.info("[check] the current blockNumber is {}", number);
+                return true;
             } catch (Exception e) {
                 logger.error("[check] get the BlockNumber fail.", e);
             } finally {
                 channelConnections.stopWork();
             }
-            return number > 0;
+            return false;
         } catch (Exception e) {
             logger.error("[check] check the node fail.", e);
             return false;

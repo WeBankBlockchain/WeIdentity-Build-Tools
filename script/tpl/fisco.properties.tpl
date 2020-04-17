@@ -50,7 +50,7 @@ web3sdk.keep-alive-seconds=60
 #                                                                                                     #
 #######################################################################################################
 # Fisco-Bcos 2.x params, including Group ID and Encrypt Type
-group.id=1
+group.id=${GROUP_ID}
 encrypt.type=0
 
 

@@ -80,10 +80,11 @@ function compile()
     
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
     export CHAIN_ID=${chain_id}
+    export GROUP_ID=${group_id}
     export CNS_PROFILE_ACTIVE=${cns_profile_active}
     export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
     export CNS_CONTRACT_FOLLOW=${cns_contract_follow}
-    FISCOVAS='${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_CONTRACT_FOLLOW}:${CNS_PROFILE_ACTIVE}'
+    FISCOVAS='${GROUP_ID}:${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_CONTRACT_FOLLOW}:${CNS_PROFILE_ACTIVE}'
     envsubst ${FISCOVAS}} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}
@@ -142,6 +143,10 @@ function check_parameter()
     fi
     if [ -z ${chain_id} ];then
         echo "chain id is empty, please check the config."
+        exit 1
+    fi
+    if [ -z ${group_id} ];then
+        echo "group id is empty, please check the config."
         exit 1
     fi
     if [ -z ${mysql_address} ];then

@@ -72,7 +72,7 @@ public class ConfigService {
     }
     
     public boolean processNodeConfig(
-        String address, String version, String orgId, String chainId, String profileActive) {
+        String address, String version, String orgId, String chainId, String groupId, String profileActive) {
         List<String> listStr = FileUtils.readFileToList("run.config");
         StringBuffer buffer = new StringBuffer();
         for (String string : listStr) {
@@ -88,6 +88,8 @@ public class ConfigService {
                 buffer.append("org_id=").append(orgId).append("\n");
             } else if (string.startsWith("chain_id")) {
                 buffer.append("chain_id=").append(chainId).append("\n");
+            }  else if (string.startsWith("group_id")) {
+                buffer.append("group_id=").append(groupId).append("\n");
             } else if (string.startsWith("cns_profile_active")) {
                 buffer.append("cns_profile_active=").append(profileActive).append("\n");
             } else {
@@ -184,6 +186,7 @@ public class ConfigService {
         String fileStr = FileUtils.readFile("script/tpl/fisco.properties.tpl");
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
         fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
+        fileStr = fileStr.replace("${GROUP_ID}", loadConfig.get("group_id"));
         fileStr = fileStr.replace("${WEID_ADDRESS}", "");
         fileStr = fileStr.replace("${CPT_ADDRESS}", "");
         fileStr = fileStr.replace("${ISSUER_ADDRESS}", "");

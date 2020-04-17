@@ -8,6 +8,7 @@ $(document).ready(function(){
         $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
         $("#nodeForm  #ipPort").val(data.blockchain_address);
         $("#nodeForm  #chainId").val(data.chain_id);
+        $("#nodeForm  #groupId").val(data.group_id);
         caDisplay(data.blockchain_fiscobcos_version);
         checkCa(data);
     });
@@ -68,6 +69,7 @@ $(document).ready(function(){
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
 	    formData.append("ipPort", $("#nodeForm  #ipPort").val());
 	    formData.append("chainId", $("#nodeForm  #chainId").val());
+	    formData.append("groupId", $("#nodeForm  #groupId").val());
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#configBtn").addClass("disabled");
@@ -110,7 +112,14 @@ $(document).ready(function(){
     	if(!r.test(chainId)) {
     		return "chainId必须为整数";
     	}
-    	
+    	var groupId = $.trim($("#nodeForm  #groupId").val());
+    	if (groupId.length == 0) {
+    		return "groupId";
+    	}
+    	var r = /^[1-9][0-9]*$/;
+    	if(!r.test(groupId)) {
+    		return "groupId必须为整数";
+    	}
     	return null;
     }
     
@@ -148,6 +157,7 @@ $(document).ready(function(){
         $("#nodeForm  #cnsProFileActive").attr("disabled",true);
         $("#nodeForm  #ipPort").attr("disabled",true);
         $("#nodeForm  #chainId").attr("disabled",true);
+        $("#nodeForm  #groupId").attr("disabled",true);
         $("#caCrtFile").attr("disabled",true);
         $("#caCrtSpan").hide();
         $("#nodeCrtFile").attr("disabled",true);

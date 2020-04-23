@@ -45,6 +45,7 @@
     <section class="content">
       <div class="card-footer">
         <button type="button" id="registerIssuerTypeBtn" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat">注册特定类型的发行者</button>
+        <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">什么是特定类型的发行者?</a>
       </div>
       <br />
       <div id="data-div">
@@ -89,7 +90,7 @@
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
               <label for="addIssuerType">特定类型</label>
-              <input type="text" class="form-control" id="addIssuerType" placeholder="Enter issuer type">
+              <input type="text" class="form-control"  onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'')" id="addIssuerType" placeholder="Enter issuer type">
             </div>
           </div>
         </div>
@@ -115,7 +116,7 @@
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
               <label for="addIssuerWeId">weId</label>
-              <input type="text" class="form-control" id="addIssuerWeId"  placeholder="Enter weId">
+              <input type="text" class="form-control" id="addIssuerWeId" onkeyup="this.value=this.value.replace(/[^\w：:]/g,'');this.value=this.value.replace(/：/g,':');"  placeholder="Enter weId">
             </div>
             <div class="form-group">
               <label for="registerIssuerName">特定类型</label>

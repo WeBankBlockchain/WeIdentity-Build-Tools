@@ -76,23 +76,26 @@
                         </select>
                   </div>
                   <div class="form-group">
-                        <label for="version">节点版本</label> <span style="display: inline;">目前只支持2.0的FISCO-BCOS版本</span>
+                        <label for="version">节点版本</label> <span style="display: inline;color: gray;">目前只支持2.0的FISCO-BCOS版本</span>
                         <select  id="version" id="version" name="version" class="form-control">
                           <option value="2">FISCO-BCOS 2.X</option>
                           <!-- <option value="1">FISCO-BCOS 1.X</option> -->
                         </select>
                   </div>
                   <div class="form-group">
-                    <label for="ipPort">节点IP:PORT(CHANNEL PORT)</label> <span style="display: inline;">如果有多个节点，请用半角逗号","分割</span>
-                    <input type="text" class="form-control" id="ipPort" name="ipPort" placeholder="IP:PORT,IP:PORT">
+                    <label for="ipPort">区块链节点 IP 和 Channel 端口</label>
+                    <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
+                    <div style="display:block; font-size: 13px;color: gray;">例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
+                    <div style="display:block; font-size: 13px;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
+                  
                   </div>
                   <div class="form-group">
-                    <label for="ipPort">链ID</label>
-                    <input type="text" class="form-control" id="chainId" name="chainId" placeholder="Enter chainId">
+                    <label for="ipPort">链ID(chain_id)</label><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="display: inline;color: blue;">什么是chain id?</span></a>
+                    <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
                   </div>
                   <div class="form-group">
-                    <label for="ipPort">群组ID</label>
-                    <input type="text" class="form-control" id="groupId" name="groupId" placeholder="Enter groupId">
+                    <label for="ipPort">群组ID(group_id)</label>
+                    <input type="text" class="form-control" id="groupId" name="groupId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter groupId">
                   </div>
                   <div class="form-group">
                         <label for="caCrtFile">ca.crt证书</label> <span id="caCrtSpan"></span>
@@ -135,11 +138,11 @@
                       </div>
                   </div>
                 </div>
+                </form>
                 <!-- /.card-body -->
                 <div class="card-footer">
                   <button type="button" id="postBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
                 </div>
-              </form>
             </div>
             <!-- /.card -->
         </div>

@@ -41,7 +41,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active">凭证声明类型转JAVA实体</li>
+              <li class="breadcrumb-item active">凭证类型(CPT)转JAVA实体</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -52,7 +52,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="policyToPojoBtn" class="btn btn-inline btn-primary btn-flat">披露策略转JAVA实体</button>
+        <button type="button" id="policyToPojoBtn" class="btn btn-inline btn-primary btn-flat">披露策略转JAR包</button>
       </div>
       <div class="row">
         <div class="col-12">
@@ -78,8 +78,8 @@
                   <td>${hashShow}</td>
                   <td>${createTime}</td>
                   <td>
-                    <button type="button" onclick="downPolicy('${id}', '${cptIds}', '${fromType}')" class="btn btn-inline btn-primary btn-flat">下载披露策略</button>
-                    <button type="button" onclick="downCptJar('${id}')" class="btn btn-inline btn-primary btn-flat">下载JAVA实体包</button>
+                    <button type="button" onclick="downPolicy('${id}', '${cptIds}', '${fromType}')" class="btn btn-inline btn-primary btn-flat">下载披露策略文件</button>
+                    <button type="button" onclick="downCptJar('${id}')" class="btn btn-inline btn-primary btn-flat">下载JAR包</button>
                   </td>
                 </tr>
                 </tbody>
@@ -105,7 +105,7 @@
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
               <label for="addIssuerWeId">策略编号</label>
-              <input type="text" class="form-control" id="policyId"  placeholder="Enter policyId">
+              <input type="text" class="form-control" id="policyId" onkeyup="this.value=this.value.replace(/\D/g,'')"  placeholder="Enter policyId">
               <input type="hidden" class="form-control" id="pojoId" >
               <input type="hidden" class="form-control" id="fromType" >
             </div>
@@ -140,7 +140,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">披露策略转JAVA实体</h4>
+          <h4 class="modal-title">披露策略转JAR包</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

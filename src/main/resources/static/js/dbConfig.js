@@ -23,10 +23,10 @@ $(document).ready(function(){
     	    return ;
         }
 	    var formData = new FormData();
-	    formData.append("mysql_address", $("#dbForm  #mysql_address").val());
-	    formData.append("mysql_database", $("#dbForm  #mysql_database").val());
-	    formData.append("mysql_username", $("#dbForm  #mysql_username").val());
-	    formData.append("mysql_password", $("#dbForm  #mysql_password").val());
+	    formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
+	    formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
+	    formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
+	    formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#configBtn").addClass("disabled");
@@ -91,7 +91,7 @@ $(document).ready(function(){
             $("#checkBody").html("<p>当前配置正常，无需再次配置。</p>");
             $("#modal-default").modal();
             disabledInput();
-            step2();
+            setTimeout(step2,150);
         } else {
         	step1();
         }

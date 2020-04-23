@@ -24,7 +24,7 @@ $(document).ready(function(){
     if (isReady) {
     	loadData();
     }
-    
+    var isClose = false;
     $("#registerIssuerBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
@@ -46,18 +46,20 @@ $(document).ready(function(){
         var formData = {};
 	    formData.weId = weId;
 	    formData.name = name;
+	    isClose = false;
         $.post("registerIssuer", formData, function(value,status){
             if (value == "success") {
-                $("#messageBody").html("<p>权威凭证发行者注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>权威凭证发行者注册<span class='success-span'>成功</span>。</p>");
                 loadData();
+                isClose = true;
             }  else if (value == "fail") {
-            	 $("#messageBody").html("<p>权威凭证发行者注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>权威凭证发行者注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-            	 $("#messageBody").html("<p>"+value+"</p>");
+            	 $("#confirmMessageBody").html("<p>"+value+"</p>");
             }
             $($this).html("注册");
             $($this).removeClass("disabled");
-            $("#modal-message").modal();
+            $("#modal-confirm-message").modal();
         })
     });
     
@@ -76,23 +78,32 @@ $(document).ready(function(){
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
+        isClose = false;
         var formData = {};
 	    formData.weId = weId;
 	    formData.issuerType = type;
         $.post("addIssuerIntoIssuerType", formData, function(value,status){
             if (value == "success") {
-                $("#messageBody").html("<p>特定类型的发行者注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>特定类型的发行者注册<span class='success-span'>成功</span>。</p>");
                 loadData();
+                isClose = true;
             }  else if (value == "fail") {
-            	 $("#messageBody").html("<p>特定类型的发行者注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	$("#confirmMessageBody").html("<p>特定类型的发行者注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-            	 $("#messageBody").html("<p>"+value+"</p>");
+            	$("#confirmMessageBody").html("<p>"+value+"</p>");
             }
             $($this).html("注册");
             $($this).removeClass("disabled");
-            $("#modal-message").modal();
+            $("#modal-confirm-message").modal();
         })
     });
+    $('#modal-confirm-message').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-add-to-issueType").modal("hide");
+			$("#modal-register-issue").modal("hide");
+		}
+    	
+	})
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -101,6 +112,15 @@ function loadData() {
 	$.get("getWeIdList",function(data,status){
   		if(table != null) {
   			table.destroy();
+  		}
+  		if (data.length > 0) {
+  			for(var i = 0; i < data.length; i++) {
+  				if (data[i].admin) {
+  					data[i]["showAdmin"] = "是";
+  				} else {
+  					data[i]["showAdmin"] = "否";
+  				}
+  			}
   		}
   		$("#data-tbody").renderData(template,data);
   		table = $('#example2').DataTable({

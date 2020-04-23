@@ -62,9 +62,6 @@ domain.encryptKey=datasource1:encrypt_key_info
 domain.encryptKey.timeout=31556908799941
 
 # 
-domain.zkp=datasource1:zkp_data
-
-# 
 domain.templateSecret=datasource1:template_secret
 domain.templateSecret.timeout=31556908799941
 
@@ -73,6 +70,9 @@ domain.masterKey=datasource1:master_secret
 
 # 
 domain.credentialSignature=datasource1:credential_signature
+
+# weid auth info
+domain.weIdAuth=datasource1:weid_auth
 
 # the domain for save resource
 domain.resourceInfo=datasource1:resource_info

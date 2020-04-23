@@ -121,6 +121,12 @@ bootRun {
    systemProperty "jdk.tls.namedGroups", "${jdkTlsNamedGroups}"
 }
 
+eclipse {
+    classpath {
+        downloadSources = true
+    }
+}
+
 jar {
     enabled = true
     destinationDir file('dist/app')

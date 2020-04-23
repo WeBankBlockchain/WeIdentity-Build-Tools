@@ -32,7 +32,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active">身份标识</li>
+              <li class="breadcrumb-item active">WeID管理</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -43,7 +43,8 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-inline btn-primary btn-flat">创建身份标识</button>
+        <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-inline btn-primary btn-flat">创建WeID</button>
+        <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">什么是WeID?</a>
       </div>
       <div class="row">
         <div class="col-12">
@@ -54,6 +55,7 @@
                 <thead>
                 <tr>
                   <th title="WeIdentity DID">weId</th>
+                  <th>Admin</th>
                   <th>数据来源</th>
                   <th>CNS</th>
                   <th>创建时间</th>
@@ -63,6 +65,7 @@
                 <tbody id="data-tbody" style="line-height: 40px">
 	            <tr class="display-none">
 	                <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
+	                <td>${showAdmin}</td>
 	                <td>${from}</td>
 	                <td>${hashShow}</td>
 	                <td>${createTime}</td>
@@ -101,7 +104,7 @@
             </div>
             <div class="form-group">
               <label for="registerIssuerName">权威机构名称</label>
-              <input type="text" class="form-control" id="registerIssuerName" placeholder="Enter issuer name">
+              <input type="text" class="form-control" id="registerIssuerName"  onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'')" placeholder="Enter issuer name">
             </div>
           </div>
         </div>

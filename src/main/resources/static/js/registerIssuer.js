@@ -3,7 +3,7 @@ $(document).ready(function(){
 	if (isReady) {
     	loadData();
     }
-	
+	var isClose = false;
     $("#registerIssuerBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
@@ -27,24 +27,31 @@ $(document).ready(function(){
         }
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
+        isClose = false;
         var formData = {};
 	    formData.weId = weId;
 	    formData.name = name;
         $.post("registerIssuer", formData ,function(value,status){
         	if (value == "success") {
-                $("#messageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
                 loadData();
+                isClose = true;
             }  else if (value == "fail") {
-            	 $("#messageBody").html("<p>注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-            	 $("#messageBody").html("<p>"+value+"</p>");
+            	 $("#confirmMessageBody").html("<p>"+value+"</p>");
             }
             $($this).html("注册");
             $($this).removeClass("disabled");
-            $("#modal-message").modal();
+            $("#modal-confirm-message").modal();
         })
     });
     
+    $('#modal-confirm-message').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-register-issue").modal("hide");
+		}
+	})
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -79,8 +86,9 @@ function loadData() {
   })
 }
 
-function registerIssuer(weId) {
-	$("#registerIssuerWeId").val(weId);
+function registerIssuer() {
+	$("#registerIssuerWeId").val("");
+	$("#registerIssuerName").val("");
     $("#modal-register-issue").modal();
 }
 

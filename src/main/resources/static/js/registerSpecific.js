@@ -3,7 +3,7 @@ $(document).ready(function(){
     if (isReady) {
     	loadData();
     }
-    
+    var isClose = false;
     $("#registerBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
@@ -21,20 +21,22 @@ $(document).ready(function(){
         }
         $($this).addClass("disabled");
         $($this).html("注册中,  请稍等...");
+        isClose = false;
         var formData = {};
 	    formData.issuerType = type;
     	$.post(escape("registerIssuerType"), formData, function(value,status){
         	if (value == "success") {
-                $("#messageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
                 loadData();
+                isClose = true;
             }  else if (value == "fail") {
-            	 $("#messageBody").html("<p>注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-            	 $("#messageBody").html("<p>"+value+"</p>");
+            	 $("#confirmMessageBody").html("<p>"+value+"</p>");
             }
             $($this).html("注册");
             $($this).removeClass("disabled");
-            $("#modal-message").modal();
+            $("#modal-confirm-message").modal();
         })
     });
     
@@ -42,7 +44,6 @@ $(document).ready(function(){
     	$("#addIssuerType").val("");
     	$("#modal-register-issue-type").modal();
     });
-    
     $("#addToIssuerType").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
@@ -56,23 +57,32 @@ $(document).ready(function(){
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
         $($this).html("添加中,  请稍等...");
+        isClose = false;
         var formData = {};
 	    formData.issuerType = type;
 	    formData.weId = weId;
         $.post("addIssuerIntoIssuerType", formData, function(value,status){
             if (value == "success") {
-                $("#messageBody").html("<p>添加<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>添加<span class='success-span'>成功</span>。</p>");
                 loadData();
+                isClose = true;
             }  else if (value == "fail") {
-            	 $("#messageBody").html("<p>添加<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>添加<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-            	 $("#messageBody").html("<p>"+value+"</p>");
+            	 $("#confirmMessageBody").html("<p>"+value+"</p>");
             }
             $($this).html("添加");
             $($this).removeClass("disabled");
-            $("#modal-message").modal();
+            $("#modal-confirm-message").modal();
         })
     });
+    $('#modal-confirm-message').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-register-issue-type").modal("hide");
+			$("#modal-add-to-issueType").modal("hide");
+			
+		}
+	})
 });
 
 var template = $("#data-div").html();
@@ -87,6 +97,8 @@ function loadData() {
    		$("#btn1").find("i").removeClass("fa-plus");
    		$("#btn1").find("i").addClass("fa-minus");
    		$("#card1").removeClass("collapsed-card");
+   	} else {
+   		$("#data-div").html("<div style='text-align: center;'><p>对不起，查询不到任何相关数据</p></div>");
    	}
    })
    
@@ -155,6 +167,7 @@ function  removeIssuerFromIssuerType(thisObj, type, weId) {
 
 function addIssuerTypeBtn(type) {
 	$("#issuerType").val(type);
+	$("#addIssuerWeId").val("");
 	$("#modal-add-to-issueType").modal();
 }
 

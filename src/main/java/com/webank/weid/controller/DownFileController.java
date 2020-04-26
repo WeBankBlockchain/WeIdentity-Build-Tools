@@ -169,7 +169,7 @@ public class DownFileController {
             String policy = PolicyFactory.loadJar(jarPath).generate(cptStr, policyType, policyId, fromType);
             down(response, policy.getBytes(), "presentation_policy.json");
         } catch (Exception e) {
-            logger.error("[downPolicy] down policy has error.");
+            logger.error("[downPolicy] down policy has error.", e);
         }
     }
 }

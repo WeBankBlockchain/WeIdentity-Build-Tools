@@ -44,13 +44,17 @@ $(document).ready(function(){
     
     $("#policyJsonFile").change(function(){
     	var file = $("#policyJsonFile")[0].files[0];
-    	let reader = new FileReader();
-        reader.readAsText(file, 'utf-8');
-        reader.onload = function(e, rs) {
-          editor.set(JSON.parse(e.target.result));
-        };
+    	if (file == null || file == undefined) {
+    		editor.set(JSON.parse("{}"));
+    	} else {
+    		let reader = new FileReader();
+            reader.readAsText(file, 'utf-8');
+            reader.onload = function(e, rs) {
+              editor.set(JSON.parse(e.target.result));
+            };
+    	}
     })
-    
+    var isClose = false;
     $("#policyToPojo").click(function(){
     	try {
     		var thisObj = this;
@@ -61,6 +65,7 @@ $(document).ready(function(){
 		    formData.append("policy", policy);
 		    var btnValue = $(thisObj).html();
 		    $(thisObj).html("转换中，请稍后...");
+		    isClose = false;
 		    $(thisObj).addClass("disabled");
     		$.ajax({
     	        url:'policyToPojo', /*接口域名地址*/
@@ -70,26 +75,35 @@ $(document).ready(function(){
     	        processData: false,
     	        success:function(res) {
     	        	if (res=="success") {
-    	            	//检查节点是否正确
-    	            	$("#messageBody").html("<p>披露策略转JAVA实体<span class='success-span'>成功</span>。</p>");
+    	            	$("#confirmMessageBody").html("<p>披露策略转JAR包<span class='success-span'>成功</span>。</p>");
     	            	loadData();
+    	            	isClose = true;
     	            } else if (res=="fail") {
-    	            	$("#messageBody").html("<p>披露策略转JAVA实体<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+    	            	$("#confirmMessageBody").html("<p>披露策略转JAR包<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
     	            } else {
-    	            	$("#messageBody").html("<p>"+res+"</p>");
+    	            	$("#confirmMessageBody").html("<p>"+res+"</p>");
     	            }
-    	        	$("#modal-message").modal();
+    	        	$("#modal-confirm-message").modal();
     	        	$(thisObj).html(btnValue);
     	            $(thisObj).removeClass("disabled");
     	        }
     	    })
-    		
     	} catch (e) {
     		$("#messageBody").html("<pre>Error：" + e.message + "</pre>");
     		$("#modal-message").modal();
     	}
     })
     
+    $('#modal-confirm-message').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-policy-to-pojo").modal("hide");
+		}
+	})
+	$('#modal-policy-to-pojo').on('hide.bs.modal', function () {
+    	editor.set(JSON.parse("{}"));
+    	$("#policyJsonFile").val("");
+		$(".custom-file-label").html("选择策略文件...");
+	})
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -121,7 +135,7 @@ function loadData() {
 }
 
 function downCptJar(pojoId) {
-	$.confirm("确定下载该JAVA实体包吗?",function(){
+	$.confirm("确定下载该JAR包吗?",function(){
 		window.location.href="downPojoJar/" + pojoId;
     })
 }

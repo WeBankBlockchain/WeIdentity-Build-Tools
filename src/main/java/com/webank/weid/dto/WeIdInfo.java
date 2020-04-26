@@ -12,6 +12,7 @@ public class WeIdInfo extends BaseDto {
     private String ecdsaPubKey;
     private boolean isIssuer;
     private String weIdShow;
+    private boolean isAdmin;
     
     public void setWeId(String weId) {
         this.weId = weId;

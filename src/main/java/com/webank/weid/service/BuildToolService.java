@@ -145,7 +145,7 @@ public class BuildToolService {
         //System.out.println("weid is ------> " + weId);
         String publicKey = result.getUserWeIdPublicKey().getPublicKey();
         String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
-        saveWeId(weId, publicKey, privateKey, from);
+        saveWeId(weId, publicKey, privateKey, from, false);
         return weId;
     }
     
@@ -165,18 +165,24 @@ public class BuildToolService {
             return "fail";
         }
         String weId = response.getResult();
-        saveWeId(weId, arg.getPublicKey(), arg.getWeIdPrivateKey().getPrivateKey(), from);
+        saveWeId(weId, arg.getPublicKey(), arg.getWeIdPrivateKey().getPrivateKey(), from, true);
         return weId;
     }
     
-    private void saveWeId(String weId, String publicKey, String privateKey, DataFrom from) {
+    private void saveWeId(
+        String weId, 
+        String publicKey, 
+        String privateKey, 
+        DataFrom from, 
+        boolean isAdmin
+    ) {
         //write weId, publicKey and privateKey to output dir
         File targetDir = getWeidDir(getWeIdAddress(weId));
         FileUtils.writeToFile(weId, WEID_FILE); //适配命令输出
         FileUtils.writeToFile(weId, new File(targetDir, WEID_FILE).getAbsolutePath());
         FileUtils.writeToFile(publicKey, new File(targetDir, ECDSA_PUB_KEY).getAbsolutePath());
         FileUtils.writeToFile(privateKey, new File(targetDir, ECDSA_KEY).getAbsolutePath());
-        saveWeIdInfo(weId, publicKey, privateKey, from);
+        saveWeIdInfo(weId, publicKey, privateKey, from, isAdmin);
     }
     
     public void  deleteWeId() {
@@ -195,19 +201,31 @@ public class BuildToolService {
         return WeIdUtils.convertWeIdToAddress(weId);
     }
     
-    private void saveWeIdInfo(String weId, String publicKey, String privateKey, DataFrom from) {
+    private void saveWeIdInfo(
+        String weId, 
+        String publicKey, 
+        String privateKey, 
+        DataFrom from, 
+        boolean isAdmin
+    ) {
         logger.info("[saveWeIdInfo] begin to save weid info...");
         //创建部署目录
         File targetDir = getWeidDir(getWeIdAddress(weId));
         File saveFile = new File(targetDir.getAbsoluteFile(), "info");
         FileUtils.writeToFile(
-            buildInfo(weId, publicKey, privateKey, from), 
+            buildInfo(weId, publicKey, privateKey, from, isAdmin), 
             saveFile.getAbsolutePath(), 
             FileOperator.OVERWRITE);
         logger.info("[saveWeIdInfo] save the weid info successfully.");
     }
     
-    private String buildInfo(String weId, String publicKey, String privateKey, DataFrom from) {
+    private String buildInfo(
+        String weId, 
+        String publicKey, 
+        String privateKey, 
+        DataFrom from, 
+        boolean isAdmin
+    ) {
         WeIdInfo info = new WeIdInfo();
         info.setId(getWeIdAddress(weId));
         long time = System.currentTimeMillis();
@@ -217,6 +235,7 @@ public class BuildToolService {
         info.setWeId(weId);
         info.setHash(ConfigUtils.getCurrentHash());
         info.setFrom(from.name());
+        info.setAdmin(isAdmin);
         return DataToolUtils.serialize(info);
     }
     

@@ -15,7 +15,7 @@ $(document).ready(function(){
 		var thisObj = this;
 		var disabled = $(thisObj).attr("class").indexOf("disabled");
         if(disabled > 0) return;
-        $.confirm("是否确定使用系统自动创建账户?",function(){
+        $.confirm("确定系统自动创建 admin 账户的公私钥?",function(){
 			createAdmin(thisObj);
 	    })
     });

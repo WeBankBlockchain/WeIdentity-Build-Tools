@@ -2,9 +2,11 @@ package com.webank.weid.command;
 
 import java.util.Calendar;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.AsyncStatus;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.util.DateFormatUtils;
@@ -26,23 +28,60 @@ public class BatchTransaction {
     
     public static void main(String[] args) {
         try {
+            CommandArgs commandArgs = new CommandArgs();
+            JCommander.newBuilder()
+                .addObject(commandArgs)
+                .build()
+                .parse(args);
             //计算昨天时间
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -1);
             String timeStr = DateFormatUtils.getDateString(calendar.getTime(), "yyyyMMdd");
             int time = Integer.parseInt(timeStr);
-            logger.info("[BatchTransaction] beign process batchTransaction, time = {}", time);
+            AsyncStatus asyncStatus = AsyncStatus.INIT;
+            // 如果输入了时间
+            if (StringUtils.isNotBlank(commandArgs.getDataTime())) {
+                int inputTime = Integer.parseInt(commandArgs.getDataTime());
+                // 时间不能大于今天
+                if (inputTime > time) {
+                    log("[BatchTransaction] input time error, time needs to be less than " + time);
+                    System.exit(1);
+                }
+                time = inputTime;
+                // 如果输入了状态
+                if (StringUtils.isNotBlank(commandArgs.getAsyncStatus())) {
+                    int status = Integer.parseInt(commandArgs.getAsyncStatus());
+                    if (status == AsyncStatus.INIT.getCode()) {
+                        // 初始状态
+                        asyncStatus = AsyncStatus.INIT;
+                    } else if (status == AsyncStatus.FAIL.getCode()) {
+                        // 失败状态
+                        asyncStatus = AsyncStatus.FAIL;
+                    } else {
+                        // 非初始和失败状态
+                        log("[BatchTransaction] input status error, status needs 0 or 3 ");
+                        System.exit(1);
+                    }
+                }
+            }
+            log("[BatchTransaction] beign process batchTransaction, time = " + time);
             // 异步上链处理
-            boolean result = transactionService.batchTransaction(time, AsyncStatus.INIT);
+            boolean result = transactionService.batchTransaction(time, asyncStatus);
             if (result) {
-                logger.info("[BatchTransaction] process successfully.");
-                System.exit(1);
+                log("[BatchTransaction] process successfully.");
+                System.exit(0);
             } else {
-                logger.error("[BatchTransaction] process fail.");
+                log("[BatchTransaction] process fail.");
             }
         } catch (Exception e) {
-            logger.error("[BatchTransaction] process has error.", e);
+            String message = "[BatchTransaction] process has error.";
+            logger.error(message, e);
+            System.out.println(message);
         }
-        System.exit(0);
+        System.exit(1);
+    }
+    private static void log(String message) {
+        logger.info(message);
+        System.out.println(message);
     }
 }

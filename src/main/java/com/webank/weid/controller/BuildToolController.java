@@ -250,13 +250,14 @@ public class BuildToolController {
         String version = request.getParameter("version");
         String ipPort = request.getParameter("ipPort");
         String chainId = request.getParameter("chainId");
+        String groupId = request.getParameter("groupId");
         String profileActive = request.getParameter("cnsProFileActive");
         String privName = request.getParameter("privName");
         if (profileActive.equals("priv")) {
             profileActive = privName;
         }
         //根据模板生成配置文件
-        if(configService.processNodeConfig(ipPort, version, orgId, chainId, profileActive)) {
+        if(configService.processNodeConfig(ipPort, version, orgId, chainId, groupId, profileActive)) {
             return BuildToolsConstant.SUCCESS;
         }
         return BuildToolsConstant.FAIL;

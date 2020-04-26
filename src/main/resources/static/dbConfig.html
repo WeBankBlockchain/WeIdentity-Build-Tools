@@ -64,26 +64,26 @@
               <form role="form" id="dbForm">
                 <div id="dbFormDiv" class="card-body">
                 <div class="form-group">
-                        <label for="version">数据库类型</label> <span style="display: inline;">目前暂只支持MySql数据库</span>
+                        <label for="version">数据库类型</label> <span style="display: inline;color: gray;">目前暂只支持MySql数据库</span>
                         <select  id="version" id="version" name="version" class="form-control">
                           <option value="mysql">MYSQL</option>
                           <!-- <option value="1">FISCO-BCOS 1.X</option> -->
                         </select>
                   </div>
                   <div class="form-group">
-                    <label for="exampleInputEmail1">数据库IP:PORT</label>
-                    <input type="text" class="form-control" id="mysql_address" placeholder="IP:PORT">
+                    <label for="mysql_address">数据库IP:PORT</label>
+                    <input type="text" class="form-control" id="mysql_address" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" placeholder="IP:PORT">
                   </div>
                   <div class="form-group">
-                    <label for="exampleInputPassword1">数据库名称</label>
+                    <label for="mysql_database">数据库名称</label>
                     <input type="text" class="form-control" id="mysql_database" placeholder="Enter DataBseName">
                   </div>
                   <div class="form-group">
-                    <label for="exampleInputPassword1">数据库用户名</label>
+                    <label for="mysql_username">数据库用户名</label>
                     <input type="text" class="form-control" id="mysql_username" placeholder="Enter username">
                   </div>
                   <div class="form-group">
-                    <label for="exampleInputPassword1">数据库密码</label>
+                    <label for="mysql_password">数据库密码</label>
                     <input type="password" class="form-control" id="mysql_password" placeholder="Enter password">
                   </div>
                 </div>

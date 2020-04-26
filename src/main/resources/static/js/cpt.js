@@ -8,12 +8,12 @@ $(document).ready(function(){
     	var $this = this;
     	var cptIds = getCptIds();
         if (cptIds.length == 0) {
-        	$("#messageBody").html("<p>请选择需要转换的凭证声明类型</p>");
+        	$("#messageBody").html("<p>请选择需要转换的凭证类型(CPT)</p>");
     		$("#modal-message").modal();
     		return;
         }
         
-        $.confirm("确定将["+cptIds+"]转成JAVA实体吗?",function(){
+        $.confirm("确定将["+cptIds+"]转成JAR包吗?",function(){
             var disabled = $($this).attr("class").indexOf("disabled");
             if(disabled > 0) return;
             $($this).addClass("disabled");
@@ -21,9 +21,9 @@ $(document).ready(function(){
             $($this).html("转换中,  请稍等...");
         	$.get("cptToPojo",{cptIds:cptIds},function(data,status){
         		if (data == "success") {
-        			$("#messageBody").html("<p>凭证声明类型转JAVA实体<span class='success-span'>成功</span>。</p>");
+        			$("#messageBody").html("<p>凭证类型(CPT)转JAR包<span class='success-span'>成功</span>。</p>");
         		} else {
-        			$("#messageBody").html("<p>凭证声明类型转JAVA实体<span class='fail-span'>失败</span>，请查看后台日志。</p>");
+        			$("#messageBody").html("<p>凭证类型(CPT)转JAR包<span class='fail-span'>失败</span>，请查看后台日志。</p>");
         		}
         		$("#modal-message").modal();
         		$($this).html(btnValue);
@@ -38,14 +38,13 @@ $(document).ready(function(){
     	$("#modal-message .modal-dialog").removeClass("modal-lg");
 	})
 	
-	$('#modal-cpt-message').on('hide.bs.modal', function () {
+	$('#modal-confirm-message').on('hide.bs.modal', function () {
 		if (registerCptResult) {
-			editor.set(JSON.parse("{}"));
-			$(".custom-file-label").html("选择文件...");
 			$("#modal-register-cpt").modal("hide");
 		}
-    	
 	})
+	
+	
     
 	//json编辑器
     var options = {
@@ -55,7 +54,7 @@ $(document).ready(function(){
 			alert(err.toString());
 		}
 	};
-    
+
     var editor = new JSONEditor(jQuery("#jsonContent").get(0), options);
     //注册CPT
     $("#registerCpt").click(function(){
@@ -77,7 +76,7 @@ $(document).ready(function(){
     		return;
 	    }
 	    if (cptJson == null) {
-	    	$("#messageBody").html("<p>凭证申明类型不能为空</p>");
+	    	$("#messageBody").html("<p>凭证类型(CPT)不能为空</p>");
 	    	$("#modal-message").modal();
 	    	return;
 	    }
@@ -87,7 +86,7 @@ $(document).ready(function(){
 	    formData.append("cptJson", cptJson);
 	    formData.append("cptId", cptId);
 	    var btnValue = $(thisObj).html();
-	    $(thisObj).html("凭证的声明类型注册中，请稍后...");
+	    $(thisObj).html("凭证类型(CPT)注册中，请稍后...");
 	    $(thisObj).addClass("disabled");
 	    $.ajax({
 	        url:'registerCpt', /*接口域名地址*/
@@ -99,18 +98,17 @@ $(document).ready(function(){
 	            console.log(res);
 	            registerCptResult = false;
 	            if (res=="success") {
-	            	//检查节点是否正确
-	            	$("#cptMessageBody").html("<p>凭证的声明类型注册<span class='success-span'>成功</span>。</p>");
+	            	$("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='success-span'>成功</span>。</p>");
 	            	registerCptResult = true;
 	            	loadData();
 	            } else if (res=="fail") {
-	            	$("#cptMessageBody").html("<p>凭证的声明类型注册<span class='fail-span'>失败</span>，请查看服务端日志。</p>");
+	            	$("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='fail-span'>失败</span>，请查看服务端日志。</p>");
 	            } else {
-	            	$("#cptMessageBody").html("<p>"+res+"</p>");
+	            	$("#confirmMessageBody").html("<p>"+res+"</p>");
 	            }
-	            $("#modal-cpt-message").modal();
 	            $(thisObj).html(btnValue);
 	            $(thisObj).removeClass("disabled");
+	            $("#modal-confirm-message").modal();
 	        }
 	    })
     })
@@ -122,19 +120,28 @@ $(document).ready(function(){
     	}
     	return true;
     }
-
 	$("#cptJsonFile").change(function(){
     	var file = $("#cptJsonFile")[0].files[0];
-    	let reader = new FileReader();
-        reader.readAsText(file, 'utf-8');
-        reader.onload = function(e, rs) {
-          editor.set(JSON.parse(e.target.result));
-        };
+    	if (file == null || file == undefined) {
+    		editor.set(JSON.parse("{}"));
+    	} else {
+    		let reader = new FileReader();
+            reader.readAsText(file, 'utf-8');
+            reader.onload = function(e, rs) {
+              editor.set(JSON.parse(e.target.result));
+            };
+    	}
     })
     
     $("#openRegisterCpt").click(function(){
     	$("#modal-register-cpt").modal();
     });
+    
+    $('#modal-register-cpt').on('hide.bs.modal', function () {
+    	editor.set(JSON.parse("{}"));
+    	$("#cptJsonFile").val("");
+		$(".custom-file-label").html("选择CPT文件...");
+	})
 });
 var template = $("#data-tbody").html();
 var  table;

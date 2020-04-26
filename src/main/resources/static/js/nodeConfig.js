@@ -8,6 +8,7 @@ $(document).ready(function(){
         $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
         $("#nodeForm  #ipPort").val(data.blockchain_address);
         $("#nodeForm  #chainId").val(data.chain_id);
+        $("#nodeForm  #groupId").val(data.group_id);
         caDisplay(data.blockchain_fiscobcos_version);
         checkCa(data);
     });
@@ -63,11 +64,12 @@ $(document).ready(function(){
 	    formData.append("file", $("#nodeCrtFile")[0].files[0]);
 	    formData.append("file", $("#nodeKeyFile")[0].files[0]);
 	    formData.append("file", $("#clientKeyStoreFile")[0].files[0]);
-	    formData.append("orgId", $("#nodeForm  #orgId").val());
+	    formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
 	    formData.append("version", $("#nodeForm  #version").val());
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
-	    formData.append("ipPort", $("#nodeForm  #ipPort").val());
-	    formData.append("chainId", $("#nodeForm  #chainId").val());
+	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
+	    formData.append("chainId", $.trim($("#nodeForm  #chainId").val()));
+	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#configBtn").addClass("disabled");
@@ -110,7 +112,31 @@ $(document).ready(function(){
     	if(!r.test(chainId)) {
     		return "chainId必须为整数";
     	}
-    	
+    	var groupId = $.trim($("#nodeForm  #groupId").val());
+    	if (groupId.length == 0) {
+    		return "请输入您的groupId";
+    	}
+    	var r = /^[1-9][0-9]*$/;
+    	if(!r.test(groupId)) {
+    		return "groupId必须为整数";
+    	}
+    	// 检查上传文件是否跟要求一致
+    	var caCrtFile = $("#caCrtFile")[0].files[0];
+    	if (caCrtFile != null && caCrtFile.name != "ca.crt") {
+    		return "请选择正确的ca.crt文件";
+    	}
+    	var nodeCrtFile = $("#nodeCrtFile")[0].files[0];
+    	if (nodeCrtFile != null && nodeCrtFile.name != "node.crt") {
+    		return "请选择正确的node.crt文件";
+    	}
+		var nodeKeyFile = $("#nodeKeyFile")[0].files[0];
+		if (nodeKeyFile != null && nodeKeyFile.name != "node.key") {
+    		return "请选择正确的node.key文件";
+    	}
+		var clientKeyStoreFile = $("#clientKeyStoreFile")[0].files[0];
+		if (clientKeyStoreFile != null && clientKeyStoreFile.name != "client.keystore") {
+    		return "请选择正确的client.keystore文件";
+    	}
     	return null;
     }
     
@@ -136,7 +162,7 @@ $(document).ready(function(){
             $("#checkBody").html("<p>当前配置正常，无需再次配置。</p>");
             $("#modal-default").modal();
             disabledInput();
-            step2();
+            setTimeout(step2,150);
         } else {
         	step1();
         }
@@ -148,6 +174,7 @@ $(document).ready(function(){
         $("#nodeForm  #cnsProFileActive").attr("disabled",true);
         $("#nodeForm  #ipPort").attr("disabled",true);
         $("#nodeForm  #chainId").attr("disabled",true);
+        $("#nodeForm  #groupId").attr("disabled",true);
         $("#caCrtFile").attr("disabled",true);
         $("#caCrtSpan").hide();
         $("#nodeCrtFile").attr("disabled",true);
@@ -166,6 +193,7 @@ $(document).ready(function(){
     	if($.cookie("skip")){
 			return;
 		}
+    	window.scrollTo(0, 370);
 		var enjoyhint_instance = new EnjoyHint({});
 		var enjoyhint_script_steps = [{
 		    'next #nodeForm': "请完成配置，并点击' 下一步'",

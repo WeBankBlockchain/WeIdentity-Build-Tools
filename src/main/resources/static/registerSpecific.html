@@ -55,10 +55,14 @@
                    <!-- Default box -->
                    <div id="card${index}" class="card collapsed-card">
                      <div class="card-header">
-                       <h3 class="card-title">
-                       ${index}#  <button type="button" id="addIssuerTypeBtn" onclick="addIssuerTypeBtn('${type}')" title="add weId to this Specific type" class="btn btn-inline btn-primary btn-flat btn-sm">将WeID注册为这个特定类型的发行者</button> 
-                       &nbsp;&nbsp;&nbsp;&nbsp;特定类型的发行者: ${type}  
-                      </h3>
+                       <div  style="float: left;width: 400px">
+                         <h3 class="card-title" style="line-height: 30px;">
+                           ${index}#&nbsp;&nbsp;&nbsp;&nbsp;特定类型的发行者: ${type}
+                         </h3>
+                      </div>
+                      <div>
+                        <button type="button" id="addIssuerTypeBtn" onclick="addIssuerTypeBtn('${type}')" title="add weId to this Specific type" class="btn btn-inline btn-primary btn-flat btn-sm" style="float: left">将WeID注册为这个特定类型的发行者</button>
+                      </div>
                        <div class="card-tools">
                          <button type="button" id="btn${index}" value="${type}" onclick="collapse(this, '${type}' , 'div${index}')" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
                            <i class="fas fa-plus"></i></button>

@@ -268,7 +268,7 @@ public class TransactionService {
                 response.getErrorCode(), 
                 response.getErrorMessage()
             );
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("[sendBatchTransaction] has unkonw exception.", e);
             response = new ResponseData<List<Boolean>>(null, ErrorCode.UNKNOW_ERROR);
         }

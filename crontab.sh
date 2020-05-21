@@ -6,7 +6,7 @@ WEIDENTITY_CRON_JOB_TPL=$ROOT_DIR/script/tpl/weidentity-cron-job.tpl
 WEIDENTITY_CRON_JOB=$ROOT_DIR/script/tpl/weidentity-cron-job
 
 # default configuration
-export CRONTAB_TIME="0 0 1 * * ?"
+export CRONTAB_TIME="0 1 * * *"
 export BUILD_TOOL_DIR="$ROOT_DIR"
 export USER="root"
 

@@ -59,4 +59,10 @@ public class CommandArgs {
 
     @Parameter(names = "--data-time", description = "data time")
     private String dataTime;
+    
+    @Parameter(names = "--group-id", description = "group id")
+    private String groupId;
+    
+    @Parameter(names = "--cns", description = "cns")
+    private String cns;
 }

@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,7 @@ import org.fisco.bcos.web3j.protocol.Web3j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.BuildToolsConstant;
@@ -420,18 +423,19 @@ public class DeployService {
         List<HashContract> list = dataBucket.getAllHash().getResult();
         List<ShareInfo> result = new ArrayList<ShareInfo>();
         if (CollectionUtils.isNotEmpty(list)) {
+            List<String> allGroup = getAllGroup();
             for (HashContract hashContract : list) {
                 ShareInfo share = new ShareInfo();
                 share.setTime(hashContract.getTime());
                 share.setOwner(WeIdUtils.convertAddressToWeId(hashContract.getOwner()));
                 share.setHash(hashContract.getHash());
                 String groupId = dataBucket.get(hashContract.getHash(), WeIdConstant.CNS_GROUP_ID).getResult();
-                if(StringUtils.isNotBlank(groupId)) {
+                if(StringUtils.isNotBlank(groupId) && allGroup.contains(groupId)) {
                     share.setGroupId(Integer.parseInt(groupId));
                     String enableHash = PropertiesService.getInstance().getProperty(ParamKeyConstant.SHARE_CNS + groupId);
                     share.setEnable(hashContract.getHash().equals(enableHash));
+                    result.add(share);
                 }
-                result.add(share);
             }
         }
         return result;
@@ -442,7 +446,7 @@ public class DeployService {
      * @param groupId 群组编号
      * @return 返回是否部署成功
      */
-    public boolean deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {
+    public String deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {
         logger.info("[deployEvidence] begin deploy the evidence, groupId = {}.", groupId);
         try {
             //  获取私钥
@@ -454,16 +458,16 @@ public class DeployService {
             );
             if (StringUtils.isBlank(hash)) {
                 logger.error("[deployEvidence] deploy the evidence fail, please check the log.");
-                return false;
+                return StringUtils.EMPTY;
             }
             // 写部署文件
             ShareInfo share = buildShareInfo(fiscoConfig, hash, groupId, currentPrivateKey, from);
             saveShareInfo(share);
             logger.info("[deployEvidence] the evidence deploy successfully.");
-            return true;
+            return hash;
         } catch (Exception e) {
             logger.error("[deployEvidence] deploy the evidence has error.", e);
-            return false;
+            return StringUtils.EMPTY;
         }
     }
     
@@ -533,6 +537,32 @@ public class DeployService {
             return DataToolUtils.deserialize(jsonData, ShareInfo.class);
         } else {
             return null;
+        }
+    }
+    
+    public boolean enableShareCns(String hash) {
+        logger.info("[enableShareCns] begin enable new hash...");
+        try {
+            List<String> allGroup = getAllGroup();
+            // 查询hash对应的群组
+            String groupId = getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
+            if (!allGroup.contains(groupId)) {
+                logger.error("[enableShareCns] the groupId of hash is not in your groupList. groupList = " , allGroup);
+                return false;
+            }
+            // 获取原hash
+            String shareHashOld = PropertiesService.getInstance().getProperty(ParamKeyConstant.SHARE_CNS + groupId);
+            // 启用新hash并停用原hash
+            this.enableHash(CnsType.SHARE, hash, shareHashOld);
+            // 更新数据库中的配置 cns.contract.share.follow.<groupId> 
+            Map<String, String> properties = new HashMap<>();
+            properties.put(ParamKeyConstant.SHARE_CNS + groupId.toString(), hash);
+            PropertiesService.getInstance().saveProperties(properties);
+            logger.info("[enableShareCns] enable the hash {} successFully.", hash);
+            return true;
+        } catch (Exception e) {
+            logger.error("[enableShareCns] enable the hash error.", e);
+            return false;
         }
     }
 }

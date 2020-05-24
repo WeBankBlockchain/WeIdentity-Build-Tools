@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.DeployService;
@@ -61,7 +62,7 @@ public class DeployContract {
         configService.enableHash(hash);
         System.out.println("begin enable the hash.");
         //节点启用新hash并停用原hash
-        deployService.enableHash(hash, fiscoConfig);
+        deployService.enableHash(CnsType.DEFAULT, hash, fiscoConfig.getCnsContractFollow());
         //重新加载合约地址
         configService.reloadAddress();
         System.out.println("begin create the weId for admin and deploy the systemCpt.");

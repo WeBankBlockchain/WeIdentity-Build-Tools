@@ -51,9 +51,15 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="deploy.html" class="nav-link">
+                <a href="deploy.html" title="Deploy WeIdentity Contract"  class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>部署合约</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="deployEvidence.html" title="Deploy Evidence Contract"  class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>存证部署</p>
                 </a>
               </li>
 <!--               <li class="nav-item">
@@ -94,7 +100,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item has-treeview menu-open">
+          <li class="nav-item has-treeview menu-open async-menu">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
@@ -104,15 +110,9 @@
             </a>
             <ul class="nav nav-treeview">
              <li class="nav-item">
-                <a href="async.html" class="nav-link">
+                <a href="async.html" class="nav-link async-form">
                   <i class="far fa-circle nav-icon"></i>
                   <p>异步任务列表</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="asyncDetail.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>异步处理详情</p>
                 </a>
               </li>
             </ul>
@@ -149,6 +149,12 @@ $(document).ready(function(){
 	        });
 		}
 	});
+	
+	if (url == 'asyncDetail.html') {
+		$(".async-form").addClass("active")
+		$(".async-menu").addClass("menu-open")
+	}
+
 	checkAdmin();
 	//加载状态
 	function checkAdmin() {

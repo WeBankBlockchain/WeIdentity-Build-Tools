@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
@@ -42,7 +43,9 @@ import com.webank.weid.dto.Issuer;
 import com.webank.weid.dto.IssuerType;
 import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
+import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.dto.WeIdInfo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
@@ -147,13 +150,13 @@ public class BuildToolController {
             //配置启用新hash
             configService.enableHash(hash);
             //节点启用新hash并停用原hash
-            deployService.enableHash(hash, fiscoConfig);
+            deployService.enableHash(CnsType.DEFAULT, hash, fiscoConfig.getCnsContractFollow());
             //重新加载合约地址
             reloadAddress();
             logger.info("[enableHash] enable the hash {} successFully.", hash);
             return true;
         } catch (Exception e) {
-            logger.error("[enableHash] the contract depoly error.", e);
+            logger.error("[enableHash] enable the hash error.", e);
             return false;
         }
     }
@@ -187,10 +190,20 @@ public class BuildToolController {
         return deployService.getDeployInfoByHashFromChain(hash);
     }
     
-    @GetMapping("/removeHash/{hash}")
-    public String removeHash(@PathVariable("hash") String hash){
+    @GetMapping("/removeHash/{hash}/{type}")
+    public String removeHash(@PathVariable("hash") String hash, @PathVariable("type") Integer type){
         try {
-            return deployService.removeHash(hash);
+            CnsType cnsType = null;
+            if (type == 1) {
+                cnsType = CnsType.DEFAULT;
+            } else if (type == 2) {
+                cnsType = CnsType.SHARE;
+            } else {
+                logger.error("[removeHash] the type error, type = {}.", type);
+                return BuildToolsConstant.FAIL; 
+            }
+            
+            return deployService.removeHash(cnsType, hash);
         } catch (Exception e) {
             logger.error("[removeHash] remove the hash error.", e);
             return BuildToolsConstant.FAIL;
@@ -401,12 +414,9 @@ public class BuildToolController {
         File targetFIle = new File("output/", fileName);
         FileUtils.writeToFile(cptJson, targetFIle.getAbsolutePath(), FileOperator.OVERWRITE);
         logger.info("[registerCpt] begin register cpt...");
-        
-        DeployInfo deployInfo = DeployService.getDepolyInfoByHash(ConfigUtils.getCurrentHash());
-        String weId = WeIdUtils.convertPublicKeyToWeId(deployInfo.getEcdsaPublicKey());
         String cptId = request.getParameter("cptId");
         try {
-            return buildToolService.registerCpt(targetFIle, weId, cptId, DataFrom.WEB);
+            return buildToolService.registerCpt(targetFIle, cptId, DataFrom.WEB);
         } catch (Exception e) {
             logger.error("[registerCpt] register cpt has error.", e);
         } finally {
@@ -539,6 +549,7 @@ public class BuildToolController {
     
     @Description("检查是否已开启异步上链")
     @PostMapping("/chekEnableAsync")
+    @Deprecated
     public boolean chekEnableAsync() {
         String offLine = PropertiesService.getInstance().getProperty(ParamKeyConstant.ENABLE_OFFLINE);
         if (StringUtils.isBlank(offLine)) {
@@ -549,12 +560,70 @@ public class BuildToolController {
     
     @Description("修改异步上链状态")
     @PostMapping("/doEnableAsync")
+    @Deprecated
     public boolean doEnableAsync(
         @RequestParam(value = "enable") boolean enable
     ) {
         Map<String, String> map = new HashMap<String, String>();
         map.put(ParamKeyConstant.ENABLE_OFFLINE, String.valueOf(enable));
-        PropertiesService.getInstance().addProperties(map);
+        PropertiesService.getInstance().saveProperties(map);
         return chekEnableAsync();
+    }
+    
+    @Description("获取群组列表")
+    @GetMapping("/getAllGroup")
+    public List<Map<String,String>> getAllGroup() {
+        List<String> allGroup = deployService.getAllGroup();
+        List<Map<String,String>> result = new ArrayList<Map<String,String>>();
+        if (allGroup != null) {
+            for (String string : allGroup) {
+                Map<String,String> data = new HashMap<String, String>();
+                data.put("value", string);
+                result.add(data);
+            }
+        }
+        return result;
+    }
+
+    @Description("从share的cns中获取所有的hash")
+    @GetMapping("/getShareList")
+    public List<ShareInfo> getShareList() {
+        return deployService.getShareList();
+    }
+    
+    @Description("根据群组Id部署Evidence合约")
+    @PostMapping("/deployEvidence")
+    public boolean deployEvidence(@RequestParam(value = "groupId") Integer groupId) {
+        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+        return deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
+    }
+
+    @Description("启用新的shareHash,禁用老的shareHash")
+    @PostMapping("/enableHash")
+    public boolean enableHash(
+        @RequestParam(value = "hash") String hash, 
+        @RequestParam(value = "groupId") Integer groupId
+    ) {
+        logger.info("[enableHash] begin enable new hash...");
+        try {
+            //获取原hash
+            String shareHashOld = PropertiesService.getInstance().getProperty(ParamKeyConstant.SHARE_CNS + groupId);
+            //启用新hash并停用原hash
+            deployService.enableHash(CnsType.SHARE, hash, shareHashOld);
+            //更新数据库中的配置 cns.contract.share.follow.<groupId> 
+            Map<String, String> properties = new HashMap<>();
+            properties.put(ParamKeyConstant.SHARE_CNS + groupId.toString(), hash);
+            PropertiesService.getInstance().saveProperties(properties);
+            logger.info("[enableHash] enable the hash {} successFully.", hash);
+            return true;
+        } catch (Exception e) {
+            logger.error("[enableHash] enable the hash error.", e);
+            return false;
+        }
+    }
+
+    @GetMapping("/getShareInfo/{hash}")
+    public ShareInfo getShareInfo(@PathVariable("hash") String hash) {
+        return deployService.getShareInfo(hash);
     }
 }

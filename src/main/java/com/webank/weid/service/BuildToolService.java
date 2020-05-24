@@ -511,8 +511,8 @@ public class BuildToolService {
         }
     }
     
-    public String registerCpt(File cptFile, String weId, String cptId, DataFrom from) throws IOException {
-        return registerCpt(cptFile, getCurrentWeIdAuth(weId), cptId, from).getMessage();
+    public String registerCpt(File cptFile, String cptId, DataFrom from) throws IOException {
+        return registerCpt(cptFile, getCurrentWeIdAuth(), cptId, from).getMessage();
     }
     
     public CptFile registerCpt(

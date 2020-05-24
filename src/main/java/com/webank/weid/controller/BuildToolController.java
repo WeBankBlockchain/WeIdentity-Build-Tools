@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -585,7 +586,12 @@ public class BuildToolController {
     @Description("从share的cns中获取所有的hash")
     @GetMapping("/getShareList")
     public List<ShareInfo> getShareList() {
-        return deployService.getShareList();
+        try {
+            return deployService.getShareList();
+        } catch (Exception e) {
+            logger.error("[getShareList] get share list has error.", e);
+            return new ArrayList<ShareInfo>();
+        }
     }
     
     @Description("根据群组Id部署Evidence合约")

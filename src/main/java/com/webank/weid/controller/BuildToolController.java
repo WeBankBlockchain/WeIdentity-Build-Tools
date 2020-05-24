@@ -45,7 +45,6 @@ import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.dto.WeIdInfo;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
@@ -54,10 +53,8 @@ import com.webank.weid.service.DeployService;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
-import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.WeIdUtils;
 
 @RestController
 public class BuildToolController {
@@ -595,31 +592,14 @@ public class BuildToolController {
     @PostMapping("/deployEvidence")
     public boolean deployEvidence(@RequestParam(value = "groupId") Integer groupId) {
         FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-        return deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
+        String hash = deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
+        return StringUtils.isNotBlank(hash);
     }
 
     @Description("启用新的shareHash,禁用老的shareHash")
-    @PostMapping("/enableHash")
-    public boolean enableHash(
-        @RequestParam(value = "hash") String hash, 
-        @RequestParam(value = "groupId") Integer groupId
-    ) {
-        logger.info("[enableHash] begin enable new hash...");
-        try {
-            //获取原hash
-            String shareHashOld = PropertiesService.getInstance().getProperty(ParamKeyConstant.SHARE_CNS + groupId);
-            //启用新hash并停用原hash
-            deployService.enableHash(CnsType.SHARE, hash, shareHashOld);
-            //更新数据库中的配置 cns.contract.share.follow.<groupId> 
-            Map<String, String> properties = new HashMap<>();
-            properties.put(ParamKeyConstant.SHARE_CNS + groupId.toString(), hash);
-            PropertiesService.getInstance().saveProperties(properties);
-            logger.info("[enableHash] enable the hash {} successFully.", hash);
-            return true;
-        } catch (Exception e) {
-            logger.error("[enableHash] enable the hash error.", e);
-            return false;
-        }
+    @PostMapping("/enableShareCns")
+    public boolean enableShareCns(@RequestParam(value = "hash") String hash) {
+        return deployService.enableShareCns(hash);
     }
 
     @GetMapping("/getShareInfo/{hash}")

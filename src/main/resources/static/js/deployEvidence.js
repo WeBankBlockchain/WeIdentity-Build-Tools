@@ -1,8 +1,8 @@
 $(document).ready(function(){
-//    if (isReady) {
-//    	loadData();
-//    }
-    loadData();
+    if (isReady) {
+    	loadData();
+    }
+
     $("#depolyBtn").click(function(){
     	$("#modal-evidence-deploy").modal();
     });
@@ -125,7 +125,7 @@ function enableHash(hash, groupId) {
 		var formData = {};
 	    formData.hash = hash;
 	    formData.groupId = groupId;
-		$.post("enableHash", formData, function(value,status){
+		$.post("enableShareCns", formData, function(value,status){
 			if (value) {
 				$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='success-span'>成功</span>。</p>");
 				loadData();

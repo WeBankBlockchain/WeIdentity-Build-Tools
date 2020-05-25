@@ -24,6 +24,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.service.BuildToolService;
 import com.webank.weid.util.WeIdUtils;
@@ -31,7 +32,7 @@ import com.webank.weid.util.WeIdUtils;
 /**
  * @author tonychen 2019/4/11
  */
-public class CreateWeId {
+public class CreateWeId extends StaticConfig {
 
     /**
      * log4j.

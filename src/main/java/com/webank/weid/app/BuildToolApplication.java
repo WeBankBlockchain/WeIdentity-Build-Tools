@@ -11,10 +11,12 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.webank.weid.config.StaticConfig;
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 @ComponentScan("com.webank.weid")
 @ServletComponentScan("com.webank.weid")
-public class BuildToolApplication {
+public class BuildToolApplication extends StaticConfig {
 
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         SpringApplication.run(BuildToolApplication.class, args);

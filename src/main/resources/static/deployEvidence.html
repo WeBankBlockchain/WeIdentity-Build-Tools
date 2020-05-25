@@ -11,14 +11,6 @@
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  <style type="text/css">
-    .show_line{
-        margin-top: 9px; 
-        float: left;
-        margin-right: 12px
-    }
-  </style>
-  <link rel="stylesheet" href="plugins/json-editor/jsoneditor.css"/>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -41,7 +33,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active">凭证类型(CPT)转JAVA Jar包</li>
+              <li class="breadcrumb-item active">存证部署</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -52,8 +44,9 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="policyToPojoBtn" class="btn btn-inline btn-primary btn-flat">披露策略转Jar包</button>
+        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">根据群组部署存证合约</button>
       </div>
+      <br />
       <div class="row">
         <div class="col-12">
           <div class="card">
@@ -62,41 +55,43 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>cptId集合</th>
-                  <th>转换来源</th>
-                  <th>数据来源</th>
                   <th>CNS</th>
+                  <th>部署账户</th>
+                  <th>群组</th>
+                  <th style="display: none">状态</th>
                   <th>创建时间</th>
-                  <th  width="250px">操作</th>
+                  <th width="130px">操作</th>
                 </tr>
                 </thead>
-                <tbody id="data-tbody" style="line-height: 40px;">
+                <tbody id="data-tbody" style="line-height: 40px">
                 <tr class="display-none">
-                  <td><a href="javascript:showWeId('${cptIds}')"> ${showCptIds} </a></td>
-                  <td>${fromType}</td>
-                  <td>${from}</td>
-                  <td>${hashShow}</td>
-                  <td>${createTime}</td>
-                  <td>
-                    <button type="button" onclick="downPolicy('${id}', '${cptIds}', '${fromType}')" class="btn btn-inline btn-primary btn-flat">下载披露策略文件</button>
-                    <button type="button" onclick="downCptJar('${id}')" class="btn btn-inline btn-primary btn-flat">下载Jar包</button>
-                  </td>
-                </tr>
+                    <td><a href="javascript:showDeploy('${hash}', '${owner}')"> ${hashShow} </a></td>
+                    <td><a href="javascript:showWeId('${owner}')"> ${ownerShow} </a></td>
+                    <td>${showGroupId} </td>
+                    <td style="display: none">${enable}</td>
+                    <td>${createTime}</td>
+                    <td>
+                          <div style="display: none">${enable}</div>
+                          <button type="button" name="cnsEnableBtn" onclick="enableHash('${hash}' , ${groupId})"   class="btn btn-inline btn-primary btn-flat ${enable}">启用</button>
+                          <button type="button" name="cnsRemoveBtn" onclick="removeHash('${hash}', this)"   class="btn btn-inline btn-primary btn-flat ${enable}">删除</button>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
             <!-- /.card-body -->
           </div>
-          </div>
-          </div>
+        </div>
+      </div>
     </section>
     <!-- /.content -->
   </div>
-  <div class="modal fade" id="modal-down-policy">
+  <!-- 根据群组部署存证合约 -->
+  <div class="modal fade" id="modal-evidence-deploy">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content" style="width: 600px;">
         <div class="modal-header">
-          <h4 class="modal-title">下载披露策略</h4>
+          <h4 class="modal-title">根据群组部署存证合约</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -104,31 +99,15 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
-              <label for="addIssuerWeId">策略编号</label>
-              <input type="text" class="form-control" id="policyId" onkeyup="this.value=this.value.replace(/\D/g,'')"  placeholder="Enter policyId">
-              <input type="hidden" class="form-control" id="pojoId" >
-              <input type="hidden" class="form-control" id="fromType" >
-            </div>
-            <div class="form-group">
-              <label for="registerIssuerName">策略类型</label>
-              <select class="custom-select" id="policyType">
-                <option value="zkp">zkp</option>
-                <option value="original">original</option>
+              <label for="groupId">选择将Evidence合约部署到哪一个FISCO-BCOS群组ID（group ID）</label>
+              <select class="custom-select" id="groupId">
               </select>
-            </div>
-            <div class="form-group">
-              <label for="addIssuerWeId">cptIds</label>
-              <div id="cptId_Div">
-	              <div class="custom-control custom-checkbox show_line">
-				    <input class="custom-control-input" type="checkbox" id="cptId-${cptId}" checked="checked" name="cptId" value="${cptId}">
-				    <label for="cptId-${cptId}" class="custom-control-label">${cptId}</label>
-				  </div>
-              </div>
+              <div class="col-sm-10"><span style="font-size: 13px;color: gray">(找不到想找要的FISCO-BCOS群组ID？请确认下是否已经完成群组的部署)</span></div>
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" id="downPolicy" class="btn btn-block btn-primary btn-flat">下载</button>
+          <button type="button" id="evidenceDeployBtn" class="btn btn-block btn-primary btn-flat">部署</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -136,30 +115,62 @@
     <!-- /.modal-dialog -->
   </div>
   
-  <div class="modal fade" id="modal-policy-to-pojo" >
+  <div class="modal fade" id="modal-show-deploy">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
+      <div id="deployDiv" class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">披露策略转Jar包</h4>
+          <h4 class="modal-title">部署信息</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div  class="modal-body" >
-          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
-            <div class="form-group">
-               <div class="input-group">
-                 <div class="custom-file">
-                   <input type="file" class="custom-file-input" id="policyJsonFile" accept=".json"  name="policyJsonFile">
-                   <label class="custom-file-label" for="policyJsonFile">选择策略文件...</label>
-                 </div>
-               </div>
-             </div>
-            <div id="jsonContent" style="height: 350px"></div>
+        <div  class="modal-body">
+          <div  class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <table  class="table table-hover">
+              <tbody>
+                <tr>
+                  <td>CNS编码</td>
+                  <td colspan="3">${hash}</td>
+                </tr>
+                <tr>
+                  <td>部署账户</td>
+                  <td colspan="3">${owner}</td>
+                </tr>
+                <tr>
+                  <td>群组</td>
+                  <td colspan="3">${groupId}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table id="otherInfo" class="table table-hover" style="display: none" show = '${local}'>
+              <tbody>
+                <tr>
+                  <td>WeID SDK版本</td>
+                  <td>${weIdSdkVersion}</td>
+                  <td>WeID合约版本</td>
+                  <td>${contractVersion}</td>
+                </tr>
+                <tr>
+                  <td>部署来源</td>
+                  <td>${from}</td>
+                  <td>区块链节点版本</td>
+                  <td>${nodeVerion}</td>
+                </tr>
+                <tr>
+                  <td>区块链节点</td>
+                  <td colspan="3">${nodeAddress}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table  class="table table-hover">
+              <tbody>
+                <tr>
+                  <td>Evidentce 智能合约地址</td>
+                  <td>${evidenceAddress}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" id="policyToPojo" class="btn btn-block btn-primary btn-flat">转换</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -182,14 +193,13 @@
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="plugins/datatables/dataTables.sort.plungin.js"></script>
 <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-<script src="plugins/json-editor/jsoneditor.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/checkConfig.js"></script>
-<script src="js/pojo.js"></script>
+<script src="js/deployEvidence.js"></script>
 </body>
 </html>

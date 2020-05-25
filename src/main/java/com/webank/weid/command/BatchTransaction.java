@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
+import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.AsyncStatus;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.util.DateFormatUtils;
@@ -16,7 +17,7 @@ import com.webank.weid.util.DateFormatUtils;
  * @author yanggang
  *
  */
-public class BatchTransaction {
+public class BatchTransaction extends StaticConfig {
     
     /**
      * log4j.

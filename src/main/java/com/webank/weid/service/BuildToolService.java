@@ -866,4 +866,18 @@ public class BuildToolService {
             }
         }
     }
+    
+    public String getIssuerByWeId(String weId) {
+        logger.info("[getIssuerByWeId] begin query issuer. weid = {}", weId);
+        ResponseData<AuthorityIssuer> response = this.getAuthorityIssuerService()
+            .queryAuthorityIssuerInfo(weId);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.warn("[getIssuerByWeId] query issuer fail. ErrorCode is:{}, msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
+            return StringUtils.EMPTY;
+        } else {
+            return response.getResult().getName();
+        }
+    }
 }

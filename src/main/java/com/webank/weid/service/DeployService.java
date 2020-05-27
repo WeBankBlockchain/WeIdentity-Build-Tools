@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,7 +20,6 @@ import org.fisco.bcos.web3j.protocol.Web3j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.BuildToolsConstant;
@@ -34,7 +32,6 @@ import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.deploy.DeployEvidence;
 import com.webank.weid.contract.deploy.v1.DeployContractV1;
 import com.webank.weid.contract.deploy.v2.DeployContractV2;
-import com.webank.weid.contract.deploy.v2.DeployEvidenceV2;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
@@ -186,6 +183,7 @@ public class DeployService {
         }
         
         List<HashContract> result = getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
+        Map<String, String> cache = new HashMap<String, String>();
         for (HashContract hashContract : result) {
             CnsInfo cns = new CnsInfo();
             cns.setHash(hashContract.getHash());
@@ -198,6 +196,14 @@ public class DeployService {
             }
             if (cns.isEnable() && cns.isNeedDeployCpt()) { //如果是启用状态
                 cns.setShowDeployCptBtn(true);
+            }
+            // 查询此部署账户的权威机构名
+            if(cache.containsKey(cns.getWeId())) {
+                cns.setIssuer(cache.get(cns.getWeId()));
+            } else {
+                String issuer = buildToolService.getIssuerByWeId(cns.getWeId());
+                cns.setIssuer(issuer);
+                cache.put(cns.getWeId(), issuer);
             }
             dataList.add(cns);
         }
@@ -428,7 +434,7 @@ public class DeployService {
         }
         DataBucketServiceEngine dataBucket = getDataBucket(CnsType.SHARE);
         List<HashContract> list = dataBucket.getAllHash().getResult();
-        
+        Map<String, String> cache = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(list)) {
             List<String> allGroup = getAllGroup();
             for (HashContract hashContract : list) {
@@ -436,11 +442,21 @@ public class DeployService {
                 share.setTime(hashContract.getTime());
                 share.setOwner(WeIdUtils.convertAddressToWeId(hashContract.getOwner()));
                 share.setHash(hashContract.getHash());
+                // 获取hash的群组
                 String groupId = dataBucket.get(hashContract.getHash(), WeIdConstant.CNS_GROUP_ID).getResult();
                 if(StringUtils.isNotBlank(groupId) && allGroup.contains(groupId)) {
                     share.setGroupId(Integer.parseInt(groupId));
+                    //判断是否启用此hash
                     String enableHash = PropertiesService.getInstance().getProperty(ParamKeyConstant.SHARE_CNS + groupId);
                     share.setEnable(hashContract.getHash().equals(enableHash));
+                    //查询此部署账户的权威机构名
+                    if(cache.containsKey(share.getOwner())) {
+                        share.setIssuer(cache.get(share.getOwner()));
+                    } else {
+                        String issuer = buildToolService.getIssuerByWeId(share.getOwner());
+                        share.setIssuer(issuer);
+                        cache.put(share.getOwner(), issuer);
+                    }
                     result.add(share);
                 }
             }

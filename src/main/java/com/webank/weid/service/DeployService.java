@@ -419,9 +419,16 @@ public class DeployService {
      * @return
      */
     public List<ShareInfo> getShareList() {
+        List<ShareInfo> result = new ArrayList<ShareInfo>();
+        // 如果没有部署databuket则直接返回
+        String bucketAddress = BaseService.getBucketAddress(CnsType.SHARE);
+        if (StringUtils.isBlank(bucketAddress)) {
+            logger.warn("[getShareList] the cnsType does not regist, please deploy the evidence.");
+            return result;
+        }
         DataBucketServiceEngine dataBucket = getDataBucket(CnsType.SHARE);
         List<HashContract> list = dataBucket.getAllHash().getResult();
-        List<ShareInfo> result = new ArrayList<ShareInfo>();
+        
         if (CollectionUtils.isNotEmpty(list)) {
             List<String> allGroup = getAllGroup();
             for (HashContract hashContract : list) {

@@ -33,7 +33,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active">存证部署</li>
+              <li class="breadcrumb-item active">部署Evidence合约</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -44,7 +44,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">根据群组部署存证合约</button>
+        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">部署Evidence合约</button>
       </div>
       <br />
       <div class="row">
@@ -57,6 +57,7 @@
                 <tr>
                   <th>CNS</th>
                   <th>部署账户</th>
+                  <th>权威机构名称</th>
                   <th>群组</th>
                   <th style="display: none">状态</th>
                   <th>创建时间</th>
@@ -67,6 +68,7 @@
                 <tr class="display-none">
                     <td><a href="javascript:showDeploy('${hash}', '${owner}')"> ${hashShow} </a></td>
                     <td><a href="javascript:showWeId('${owner}')"> ${ownerShow} </a></td>
+                    <td>${issuer} </td>
                     <td>${showGroupId} </td>
                     <td style="display: none">${enable}</td>
                     <td>${createTime}</td>
@@ -91,7 +93,7 @@
     <div class="modal-dialog">
       <div class="modal-content" style="width: 600px;">
         <div class="modal-header">
-          <h4 class="modal-title">根据群组部署存证合约</h4>
+          <h4 class="modal-title">部署Evidence合约</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -102,7 +104,9 @@
               <label for="groupId">选择将Evidence合约部署到哪一个FISCO-BCOS群组ID（group ID）</label>
               <select class="custom-select" id="groupId">
               </select>
-              <div class="col-sm-10"><span style="font-size: 13px;color: gray">(找不到想找要的FISCO-BCOS群组ID？请确认下是否已经完成群组的部署)</span></div>
+              <span style="font-size: 13px;color: gray">说明:</span>
+              <div class="col-sm-12"><span style="font-size: 13px;color: gray">1. 找不到想找要的FISCO-BCOS群组ID？请确认下是否已经完成群组的部署。</span></div>
+              <div class="col-sm-12"><span style="font-size: 13px;color: gray">2. 只能在“非主群组”上部署 Evidence 合约，主群组上的 Evidence 合约不能随意替换。</span></div>
             </div>
           </div>
         </div>

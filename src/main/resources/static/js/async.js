@@ -10,10 +10,11 @@ $(document).ready(function(){
 			forceParse: 0,
 			format:"yyyy-mm-dd"
 	});
-	if (isReady) {
-		query();
-		queryAsyncStatus(false);
+	if (!isReady) {
+		return;
     }
+	query();
+	queryAsyncStatus(false);
 });
 
 function query() {

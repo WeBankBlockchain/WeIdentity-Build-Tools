@@ -18,9 +18,10 @@ $(document).ready(function(){
 		var formatedDate = dataTime.replace(pattern, '$1-$2-$3');
 		$("#batch").val(formatedDate);
 	}
-	if (isReady) {
-		query();
+	if (!isReady) {
+    	return;
     }
+	query();
 	$("#btn_supplement").click(function(){
 		$.confirm("是否确定触发补录程序?", function(){
 			var formData = {};

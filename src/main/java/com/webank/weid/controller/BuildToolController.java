@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +53,7 @@ import com.webank.weid.service.DeployService;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
+import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 
@@ -101,6 +101,11 @@ public class BuildToolController {
     @GetMapping("/isReady")
     public boolean isReady() {
         return nodeCheck && dbCheck;
+    }
+    
+    @GetMapping("/isEnableMasterCns")
+    public boolean isEnableMasterCns() {
+        return StringUtils.isNotBlank(ConfigUtils.getCurrentHash());
     }
     
     @PostMapping("/createAdmin")
@@ -611,5 +616,10 @@ public class BuildToolController {
     @GetMapping("/getShareInfo/{hash}")
     public ShareInfo getShareInfo(@PathVariable("hash") String hash) {
         return deployService.getShareInfo(hash);
+    }
+    
+    @GetMapping("/getWeIdPath")
+    public String getWeIdPath() {
+        return buildToolService.getWeidDir();
     }
 }

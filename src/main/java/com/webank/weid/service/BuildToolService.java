@@ -169,6 +169,23 @@ public class BuildToolService {
         return weId;
     }
     
+    /**
+     * 检查weid是否存在
+     * @param weId
+     * @return
+     */
+    public boolean checkWeId(String weId) {
+        ResponseData<Boolean> response = getWeIdService().isWeIdExist(weId);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error(
+                "[checkWeId] check the WeID faild. error code : {}, error msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
+            return false;
+        }
+        return response.getResult();
+    }
+    
     private void saveWeId(
         String weId, 
         String publicKey, 

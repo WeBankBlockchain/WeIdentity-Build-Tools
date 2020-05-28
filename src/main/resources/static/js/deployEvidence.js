@@ -1,7 +1,8 @@
 $(document).ready(function(){
-    if (isReady) {
-    	loadData();
+	if (!isReady) {
+    	return;
     }
+    loadData();
 
     $("#depolyBtn").click(function(){
     	$("#modal-evidence-deploy").modal();
@@ -118,7 +119,11 @@ function removeHash(hash, obj) {
 
 function enableHash(hash, groupId) {
 	var showHash = "..." + hash.substring(hash.length - 6);
-	var message = "是否确定启用群组" + groupId + "中的CNS[" + showHash +"]吗?<br />启用后将同步对应应用环境";
+	var message = "是否确定在此群组（group ID : " + groupId + "）中使用这个 Evidence 合约地址? "
+			+"<br/>* 启用后将直接同步到应用环境（如果是生产环境，请特别小心）。"
+			+"<br/>* 每一个群组，只能有一个启用的 Evidence 合约（调用EvidenceService的createEvidence会将Evidence写入这个 Evidence 合约）。"
+			+"<br/>* 不同群组，可以启用不同的 Evidence 合约。";
+	$("#modal-confirm .modal-dialog").addClass("modal-lg");
 	$.confirm(message,function() {
 		$("#messageBody").html("<p>CNS启用中，请稍等...</p>");
 		$("#modal-message").modal();

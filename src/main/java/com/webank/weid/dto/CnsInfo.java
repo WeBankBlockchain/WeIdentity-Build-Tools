@@ -12,6 +12,7 @@ public class CnsInfo extends BaseDto {
     private boolean enable;
     private boolean showDeployCptBtn;
     private boolean needDeployCpt;
+    private String issuer;
 
     public void setWeId(String weId) {
         this.weId = weId;

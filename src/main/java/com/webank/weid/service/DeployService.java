@@ -315,9 +315,36 @@ public class DeployService {
         WeIdPrivateKey pkey = new WeIdPrivateKey();
         pkey.setPrivateKey(deployInfo.getEcdsaKey());
         arg.setWeIdPrivateKey(pkey);
-        String result = buildToolService.createWeId(arg, from);
-        logger.info("[createWeId]  createWeId for admin result = {}", result);
-        System.out.println("createWeId for admin result = " + result);
+        String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
+        boolean checkWeId = buildToolService.checkWeId(weId);
+        if (!checkWeId) {
+            String result = buildToolService.createWeId(arg, from);
+            logger.info("[createWeId]  createWeId for admin result = {}", result);
+            System.out.println("createWeId for admin result = " + result);
+        } else {
+            logger.info("[createWeId] the weId is exist."); 
+        }
+    }
+    
+    /**
+     * 给当前账户创建WeId.
+     * @param from
+     */
+    public void createWeIdForCurrentUser(DataFrom from) {
+        //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId
+        CreateWeIdArgs arg = new CreateWeIdArgs();
+        arg.setWeIdPrivateKey(getCurrentPrivateKey());
+        arg.setPublicKey(DataToolUtils.publicKeyFromPrivate(new BigInteger(arg.getWeIdPrivateKey().getPrivateKey())).toString());
+        String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
+        logger.info("[createWeIdForCurrentUser] the current weId is = {}", weId);
+        boolean checkWeId = buildToolService.checkWeId(weId);
+        if (!checkWeId) {
+            logger.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
+            String result = buildToolService.createWeId(arg, from);
+            logger.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
+        } else {
+            logger.info("[createWeIdForCurrentUser] the current weId is exist."); 
+        }
     }
     
     public static WeIdPrivateKey getCurrentPrivateKey() {

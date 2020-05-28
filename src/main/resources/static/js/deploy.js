@@ -25,9 +25,10 @@ $(document).ready(function(){
             }
         });
     });
-    if (isReady) {
-    	loadData();
+    if (!isReady) {
+    	return;
     }
+    loadData();
     
 });
 

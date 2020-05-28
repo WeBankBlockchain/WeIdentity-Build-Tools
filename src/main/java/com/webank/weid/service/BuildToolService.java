@@ -197,6 +197,10 @@ public class BuildToolService {
         return targetDir;
     }
     
+    public String getWeidDir() {
+        return new File(WEID_PATH + "/" + ConfigUtils.getCurrentHash()).getAbsolutePath();
+    }
+    
     private String getWeIdAddress(String weId) {
         return WeIdUtils.convertWeIdToAddress(weId);
     }
@@ -242,6 +246,9 @@ public class BuildToolService {
     public List<WeIdInfo> getWeIdList() {
         List<WeIdInfo> list = new ArrayList<WeIdInfo>();
         String currentHash = ConfigUtils.getCurrentHash();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
         File targetDir = new File(WEID_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
@@ -321,6 +328,9 @@ public class BuildToolService {
     public List<Issuer> getIssuerList() {
         String currentHash = ConfigUtils.getCurrentHash();
         List<Issuer> list = new ArrayList<Issuer>();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
         File targetDir = new File(ISSUER_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
@@ -422,8 +432,12 @@ public class BuildToolService {
     }
     
     public List<IssuerType> getIssuerTypeList() {
+        String currentHash = ConfigUtils.getCurrentHash();
         List<IssuerType> list = new ArrayList<IssuerType>();
-        File targetDir = new File(ISSUER_TYPE_PATH + "/" + ConfigUtils.getCurrentHash());
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
+        File targetDir = new File(ISSUER_TYPE_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
         }
@@ -599,7 +613,11 @@ public class BuildToolService {
     
     public List<CptInfo> getCptInfoList() {
         List<CptInfo> list = new ArrayList<CptInfo>();
-        File targetDir = new File(CPT_PATH + "/" + ConfigUtils.getCurrentHash());
+        String currentHash = ConfigUtils.getCurrentHash();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
+        File targetDir = new File(CPT_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
         }
@@ -723,7 +741,11 @@ public class BuildToolService {
     
     public List<PojoInfo> getPojoList() {
         List<PojoInfo> list = new ArrayList<PojoInfo>();
-        File targetDir = new File(POJO_PATH + "/" + ConfigUtils.getCurrentHash());
+        String currentHash = ConfigUtils.getCurrentHash();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
+        File targetDir = new File(POJO_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
         }
@@ -868,6 +890,9 @@ public class BuildToolService {
     }
     
     public String getIssuerByWeId(String weId) {
+        if (StringUtils.isBlank(ConfigUtils.getCurrentHash())) {
+            return StringUtils.EMPTY;
+        }
         logger.info("[getIssuerByWeId] begin query issuer. weid = {}", weId);
         ResponseData<AuthorityIssuer> response = this.getAuthorityIssuerService()
             .queryAuthorityIssuerInfo(weId);

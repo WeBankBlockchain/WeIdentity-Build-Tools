@@ -157,6 +157,7 @@ public class BuildToolController {
             //重新加载合约地址
             reloadAddress();
             logger.info("[enableHash] enable the hash {} successFully.", hash);
+            deployService.createWeIdForCurrentUser(DataFrom.WEB);
             return true;
         } catch (Exception e) {
             logger.error("[enableHash] enable the hash error.", e);

@@ -33,7 +33,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active">合约部署</li>
+              <li class="breadcrumb-item active">主群组部署合约</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -44,7 +44,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">部署合约</button>
+        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">主群组部署合约</button>
         <button type="button" id="downConfig" onclick="downResources()" class="btn btn-inline btn-primary btn-flat" style="display: none" downFile="file">下载配置文件</button>
       </div>
       <br />
@@ -58,6 +58,7 @@
                 <tr>
                   <th>CNS</th>
                   <th>部署账户</th>
+                  <th>权威机构名称</th>
                   <th style="display: none">状态</th>
                   <th>创建时间</th>
                   <th width="400px">操作</th>
@@ -67,6 +68,7 @@
                 <tr class="display-none">
                     <td><a href="javascript:showDeploy('${hash}', '${weId}')"> ${hashShow} </a></td>
                     <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
+                    <td> ${issuer} </td>
                     <th style="display: none">${enable}</th>
                     <td>${createTime}</td>
                     <td>

@@ -112,7 +112,11 @@ $(document).ready(function(){
     	if($.cookie("skip")){
 			return;
 		}
-		var enjoyhint_instance = new EnjoyHint({});
+		var enjoyhint_instance = new EnjoyHint({
+			onSkip:function(){
+				$.cookie("skip",true);
+			}
+		});
 		var enjoyhint_script_steps = [{
 		    'next #dbFormDiv': "请完成配置，并点击' 下一步'",
 		    'showSkip': false,
@@ -128,7 +132,11 @@ $(document).ready(function(){
     	if($.cookie("skip")){
 			return;
 		}
-		var enjoyhint_instance = new EnjoyHint({});
+		var enjoyhint_instance = new EnjoyHint({
+			onSkip:function(){
+				$.cookie("skip",true);
+			}
+		});
 		var enjoyhint_script_steps = [{
 		    'click #configBtn': '下一步，前往合约部署。',
 		    'showSkip': false

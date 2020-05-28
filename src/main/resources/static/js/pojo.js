@@ -1,8 +1,9 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
-	if (isReady) {
-    	loadData();
+	if (!isReady) {
+    	return;
     }
+    loadData();
     
     $("#downPolicy").click(function(){
     	var pojoId = $("#pojoId").val();

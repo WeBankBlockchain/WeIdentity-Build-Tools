@@ -13,6 +13,7 @@ public class ShareInfo extends DeployBase {
     private String showGroupId;
     private String evidenceAddress;
     private boolean enable; 
+    private String issuer;
     
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;

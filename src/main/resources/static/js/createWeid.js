@@ -1,5 +1,9 @@
 $(document).ready(function(){
-
+	if (!isReady) {
+    	return;
+    }
+    loadData();
+    
     $("#createBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
@@ -21,9 +25,6 @@ $(document).ready(function(){
         })
     });
     
-    if (isReady) {
-    	loadData();
-    }
     var isClose = false;
     $("#registerIssuerBtn").click(function(){
         var $this = this;
@@ -104,6 +105,10 @@ $(document).ready(function(){
 		}
     	
 	})
+	
+	$.get("getWeIdPath",function(value,status){
+       $("#weidDir").html("当前WeID存放路径: " + value);
+    })
 });
 var template = $("#data-tbody").html();
 var  table;

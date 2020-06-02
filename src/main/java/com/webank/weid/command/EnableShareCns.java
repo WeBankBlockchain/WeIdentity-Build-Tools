@@ -18,7 +18,7 @@ public class EnableShareCns extends StaticConfig {
             .build()
             .parse(args);
         String hash = commandArgs.getCns();
-        if(StringUtils.isNotEmpty(hash)) {
+        if(StringUtils.isBlank(hash)) {
             System.out.println("[EnableShareCns] input error, the cns is null. Abort.");
             System.exit(1);
         }

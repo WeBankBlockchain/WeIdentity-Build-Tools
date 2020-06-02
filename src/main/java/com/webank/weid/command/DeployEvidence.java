@@ -41,7 +41,7 @@ public class DeployEvidence extends StaticConfig {
             .build()
             .parse(args);
         String goupIdStr = commandArgs.getGroupId();
-        if(StringUtils.isNotEmpty(goupIdStr)) {
+        if(StringUtils.isBlank(goupIdStr)) {
             System.out.println("[DeployEvidence] input error, the groupId is null. Abort.");
             System.exit(1);
         } 

@@ -327,7 +327,7 @@ public class TransactionService {
             
             where.append(" limit ?,? ");
             params.add(pageDto.getStartIndex());
-            params.add(pageDto.getEndIndex());
+            params.add(pageDto.getPageSize());
             queryDataSql.append(where.toString());
             List<BinLog> list = JdbcHelper.queryList(
                 queryDataSql.toString(), BinLog.class, params.toArray());
@@ -362,7 +362,7 @@ public class TransactionService {
             
             where.append(" limit ?,? ");
             params.add(pageDto.getStartIndex());
-            params.add(pageDto.getEndIndex());
+            params.add(pageDto.getPageSize());
             queryData.append(where.toString());
             List<AsyncInfo> list = JdbcHelper.queryList(
                 queryData.toString(), AsyncInfo.class, params.toArray());

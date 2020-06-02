@@ -33,7 +33,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active">主群组部署合约</li>
+              <li class="breadcrumb-item active">部署Evidence合约</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -44,8 +44,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">主群组部署合约</button>
-        <button type="button" id="downConfig" onclick="downResources()" class="btn btn-inline btn-primary btn-flat" style="display: none" downFile="file">下载配置文件</button>
+        <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">部署Evidence合约</button>
       </div>
       <br />
       <div class="row">
@@ -59,23 +58,24 @@
                   <th>CNS</th>
                   <th>部署账户</th>
                   <th>权威机构名称</th>
+                  <th>群组</th>
                   <th style="display: none">状态</th>
                   <th>创建时间</th>
-                  <th width="400px">操作</th>
+                  <th width="130px">操作</th>
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
                 <tr class="display-none">
-                    <td><a href="javascript:showDeploy('${hash}', '${weId}')"> ${hashShow} </a></td>
-                    <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
-                    <td> ${issuer} </td>
-                    <th style="display: none">${enable}</th>
+                    <td><a href="javascript:showDeploy('${hash}', '${owner}')"> ${hashShow} </a></td>
+                    <td><a href="javascript:showWeId('${owner}')"> ${ownerShow} </a></td>
+                    <td>${issuer} </td>
+                    <td>${showGroupId} </td>
+                    <td style="display: none">${enable}</td>
                     <td>${createTime}</td>
                     <td>
                           <div style="display: none">${enable}</div>
-                          <button type="button" name="cnsEnableBtn" onclick="enable('${hash}' , ${needDeployCpt}, this)"   class="btn btn-inline btn-primary btn-flat ${enable}">启用</button>
+                          <button type="button" name="cnsEnableBtn" onclick="enableHash('${hash}' , ${groupId})"   class="btn btn-inline btn-primary btn-flat ${enable}">启用</button>
                           <button type="button" name="cnsRemoveBtn" onclick="removeHash('${hash}', this)"   class="btn btn-inline btn-primary btn-flat ${enable}">删除</button>
-                          <button type="button" name="cnsDeploSystemCptBtn"  onclick="deployCpt('${hash}', this)"   class="btn btn-inline btn-primary btn-flat ${showDeployCptBtn}" style="display: none"> 部署系统CPT</button>
                     </td>
                   </tr>
                 </tbody>
@@ -88,6 +88,37 @@
     </section>
     <!-- /.content -->
   </div>
+  <!-- 根据群组部署存证合约 -->
+  <div class="modal fade" id="modal-evidence-deploy">
+    <div class="modal-dialog">
+      <div class="modal-content" style="width: 600px;">
+        <div class="modal-header">
+          <h4 class="modal-title">部署Evidence合约</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <div class="form-group">
+              <label for="groupId">选择将Evidence合约部署到哪一个FISCO-BCOS群组ID（group ID）</label>
+              <select class="custom-select" id="groupId">
+              </select>
+              <span style="font-size: 13px;color: gray">说明:</span>
+              <div class="col-sm-12"><span style="font-size: 13px;color: gray">1. 找不到想找要的FISCO-BCOS群组ID？请确认下是否已经完成群组的部署。</span></div>
+              <div class="col-sm-12"><span style="font-size: 13px;color: gray">2. 只能在“非主群组”上部署 Evidence 合约，主群组上的 Evidence 合约不能随意替换。</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="evidenceDeployBtn" class="btn btn-block btn-primary btn-flat">部署</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  
   <div class="modal fade" id="modal-show-deploy">
     <div class="modal-dialog modal-lg">
       <div id="deployDiv" class="modal-content">
@@ -108,6 +139,10 @@
                 <tr>
                   <td>部署账户</td>
                   <td colspan="3">${owner}</td>
+                </tr>
+                <tr>
+                  <td>群组</td>
+                  <td colspan="3">${groupId}</td>
                 </tr>
               </tbody>
             </table>
@@ -134,31 +169,12 @@
             <table  class="table table-hover">
               <tbody>
                 <tr>
-                  <td>WeID智能合约地址</td>
-                  <td>${weIdAddress}</td>
-                </tr>
-                <tr>
-                  <td>CPT智能合约地址</td>
-                  <td>${cptAddress}</td>
-                </tr>
-                <tr>
-                  <td>Authority Issuer 智能合约地址</td>
-                  <td>${authorityAddress}</td>
-                </tr>
-                <tr>
                   <td>Evidentce 智能合约地址</td>
                   <td>${evidenceAddress}</td>
-                </tr>
-                <tr>
-                  <td>Specific Issuer 智能合约地址</td>
-                  <td>${specificAddress}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" onclick="downEcdsaKey('${hash}')" class="btn btn-block btn-primary btn-flat" style="display: none" downFile="file" show = '${local}'>下载私钥</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -188,6 +204,6 @@
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/checkConfig.js"></script>
-<script src="js/deploy.js"></script>
+<script src="js/deployEvidence.js"></script>
 </body>
 </html>

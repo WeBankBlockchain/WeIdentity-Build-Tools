@@ -25,9 +25,10 @@ $(document).ready(function(){
             }
         });
     });
-    if (isReady) {
-    	loadData();
+    if (!isReady) {
+    	return;
     }
+    loadData();
     
 });
 
@@ -130,7 +131,7 @@ function removeHash(hash, obj) {
 	    $(obj).html("删除中...");
 		$("#messageBody").html("<p>CNS删除中，请稍等...</p>");
 		$("#modal-message").modal();
-		$.get("removeHash/" + hash, function(value,status){ 
+		$.get("removeHash/" + hash + "/1", function(value,status){ 
 			if (value == "success") {
 				$("#messageBody").html($("#messageBody").html() + "<p>CNS删除<span class='success-span'>成功</span>。</p>");
 				loadData();

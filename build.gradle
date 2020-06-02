@@ -21,7 +21,7 @@ apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-version = "1.0.10"
+version = "1.0.11"
 
 // Specify JDK version - may vary in different scenarios
 sourceCompatibility = 1.8
@@ -123,7 +123,7 @@ bootRun {
 
 eclipse {
     classpath {
-        downloadSources = true
+        downloadSources = false
     }
 }
 

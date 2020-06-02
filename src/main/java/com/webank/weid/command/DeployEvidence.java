@@ -20,56 +20,53 @@
 package com.webank.weid.command;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.DeployService;
-import com.webank.weid.util.FileUtils;
 
-public class DeployContract extends StaticConfig {
-    
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(DeployContract.class);
-    
+public class DeployEvidence extends StaticConfig {
+
     private static DeployService deployService = new DeployService();
     private static ConfigService configService = new ConfigService();
     
     public static void main(String[] args) {
-        logger.info("[DeployContract] execute contract deployment.");
-        
         CommandArgs commandArgs = new CommandArgs();
         JCommander.newBuilder()
             .addObject(commandArgs)
             .build()
             .parse(args);
-        String privateKeyFile = commandArgs.getPrivateKey();
-        if (StringUtils.isNotBlank(privateKeyFile)) {
-            String privateKey = FileUtils.readFile(privateKeyFile);
-            deployService.createAdmin(privateKey);
+        String goupIdStr = commandArgs.getGroupId();
+        if(StringUtils.isBlank(goupIdStr)) {
+            System.out.println("[DeployEvidence] input error, the groupId is null. Abort.");
+            System.exit(1);
+        } 
+        if (!NumberUtils.isDigits(goupIdStr)) {
+            System.out.println("[DeployEvidence] input error, the groupId does not digits. Abort.");
+            System.exit(1);
+        }
+        System.out.println("[DeployEvidence] begin deploy the evidence by groupId, groupId = " + goupIdStr);
+        Integer groupId = Integer.parseInt(goupIdStr);
+        // 检查是否有admin账户，如果没有则创建admin账户
+        String adminAddress = deployService.checkAdmin();
+        if (StringUtils.isBlank(adminAddress)) {
+            System.out.println("[DeployEvidence] begin create admin...");
+            deployService.createAdmin(null);
+        }
+        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+        String hash = deployService.deployEvidence(fiscoConfig, groupId, DataFrom.COMMAND);
+        if (StringUtils.isNotBlank(hash)) {
+            System.out.println("[DeployEvidence] the evidence deploy successfully, cns --> " + hash);
+            System.exit(0);
+        } else {
+            System.out.println("[DeployEvidence] the evidence deploy faile， please check the log.");
+            System.exit(1);
         }
         
-        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-        String hash = deployService.deploy(fiscoConfig, DataFrom.COMMAND);
-        System.out.println("the contract deploy successfully  --> hash : " +  hash);
-       //配置启用新hash
-        configService.enableHash(hash);
-        System.out.println("begin enable the hash.");
-        //节点启用新hash并停用原hash
-        deployService.enableHash(CnsType.DEFAULT, hash, fiscoConfig.getCnsContractFollow());
-        //重新加载合约地址
-        configService.reloadAddress();
-        System.out.println("begin create the weId for admin and deploy the systemCpt.");
-        deployService.deploySystemCpt(hash, DataFrom.COMMAND);
-        System.out.println("the systemCpt deploy successfully.");
-        System.exit(0);
     }
 
 }

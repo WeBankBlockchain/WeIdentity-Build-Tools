@@ -1,8 +1,9 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
-	if (isReady) {
-    	loadData();
+	if (!isReady) {
+    	return;
     }
+    loadData();
 
     $("#cptToPojoBtn").click(function(){
     	var $this = this;
@@ -13,7 +14,7 @@ $(document).ready(function(){
     		return;
         }
         
-        $.confirm("确定将["+cptIds+"]转成JAR包吗?",function(){
+        $.confirm("确定将["+cptIds+"]转成Jar包吗?",function(){
             var disabled = $($this).attr("class").indexOf("disabled");
             if(disabled > 0) return;
             $($this).addClass("disabled");
@@ -21,9 +22,9 @@ $(document).ready(function(){
             $($this).html("转换中,  请稍等...");
         	$.get("cptToPojo",{cptIds:cptIds},function(data,status){
         		if (data == "success") {
-        			$("#messageBody").html("<p>凭证类型(CPT)转JAR包<span class='success-span'>成功</span>。</p>");
+        			$("#messageBody").html("<p>凭证类型(CPT)转Jar包<span class='success-span'>成功</span>。</p>");
         		} else {
-        			$("#messageBody").html("<p>凭证类型(CPT)转JAR包<span class='fail-span'>失败</span>，请查看后台日志。</p>");
+        			$("#messageBody").html("<p>凭证类型(CPT)转Jar包<span class='fail-span'>失败</span>，请查看后台日志。</p>");
         		}
         		$("#modal-message").modal();
         		$($this).html(btnValue);

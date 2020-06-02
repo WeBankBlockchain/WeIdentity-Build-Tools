@@ -1,8 +1,10 @@
 $(document).ready(function(){
 	
-	if (isReady) {
-    	loadData();
+	if (!isReady) {
+    	return;
     }
+    loadData();
+	
 	var isClose = false;
     $("#registerIssuerBtn").click(function(){
         var $this = this;

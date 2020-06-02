@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
+import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.service.BuildToolService;
@@ -31,7 +32,7 @@ import com.webank.weid.service.BuildToolService;
 /**
  * @author tonychen 2019/4/11
  */
-public class RegistAuthorityIssuer {
+public class RegistAuthorityIssuer extends StaticConfig {
 
 
     private static final Logger logger = LoggerFactory.getLogger(RegistAuthorityIssuer.class);

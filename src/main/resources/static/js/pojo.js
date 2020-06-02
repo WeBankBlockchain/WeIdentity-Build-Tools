@@ -1,8 +1,9 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
-	if (isReady) {
-    	loadData();
+	if (!isReady) {
+    	return;
     }
+    loadData();
     
     $("#downPolicy").click(function(){
     	var pojoId = $("#pojoId").val();
@@ -75,11 +76,11 @@ $(document).ready(function(){
     	        processData: false,
     	        success:function(res) {
     	        	if (res=="success") {
-    	            	$("#confirmMessageBody").html("<p>披露策略转JAR包<span class='success-span'>成功</span>。</p>");
+    	            	$("#confirmMessageBody").html("<p>披露策略转Jar包<span class='success-span'>成功</span>。</p>");
     	            	loadData();
     	            	isClose = true;
     	            } else if (res=="fail") {
-    	            	$("#confirmMessageBody").html("<p>披露策略转JAR包<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+    	            	$("#confirmMessageBody").html("<p>披露策略转Jar包<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
     	            } else {
     	            	$("#confirmMessageBody").html("<p>"+res+"</p>");
     	            }
@@ -135,7 +136,7 @@ function loadData() {
 }
 
 function downCptJar(pojoId) {
-	$.confirm("确定下载该JAR包吗?",function(){
+	$.confirm("确定下载该Jar包吗?",function(){
 		window.location.href="downPojoJar/" + pojoId;
     })
 }

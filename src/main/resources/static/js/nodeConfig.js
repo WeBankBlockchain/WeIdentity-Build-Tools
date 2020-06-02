@@ -194,7 +194,11 @@ $(document).ready(function(){
 			return;
 		}
     	window.scrollTo(0, 370);
-		var enjoyhint_instance = new EnjoyHint({});
+		var enjoyhint_instance = new EnjoyHint({
+			onSkip:function(){
+				$.cookie("skip",true);
+			}
+		});
 		var enjoyhint_script_steps = [{
 		    'next #nodeForm': "请完成配置，并点击' 下一步'",
 		    'showSkip': false,
@@ -211,7 +215,11 @@ $(document).ready(function(){
     	if($.cookie("skip")){
 			return;
 		}
-		var enjoyhint_instance = new EnjoyHint({});
+		var enjoyhint_instance = new EnjoyHint({
+			onSkip:function(){
+				$.cookie("skip",true);
+			}
+		});
 		var enjoyhint_script_steps = [{
 		    'click #configBtn': '下一步，配置数据库。',
 		    'showSkip': false

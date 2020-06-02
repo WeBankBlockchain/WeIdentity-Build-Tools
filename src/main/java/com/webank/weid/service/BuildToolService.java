@@ -169,6 +169,23 @@ public class BuildToolService {
         return weId;
     }
     
+    /**
+     * 检查weid是否存在
+     * @param weId
+     * @return
+     */
+    public boolean checkWeId(String weId) {
+        ResponseData<Boolean> response = getWeIdService().isWeIdExist(weId);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error(
+                "[checkWeId] check the WeID faild. error code : {}, error msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
+            return false;
+        }
+        return response.getResult();
+    }
+    
     private void saveWeId(
         String weId, 
         String publicKey, 
@@ -195,6 +212,10 @@ public class BuildToolService {
             targetDir.mkdirs();
         }
         return targetDir;
+    }
+    
+    public String getWeidDir() {
+        return new File(WEID_PATH + "/" + ConfigUtils.getCurrentHash()).getAbsolutePath();
     }
     
     private String getWeIdAddress(String weId) {
@@ -242,6 +263,9 @@ public class BuildToolService {
     public List<WeIdInfo> getWeIdList() {
         List<WeIdInfo> list = new ArrayList<WeIdInfo>();
         String currentHash = ConfigUtils.getCurrentHash();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
         File targetDir = new File(WEID_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
@@ -321,6 +345,9 @@ public class BuildToolService {
     public List<Issuer> getIssuerList() {
         String currentHash = ConfigUtils.getCurrentHash();
         List<Issuer> list = new ArrayList<Issuer>();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
         File targetDir = new File(ISSUER_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
@@ -422,8 +449,12 @@ public class BuildToolService {
     }
     
     public List<IssuerType> getIssuerTypeList() {
+        String currentHash = ConfigUtils.getCurrentHash();
         List<IssuerType> list = new ArrayList<IssuerType>();
-        File targetDir = new File(ISSUER_TYPE_PATH + "/" + ConfigUtils.getCurrentHash());
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
+        File targetDir = new File(ISSUER_TYPE_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
         }
@@ -511,8 +542,8 @@ public class BuildToolService {
         }
     }
     
-    public String registerCpt(File cptFile, String weId, String cptId, DataFrom from) throws IOException {
-        return registerCpt(cptFile, getCurrentWeIdAuth(weId), cptId, from).getMessage();
+    public String registerCpt(File cptFile, String cptId, DataFrom from) throws IOException {
+        return registerCpt(cptFile, getCurrentWeIdAuth(), cptId, from).getMessage();
     }
     
     public CptFile registerCpt(
@@ -599,7 +630,11 @@ public class BuildToolService {
     
     public List<CptInfo> getCptInfoList() {
         List<CptInfo> list = new ArrayList<CptInfo>();
-        File targetDir = new File(CPT_PATH + "/" + ConfigUtils.getCurrentHash());
+        String currentHash = ConfigUtils.getCurrentHash();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
+        File targetDir = new File(CPT_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
         }
@@ -723,7 +758,11 @@ public class BuildToolService {
     
     public List<PojoInfo> getPojoList() {
         List<PojoInfo> list = new ArrayList<PojoInfo>();
-        File targetDir = new File(POJO_PATH + "/" + ConfigUtils.getCurrentHash());
+        String currentHash = ConfigUtils.getCurrentHash();
+        if (StringUtils.isBlank(currentHash)) {
+            return list;
+        }
+        File targetDir = new File(POJO_PATH + "/" + currentHash);
         if (!targetDir.exists()) {
             return list;
         }
@@ -864,6 +903,23 @@ public class BuildToolService {
             if (cptMapNext.isEmpty()) {
                 cptMap.remove(k);
             }
+        }
+    }
+    
+    public String getIssuerByWeId(String weId) {
+        if (StringUtils.isBlank(ConfigUtils.getCurrentHash())) {
+            return StringUtils.EMPTY;
+        }
+        logger.info("[getIssuerByWeId] begin query issuer. weid = {}", weId);
+        ResponseData<AuthorityIssuer> response = this.getAuthorityIssuerService()
+            .queryAuthorityIssuerInfo(weId);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.warn("[getIssuerByWeId] query issuer fail. ErrorCode is:{}, msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
+            return StringUtils.EMPTY;
+        } else {
+            return response.getResult().getName();
         }
     }
 }

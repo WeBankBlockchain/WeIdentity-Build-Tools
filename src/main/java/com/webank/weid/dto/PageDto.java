@@ -11,15 +11,13 @@ public class PageDto<T> {
     private int pageSize;
     private int allCount;
     private List<T> dataList;
-    
+
     public PageDto(int startIndex, int pageSize) {
         this.startIndex = startIndex;
         this.pageSize = pageSize;
     }
-    
-    public int getEndIndex() {
-        return startIndex + pageSize;
-    }
 
-    
+    public int getPageSize() {
+        return pageSize;
+    }
 }

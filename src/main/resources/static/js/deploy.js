@@ -50,7 +50,7 @@ function loadData() {
   	      "autoWidth": false,
   	      "order": [[ 2, "desc" ], [ 3, "desc" ]],
 	  	  "aoColumnDefs": [
-	          { "sType": "operation-column", "aTargets": [4] },    //指定列号使用自定义排序
+	          { "sType": "operation-column", "aTargets": [5] },    //指定列号使用自定义排序
 	      ],
 	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
@@ -186,7 +186,7 @@ function deployCpt(hash, obj) {
 
 function showBtn(btnObj) {
 	if (btnObj != null) {
-		$(btnObj).html("部署合约");
+		$(btnObj).html("主群组部署合约");
 	    $(btnObj).removeClass("disabled");
 	    $("#modal-message").modal();
 	}

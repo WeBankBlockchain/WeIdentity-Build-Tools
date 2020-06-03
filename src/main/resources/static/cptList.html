@@ -57,7 +57,12 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th width="70px">选择</th>
+                  <th width="100px">选择
+                      <div class="custom-control custom-checkbox" style="float: right;padding-right: 36px">
+                        <input class="custom-control-input" type="checkbox" id="selectAll" onclick="" name="selectAll" value="0">
+                        <label for="selectAll" class="custom-control-label"></label>
+                      </div>
+                  </th>
                   <th>cptId</th>
                   <th>数据来源</th>
                   <th>owner</th>
@@ -70,7 +75,7 @@
                 <tr class="display-none">
                   <td align="center" valign="middle">
                       <div class="custom-control custom-checkbox" style="margin-top: 9px">
-					    <input class="custom-control-input" type="checkbox" id="${cptId}" onclick="clickCptId(this)" name="cptId" value="${cptId}">
+					    <input class="custom-control-input" type="checkbox" id="${cptId}" onclick="clickCptId(this, true)" name="cptId" value="${cptId}">
 					    <label for="${cptId}" class="custom-control-label"></label>
 					  </div>
                   </td>

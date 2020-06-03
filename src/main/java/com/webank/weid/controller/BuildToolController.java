@@ -219,10 +219,10 @@ public class BuildToolController {
     public boolean createWeId() {
         try {
             logger.info("[createWeId] begin create weid...");
-            buildToolService.createWeId(DataFrom.WEB);
+            String result = buildToolService.createWeId(DataFrom.WEB);
             buildToolService.deleteWeId();
             logger.info("[createWeId] the weid create successfully.");
-            return true;
+            return StringUtils.isNotBlank(result);
         } catch (Exception e) {
             logger.error("[createWeId] create weId has error.", e);
             return false;

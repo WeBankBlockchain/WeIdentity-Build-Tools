@@ -29,7 +29,7 @@ public class CompilerAndJarTools {
     
     private static final Logger logger = LoggerFactory.getLogger(CompilerAndJarTools.class);
     
-    private static JavaCompiler javaCompiler;
+    private static volatile JavaCompiler javaCompiler;
     
     private String javaSourcePath;
     
@@ -153,10 +153,12 @@ public class CompilerAndJarTools {
         manifest.getMainAttributes().putValue("Manifest-Version", "1.0");
         // 创建临时jar
         File jarFile = File.createTempFile("edwin-", ".jar", new File(System.getProperty("java.io.tmpdir")));
-        JarOutputStream out = new JarOutputStream(new FileOutputStream(jarFile), manifest);
+        FileOutputStream fos = new FileOutputStream(jarFile);
+        JarOutputStream out = new JarOutputStream(fos, manifest);
         createTempJarInner(out, new File(rootPath), "");
         out.flush();
         out.close();
+        fos.close();
         // 生成目标路径
         File targetJarFile = new File(targetPath + File.separator + jarFileName);
         if (targetJarFile.exists() && targetJarFile.isFile())

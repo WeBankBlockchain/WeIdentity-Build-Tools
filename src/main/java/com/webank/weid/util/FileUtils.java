@@ -55,6 +55,7 @@ public final class FileUtils {
         FileOperator operator) {
 
         OutputStreamWriter ow = null;
+        FileOutputStream fos = null;
         try {
             boolean flag = true;
             File file = new File(fileName);
@@ -70,14 +71,15 @@ public final class FileUtils {
                 logger.error("writeAddressToFile() delete file is fail.");
                 return;
             }
-            ow = new OutputStreamWriter(new FileOutputStream(fileName, true),
-                BuildToolsConstant.UTF_8);
+            fos = new FileOutputStream(fileName, true);
+            ow = new OutputStreamWriter(fos,BuildToolsConstant.UTF_8);
             ow.write(content);
             ow.flush();
         } catch (IOException e) {
             logger.error("writer file exception.", e);
         } finally {
             close(ow);
+            close(fos);
         }
     }
 
@@ -231,5 +233,16 @@ public final class FileUtils {
     
     public static void delete(String filePath) {
         delete(new File(filePath));
+    }
+    
+    public static String getSecurityFileName(String fileName) {
+        if (StringUtils.isBlank(fileName)) {
+            return StringUtils.EMPTY;
+        }
+        return fileName.replaceAll("\\.", StringUtils.EMPTY).replaceAll("/", StringUtils.EMPTY);
+    }
+    
+    public static String removeSpecial(String fileName) {
+        return fileName.replaceAll("[^a-zA-Z0-9-_\\.]", StringUtils.EMPTY);
     }
 }

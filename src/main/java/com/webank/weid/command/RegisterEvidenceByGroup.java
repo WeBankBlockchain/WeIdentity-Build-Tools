@@ -63,7 +63,7 @@ public class RegisterEvidenceByGroup {
             }
             System.out.println("[RegisterEvidenceByGroup] begin register evidenceAddress by cns and groupId, cns = "+ cns + ", groupId = " + goupIdStr);
             // 检查群组是否存在
-            Integer groupId = Integer.parseInt(goupIdStr);
+            int groupId = Integer.parseInt(goupIdStr);
             boolean checkGroupId = BaseService.checkGroupId(groupId);
             if (!checkGroupId) {
                 System.out.println("[RegisterEvidenceByGroup] input error, the group does not exists, Abort.");
@@ -111,7 +111,7 @@ public class RegisterEvidenceByGroup {
             RegisterAddressV2.registerAddress(
                 cnsType, 
                 hash, 
-                groupId.toString(), 
+                String.valueOf(groupId), 
                 WeIdConstant.CNS_GROUP_ID, 
                 currentPrivateKey
             );

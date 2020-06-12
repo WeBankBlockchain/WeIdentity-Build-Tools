@@ -327,12 +327,10 @@ public class TransactionService {
             int allCount = JdbcHelper.queryCount(queryCountSql.toString(), params.toArray());
             pageDto.setAllCount(allCount);
             
-            where.append(" limit ?,? ");
             params.add(pageDto.getStartIndex());
             params.add(pageDto.getPageSize());
-            queryDataSql.append(where.toString());
-            List<BinLog> list = JdbcHelper.queryList(
-                queryDataSql.toString(), BinLog.class, params.toArray());
+            String sql = queryDataSql.toString().replace("$1", where.toString());
+            List<BinLog> list = JdbcHelper.queryList(sql, BinLog.class, params.toArray());
             pageDto.setDataList(list);
         } catch (SQLException e) {
             logger.error("queryBinLogList fail.", e);

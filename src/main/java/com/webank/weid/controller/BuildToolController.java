@@ -57,6 +57,7 @@ import com.webank.weid.service.v2.CheckNodeServiceV2;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.WeIdUtils;
 
 @RestController
 public class BuildToolController {
@@ -214,21 +215,62 @@ public class BuildToolController {
             return BuildToolsConstant.FAIL;
         }
     }
-    
+
+    @Description("系统自动生成公私钥生成weId")
     @GetMapping("/createWeId")
-    public boolean createWeId() {
+    public String createWeId() {
         try {
             logger.info("[createWeId] begin create weid...");
-            String result = buildToolService.createWeId(DataFrom.WEB);
-            buildToolService.deleteWeId();
-            logger.info("[createWeId] the weid create successfully.");
-            return StringUtils.isNotBlank(result);
+            String result = buildToolService.createWeId(DataFrom.WEB_BY_DEFAULT);
+            if (WeIdUtils.isWeIdValid(result)) {
+                logger.info("[createWeIdByPrivateKey] the weid create successfully.");
+                return BuildToolsConstant.SUCCESS;
+            }
+            return result;
         } catch (Exception e) {
             logger.error("[createWeId] create weId has error.", e);
-            return false;
+            return BuildToolsConstant.FAIL;
         }
     }
-    
+
+    @Description("根据传入的私钥创建weId")
+    @PostMapping("/createWeIdByPrivateKey")
+    public String createWeIdByPrivateKey(HttpServletRequest request) {
+        try {
+            logger.info("[createWeIdByPrivateKey] begin create weid...");
+            MultipartFile file = ((MultipartHttpServletRequest) request).getFile("privateKey");
+            String inputPrivateKey = new String(file.getBytes(),StandardCharsets.UTF_8);
+            String result = buildToolService.createWeIdByPrivateKey(inputPrivateKey, DataFrom.WEB_BY_PRIVATE_KEY);
+            if (WeIdUtils.isWeIdValid(result)) {
+                logger.info("[createWeIdByPrivateKey] the weid create successfully.");
+                return BuildToolsConstant.SUCCESS;
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("[createWeIdByPrivateKey] create weId has error.", e);
+            return BuildToolsConstant.FAIL;
+        }
+    }
+
+    @Description("根据传入的公钥代理创建weId")
+    @PostMapping("/createWeIdByPublicKey")
+    public String createWeIdByPublicKey(HttpServletRequest request) {
+        try {
+            logger.info("[createWeIdByPublicKey] begin create weid...");
+            MultipartFile file = ((MultipartHttpServletRequest) request).getFile("publicKey");
+            String inputPublicKey = new String(file.getBytes(),StandardCharsets.UTF_8);
+            String result = buildToolService.createWeIdByPublicKey(inputPublicKey, DataFrom.WEB_BY_PUBLIC_KEY);
+            if (WeIdUtils.isWeIdValid(result)) {
+                logger.info("[createWeIdByPrivateKey] the weid create successfully.");
+                return BuildToolsConstant.SUCCESS;
+            }
+            return result;
+        } catch (Exception e) {
+            logger.error("[createWeIdByPublicKey] create weId has error.", e);
+            return BuildToolsConstant.FAIL;
+        }
+    }
+
     @GetMapping("/getWeIdList")
     public List<WeIdInfo> getWeIdList() {
         return buildToolService.getWeIdList();
@@ -436,7 +478,7 @@ public class BuildToolController {
         }
         return BuildToolsConstant.FAIL;
     }
-    
+
     @Description("获取cpt列表")
     @GetMapping("/getCptInfoList")
     public List<CptInfo> getCptInfoList() {

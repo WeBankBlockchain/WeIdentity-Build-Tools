@@ -46,10 +46,14 @@ public class CreateWeId extends StaticConfig {
      */
     public static void main(String[] args) {
         logger.info("[CreateWeId] begin create weId.");
-        String weId = buildToolService.createWeId(DataFrom.COMMAND);
-        File weIdFile = buildToolService.getWeidDir(WeIdUtils.convertWeIdToAddress(weId));
+        String result = buildToolService.createWeId(DataFrom.COMMAND);
+        if (!WeIdUtils.isWeIdValid(result)) {
+            System.out.println("[CreateWeId] create WeID failed, result: " + result);
+            System.exit(1);
+        }
+        File weIdFile = buildToolService.getWeidDir(WeIdUtils.convertWeIdToAddress(result));
         if (weIdFile.exists()) {
-            System.out.println("New weid has been created ---->" + weId);
+            System.out.println("New weid has been created ---->" + result);
             System.out.println("The related private key and public key can be found at " 
                 + weIdFile.getAbsolutePath());
         }

@@ -243,6 +243,7 @@ public class DeployService {
     }
     
     private static File getDeployFileByHash(String hash) {
+        hash = FileUtils.getSecurityFileName(hash);
         return new File(DEPLOY_PATH, hash);
     }
     
@@ -577,6 +578,7 @@ public class DeployService {
     }
     
     private static File getShareFileByHash(String hash) {
+        hash = FileUtils.getSecurityFileName(hash);
         return new File(SHARE_PATH, hash);
     }
     
@@ -597,7 +599,7 @@ public class DeployService {
             // 查询hash对应的群组
             String groupId = getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
             if (!allGroup.contains(groupId)) {
-                logger.error("[enableShareCns] the groupId of hash is not in your groupList. groupList = " , allGroup);
+                logger.error("[enableShareCns] the groupId of hash is not in your groupList. groupId = {}" , groupId);
                 return false;
             }
             // 获取原hash

@@ -100,7 +100,7 @@ public class ToPojo {
             //2. get cpt info from blockchain
             //根据cptId找registerId
             for (int i = 0; i < cptIdStrs.length; i++) {
-                Integer cptId = Integer.parseInt(cptIdStrs[i]);
+                int cptId = Integer.parseInt(cptIdStrs[i]);
                 File cptFile = buildToolService.getCptFile(cptId);
                 if (!cptFile.exists()) {//如果找不到cpt文件
                     logger.error(

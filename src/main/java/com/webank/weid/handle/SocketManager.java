@@ -102,8 +102,10 @@ public class SocketManager {
         @Override
         public void onFileChange(File file) {
             BufferedReader br;
+            FileInputStream fis = null;
             try {
-                InputStreamReader isr = new InputStreamReader(new FileInputStream(file), "UTF-8");
+                fis = new FileInputStream(file);
+                InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
                 br = new BufferedReader(isr);
                 if (br.ready()) {
                     lines += br.lines()
@@ -113,6 +115,14 @@ public class SocketManager {
                 }
             } catch (Exception e) {
                 logger.error("[onFileChange] read the log file error.", e);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        logger.error("[onFileChange] FileInputStream close error.", e);
+                    }
+                }
             }
         }
 

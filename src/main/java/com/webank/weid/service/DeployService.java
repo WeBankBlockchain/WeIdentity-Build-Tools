@@ -261,7 +261,7 @@ public class DeployService {
             return false;
         }
         //注册weid
-        createWeId(deployInfo, from);
+        createWeId(deployInfo, from, true);
         logger.info("[deploySystemCpt] begin register systemCpt...");
         //部署系统CPT, 
         boolean result = registerSystemCpt(deployInfo);
@@ -306,7 +306,7 @@ public class DeployService {
         return true;
     }
     
-    private void createWeId(DeployInfo deployInfo, DataFrom from) {
+    private void createWeId(DeployInfo deployInfo, DataFrom from, boolean isAdmin) {
         logger.info("[createWeId] begin createWeid for admin");
         CreateWeIdArgs arg = new CreateWeIdArgs();
         arg.setPublicKey(deployInfo.getEcdsaPublicKey());
@@ -316,7 +316,7 @@ public class DeployService {
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
         boolean checkWeId = buildToolService.checkWeId(weId);
         if (!checkWeId) {
-            String result = buildToolService.createWeId(arg, from);
+            String result = buildToolService.createWeId(arg, from, isAdmin);
             logger.info("[createWeId]  createWeId for admin result = {}", result);
             System.out.println("createWeId for admin result = " + result);
         } else {
@@ -338,7 +338,7 @@ public class DeployService {
         boolean checkWeId = buildToolService.checkWeId(weId);
         if (!checkWeId) {
             logger.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
-            String result = buildToolService.createWeId(arg, from);
+            String result = buildToolService.createWeId(arg, from, true);
             logger.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
         } else {
             logger.info("[createWeIdForCurrentUser] the current weId is exist."); 

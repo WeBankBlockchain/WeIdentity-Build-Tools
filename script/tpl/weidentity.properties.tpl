@@ -25,7 +25,7 @@ nodes=${BLOCKCHIAN_NODE_INFO}
 datasource.name=datasource1
 
 # The configuration of each data source is prefixed by the name of the data source.
-datasource1.jdbc.url=jdbc:mysql://${MYSQL_ADDRESS}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&rewriteBatchedStatements=true
+datasource1.jdbc.url=jdbc:mysql://${MYSQL_ADDRESS}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
 datasource1.jdbc.driver=com.mysql.cj.jdbc.Driver
 datasource1.jdbc.username=${MYSQL_USERNAME}
 datasource1.jdbc.password=${MYSQL_PASSWORD}

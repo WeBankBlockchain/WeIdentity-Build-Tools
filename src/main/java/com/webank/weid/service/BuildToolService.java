@@ -164,7 +164,7 @@ public class BuildToolService {
         weIdPrivateKey.setPrivateKey(privateKey);
         arg.setWeIdPrivateKey(weIdPrivateKey);
         arg.setPublicKey(DataToolUtils.publicKeyFromPrivate(new BigInteger(privateKey)).toString());
-        return this.createWeId(arg, from);
+        return this.createWeId(arg, from, false);
     }
     
     // 根据公钥代理创建weId(只有主群组管理员才可以调用)
@@ -209,7 +209,7 @@ public class BuildToolService {
      * @param arg
      * @param from
      */
-    public String createWeId(CreateWeIdArgs arg, DataFrom from) {
+    public String createWeId(CreateWeIdArgs arg, DataFrom from, boolean isAdmin) {
         ResponseData<String> response = getWeIdService().createWeId(arg);
         if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
             logger.error(
@@ -219,7 +219,7 @@ public class BuildToolService {
             return response.getErrorCode() + "-" + response.getErrorMessage();
         }
         String weId = response.getResult();
-        saveWeId(weId, arg.getPublicKey(), arg.getWeIdPrivateKey().getPrivateKey(), from, false);
+        saveWeId(weId, arg.getPublicKey(), arg.getWeIdPrivateKey().getPrivateKey(), from, isAdmin);
         return weId;
     }
     

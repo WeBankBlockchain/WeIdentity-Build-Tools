@@ -253,7 +253,10 @@ public class BuildToolController {
                 continue;
             }
             String fileName = file.getOriginalFilename();
-            fileName = FileUtils.getSecurityFileName(fileName);
+            if(!fileName.endsWith(".crt") && !fileName.endsWith(".key")) {
+                logger.error("[nodeConfigUpload] the file type error, fileName = {}.", fileName);
+                return BuildToolsConstant.FAIL; 
+            }
             File dest = new File(targetFIle.getAbsoluteFile() + "/" + fileName);
             try {
                 file.transferTo(dest);

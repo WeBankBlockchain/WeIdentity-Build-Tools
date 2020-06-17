@@ -72,7 +72,9 @@ public class TransactionService {
                         AsyncStatus.SUCCESS.getCode() : AsyncStatus.FAIL.getCode());
                 } catch (Exception e) {
                     logger.error("[batchTransaction] do batchTransaction error.", e);
-                    asyncInfo.setStatus(AsyncStatus.FAIL.getCode());
+                    if (asyncInfo != null) {
+                        asyncInfo.setStatus(AsyncStatus.FAIL.getCode());
+                    }
                     return false;
                 } finally {
                     //更新异步处理状态

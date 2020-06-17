@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -415,6 +416,7 @@ public class BuildToolController {
     public String registerCpt(HttpServletRequest request) {
         logger.info("[registerCpt] begin save the cpt json file...");
         String cptJson = request.getParameter("cptJson");
+        cptJson = StringEscapeUtils.unescapeHtml(cptJson);
         String fileName = request.getParameter("fileName");
         fileName = fileName.substring(0, fileName.lastIndexOf("."));
         fileName = FileUtils.getSecurityFileName(fileName);
@@ -471,6 +473,7 @@ public class BuildToolController {
         @RequestParam(value = "policy") String policy) {
         String pojoId = DataToolUtils.getUuId32();
         try {
+            policy = StringEscapeUtils.unescapeHtml(policy);
             logger.info("[policyToPojo] begin policy to pojo.");
             logger.info("[policyToPojo] policy = {}.", policy);
             

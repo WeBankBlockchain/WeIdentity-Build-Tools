@@ -207,10 +207,8 @@ public class BuildToolService {
     }
     
     public File getWeidDir(String address) {
+        address = FileUtils.getSecurityFileName(address);
         File targetDir = new File(WEID_PATH + "/" + ConfigUtils.getCurrentHash() + "/" + address);
-        if (!targetDir.exists()) {
-            targetDir.mkdirs();
-        }
         return targetDir;
     }
     
@@ -801,6 +799,7 @@ public class BuildToolService {
     }
     
     public File getJarFile(String pojoId) {
+        pojoId =  FileUtils.getSecurityFileName(pojoId);
         return new File(getPojoDir().getAbsoluteFile() + "/" + pojoId, 
             BuildToolsConstant.CPT_JAR_NAME);
     }
@@ -808,10 +807,11 @@ public class BuildToolService {
     private File getPojoDir() {
         return new File(POJO_PATH + "/" + ConfigUtils.getCurrentHash());
     }
+
     /**
      * convert policy to cpt pojo.
      *
-     * @param policyFile the policy file
+     * @param policyJson the policy JSON
      */
     public ResponseData<List<CptFile>> generateCptFileListByPolicy(String policyJson) {
         List<CptFile> cptFileList = new ArrayList<CptFile>();

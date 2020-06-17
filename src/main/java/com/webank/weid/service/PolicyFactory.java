@@ -49,11 +49,15 @@ public class PolicyFactory {
                     policyE = (PresentationPolicyE) constructor.newInstance();
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                    e.printStackTrace();
+                    logger.error("[generate] create instance for PresentationPolicyE has error.", e);
                     return StringUtils.EMPTY;
                 }
                 break;
             }
+        }
+        if (policyE == null) {
+            logger.error("[generate] can not create instance for PresentationPolicyE");
+            return StringUtils.EMPTY;
         }
         
         boolean isZkp = false;

@@ -252,6 +252,7 @@ public class BuildToolController {
                 continue;
             }
             String fileName = file.getOriginalFilename();
+            fileName = FileUtils.getSecurityFileName(fileName);
             File dest = new File(targetFIle.getAbsoluteFile() + "/" + fileName);
             try {
                 file.transferTo(dest);
@@ -415,7 +416,9 @@ public class BuildToolController {
         logger.info("[registerCpt] begin save the cpt json file...");
         String cptJson = request.getParameter("cptJson");
         String fileName = request.getParameter("fileName");
-        File targetFIle = new File("output/", fileName);
+        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        fileName = FileUtils.getSecurityFileName(fileName);
+        File targetFIle = new File("output/", fileName + ".json");
         FileUtils.writeToFile(cptJson, targetFIle.getAbsolutePath(), FileOperator.OVERWRITE);
         logger.info("[registerCpt] begin register cpt...");
         String cptId = request.getParameter("cptId");

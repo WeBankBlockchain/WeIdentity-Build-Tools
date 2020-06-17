@@ -21,7 +21,7 @@ apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-version = "1.0.11"
+version = "1.0.12"
 
 // Specify JDK version - may vary in different scenarios
 sourceCompatibility = 1.8
@@ -46,30 +46,35 @@ repositories {
 }
 
 List lombok = [
-        "org.projectlombok:lombok:1.18.10"
+        "org.projectlombok:lombok:1.18.12"
 ]
 
 List jcommander = [
         "com.beust:jcommander:1.72"
 ]
 
-List apache_commons = [
-        "org.apache.commons:commons-collections4:4.1",
-        "org.apache.commons:commons-lang3:3.5",
-        "commons-cli:commons-cli:1.3.1",
-		"org.apache.logging.log4j:log4j-jcl:2.12.0"
+List log4j = [
+        "org.apache.logging.log4j:log4j-api:2.13.3",
+        "org.apache.logging.log4j:log4j-web:2.13.3",
+        "org.apache.logging.log4j:log4j-core:2.13.3",
+        "org.apache.logging.log4j:log4j-jcl:2.13.3",
+        "org.apache.logging.log4j:log4j-slf4j-impl:2.13.3",
+        "org.slf4j:jul-to-slf4j:1.7.30",
+        "org.slf4j:slf4j-api:1.7.30"
 ]
 
-// In this section you declare the dependencies for your production and test code
-List jackson = [
-        "com.fasterxml.jackson.core:jackson-databind:2.10.0",
-        "com.github.fge:json-schema-validator:2.2.6",
-        "com.google.zxing:core:3.3.0",
-        "org.jsonschema2pojo:jsonschema2pojo-core:1.0.1"
+List json = [
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.11.0",
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.0",
+        "com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.0",
+        "com.fasterxml.jackson.core:jackson-databind:2.11.0",
+        "com.fasterxml.jackson.core:jackson-annotations:2.11.0",
+        "com.fasterxml.jackson.core:jackson-core:2.11.0",
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.0"
 ]
 
-List protobuf = [
-        "com.google.protobuf:protobuf-java:3.9.1"
+List mysql_driver = [
+        "mysql:mysql-connector-java:8.0.20"
 ]
 
 configurations {
@@ -85,22 +90,21 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     //compile("org.springframework.boot:spring-boot-devtools")
     compile("org.springframework.boot:spring-boot-starter-websocket")
-    
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
-            compile lombok, apache_commons, jackson, jcommander, protobuf
+            compile lombok, jcommander, log4j, json, mysql_driver
             compile("com.webank:weid-java-sdk:${weidSdkVersion}")
         }
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
-            compileOnly 'org.projectlombok:lombok:1.18.10'
-            annotationProcessor 'org.projectlombok:lombok:1.18.10'
-            compile apache_commons, jackson, jcommander, protobuf
+            compileOnly 'org.projectlombok:lombok:1.18.12'
+            annotationProcessor 'org.projectlombok:lombok:1.18.12'
+            compile lombok, jcommander, log4j, json, mysql_driver
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}")
         } else {
-            compileOnly files('dist/lib/lombok-1.18.10.jar')
-            annotationProcessor files('dist/lib/lombok-1.18.10.jar')
+            compileOnly files('dist/lib/lombok-1.18.12.jar')
+            annotationProcessor files('dist/lib/lombok-1.18.12.jar')
         }
     }
     compile fileTree(dir: 'ext', include: '*.jar')

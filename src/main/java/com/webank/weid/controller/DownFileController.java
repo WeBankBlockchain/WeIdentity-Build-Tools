@@ -98,7 +98,8 @@ public class DownFileController {
     
     private void down(HttpServletResponse response, byte[] buffer, String fileName) {
         logger.info("[down] begin downloading, fileName is {}.", fileName);
-        response.setContentType("application/force-download");// 设置强制下载不打开         
+        response.setContentType("application/force-download");// 设置强制下载不打开
+        fileName = FileUtils.removeSpecial(fileName);//移除特殊符号
         response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
         try {
            OutputStream outputStream = response.getOutputStream();
@@ -110,7 +111,7 @@ public class DownFileController {
             logger.error("[down] the file downloading has error.", e);
         }
     }
-    
+
     @Description("weid私钥下载")
     @GetMapping("/downWeIdEcdsaKey/{address}")
     public void downWeIdEcdsaKey(HttpServletResponse response, @PathVariable("address") String address) {

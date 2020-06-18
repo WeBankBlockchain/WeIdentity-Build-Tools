@@ -5,8 +5,12 @@ source run.config
 set -e
 
 if [[ "$@" == "--offline" ]];then
-    OFFLINE_MODE="1"
-    echo "Compile in offline mode.."
+   OFFLINE_MODE="1"
+   echo "Compile in offline mode.."
+fi
+
+if [[ "$@" == "cn" || "$@" == "en" ]];then
+    sed -i "/^repoType/crepoType=$1" gradle.properties
 fi
 
 if [ ! -d dist/ ];then
@@ -108,9 +112,9 @@ function compile()
         rm -rf ${SOURCE_CODE_DIR}/dist/app
     fi
     if [[ ${OFFLINE_MODE} == "1" ]];then
-        gradle clean build --offline
+        ./gradlew clean build --offline
     else
-        gradle clean build
+        ./gradlew clean build
     fi
     build_classpath
     echo "compile finished."
@@ -188,10 +192,11 @@ function check_font()
 
 function main()
 {
-    check_font
+    # check_font
     check_parameter
     # setup
     check_jdk
+    chmod u+x gradlew
     compile
     clean_config
 }

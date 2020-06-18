@@ -21,7 +21,9 @@ apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-version = "1.0.12"
+
+def version = "1.0.12"
+def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios
 sourceCompatibility = 1.8
@@ -36,9 +38,12 @@ repositories {
         }
     } else {
         mavenLocal()
-        mavenCentral()
-        maven {
-            url "http://maven.aliyun.com/nexus/content/groups/public/"
+        if ("cn" == repo) {
+            println "use cn repo"
+            maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        } else {
+            println "use default repo"
+            mavenCentral()
         }
         maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url "https://oss.sonatype.org/content/groups/public/" }
@@ -131,23 +136,41 @@ eclipse {
     }
 }
 
+clean {
+ delete "dist"
+ delete "resources/fisco.properties"
+ delete "resources/weidentity.properties"
+}
+
 jar {
     enabled = true
     destinationDir file('dist/app')
     archiveName project.name + '-' + version + '.jar'
     classifier = 'boot'
-    excludes = ["*.jar","*.key","*.ttf","*.crt","*.xml","*.properties"]
-    
-    doLast {
-        copy {
-            from file('ext/NotoSansCJKtc-Regular.ttf')
-            into 'resources/'
+    def outputs = file("./")
+    into('file/tools') {
+        from 'tools/'
+    }
+    into('file/script') {
+        from 'script/'
+    }
+    into('file/ext') {
+        from 'ext/'
+    }
+    into('file') {
+       from fileTree(file("./")){
+            //自定义过滤规则
+            includes = ["*.sh", "*.config"]
         }
+    }
+    // excludes = ["*.xml", "*.properties"]
+   
+    doLast {
         copy {
             from file('src/main/resources/log4j2.xml')
             into 'resources/'
         }
-     	copy {
+        copy {
             from file('resources/')
             into 'dist/conf'
         }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ..
-source ./script/common.inc
+source ./common/script/common.inc
 
 cd ${SOURCE_CODE_DIR}
 

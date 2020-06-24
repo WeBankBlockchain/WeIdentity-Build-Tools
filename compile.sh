@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./script/common.inc
+source ./common/script/common.inc
 source run.config
 
 set -e
@@ -21,12 +21,11 @@ if [ ! -d dist/lib ];then
 fi
 
 #SOURCE_CODE_DIR=$(pwd)
-CONFIG_FILE=${SOURCE_CODE_DIR}/conf/run.config
-FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tpl
-FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/script/tpl/fisco.properties
-FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/script/tpl/fisco.properties.tmp
-WEIDENTITY_CONFIG_TPL=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties.tpl
-WEIDENTITY_CONFIG=${SOURCE_CODE_DIR}/script/tpl/weidentity.properties
+FISCO_XML_CONFIG_TPL=${SOURCE_CODE_DIR}/common/script/tpl/fisco.properties.tpl
+FISCO_XML_CONFIG=${SOURCE_CODE_DIR}/common/script/tpl/fisco.properties
+FISCO_XML_CONFIG_TMP=${SOURCE_CODE_DIR}/common/script/tpl/fisco.properties.tmp
+WEIDENTITY_CONFIG_TPL=${SOURCE_CODE_DIR}/common/script/tpl/weidentity.properties.tpl
+WEIDENTITY_CONFIG=${SOURCE_CODE_DIR}/common/script/tpl/weidentity.properties
 
 
 function clean_config()
@@ -93,9 +92,8 @@ function compile()
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}
     fi
-    cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     #cp ${SOURCE_CODE_DIR}/script/tpl/log4j2.xml ${SOURCE_CODE_DIR}/resources
-    cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
+    #cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     
     #modify weidentity properties
     export ORG_ID=${org_id}
@@ -105,17 +103,21 @@ function compile()
     export MYSQL_PASSWORD=${mysql_password}
     VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
     envsubst ${VARS} < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
-    cp  ${WEIDENTITY_CONFIG} ${SOURCE_CODE_DIR}/resources
-    
-    
-    if [ -d ${SOURCE_CODE_DIR}/dist/app ];then
-        rm -rf ${SOURCE_CODE_DIR}/dist/app
+
+    if [ -f build.gradle ]; then
+        chmod u+x gradlew
+        if [ -d ${SOURCE_CODE_DIR}/dist/app ];then
+            rm -rf ${SOURCE_CODE_DIR}/dist/app
+        fi
+        if [[ ${OFFLINE_MODE} == "1" ]];then
+            ./gradlew clean build --offline
+        else
+            ./gradlew clean build
+        fi
     fi
-    if [[ ${OFFLINE_MODE} == "1" ]];then
-        ./gradlew clean build --offline
-    else
-        ./gradlew clean build
-    fi
+    
+    cp ${WEIDENTITY_CONFIG} ${SOURCE_CODE_DIR}/resources
+    cp ${FISCO_XML_CONFIG} ${SOURCE_CODE_DIR}/resources
     build_classpath
     echo "compile finished."
 }
@@ -196,7 +198,6 @@ function main()
     check_parameter
     # setup
     check_jdk
-    chmod u+x gradlew
     compile
     clean_config
 }

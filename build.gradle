@@ -24,7 +24,7 @@ apply plugin: 'idea'
 apply plugin: 'signing'
 group = 'com.webank'
 
-version = "1.0.12"
+version = "1.0.12-rc.16-SNAPSHOT"
 def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios
@@ -119,6 +119,7 @@ dependencies {
             compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
+                exclude group: "javax.validation", module: "validation-api"
             }
         }
     }
@@ -129,13 +130,14 @@ dependencies {
             compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
+                exclude group: "javax.validation", module: "validation-api"
             }
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')
             annotationProcessor files('dist/lib/lombok-1.18.12.jar')
         }
     }
-    compile fileTree(dir: 'ext', include: '*.jar')
+    compile fileTree(dir: 'common/ext', include: '*.jar')
 }
 
 sourceSets {
@@ -189,20 +191,40 @@ jar {
     archiveName project.name + '-' + version + '.jar'
     // 这句会改变maven包的包名，谨慎
     // classifier = 'boot'
-    def outputs = file("./")
     into('file/tools') {
         from 'tools/'
     }
-    into('file/script') {
-        from 'script/'
+    into('file/common/script') {
+        from 'common/script/'
+        excludes = ["build_tools_ci.sh", "install_build_tool.sh"]
     }
-    into('file/ext') {
-        from 'ext/'
+    into('file/common/ext') {
+        from fileTree(file("./common/ext")){
+            //自定义过滤规则
+            excludes = ["*.jar"]
+        }
+    }
+    into('file/resources') {
+        from 'src/main/resources/log4j2.xml'
+    }
+    into('file/dist/conf') {
+        from 'src/main/resources/application.properties'
+    }
+    
+    into('file/dist/lib') {
+        from fileTree(file("./common/ext")){
+            //自定义过滤规则
+            includes = ["*.jar"]
+        }
+    }
+    into('file/dist/app') {
+        from 'resources/.gitkeep'
     }
     into('file') {
        from fileTree(file("./")){
             //自定义过滤规则
             includes = ["*.sh", "*.config"]
+            excludes = ["build.sh"]
         }
     }
     // excludes = ["*.xml", "*.properties"]
@@ -213,7 +235,7 @@ jar {
             into 'resources/'
         }
         copy {
-            from file('resources/')
+            from file('src/main/resources/application.properties')
             into 'dist/conf'
         }
         if (!gradle.startParameter.isOffline()) {

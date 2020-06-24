@@ -42,7 +42,7 @@ public class CreateWeId extends StaticConfig {
     private static BuildToolService buildToolService = new BuildToolService();
 
     /**
-     * @param args
+     * @param args 入参
      */
     public static void main(String[] args) {
         logger.info("[CreateWeId] begin create weId.");

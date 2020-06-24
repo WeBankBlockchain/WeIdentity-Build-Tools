@@ -46,7 +46,6 @@ import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.service.impl.engine.EngineFactory;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
@@ -209,8 +208,8 @@ public class DeployService {
     
     /**
      * 根据hash从链上获取地址信息.
-     * @param hash
-     * @return
+     * @param hash 获取部署数据的hash值
+     * @return 返回当前hash的部署信息
      */
     public DeployInfo getDeployInfoByHashFromChain(String hash) {
         //判断本地是否有次hash记录
@@ -326,7 +325,7 @@ public class DeployService {
     
     /**
      * 给当前账户创建WeId.
-     * @param from
+     * @param from 创建来源
      */
     public void createWeIdForCurrentUser(DataFrom from) {
         //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId
@@ -430,7 +429,7 @@ public class DeployService {
 
     /**
      * 获取群组列表
-     * @return
+     * @return 返回群组列表
      */
     public List<String> getAllGroup() {
         try {
@@ -447,7 +446,7 @@ public class DeployService {
     
     /**
      * 获取所有的hash列表
-     * @return
+     * @return 返回shareInfo列表数据
      */
     public List<ShareInfo> getShareList() {
         List<ShareInfo> result = new ArrayList<ShareInfo>();
@@ -491,7 +490,9 @@ public class DeployService {
     
     /**
      * 根据群组部署Evidence合约.
+     * @param fiscoConfig 当前配置信息
      * @param groupId 群组编号
+     * @param from 部署来源
      * @return 返回是否部署成功
      */
     public String deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {

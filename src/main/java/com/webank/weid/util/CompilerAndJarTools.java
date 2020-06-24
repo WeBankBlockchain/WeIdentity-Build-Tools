@@ -137,9 +137,6 @@ public class CompilerAndJarTools {
      * @param rootPath    class文件根目录
      * @param targetPath  需要将jar存放的路径
      * @param jarFileName jar文件的名称
-     * @Description: 根据class生成jar文件
-     * @Author zhangchengping
-     * @Date 2019-06-06 23:56
      */
     public static void createTempJar(String rootPath, String targetPath, String jarFileName) throws IOException {
         if (!new File(rootPath).exists()) {

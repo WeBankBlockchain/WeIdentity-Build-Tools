@@ -206,8 +206,10 @@ public class BuildToolService {
     
     /**
      * 部署admin的weid
-     * @param arg
-     * @param from
+     * @param arg 创建weId的参数
+     * @param from 数据来源
+     * @param isAdmin 是否为管理员
+     * @return 返回创建weId结果
      */
     public String createWeId(CreateWeIdArgs arg, DataFrom from, boolean isAdmin) {
         ResponseData<String> response = getWeIdService().createWeId(arg);
@@ -225,8 +227,8 @@ public class BuildToolService {
     
     /**
      * 检查weid是否存在
-     * @param weId
-     * @return
+     * @param weId 需要被检查的WeId
+     * @return 返回weId是否存在
      */
     public boolean checkWeId(String weId) {
         ResponseData<Boolean> response = getWeIdService().isWeIdExist(weId);
@@ -343,9 +345,10 @@ public class BuildToolService {
     
     /**
      * 注册issuer.
-     * @param weId the weId
-     * @param name the name
-     * @return true is success, others fail.
+     * @param weId 被注册成issuer的WeId
+     * @param name 注册issuer名
+     * @param from 数据来源
+     * @return 返回注册结果，true表示成功，false表示失败
      */
     public String registerIssuer(String weId, String name, DataFrom from) {
         logger.info("[registerIssuer] begin register authority issuer..., weId={}, name={}", weId, name);
@@ -717,7 +720,11 @@ public class BuildToolService {
     
     /**
      * 根据CPT文件生成java源文件
-     * @throws Exception 
+     * @param cptFile cpt文件
+     * @param cptId cptId
+     * @param pojoId 转换成pojo的Id
+     * @param fromType 转换来源
+     * @throws Exception 异常抛出
      */
     public void generateJavaCodeByCpt(File cptFile, Integer cptId, String pojoId, String fromType) throws Exception {
         String fileName = cptFile.getName();
@@ -764,8 +771,11 @@ public class BuildToolService {
     
     /**
      * 根据java文件生成jar包
-     * @param sourceFile
-     * @return 返回jar包路径
+     * @param sourceFile 源文件路径
+     * @param cptIds jar包含的cpt集合
+     * @param fromType  转换来源
+     * @param from  数据来源
+     * @return 返回是否创建成功
      */
     public boolean createJar(File sourceFile, Integer[] cptIds, String fromType, DataFrom from) {
         logger.info("[createJar] begin create jar.");
@@ -866,6 +876,7 @@ public class BuildToolService {
      * convert policy to cpt pojo.
      *
      * @param policyJson the policy JSON
+     * @return 返回披露策略文件中cpt集合
      */
     public ResponseData<List<CptFile>> generateCptFileListByPolicy(String policyJson) {
         List<CptFile> cptFileList = new ArrayList<CptFile>();

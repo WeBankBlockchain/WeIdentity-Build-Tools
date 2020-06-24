@@ -24,7 +24,7 @@ public class DateFormatUtils {
 
     /**
      * 获取当天凌晨
-     * @return
+     * @return 返回当然凌晨时间
      */
     public static Date getTimesmorning() {
         Calendar cal = Calendar.getInstance();

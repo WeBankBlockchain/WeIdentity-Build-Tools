@@ -2,8 +2,8 @@
 
 # base path
 ROOT_DIR=$(pwd)
-WEIDENTITY_CRON_JOB_TPL=$ROOT_DIR/script/tpl/weidentity-cron-job.tpl
-WEIDENTITY_CRON_JOB=$ROOT_DIR/script/tpl/weidentity-cron-job
+WEIDENTITY_CRON_JOB_TPL=$ROOT_DIR/common/script/tpl/weidentity-cron-job.tpl
+WEIDENTITY_CRON_JOB=$ROOT_DIR/common/script/tpl/weidentity-cron-job
 
 # default configuration
 export CRONTAB_TIME="0 1 * * *"

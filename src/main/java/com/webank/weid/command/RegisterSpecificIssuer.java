@@ -42,7 +42,7 @@ public class RegisterSpecificIssuer extends StaticConfig {
     private static BuildToolService buildToolService = new BuildToolService();
 
     /**
-     *
+     * @param args 入参
      */
     public static void main(String[] args) {
 

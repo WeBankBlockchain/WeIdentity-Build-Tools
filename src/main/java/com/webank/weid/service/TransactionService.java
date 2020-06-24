@@ -308,7 +308,6 @@ public class TransactionService {
     
     /**
      * 分页查询binLog记录,包括条件查询
-     * @return
      */
     public void queryBinLogList(PageDto<BinLog> pageDto, BinLog binLog) {
         StringBuffer queryDataSql = new StringBuffer(
@@ -339,7 +338,6 @@ public class TransactionService {
     
     /**
      * 分页查询异步记录
-     * @return
      */
     public void queryAsyncList(PageDto<AsyncInfo> pageDto, AsyncInfo asyncInfo) {
         StringBuffer queryData = new StringBuffer(SqlConstant.DML_SELECT_ASYNC_INFO);

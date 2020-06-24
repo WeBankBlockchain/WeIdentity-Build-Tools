@@ -183,7 +183,7 @@ public class ConfigService {
     
     private void generateFiscoProperties(Map<String, String> loadConfig) {
         logger.info("[generateFiscoProperties] begin generate fisco.properties...");
-        String fileStr = FileUtils.readFile("script/tpl/fisco.properties.tpl");
+        String fileStr = FileUtils.readFile("common/script/tpl/fisco.properties.tpl");
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
         fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
         fileStr = fileStr.replace("${GROUP_ID}", loadConfig.get("group_id"));
@@ -200,7 +200,7 @@ public class ConfigService {
     
     private void generateWeidentityProperties(Map<String, String> loadConfig) {
         logger.info("[generateWeidentityProperties] begin generate weidentity.properties...");
-        String fileStr = FileUtils.readFile("script/tpl/weidentity.properties.tpl");
+        String fileStr = FileUtils.readFile("common/script/tpl/weidentity.properties.tpl");
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
         
@@ -234,7 +234,7 @@ public class ConfigService {
     
     /**
      * 启用CNS.
-     * @param hash
+     * @param hash 需要启用的cns值
      */
     public void enableHash(String hash) {
         //更新cns配置

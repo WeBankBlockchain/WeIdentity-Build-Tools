@@ -24,7 +24,7 @@ apply plugin: 'idea'
 apply plugin: 'signing'
 group = 'com.webank'
 
-version = "1.0.12-rc.16-SNAPSHOT"
+version = "1.0.13"
 def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios
@@ -147,6 +147,7 @@ sourceSets {
         }
         resources {
             srcDirs = ['src/main/resources']
+            excludes = ["*.xml", "*.properties", "*.crt", "*.key"]
         }
     }
 }
@@ -192,16 +193,13 @@ jar {
     // 这句会改变maven包的包名，谨慎
     // classifier = 'boot'
     into('file/tools') {
-        from 'tools/'
+        from fileTree(file("tools/")){
+            excludes = ["test_data"]
+        }
     }
     into('file/common/script') {
-        from 'common/script/'
-        excludes = ["build_tools_ci.sh", "install_build_tool.sh"]
-    }
-    into('file/common/ext') {
-        from fileTree(file("./common/ext")){
-            //自定义过滤规则
-            excludes = ["*.jar"]
+        from fileTree(file("common/script/")){
+            excludes = ["build_tools_ci.sh", "install_build_tool.sh", "**/*.properties"]
         }
     }
     into('file/resources') {
@@ -210,7 +208,6 @@ jar {
     into('file/dist/conf') {
         from 'src/main/resources/application.properties'
     }
-    
     into('file/dist/lib') {
         from fileTree(file("./common/ext")){
             //自定义过滤规则
@@ -223,12 +220,13 @@ jar {
     into('file') {
        from fileTree(file("./")){
             //自定义过滤规则
-            includes = ["*.sh", "*.config"]
+            includes = ["*.sh"]
             excludes = ["build.sh"]
         }
+        from 'common/script/tpl/run.config.tpl'
+        rename('run.config.tpl', 'run.config')
     }
-    // excludes = ["*.xml", "*.properties"]
-   
+
     doLast {
         copy {
             from file('src/main/resources/log4j2.xml')

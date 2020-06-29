@@ -24,7 +24,7 @@ apply plugin: 'idea'
 apply plugin: 'signing'
 group = 'com.webank'
 
-version = "1.0.13"
+version = "1.0.12"
 def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios

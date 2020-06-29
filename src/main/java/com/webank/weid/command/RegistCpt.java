@@ -52,8 +52,9 @@ public class RegistCpt extends StaticConfig {
     private static BuildToolService buildToolService = new BuildToolService();
 
     private static WeIdService weIdService = new WeIdServiceImpl();
+
     /**
-     * @param args
+     * @param args 入参
      */
     public static void main(String[] args) {
 

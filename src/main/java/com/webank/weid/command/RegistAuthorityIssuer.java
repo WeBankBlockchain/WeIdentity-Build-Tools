@@ -40,7 +40,7 @@ public class RegistAuthorityIssuer extends StaticConfig {
     private static BuildToolService buildToolService = new BuildToolService();
 
     /**
-     * @param args
+     * @param args 入参
      */
     public static void main(String[] args) {
 

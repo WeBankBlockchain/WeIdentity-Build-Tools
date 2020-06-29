@@ -1,10 +1,10 @@
 #!/bin/bash
-source ./script/common.inc
+source ./common/script/common.inc
 source run.config
 set -e
 
 #SOURCE_CODE_DIR=$(pwd)
-applicationFile=${SOURCE_CODE_DIR}/src/main/resources/application.properties
+applicationFile=${SOURCE_CODE_DIR}/dist/conf/application.properties
 port=$(grep "server\.port" $applicationFile |awk -F "=" '{print $2}')
 
 function reloadAddressForWeb() {

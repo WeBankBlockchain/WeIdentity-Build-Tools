@@ -21,7 +21,11 @@ apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-version = "1.0.12"
+apply plugin: 'signing'
+group = 'com.webank'
+
+version = "1.0.13"
+def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios
 sourceCompatibility = 1.8
@@ -36,9 +40,12 @@ repositories {
         }
     } else {
         mavenLocal()
-        mavenCentral()
-        maven {
-            url "http://maven.aliyun.com/nexus/content/groups/public/"
+        if ("cn" == repo) {
+            println "use cn repo"
+            maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        } else {
+            println "use default repo"
+            mavenCentral()
         }
         maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url "https://oss.sonatype.org/content/groups/public/" }
@@ -77,6 +84,24 @@ List mysql_driver = [
         "mysql:mysql-connector-java:8.0.20"
 ]
 
+def spring_version = "5.2.2.RELEASE"
+List spring = [
+        "org.springframework:spring-aop:$spring_version",
+        "org.springframework:spring-beans:$spring_version",
+        "org.springframework:spring-context:$spring_version",
+        "org.springframework:spring-core:$spring_version",
+        "org.springframework:spring-jcl:$spring_version",
+        "org.springframework:spring-jdbc:$spring_version",
+        "org.springframework:spring-test:$spring_version",
+        "org.springframework:spring-messaging:$spring_version",
+        "org.springframework:spring-tx:$spring_version"
+]
+
+def gson_version = "2.8.6"
+List gson = [
+        "com.google.code.gson:gson:$gson_version"
+]
+
 configurations {
    localDeps
    all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
@@ -88,26 +113,31 @@ configurations {
 dependencies {
     localDeps lombok
     compile('org.springframework.boot:spring-boot-starter-web')
-    //compile("org.springframework.boot:spring-boot-devtools")
     compile("org.springframework.boot:spring-boot-starter-websocket")
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
-            compile lombok, jcommander, log4j, json, mysql_driver
-            compile("com.webank:weid-java-sdk:${weidSdkVersion}")
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
+            compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
+                exclude group: "org.springframework", module: "*"
+                exclude group: "javax.validation", module: "validation-api"
+            }
         }
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.18.12'
             annotationProcessor 'org.projectlombok:lombok:1.18.12'
-            compile lombok, jcommander, log4j, json, mysql_driver
-			compile("com.webank:weid-java-sdk:${weidSdkVersion}")
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
+			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
+                exclude group: "org.springframework", module: "*"
+                exclude group: "javax.validation", module: "validation-api"
+            }
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')
             annotationProcessor files('dist/lib/lombok-1.18.12.jar')
         }
     }
-    compile fileTree(dir: 'ext', include: '*.jar')
+    compile fileTree(dir: 'common/ext', include: '*.jar')
 }
 
 sourceSets {
@@ -117,9 +147,27 @@ sourceSets {
         }
         resources {
             srcDirs = ['src/main/resources']
+            excludes = ["*.xml", "*.properties", "*.crt", "*.key"]
         }
     }
 }
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+    archives javadocJar
+}
+
 
 bootRun {
    systemProperty "jdk.tls.namedGroups", "${jdkTlsNamedGroups}"
@@ -131,24 +179,61 @@ eclipse {
     }
 }
 
+clean {
+ delete "dist"
+ delete "resources/fisco.properties"
+ delete "resources/weidentity.properties"
+}
+
 jar {
     enabled = true
+    baseName = 'weid-build-tools'
     destinationDir file('dist/app')
     archiveName project.name + '-' + version + '.jar'
-    classifier = 'boot'
-    excludes = ["*.jar","*.key","*.ttf","*.crt","*.xml","*.properties"]
-    
-    doLast {
-        copy {
-            from file('ext/NotoSansCJKtc-Regular.ttf')
-            into 'resources/'
+    // 这句会改变maven包的包名，谨慎
+    // classifier = 'boot'
+    into('file/tools') {
+        from fileTree(file("tools/")){
+            excludes = ["test_data"]
         }
+    }
+    into('file/common/script') {
+        from fileTree(file("common/script/")){
+            excludes = ["build_tools_ci.sh", "install_build_tool.sh", "**/*.properties"]
+        }
+    }
+    into('file/resources') {
+        from 'src/main/resources/log4j2.xml'
+    }
+    into('file/dist/conf') {
+        from 'src/main/resources/application.properties'
+    }
+    into('file/dist/lib') {
+        from fileTree(file("./common/ext")){
+            //自定义过滤规则
+            includes = ["*.jar"]
+        }
+    }
+    into('file/dist/app') {
+        from 'resources/.gitkeep'
+    }
+    into('file') {
+       from fileTree(file("./")){
+            //自定义过滤规则
+            includes = ["*.sh"]
+            excludes = ["build.sh"]
+        }
+        from 'common/script/tpl/run.config.tpl'
+        rename('run.config.tpl', 'run.config')
+    }
+
+    doLast {
         copy {
             from file('src/main/resources/log4j2.xml')
             into 'resources/'
         }
-     	copy {
-            from file('resources/')
+        copy {
+            from file('src/main/resources/application.properties')
             into 'dist/conf'
         }
         if (!gradle.startParameter.isOffline()) {
@@ -157,6 +242,65 @@ jar {
                 from configurations.localDeps
                 into 'dist/lib'
             }
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'weid-build-tools'
+                packaging 'jar'
+                description 'Java sdk for WeIdentity.'
+                url 'https://github.com/WeBankFinTech/weidentity-contract'
+
+                scm {
+                    url 'scm:git@github.com:WeBankFinTech/weidentity-contract.git'
+                    connection 'scm:git@github.com:WeBankFinTech/weidentity-contract.git'
+                    developerConnection 'git@github.com:WeBankFinTech/weidentity-contract.git'
+                }
+
+                licenses {
+                    license {
+                        name 'GNU Lesser General Public License version 3'
+                        url 'https://opensource.org/licenses/LGPL-3.0'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'tonychen'
+                        name 'tonychen'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+ 	required { gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'assemble' }) {
+        tasks.findAll {
+            it.name == 'signArchives' || it.name == 'signDocsJar' || it.name == 'signTestJar'
+        }.each { task ->
+            task.enabled = false
         }
     }
 }

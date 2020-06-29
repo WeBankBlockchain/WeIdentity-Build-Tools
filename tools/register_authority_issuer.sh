@@ -2,7 +2,7 @@
 
 cd ..
 source run.config
-source ./script/common.inc
+source ./common/script/common.inc
 
 if [ $# -lt 2 ] ;then
 	echo "input error."

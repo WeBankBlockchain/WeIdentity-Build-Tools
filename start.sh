@@ -1,9 +1,9 @@
 #!/bin/bash
-source ./script/common.inc
+source ./common/script/common.inc
 
 set -e
 
-applicationFile=${SOURCE_CODE_DIR}/src/main/resources/application.properties
+applicationFile=${SOURCE_CODE_DIR}/dist/conf/application.properties
 
 buildTool_pid=
 running=false
@@ -27,7 +27,7 @@ checkServer() {
 CLASSPATH=${SOURCE_CODE_DIR}/resources:${SOURCE_CODE_DIR}/dist/app/*:${SOURCE_CODE_DIR}/dist/lib/*
 
 #set the application.properties in to classpath
-CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/src/main/resources/
+CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/dist/conf/
 
 getPid;
 
@@ -37,7 +37,7 @@ if [ -n "$buildTool_pid" ];then
 fi
 
 #start the application
-nohup java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.app.BuildToolApplication &> nohup.out &
+nohup java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.app.BuildToolApplication &> /dev/null&
 
 echo -n "starting..."
 
@@ -58,10 +58,10 @@ echo
 
 if [ ${running} = true ];then
     echo "the server start successfully."
-    echo "the server url:  http://localhost:"${port}"/index.html"
+    echo "the server url:  http://127.0.0.1:"${port}"/index.html"
 else 
     if [ $count == 30 ]; then
-        echo "the server start timeout, please restart the server."
+        echo "the server start timeout, please check the log -> ./logs/error.log."
         exit 1;
     fi
     echo "the server start error, please check the log."

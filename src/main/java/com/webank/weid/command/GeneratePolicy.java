@@ -38,8 +38,9 @@ public class GeneratePolicy {
     private static final Logger logger = LoggerFactory.getLogger(GeneratePolicy.class);
     
     private static BuildToolService buildToolService = new BuildToolService();
+
     /**
-     * @param args
+     * @param args 入参
      */
     public static void main(String[] args) {
 

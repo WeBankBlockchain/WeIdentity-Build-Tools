@@ -199,7 +199,7 @@ jar {
     }
     into('file/common/script') {
         from fileTree(file("common/script/")){
-            excludes = ["build_tools_ci.sh", "install_build_tool.sh", "**/*.properties"]
+            excludes = ["build_tools_ci.sh", "install_build_tool.sh", "**/*.properties", "install"]
         }
     }
     into('file/resources') {

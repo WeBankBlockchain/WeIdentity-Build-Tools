@@ -21,7 +21,11 @@ done
 if [ ! -d "weid-install-tools" ];then
 	if [ ! -f "weid-install-tools.zip" ]; then
 		echo "begin download the weid-install-tools.zip..."
-		wget -c https://www.fisco.com.cn/cdn/weevent/weidentity/download/releases/weid-install-tools.zip
+		if [[ ${repo} == "cn" ]];then
+		  wget -c https://www.fisco.com.cn/cdn/weevent/weidentity/download/releases/weid-install-tools.zip
+		else 
+		  wget -c https://github.com/WeBankFinTech/weid-build-tools/raw/master/common/script/install/weid-install-tools.zip
+		fi
 	fi
 	# unzip weid-install-tools.zip
 	unzip weid-install-tools.zip

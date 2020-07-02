@@ -58,6 +58,8 @@ public class BuildWebSocket {
 
     /**
      * 发生错误时调用
+     * @param session 回话请求
+     * @param error 异常堆栈
      */
     @OnError
     public void onError(Session session, Throwable error) {

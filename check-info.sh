@@ -287,6 +287,7 @@ function check_node_version() {
 			done
 		fi
 	fi
+	rm -rf sdk.out
 }
 
 function get_the_version() {

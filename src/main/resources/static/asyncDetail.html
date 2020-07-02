@@ -13,6 +13,12 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <script src="dist/js/include.js"></script>
+  <style type="text/css">
+  	.content-header .has_backicon .backicon{
+      display: inline-block;
+      width:60px;
+    }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -28,14 +34,18 @@
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0 text-dark">异步上链管理</h1>
+          <div class="col-sm-6 has_backicon">
+            <h1 class="m-0 text-dark">
+              <!-- <img src="./dist/img/back.svg" alt="" class='backicon' onClick="javascript:history.back(-1)"> -->
+              <button class='backicon btn btn-primary' onClick="javascript:history.back(-1)">返回</button>
+              每日任务
+            </h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">主页</a></li>
-              <li class="breadcrumb-item active"><a href="#"><a href="javascript:history.back(-1)">异步任务列表</a></a></li>
-              <li class="breadcrumb-item">异步处理详情</li>
+              <li class="breadcrumb-item"><a href="#">异步上链管理</a></li>
+              <li class="breadcrumb-item active"><a href="javascript:history.back(-1)">异步任务列表</a></li>
+              <li class="breadcrumb-item">每日任务</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -46,7 +56,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <div class="form-group row">
+        <div class="form-group row" style='display:none'>
            <label for="version" class="col-sm-0 col-form-label">同步日期</label>
            <div class="col-sm-2">
               <input type="text" class="form-control" id="batch" placeholder="yyyy-MM-dd">

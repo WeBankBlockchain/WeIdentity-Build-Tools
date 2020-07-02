@@ -29,11 +29,11 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">功能管理</h1>
+            <h1 class="m-0 text-dark">凭证类型(CPT)管理</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">主页</a></li>
+              <li class="breadcrumb-item"><a href="#">功能管理</a></li>
               <li class="breadcrumb-item active">凭证类型(CPT)管理</li>
             </ol>
           </div><!-- /.col -->
@@ -57,7 +57,12 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th width="70px">选择</th>
+                  <th width="100px">选择
+                      <div class="custom-control custom-checkbox" style="float: right;padding-right: 36px">
+                        <input class="custom-control-input" type="checkbox" id="selectAll" onclick="" name="selectAll" value="0">
+                        <label for="selectAll" class="custom-control-label"></label>
+                      </div>
+                  </th>
                   <th>cptId</th>
                   <th>数据来源</th>
                   <th>owner</th>
@@ -70,7 +75,7 @@
                 <tr class="display-none">
                   <td align="center" valign="middle">
                       <div class="custom-control custom-checkbox" style="margin-top: 9px">
-					    <input class="custom-control-input" type="checkbox" id="${cptId}" onclick="clickCptId(this)" name="cptId" value="${cptId}">
+					    <input class="custom-control-input" type="checkbox" id="${cptId}" onclick="clickCptId(this, true)" name="cptId" value="${cptId}">
 					    <label for="${cptId}" class="custom-control-label"></label>
 					  </div>
                   </td>

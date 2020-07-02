@@ -61,7 +61,7 @@ public class SqlConstant {
         + "  updated datetime DEFAULT NULL COMMENT '更新时间', "
         + "  PRIMARY KEY (id), "
         + "  UNIQUE KEY uq_woti_rid (request_id), "
-        + "  key idx_woti_bts (batch, status) "
+        + "  key idx_woti_btsi (batch, status, id) "
         + " ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='WeIdentity离线交易记录表'; ";
     
     // 查询时间范围内待上链的数据(包括带上链状态数据 和 上链失败数据)
@@ -75,11 +75,15 @@ public class SqlConstant {
         + " id, request_id, transaction_method, transaction_args, transaction_timestamp,"
         + " extra, batch, status, created, updated "
         + " from " + TABLE_NAME_OFFLINE_TRANSACTION_INFO + " where request_id = ? status = 2";
-    
+
     public static final String DML_SELECT_OFFLINE_TRANSACTION_FOR_PAGE = " select "
-        + " id, request_id, transaction_method, transaction_args, transaction_timestamp,"
-        + " extra, batch, status, created, updated"
-        + " from " + TABLE_NAME_OFFLINE_TRANSACTION_INFO + " where batch = ? ";
+            + " t.id, request_id, transaction_method, transaction_args, transaction_timestamp,"
+            + " extra, batch, status, created, updated"
+            + " from " + TABLE_NAME_OFFLINE_TRANSACTION_INFO + " t "
+            + " INNER JOIN ("
+            + " SELECT id FROM " + TABLE_NAME_OFFLINE_TRANSACTION_INFO + " where batch = ? $1 "
+            + " LIMIT ?,?"
+            + " ) AS i ON t.id = i.id";
     
     public static final String DML_SELECT_OFFLINE_TRANSACTION_COUNT = " select count(1) data from "
         + TABLE_NAME_OFFLINE_TRANSACTION_INFO +" where batch = ? ";

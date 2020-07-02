@@ -55,6 +55,7 @@ public class TransactionService {
     *  处理异步上链入口
     * @param time 定时任务传入当前时间，页面重试传入记录时间
     * @param asyncStatus 异步处理状态，定时任务传入0(目的是避免定时任务重复处理)， 页面重试传入3(失败)
+    * @return 返回批量处理结果
     */
     public boolean batchTransaction(int time, AsyncStatus asyncStatus) {
         try {
@@ -308,7 +309,8 @@ public class TransactionService {
     
     /**
      * 分页查询binLog记录,包括条件查询
-     * @return
+     * @param pageDto 分页操作实体对象
+     * @param binLog 查询条件实体
      */
     public void queryBinLogList(PageDto<BinLog> pageDto, BinLog binLog) {
         StringBuffer queryDataSql = new StringBuffer(
@@ -327,12 +329,10 @@ public class TransactionService {
             int allCount = JdbcHelper.queryCount(queryCountSql.toString(), params.toArray());
             pageDto.setAllCount(allCount);
             
-            where.append(" limit ?,? ");
             params.add(pageDto.getStartIndex());
             params.add(pageDto.getPageSize());
-            queryDataSql.append(where.toString());
-            List<BinLog> list = JdbcHelper.queryList(
-                queryDataSql.toString(), BinLog.class, params.toArray());
+            String sql = queryDataSql.toString().replace("$1", where.toString());
+            List<BinLog> list = JdbcHelper.queryList(sql, BinLog.class, params.toArray());
             pageDto.setDataList(list);
         } catch (SQLException e) {
             logger.error("queryBinLogList fail.", e);
@@ -341,7 +341,8 @@ public class TransactionService {
     
     /**
      * 分页查询异步记录
-     * @return
+     * @param pageDto 分页操作实体
+     * @param asyncInfo 查询条件实体
      */
     public void queryAsyncList(PageDto<AsyncInfo> pageDto, AsyncInfo asyncInfo) {
         StringBuffer queryData = new StringBuffer(SqlConstant.DML_SELECT_ASYNC_INFO);
@@ -376,6 +377,8 @@ public class TransactionService {
     
     /**
      * 页面重试
+     * @param reqeustId 重试请求Id
+     * @return 重试处理结果
      */
     public boolean reTryTransaction(int reqeustId) {
         // 根据id查询交易记录

@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
 import com.sun.codemodel.JCodeModel;
 import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
@@ -61,9 +62,11 @@ import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.ClaimPolicy;
 import com.webank.weid.protocol.base.Cpt;
 import com.webank.weid.protocol.base.CptBaseInfo;
+import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.protocol.base.PresentationPolicyE;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.protocol.base.WeIdPublicKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.request.RegisterAuthorityIssuerArgs;
@@ -76,6 +79,8 @@ import com.webank.weid.rpc.WeIdService;
 import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
+import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
+import com.webank.weid.service.impl.engine.EngineFactory;
 import com.webank.weid.util.CompilerAndJarTools;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
@@ -130,6 +135,10 @@ public class BuildToolService {
         return cptService;
     }
     
+    public DataBucketServiceEngine getDataBucket(CnsType cnsType) {
+        return EngineFactory.createDataBucketServiceEngine(cnsType);
+    }
+    
     public String createWeId(DataFrom from) {
         ResponseData<CreateWeIdDataResult> response = getWeIdService().createWeId();
         if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
@@ -137,8 +146,7 @@ public class BuildToolService {
                 "[CreateWeId] create WeID faild. error code : {}, error msg :{}",
                 response.getErrorCode(),
                 response.getErrorMessage());
-            System.out.println("[CreateWeId] create WeID failed.");
-            return StringUtils.EMPTY;
+            return response.getErrorCode() + "-" + response.getErrorMessage();
         }
         CreateWeIdDataResult result = response.getResult();
         String weId = result.getWeId();
@@ -149,30 +157,78 @@ public class BuildToolService {
         return weId;
     }
     
+    // 根据私钥创建weId
+    public String createWeIdByPrivateKey(String privateKey, DataFrom from) {
+        CreateWeIdArgs arg = new CreateWeIdArgs();
+        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
+        weIdPrivateKey.setPrivateKey(privateKey);
+        arg.setWeIdPrivateKey(weIdPrivateKey);
+        arg.setPublicKey(DataToolUtils.publicKeyFromPrivate(new BigInteger(privateKey)).toString());
+        return this.createWeId(arg, from, false);
+    }
+    
+    // 根据公钥代理创建weId(只有主群组管理员才可以调用)
+    public String createWeIdByPublicKey(String publicKey, DataFrom from) {
+        // 判断当前使用的cns是否为当前admin部署的
+        // 获取当前配置的hash值
+        String hash = ConfigUtils.getCurrentHash();
+        // 获取所有的主合约cns值，从而获取当前cns的部署者
+        List<HashContract> result = getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
+        // 当前hash的所有者
+        String currentHashOwner =  null;
+        for (HashContract hashContract : result) {
+            if (hashContract.getHash().equals(hash)) {
+                currentHashOwner = hashContract.getOwner();
+                break;
+            }
+        }
+        // 转换成weid
+        String owner = WeIdUtils.convertAddressToWeId(currentHashOwner);
+        WeIdAuthentication currentWeIdAuth = getCurrentWeIdAuth();
+        // 如果当前weId地址跟 owner地址一致说明是主群组管理员
+        if (currentWeIdAuth.getWeId().equals(owner)) {
+            WeIdPublicKey weidPublicKey = new WeIdPublicKey();
+            weidPublicKey.setPublicKey(publicKey);
+            ResponseData<String> response = getWeIdService().delegateCreateWeId(weidPublicKey, currentWeIdAuth);
+            if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+                logger.error(
+                    "[CreateWeId] create WeID faild. error code : {}, error msg :{}",
+                    response.getErrorCode(),
+                    response.getErrorMessage());
+                return response.getErrorCode() + "-" + response.getErrorMessage();
+            }
+            String weId = response.getResult();
+            saveWeId(weId, publicKey, null, from, false);
+            return weId;
+        }
+        return "create fail: no permission.";
+    }
+    
     /**
      * 部署admin的weid
-     * @param arg
-     * @param from
+     * @param arg 创建weId的参数
+     * @param from 数据来源
+     * @param isAdmin 是否为管理员
+     * @return 返回创建weId结果
      */
-    public String createWeId(CreateWeIdArgs arg, DataFrom from) {
+    public String createWeId(CreateWeIdArgs arg, DataFrom from, boolean isAdmin) {
         ResponseData<String> response = getWeIdService().createWeId(arg);
         if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
             logger.error(
                 "[CreateWeId] create WeID faild. error code : {}, error msg :{}",
                 response.getErrorCode(),
                 response.getErrorMessage());
-            System.out.println("[CreateWeId] create WeID failed.");
-            return "fail";
+            return response.getErrorCode() + "-" + response.getErrorMessage();
         }
         String weId = response.getResult();
-        saveWeId(weId, arg.getPublicKey(), arg.getWeIdPrivateKey().getPrivateKey(), from, true);
+        saveWeId(weId, arg.getPublicKey(), arg.getWeIdPrivateKey().getPrivateKey(), from, isAdmin);
         return weId;
     }
     
     /**
      * 检查weid是否存在
-     * @param weId
-     * @return
+     * @param weId 需要被检查的WeId
+     * @return 返回weId是否存在
      */
     public boolean checkWeId(String weId) {
         ResponseData<Boolean> response = getWeIdService().isWeIdExist(weId);
@@ -195,17 +251,17 @@ public class BuildToolService {
     ) {
         //write weId, publicKey and privateKey to output dir
         File targetDir = getWeidDir(getWeIdAddress(weId));
-        FileUtils.writeToFile(weId, WEID_FILE); //适配命令输出
+        if (from == DataFrom.COMMAND) {
+            FileUtils.writeToFile(weId, WEID_FILE); //适配命令输出
+        }
         FileUtils.writeToFile(weId, new File(targetDir, WEID_FILE).getAbsolutePath());
         FileUtils.writeToFile(publicKey, new File(targetDir, ECDSA_PUB_KEY).getAbsolutePath());
-        FileUtils.writeToFile(privateKey, new File(targetDir, ECDSA_KEY).getAbsolutePath());
+        if (StringUtils.isNotBlank(privateKey)) {
+            FileUtils.writeToFile(privateKey, new File(targetDir, ECDSA_KEY).getAbsolutePath());
+        }
         saveWeIdInfo(weId, publicKey, privateKey, from, isAdmin);
     }
-    
-    public void  deleteWeId() {
-        FileUtils.delete(WEID_FILE);
-    }
-    
+
     public File getWeidDir(String address) {
         address = FileUtils.getSecurityFileName(address);
         File targetDir = new File(WEID_PATH + "/" + ConfigUtils.getCurrentHash() + "/" + address);
@@ -289,9 +345,10 @@ public class BuildToolService {
     
     /**
      * 注册issuer.
-     * @param weId the weId
-     * @param name the name
-     * @return true is success, others fail.
+     * @param weId 被注册成issuer的WeId
+     * @param name 注册issuer名
+     * @param from 数据来源
+     * @return 返回注册结果，true表示成功，false表示失败
      */
     public String registerIssuer(String weId, String name, DataFrom from) {
         logger.info("[registerIssuer] begin register authority issuer..., weId={}, name={}", weId, name);
@@ -663,7 +720,11 @@ public class BuildToolService {
     
     /**
      * 根据CPT文件生成java源文件
-     * @throws Exception 
+     * @param cptFile cpt文件
+     * @param cptId cptId
+     * @param pojoId 转换成pojo的Id
+     * @param fromType 转换来源
+     * @throws Exception 异常抛出
      */
     public void generateJavaCodeByCpt(File cptFile, Integer cptId, String pojoId, String fromType) throws Exception {
         String fileName = cptFile.getName();
@@ -710,8 +771,11 @@ public class BuildToolService {
     
     /**
      * 根据java文件生成jar包
-     * @param sourceFile
-     * @return 返回jar包路径
+     * @param sourceFile 源文件路径
+     * @param cptIds jar包含的cpt集合
+     * @param fromType  转换来源
+     * @param from  数据来源
+     * @return 返回是否创建成功
      */
     public boolean createJar(File sourceFile, Integer[] cptIds, String fromType, DataFrom from) {
         logger.info("[createJar] begin create jar.");
@@ -812,6 +876,7 @@ public class BuildToolService {
      * convert policy to cpt pojo.
      *
      * @param policyJson the policy JSON
+     * @return 返回披露策略文件中cpt集合
      */
     public ResponseData<List<CptFile>> generateCptFileListByPolicy(String policyJson) {
         List<CptFile> cptFileList = new ArrayList<CptFile>();

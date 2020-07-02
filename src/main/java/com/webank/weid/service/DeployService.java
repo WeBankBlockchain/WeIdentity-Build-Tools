@@ -46,7 +46,6 @@ import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.service.impl.engine.EngineFactory;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
@@ -77,9 +76,6 @@ public class DeployService {
     
     private BuildToolService buildToolService = new BuildToolService();
     private DataBaseService dataBaseService = new DataBaseService();
-    public DataBucketServiceEngine getDataBucket(CnsType cnsType) {
-        return EngineFactory.createDataBucketServiceEngine(cnsType);
-    }
     
     public String deploy(FiscoConfig fiscoConfig, DataFrom from) {
         logger.info("[deploy] begin depoly contract...");
@@ -182,7 +178,7 @@ public class DeployService {
             return dataList;
         }
         
-        List<HashContract> result = getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
+        List<HashContract> result = buildToolService.getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
         Map<String, String> cache = new HashMap<String, String>();
         for (HashContract hashContract : result) {
             CnsInfo cns = new CnsInfo();
@@ -212,8 +208,8 @@ public class DeployService {
     
     /**
      * 根据hash从链上获取地址信息.
-     * @param hash
-     * @return
+     * @param hash 获取部署数据的hash值
+     * @return 返回当前hash的部署信息
      */
     public DeployInfo getDeployInfoByHashFromChain(String hash) {
         //判断本地是否有次hash记录
@@ -239,7 +235,7 @@ public class DeployService {
     }
     
     private String getValueFromCns(CnsType cnsType, String hash, String key) {
-        return getDataBucket(cnsType).get(hash, key).getResult();
+        return buildToolService.getDataBucket(cnsType).get(hash, key).getResult();
     }
     
     private static File getDeployFileByHash(String hash) {
@@ -264,7 +260,7 @@ public class DeployService {
             return false;
         }
         //注册weid
-        createWeId(deployInfo, from);
+        createWeId(deployInfo, from, true);
         logger.info("[deploySystemCpt] begin register systemCpt...");
         //部署系统CPT, 
         boolean result = registerSystemCpt(deployInfo);
@@ -309,7 +305,7 @@ public class DeployService {
         return true;
     }
     
-    private void createWeId(DeployInfo deployInfo, DataFrom from) {
+    private void createWeId(DeployInfo deployInfo, DataFrom from, boolean isAdmin) {
         logger.info("[createWeId] begin createWeid for admin");
         CreateWeIdArgs arg = new CreateWeIdArgs();
         arg.setPublicKey(deployInfo.getEcdsaPublicKey());
@@ -319,7 +315,7 @@ public class DeployService {
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
         boolean checkWeId = buildToolService.checkWeId(weId);
         if (!checkWeId) {
-            String result = buildToolService.createWeId(arg, from);
+            String result = buildToolService.createWeId(arg, from, isAdmin);
             logger.info("[createWeId]  createWeId for admin result = {}", result);
             System.out.println("createWeId for admin result = " + result);
         } else {
@@ -329,7 +325,7 @@ public class DeployService {
     
     /**
      * 给当前账户创建WeId.
-     * @param from
+     * @param from 创建来源
      */
     public void createWeIdForCurrentUser(DataFrom from) {
         //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId
@@ -341,7 +337,7 @@ public class DeployService {
         boolean checkWeId = buildToolService.checkWeId(weId);
         if (!checkWeId) {
             logger.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
-            String result = buildToolService.createWeId(arg, from);
+            String result = buildToolService.createWeId(arg, from, true);
             logger.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
         } else {
             logger.info("[createWeIdForCurrentUser] the current weId is exist."); 
@@ -378,11 +374,11 @@ public class DeployService {
         logger.info("[enableHash] begin enable the hash: {}", hash);
         //启用新hash
         WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
-        ResponseData<Boolean> enableHash = getDataBucket(cnsType).enableHash(hash, privateKey);
+        ResponseData<Boolean> enableHash = buildToolService.getDataBucket(cnsType).enableHash(hash, privateKey);
         logger.info("[enableHash] enable the hash {} --> result: {}", hash, enableHash);
         //如果原hash不为空，则停用原hash
         if (StringUtils.isNotBlank(oldHash)) {
-            ResponseData<Boolean> disableHash = getDataBucket(cnsType).disableHash(oldHash, privateKey);
+            ResponseData<Boolean> disableHash = buildToolService.getDataBucket(cnsType).disableHash(oldHash, privateKey);
             logger.info("[enableHash] disable the old hash {} --> result: {}", oldHash, disableHash);
         } else {
             logger.info("[enableHash] no old hash to disable");
@@ -392,7 +388,7 @@ public class DeployService {
     public String removeHash(CnsType cnsType, String hash) {
         logger.info("[removeHash] begin remove the hash: {}", hash);
         WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
-        ResponseData<Boolean> remove = getDataBucket(cnsType).remove(hash, "", privateKey);
+        ResponseData<Boolean> remove = buildToolService.getDataBucket(cnsType).remove(hash, "", privateKey);
         if (remove.getErrorCode().intValue() != ErrorCode.SUCCESS.getCode()) {
             logger.error("[removeHash] remove the hash {} --> result: {}", hash, remove);
             return remove.getErrorCode().intValue() + "-" + remove.getErrorMessage();
@@ -433,7 +429,7 @@ public class DeployService {
 
     /**
      * 获取群组列表
-     * @return
+     * @return 返回群组列表
      */
     public List<String> getAllGroup() {
         try {
@@ -450,7 +446,7 @@ public class DeployService {
     
     /**
      * 获取所有的hash列表
-     * @return
+     * @return 返回shareInfo列表数据
      */
     public List<ShareInfo> getShareList() {
         List<ShareInfo> result = new ArrayList<ShareInfo>();
@@ -460,7 +456,7 @@ public class DeployService {
             logger.warn("[getShareList] the cnsType does not regist, please deploy the evidence.");
             return result;
         }
-        DataBucketServiceEngine dataBucket = getDataBucket(CnsType.SHARE);
+        DataBucketServiceEngine dataBucket = buildToolService.getDataBucket(CnsType.SHARE);
         List<HashContract> list = dataBucket.getAllHash().getResult();
         Map<String, String> cache = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(list)) {
@@ -494,7 +490,9 @@ public class DeployService {
     
     /**
      * 根据群组部署Evidence合约.
+     * @param fiscoConfig 当前配置信息
      * @param groupId 群组编号
+     * @param from 部署来源
      * @return 返回是否部署成功
      */
     public String deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {
@@ -548,7 +546,7 @@ public class DeployService {
             info.setNodeVerion(fiscoConfig.getVersion()); 
         }
         info.setNodeAddress(fiscoConfig.getNodes());
-        String evidenceAddress = getDataBucket(CnsType.SHARE).get(
+        String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(
             hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
         info.setEvidenceAddress(evidenceAddress);
         info.setContractVersion(getVersionByClass(WeIdContract.class));
@@ -565,11 +563,11 @@ public class DeployService {
         } else {
             shareInfo = new ShareInfo();
             shareInfo.setHash(hash);
-            String groupId = getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
+            String groupId = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
             if(StringUtils.isNotBlank(groupId)) {
                 shareInfo.setGroupId(Integer.parseInt(groupId));
             }
-            String evidenceAddress = getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
+            String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
             if(StringUtils.isNotBlank(evidenceAddress)) {
                 shareInfo.setEvidenceAddress(evidenceAddress);
             }
@@ -597,7 +595,7 @@ public class DeployService {
         try {
             List<String> allGroup = getAllGroup();
             // 查询hash对应的群组
-            String groupId = getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
+            String groupId = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
             if (!allGroup.contains(groupId)) {
                 logger.error("[enableShareCns] the groupId of hash is not in your groupList. groupId = {}" , groupId);
                 return false;

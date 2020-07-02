@@ -27,11 +27,11 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">功能管理</h1>
+            <h1 class="m-0 text-dark">WeID管理</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">主页</a></li>
+              <li class="breadcrumb-item"><a href="#">功能管理</a></li>
               <li class="breadcrumb-item active">WeID管理</li>
             </ol>
           </div><!-- /.col -->
@@ -43,7 +43,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-inline btn-primary btn-flat">创建WeID</button>
+        <button type="button" id="showCreateBtn" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-show-create-weid" class="btn btn-inline btn-primary btn-flat">创建WeID</button>
         <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">什么是WeID?</a>
       </div>
       <div class="row">
@@ -150,6 +150,107 @@
     </div>
     <!-- /.modal-dialog -->
   </div>
+  
+  <!-- 显示创建weId按钮 -->
+  <div class="modal fade" id="modal-show-create-weid">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">创建WeID</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <div class="form-group">
+	          <button type="button" id="createBtn1" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-create-by-privateKey" class="btn btn-block btn-primary btn-flat">传入私钥创建WeID</button>
+	        </div>
+	        <div class="form-group">
+              <button type="button" id="createBtn2" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-create-by-publicKey"  class="btn btn-block btn-primary btn-flat">传入公钥创建来代理模式创建WeID</button>
+            </div>
+            <div class="form-group">
+              <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-block btn-primary btn-flat">系统自动创建公私钥来创建WeID</button>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10"><span style="font-size: 13px;color: gray">* 只有是群组的admin，才能作为代理创建WeID。</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  
+  <!-- 上传私钥创建weId -->
+  <div class="modal fade" id="modal-create-by-privateKey">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">传入私钥创建WeID</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          <form id="KeyForm" role="form">
+            <div class="form-group row">
+               <div class="col-sm-12">
+                   <div class="input-group">
+                     <div class="custom-file">
+                       <input type="file" class="custom-file-input" id="privateKey" name="privateKey">
+                       <label id="privateKey-label" class="custom-file-label" for="privateKey">选择私钥文件...</label>
+                     </div>
+                   </div>
+               </div>
+             </div>
+             </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="craeteByPrivBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+    </div>
+    <!-- 上传私钥创建weId -->
+    <div class="modal fade" id="modal-create-by-publicKey">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">传入公钥创建WeID</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          <form id="KeyForm" role="form">
+            <div class="form-group row">
+               <div class="col-sm-12">
+                   <div class="input-group">
+                     <div class="custom-file">
+                       <input type="file" class="custom-file-input" id="publicKey" name="publicKey">
+                       <label id="publicKey-label" class="custom-file-label" for="publicKey">选择公钥文件...</label>
+                     </div>
+                   </div>
+               </div>
+             </div>
+             </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="craeteByPubBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
   <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
@@ -165,6 +266,7 @@
 </script>
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <!-- AdminLTE App -->

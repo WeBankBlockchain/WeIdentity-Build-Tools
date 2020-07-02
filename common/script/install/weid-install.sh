@@ -24,7 +24,7 @@ if [ ! -d "weid-install-tools" ];then
 		if [[ ${repo} == "cn" ]];then
 		  wget -c https://www.fisco.com.cn/cdn/weevent/weidentity/download/releases/weid-install-tools.zip
 		else 
-		  wget -c https://github.com/WeBankFinTech/weid-build-tools/raw/master/common/script/install/weid-install-tools.zip
+		  wget -c https://github.com/WeBankFinTech/WeIdentity-Build-Tools/releases/download/v1.0.12/weid-install-tools.zip
 		fi
 	fi
 	# unzip weid-install-tools.zip

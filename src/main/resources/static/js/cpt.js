@@ -143,6 +143,15 @@ $(document).ready(function(){
     	$("#cptJsonFile").val("");
 		$(".custom-file-label").html("选择CPT文件...");
 	})
+	
+	$("#selectAll").click(function(){
+		var selectAllObj = $(this);
+    	$("input[name=cptId]").each(function(){
+			$(this).get(0).checked = $(selectAllObj).get(0).checked;
+			clickCptId($(this).get(0), false);
+		});
+    	fixSelectAll();
+    });
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -161,6 +170,8 @@ function loadData() {
   	      "ordering": true,
   	      "info": false,
   	      "autoWidth": false,
+  	      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 0 , 6] }],
+  	      "aaSorting": [[1, "asc"]],
   	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
   	    	  "oPaginate": {
@@ -171,7 +182,34 @@ function loadData() {
 	          }
 	      }
   	    });
+  		processTable();
+  		table.on('draw', function () {
+  			processTable();
+  		}); 
 	})
+}
+
+function processTable() {
+	$("#selectAll").get(0).checked = false;
+	fixSelectAll();
+}
+
+function fixSelectAll() {
+	var allCheck = true;
+	if ($("input[name=cptId]").length == 0) {
+		$("#selectAll").get(0).checked = false;
+		return;
+	}
+	$("input[name=cptId]").each(function(){ 
+		if (!$(this).get(0).checked) {
+			allCheck = false;
+		}
+	})
+	if (allCheck) {
+		$("#selectAll").get(0).checked = true;
+	} else {
+		$("#selectAll").get(0).checked = false;
+	}
 }
 
 function queryCptSchema(cptId) {
@@ -199,12 +237,18 @@ Array.prototype.remove = function(val) {
 		this.splice(index, 1); 
 	} 
 };
+
 var cptIds = new Array();
-function clickCptId(thisObj) {
+function clickCptId(thisObj, fix) {
 	if(thisObj.checked){
-    	cptIds.push(thisObj.value);
+		if (cptIds.indexOf(thisObj.value) == -1) {
+			cptIds.push(thisObj.value);
+		}
 	} else {
-		cptIds.remove(thisObj.value)
+		cptIds.remove(thisObj.value);
+	}
+	if (fix) {
+		fixSelectAll();
 	}
 }
 function getCptIds() {

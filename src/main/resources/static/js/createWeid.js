@@ -3,26 +3,94 @@ $(document).ready(function(){
     	return;
     }
     loadData();
+    // 初始化控件
+    bsCustomFileInput.init();
     
     $("#createBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         $($this).addClass("disabled");
+        var btnValue = $($this).html();
         $($this).html("weId创建中,  请稍等...");
-        $("#messageBody").html("<p>weId创建中，请稍等...</p>");
-        $("#modal-message").modal();
         $.get("createWeId",function(value,status){
-            if (value) {
-                $("#messageBody").html("<p>weId创建<span class='success-span'>成功</span>。</p>");
+            if (value == "success") {
+                $("#confirmMessageBody").html("<p>WeID创建<span class='success-span'>成功</span>。</p>");
                 loadData();
+                isClose = true;
+            }  else if (value == "fail") {
+            	 $("#confirmMessageBody").html("<p>WeID创建<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-                $("#messageBody").html("<p>weId创建<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>" + value + "</p>");
             }
-            $($this).html("创建weId");
+            $($this).html(btnValue);
             $($this).removeClass("disabled");
-            $("#modal-message").modal();
+            $("#modal-confirm-message").modal();
         })
+    });
+    
+    $("#craeteByPrivBtn").click(function(){
+        var $this = this;
+        var disabled = $($this).attr("class").indexOf("disabled");
+        if(disabled > 0) return;
+        $($this).addClass("disabled");
+        var btnValue = $($this).html();
+        $($this).html("weId创建中,  请稍等...");
+        var formData = new FormData();
+        formData.append("privateKey", $("#privateKey")[0].files[0]);
+		$.ajax({
+	        url:'createWeIdByPrivateKey', /*接口域名地址*/
+	        type:'post',
+	        data: formData,
+	        contentType: false,
+	        processData: false,
+	        success:function(res) {
+	        	if (res == "success") {
+	                $("#confirmMessageBody").html("<p>WeID创建<span class='success-span'>成功</span>。</p>");
+	                loadData();
+	                isClose = true;
+	            }  else if (res == "fail") {
+	            	 $("#confirmMessageBody").html("<p>WeID创建<span class='fail-span'>失败</span>，请联系管理员。</p>");
+	            } else {
+	            	 $("#confirmMessageBody").html("<p>" + res + "</p>");
+	            }
+	            $($this).html(btnValue);
+	            $($this).removeClass("disabled");
+	            $("#modal-confirm-message").modal();
+	        }
+	    })
+    });
+    
+    $("#craeteByPubBtn").click(function(){
+        var $this = this;
+        var disabled = $($this).attr("class").indexOf("disabled");
+        if(disabled > 0) return;
+        $($this).addClass("disabled");
+        var btnValue = $($this).html();
+        $($this).html("weId创建中,  请稍等...");
+        var formData = new FormData();
+        formData.append("publicKey", $("#publicKey")[0].files[0]);
+		$.ajax({
+	        url:'createWeIdByPublicKey', /*接口域名地址*/
+	        type:'post',
+	        data: formData,
+	        contentType: false,
+	        processData: false,
+	        success:function(res) {
+	        	if (res == "success") {
+	                $("#confirmMessageBody").html("<p>WeID创建<span class='success-span'>成功</span>。</p>");
+	                loadData();
+	                isClose = true;
+	            }  else if (res == "fail") {
+	            	 $("#confirmMessageBody").html("<p>WeID创建<span class='fail-span'>失败</span>，请联系管理员。</p>");
+	            } else {
+	            	 $("#confirmMessageBody").html("<p>" + res + "</p>");
+	            }
+	            $($this).html(btnValue);
+	            $($this).removeClass("disabled");
+	            $("#modal-confirm-message").modal();
+	        }
+	    })
     });
     
     var isClose = false;
@@ -98,10 +166,27 @@ $(document).ready(function(){
             $("#modal-confirm-message").modal();
         })
     });
+
     $('#modal-confirm-message').on('hide.bs.modal', function () {
 		if (isClose) {
 			$("#modal-add-to-issueType").modal("hide");
 			$("#modal-register-issue").modal("hide");
+			$("#modal-show-create-weid").modal("hide");
+			$("#modal-create-by-privateKey").modal("hide");
+			$("#modal-create-by-publicKey").modal("hide");
+		}
+	})
+
+	$('#modal-create-by-privateKey, #modal-create-by-publicKey').on('hide.bs.modal', function () {
+		$("#privateKey").val("");
+		$("#publicKey").val("");
+		$("#privateKey-label").html("选择私钥文件...");
+		$("#publicKey-label").html("选择公钥文件...");
+	})
+	
+	$('#modal-message').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-show-create-weid").modal("hide");
 		}
     	
 	})
@@ -130,6 +215,7 @@ function loadData() {
   		$("#data-tbody").renderData(template,data);
   		table = $('#example2').DataTable({
   	      "paging": true,
+  	      "iDisplayLength": 7,
   	      "lengthChange": false,
   	      "searching": true,
   	      "ordering": true,

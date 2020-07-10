@@ -78,7 +78,7 @@ public class RegisterEvidenceByGroup {
             Credentials credentials = GenCredential.create(new BigInteger(privatekey).toString(16));
             // 加载DataBucket
             DataBucket dataBucket = DataBucket.load(
-                weServer.getBucketAddress(CnsType.DEFAULT), 
+                weServer.getBucketByCns(CnsType.DEFAULT).getAddress(), 
                 (Web3j)weServer.getWeb3j(), 
                 credentials, 
                 new StaticGasProvider(WeIdConstant.GAS_PRICE, WeIdConstant.GAS_LIMIT)
@@ -96,7 +96,7 @@ public class RegisterEvidenceByGroup {
             // 将地址注册到cns中
             CnsType cnsType = CnsType.SHARE;
             // 注册SHARE CNS 默认主群组
-            RegisterAddressV2.registerBucketToCns(cnsType);
+            RegisterAddressV2.registerBucketToCns(cnsType, currentPrivateKey);
             // 根据群组和evidence Address获取hash
             String hash = AddressProcess.getHashForShare(groupId, evidenceAddress);
             // 将evidence地址注册到cns中 默认主群组

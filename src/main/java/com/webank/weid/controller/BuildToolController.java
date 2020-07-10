@@ -8,6 +8,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,15 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.webank.weid.app.BuildToolApplication;
+import com.webank.weid.config.ContractConfig;
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.CnsType;
@@ -34,6 +42,7 @@ import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.ParamKeyConstant;
 import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.contract.deploy.v2.DeployContractV2;
 import com.webank.weid.dto.AsyncInfo;
 import com.webank.weid.dto.BinLog;
 import com.webank.weid.dto.CnsInfo;
@@ -46,6 +55,7 @@ import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.dto.WeIdInfo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
@@ -69,7 +79,7 @@ public class BuildToolController {
     private static boolean nodeCheck = false;
     
     private static boolean dbCheck = false;
-    
+
     @Autowired
     BuildToolService buildToolService;
     
@@ -105,9 +115,16 @@ public class BuildToolController {
         return nodeCheck && dbCheck;
     }
     
+    @Description("是否启用主hash")
     @GetMapping("/isEnableMasterCns")
     public boolean isEnableMasterCns() {
-        return StringUtils.isNotBlank(ConfigUtils.getCurrentHash());
+        return StringUtils.isBlank(buildToolService.getMainHash());
+    }
+    
+    @Description("是否启用Evidence hash")
+    @GetMapping("/isEnableEvidenceCns/{groupId}")
+    public boolean isEnableEvidenceCns(@PathVariable("groupId") String groupId) {
+        return StringUtils.isBlank(buildToolService.getEvidenceHash(groupId));
     }
     
     @PostMapping("/createAdmin")
@@ -132,12 +149,14 @@ public class BuildToolController {
         return deployService.checkAdmin();
     }
     
-    @GetMapping("/deploy")
-    public String deploy() {
+    @GetMapping("/deploy/{chainId}")
+    public String deploy(@PathVariable("chainId") String chainId) {
         logger.info("[deploy] begin load fiscoConfig...");
         try {
             FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+            fiscoConfig.setChainId(chainId);
             String hash = deployService.deploy(fiscoConfig, DataFrom.WEB);
+            configService.updateChainId(chainId);
             logger.info("[deploy] the hash: {}", hash);
             return hash;
         } catch (Exception e) {
@@ -150,12 +169,29 @@ public class BuildToolController {
     public boolean enableHash(@PathVariable("hash") String hash) {
         logger.info("[enableHash] begin load fiscoConfig...");
         try {
-            //获取原配置
+            //  获取老Hash
+            String  oldHash = buildToolService.getMainHash();
+            // 获取原配置
             FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-            //配置启用新hash
-            configService.enableHash(hash);
-            //节点启用新hash并停用原hash
-            deployService.enableHash(CnsType.DEFAULT, hash, fiscoConfig.getCnsContractFollow());
+            WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+            // 获取部署数据
+            DeployInfo deployInfo = deployService.getDeployInfoByHashFromChain(hash);
+            ContractConfig contract = new ContractConfig();
+            contract.setWeIdAddress(deployInfo.getWeIdAddress());
+            contract.setIssuerAddress(deployInfo.getAuthorityAddress());
+            contract.setSpecificIssuerAddress(deployInfo.getSpecificAddress());
+            contract.setEvidenceAddress(deployInfo.getEvidenceAddress());
+            contract.setCptAddress(deployInfo.getCptAddress());
+            if (StringUtils.isNotBlank(deployInfo.getChainId())) {
+                fiscoConfig.setChainId(deployInfo.getChainId());
+            } else {
+                //兼容历史数据
+                fiscoConfig.setChainId(configService.loadConfig().get("chain_id"));
+            }
+            // 写入全局配置中
+            DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+            // 节点启用新hash并停用原hash
+            deployService.enableHash(CnsType.DEFAULT, hash, oldHash);
             //重新加载合约地址
             reloadAddress();
             logger.info("[enableHash] enable the hash {} successFully.", hash);
@@ -188,7 +224,12 @@ public class BuildToolController {
     
     @GetMapping("/getDeployList")
     public LinkedList<CnsInfo> getDeployList() {
-        return deployService.getDeployList();
+        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+        LinkedList<CnsInfo> cnsInfoList = deployService.getDeployList();
+        for (CnsInfo cnsInfo : cnsInfoList) {
+            cnsInfo.setGroupId("group-" + fiscoConfig.getGroupId());
+        }
+        return cnsInfoList;
     }
     
     @GetMapping("/getDeployInfo/{hash}")
@@ -313,7 +354,6 @@ public class BuildToolController {
         String orgId = request.getParameter("orgId");
         String version = request.getParameter("version");
         String ipPort = request.getParameter("ipPort");
-        String chainId = request.getParameter("chainId");
         String groupId = request.getParameter("groupId");
         String profileActive = request.getParameter("cnsProFileActive");
         String privName = request.getParameter("privName");
@@ -321,7 +361,7 @@ public class BuildToolController {
             profileActive = privName;
         }
         //根据模板生成配置文件
-        if(configService.processNodeConfig(ipPort, version, orgId, chainId, groupId, profileActive)) {
+        if(configService.processNodeConfig(ipPort, version, orgId, groupId, profileActive)) {
             return BuildToolsConstant.SUCCESS;
         }
         return BuildToolsConstant.FAIL;
@@ -653,15 +693,14 @@ public class BuildToolController {
     
     @Description("根据群组Id部署Evidence合约")
     @PostMapping("/deployEvidence")
-    public boolean deployEvidence(@RequestParam(value = "groupId") Integer groupId) {
+    public String deployEvidence(@RequestParam(value = "groupId") Integer groupId) {
         FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-        String hash = deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
-        return StringUtils.isNotBlank(hash);
+        return deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
     }
 
     @Description("启用新的shareHash,禁用老的shareHash")
     @PostMapping("/enableShareCns")
-    public boolean enableShareCns(@RequestParam(value = "hash") String hash) {
+    public String enableShareCns(@RequestParam(value = "hash") String hash) {
         return deployService.enableShareCns(hash);
     }
 
@@ -673,5 +712,49 @@ public class BuildToolController {
     @GetMapping("/getWeIdPath")
     public String getWeIdPath() {
         return buildToolService.getWeidDir();
+    }
+    
+    @RequestMapping("/refresh")
+    public boolean restart() {
+        try {
+            ExecutorService threadPool = new ThreadPoolExecutor(1, 1, 0,
+                    TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.DiscardOldestPolicy());
+            threadPool.execute(() -> {
+                BuildToolApplication.context.close();
+                BuildToolApplication.context = SpringApplication.run(BuildToolApplication.class,
+                        BuildToolApplication.args);
+            });
+            threadPool.shutdown();
+            nodeCheck = false;
+            dbCheck = false;
+            return true; 
+        } catch (Exception e) {
+            logger.error("[restart] the server restart fail.", e);
+            return false;
+        }
+    }
+    
+    @Description("设置用户角色")
+    @PostMapping("/setRole")
+    public boolean setRole(@RequestParam(value = "roleType") String roleType) {
+        return deployService.setRoleType(roleType);
+    }
+    
+    @Description("获取用户角色")
+    @GetMapping("/getRole")
+    public String getRole() {
+        return deployService.getRoleType();
+    }
+    
+    @Description("判断当前机构是否存在机构配置，如果存在则不需要配置机构私钥，系统默认配置机构私钥")
+    @PostMapping("/checkOrgId")
+    public boolean checkOrgId() {
+        // 判断是否存在机构配置
+        boolean isExist= buildToolService.checkOrgId(ConfigUtils.getCurrentOrgId());
+        // 如果存在
+        if (isExist) {
+            deployService.createAdmin(null);
+        }
+        return isExist;
     }
 }

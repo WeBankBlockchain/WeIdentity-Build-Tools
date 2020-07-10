@@ -3,22 +3,7 @@ $(document).ready(function(){
         var $this = this;
         $.get("isReady",function(data,status){
             if(data) {
-                var disabled = $($this).attr("class").indexOf("disabled");
-                if(disabled > 0) return;
-                $($this).addClass("disabled");
-                $($this).html("合约部署中,  请稍等...");
-                $("#messageBody").html("<p>合约部署中，请稍等...</p>");
-                $("#modal-message").modal();
-                $.get("deploy",function(value,status){
-                    if (value == "fail") {
-                    	$("#messageBody").html($("#messageBody").html() + "<p>合约部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
-                    	showBtn($this);
-                    } else {
-                    	$("#messageBody").html($("#messageBody").html() + "<p>合约部署<span class='success-span'>成功</span>。</p>");
-                    	enableHash(value, $this, true, null);
-                    }
-                    $("#modal-message").modal();
-                })
+            	$("#modal-deploy").modal();
             } else {
                 $("#messageBody").html("<p>配置未准备完成，不可部署</p>");
                 $("#modal-message").modal();
@@ -29,7 +14,39 @@ $(document).ready(function(){
     	return;
     }
     loadData();
-    
+    var isClose = true;
+    $("#mainDeploy").click(function(){
+    	var chainId = $("#chainId").val();
+    	if (chainId == "") {
+    		isClose = false;
+    		$("#messageBody").html("<p>请输入chainId!</p>");
+            $("#modal-message").modal();
+            return;
+    	}
+    	isClose = true;
+        var $this = this;
+        var disabled = $($this).attr("class").indexOf("disabled");
+        if(disabled > 0) return;
+        $($this).addClass("disabled");
+        $($this).html("合约部署中,  请稍等...");
+        $("#messageBody").html("<p>合约部署中，请稍等...</p>");
+        $("#modal-message").modal();
+        $.get("deploy/" + chainId,function(value,status){
+            if (value == "fail") {
+            	$("#messageBody").html($("#messageBody").html() + "<p>合约部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	showBtn($this);
+            } else {
+            	$("#messageBody").html($("#messageBody").html() + "<p>合约部署<span class='success-span'>成功</span>。</p>");
+            	checkFirstDeploy(value, $this);
+            }
+            $("#modal-message").modal();
+        })
+    });
+    $('#modal-message').on('hide.bs.modal', function () {
+    	if (isClose) {
+    		$("#modal-deploy").modal("hide");
+    	}
+	})
 });
 
 var template = $("#data-tbody").html();
@@ -48,9 +65,9 @@ function loadData() {
   	      "ordering": true,
   	      "info": false,
   	      "autoWidth": false,
-  	      "order": [[ 2, "desc" ], [ 3, "desc" ]],
+  	      "order": [[ 3, "desc" ], [ 4, "desc" ]],
 	  	  "aoColumnDefs": [
-	          { "sType": "operation-column", "aTargets": [5] },    //指定列号使用自定义排序
+	          { "sType": "operation-column", "aTargets": [6] },    //指定列号使用自定义排序
 	      ],
 	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
@@ -123,6 +140,18 @@ function enableHash(hash, btnObj, deployCpt, enableBtn) {
 	});
 }
 
+function checkFirstDeploy(value, obj) {
+	$.get("isEnableMasterCns",function(data,status){
+		if (data == true) {//说明为首次部署，则调用启用逻辑
+			enableHash(value, obj, true, null);
+		} else {
+			$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
+			loadData();
+			showBtn(obj);
+		}
+	});
+}
+
 function removeHash(hash, obj) {
 	$.confirm("是否确定删除该CNS数据?",function(){
 		var disabled = $(obj).attr("class").indexOf("disabled");
@@ -150,13 +179,15 @@ function removeHash(hash, obj) {
 }
 
 function enable(hash, deployCpt, obj) {
-	var disabled = $(obj).attr("class").indexOf("disabled");
-    if(disabled > 0) return;
-    $(obj).addClass("disabled");
-    $(obj).html("启用中...");
-    $("#messageBody").html("");
-	$("#modal-message").modal();
-	enableHash(hash, null, deployCpt, obj);
+	$.confirm("是否确定启用该主合约？",function() {
+		var disabled = $(obj).attr("class").indexOf("disabled");
+	    if(disabled > 0) return;
+	    $(obj).addClass("disabled");
+	    $(obj).html("启用中...");
+	    $("#messageBody").html("");
+		$("#modal-message").modal();
+		enableHash(hash, null, deployCpt, obj);
+	})
 }
 
 function deploySystemCpt(hash, deployBtn, enableBtn) {

@@ -33,6 +33,3 @@ mysql_password=
 #If you do not set it, the system will use allOrg as the environment by default. 
 #It is not recommended. Production use default configuration
 cns_profile_active=prd
-
-#Set up the contract you use with this configuration.
-cns_contract_follow=

@@ -12,4 +12,5 @@ public class DeployInfo extends DeployBase {
     private String specificAddress;
     private String weIdAddress;
     private boolean deploySystemCpt;
+    private String chainId;
 }

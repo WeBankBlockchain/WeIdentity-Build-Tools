@@ -38,6 +38,11 @@
         </div>
       </li>
     </ul>
+    <ul class="navbar-nav ml-auto" style="display: none">
+      <li class="nav-item dropdown" style="float: right;">
+        <a class="nav-link" id="reBoot" href="#">服务重启</a>
+      </li>
+    </ul>
   </nav>
   <!-- /.navbar -->
 </div>
@@ -54,6 +59,33 @@ $(document).ready(function(){
           win.focus();
       }
     })
+    var times = 6;
+    $("#reBoot").click(function(){
+    	$.confirm("是否确定重启服务?",function(){
+    		$.get("refresh",function(data,status){
+                if (data) {
+                	$('#modal-message').on('hide.bs.modal', function () {
+                        goToIndex();
+                    })
+                    showTime();
+                    setInterval(showTime,1000);
+                    setTimeout(goToIndex,5000);
+                } else {
+                	$("#messageBody").html("<p>服务重启失败，请查看日志。</p>");
+                    $("#modal-message").modal();
+                }
+            });
+    	})
+    })
+    
+    function showTime() {
+        times--;
+        $("#messageBody").html("<p>服务重启中，" + times + "秒后回到首页。</p>");
+        $("#modal-message").modal();
+    }
+    function goToIndex() {
+        window.location.href="index.html";
+    }
 })
 </script>
 </html>

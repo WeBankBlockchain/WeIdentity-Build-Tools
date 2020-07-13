@@ -124,7 +124,7 @@ function downEcdsaKey(id) {
 function enableHash(hash, btnObj, deployCpt, enableBtn) {
 	$("#messageBody").html($("#messageBody").html() + "<p>CNS启用中，请稍等...</p>");
 	$.get("enableHash/" + hash,function(value,status){
-		if (value) {
+		if (value == "success") {
 			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='success-span'>成功</span>。</p>");
 			if (deployCpt) {
 				deploySystemCpt(hash, btnObj, enableBtn);
@@ -132,7 +132,11 @@ function enableHash(hash, btnObj, deployCpt, enableBtn) {
 				loadData();
 			}
 		} else {
-			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
+			if (value == "fail") {
+				$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
+			} else {
+				$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，原因:" + value + "。</p>");
+			}
 			showBtn(btnObj);
 			showEnableBtn(enableBtn);
 		}

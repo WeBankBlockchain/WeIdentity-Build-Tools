@@ -154,7 +154,7 @@ function enableEvidenHash(hash, groupId) {
 		} else if (value == "fail") {
 			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
 		} else {
-			$("#messageBody").html($("#messageBody").html() + "<p>" + value + "</p>");
+			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，原因：" + value + "</p>");
 		}
 		$("#modal-message").modal();
 	});

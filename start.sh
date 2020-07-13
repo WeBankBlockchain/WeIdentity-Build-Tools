@@ -32,7 +32,9 @@ CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/dist/conf/
 getPid;
 
 if [ -n "$buildTool_pid" ];then
-   echo "the server already started, pid = "$buildTool_pid
+   echo "-----------------------------------------------"
+   echo "The weid-build-tools web server has already started. pid = "$buildTool_pid
+   echo "-----------------------------------------------"
    exit 1
 fi
 
@@ -57,12 +59,18 @@ done
 echo 
 
 if [ ${running} = true ];then
-    echo "the server start successfully."
-    echo "the server url:  http://127.0.0.1:"${port}"/index.html"
+    echo "-----------------------------------------------"
+    echo "The weid-build-tools web server started successfully."
+    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}"/index.html"
+    echo "-----------------------------------------------"
 else 
     if [ $count == 30 ]; then
-        echo "the server start timeout, please check the log -> ./logs/error.log."
+        echo "-----------------------------------------------"
+        echo "The weid-build-tools web server started timeout, please check the log -> ./logs/error.log."
+        echo "-----------------------------------------------"
         exit 1;
     fi
-    echo "the server start error, please check the log."
+    echo "-----------------------------------------------"
+    echo "The weid-build-tools web server started error, please check the log -> ./logs/error.log."
+    echo "-----------------------------------------------"
 fi

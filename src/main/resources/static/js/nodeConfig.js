@@ -4,6 +4,7 @@ $(document).ready(function(){
 	//获取配置
     $.get("loadConfig",function(data,status){
         $("#nodeForm  #orgId").val(data.org_id);
+        $("#nodeForm  #amopId").val(data.amop_id);
         $("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
         $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
         $("#nodeForm  #ipPort").val(data.blockchain_address);
@@ -64,6 +65,7 @@ $(document).ready(function(){
 	    formData.append("file", $("#nodeKeyFile")[0].files[0]);
 	    formData.append("file", $("#clientKeyStoreFile")[0].files[0]);
 	    formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
+	    formData.append("amopId", $.trim($("#nodeForm  #amopId").val()));
 	    formData.append("version", $("#nodeForm  #version").val());
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
 	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
@@ -97,7 +99,10 @@ $(document).ready(function(){
     	if (orgId.length == 0) {
     		return "请输入您的机构名称";
     	}
-    	
+    	var amopId = $.trim($("#nodeForm  #amopId").val());
+    	if (amopId.length == 0) {
+    		return "请输入您的通讯ID";
+    	}
     	var ipPort = $.trim($("#nodeForm  #ipPort").val());
     	if (ipPort.length == 0) {
     		return "请输入您的节点IP与Port";
@@ -137,13 +142,15 @@ $(document).ready(function(){
     
     function checkNode() {
     	$.get("checkNode",function(data,status){
-            if(data) {//检查成功
+            if(data == "success") {//检查成功
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
          	   $("#configBtn").removeClass("disabled");
          	  disabledInput();
          	  step2();
-            } else {//检查失败
+            } else if (data == "fail"){//检查失败
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+            } else {//检查失败
+         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
             }
          });
     }
@@ -160,6 +167,7 @@ $(document).ready(function(){
     
     function disabledInput() {
     	$("#nodeForm  #orgId").attr("disabled",true);
+    	$("#nodeForm  #amopId").attr("disabled",true);
         $("#nodeForm  #version").attr("disabled",true);
         $("#nodeForm  #cnsProFileActive").attr("disabled",true);
         $("#nodeForm  #ipPort").attr("disabled",true);

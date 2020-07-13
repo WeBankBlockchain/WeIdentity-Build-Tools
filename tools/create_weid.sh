@@ -15,6 +15,9 @@ if [ ! $? -eq 0 ]; then
     exit $?;
 fi
 
+if [ "$1" == "no_del" ];then
+    exit 0
+fi
 if [ -f "weid" ];then
     rm weid
 fi

@@ -3,6 +3,7 @@ $(document).ready(function(){
 	const role = sessionStorage.getItem('guide_role')
 	const step = sessionStorage.getItem('guide_step')
 	const url = window.location.href
+	$('.menu-item').hide()
 	if (!role) {
 	//	get role and set sessionstorage
 		$.get("getRole",function(value,status){

@@ -32,7 +32,7 @@ else
 		exit 1
 	fi
     we_address=`echo $weid|awk -F":" '{print $4}' `    
-    private_key=${SOURCE_CODE_DIR}/output/create_weid/${cns_contract_follow}/${we_address}/ecdsa_key
+    private_key=${SOURCE_CODE_DIR}/output/create_weid/{cns_contract_follow}/${we_address}/ecdsa_key
     java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.RegistCpt $@ --private-key ${private_key}
 fi
 

@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bcos.web3j.crypto.Keys;
+import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
 import org.jsonschema2pojo.DefaultGenerationConfig;
 import org.jsonschema2pojo.GenerationConfig;
 import org.jsonschema2pojo.NoopAnnotator;
@@ -48,7 +49,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
 import com.sun.codemodel.JCodeModel;
-import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
@@ -987,8 +987,13 @@ public class BuildToolService {
     /**
      * 根据orgId获取org_config里面的hash数据.
      * @param orgId 机构编码
+     * @return 返回hash对象信息
      */
     public HashContract getHashFromOrgCns(String orgId) {
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return null;
+        }
         List<HashContract> allHash = getDataBucket(CnsType.ORG_CONFING).getAllHash().getResult();
         for (HashContract hashContract : allHash) {
             if (hashContract.getHash().equals(orgId)) {
@@ -1032,11 +1037,19 @@ public class BuildToolService {
     
     
     public String getMainHash() {
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return StringUtils.EMPTY;
+        }
         return getDataBucket(CnsType.ORG_CONFING).get(
             WeIdConstant.CNS_GLOBAL_KEY, WeIdConstant.CNS_MAIN_HASH).getResult();
     }
     
     public String getEvidenceHash(String groupId) {
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return StringUtils.EMPTY;
+        }
         String orgId = ConfigUtils.getCurrentOrgId();
         return getDataBucket(CnsType.ORG_CONFING).get(
             orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();

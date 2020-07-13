@@ -72,7 +72,13 @@ public class ConfigService {
     }
     
     public boolean processNodeConfig(
-        String address, String version, String orgId, String groupId, String profileActive) {
+        String address, 
+        String version, 
+        String orgId, 
+        String amopId, 
+        String groupId,
+        String profileActive
+    ) {
         List<String> listStr = FileUtils.readFileToList("run.config");
         StringBuffer buffer = new StringBuffer();
         for (String string : listStr) {
@@ -86,7 +92,9 @@ public class ConfigService {
                 buffer.append("blockchain_fiscobcos_version=").append(version).append("\n");
             } else  if (string.startsWith("org_id")) {
                 buffer.append("org_id=").append(orgId).append("\n");
-            } else if (string.startsWith("group_id")) {
+            } else  if (string.startsWith("amop_id")) {
+                buffer.append("amop_id=").append(amopId).append("\n");
+            }  else if (string.startsWith("group_id")) {
                 buffer.append("group_id=").append(groupId).append("\n");
             } else if (string.startsWith("cns_profile_active")) {
                 buffer.append("cns_profile_active=").append(profileActive).append("\n");
@@ -216,6 +224,7 @@ public class ConfigService {
         logger.info("[generateWeidentityProperties] begin generate weidentity.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/weidentity.properties.tpl");
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
+        fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));
         fileStr = fileStr.replace("${MYSQL_DATABASE}", loadConfig.get("mysql_database"));

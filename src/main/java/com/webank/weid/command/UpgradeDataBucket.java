@@ -60,7 +60,6 @@ public class UpgradeDataBucket {
             System.out.println("the DataBucket upgrade successfully.");
             System.exit(0);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("the DataBucket upgrade fail.", e);
             System.out.println("the DataBucket upgrade fail.");
             System.exit(1);

@@ -11,6 +11,7 @@
   <link href="plugins/enjoyhint/enjoyhint.css" rel="stylesheet">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="dist/css/guild.css">
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -74,6 +75,31 @@
             <!-- /.card -->
         </div>
       </div><!-- /.container-fluid -->
+      <div class='container-fluid guild-step'>
+        <div class="col-md-6 offset-md-3">
+          <!-- general form elements -->
+          <div id="AccountDiv" class="card card-primary">
+            <div class="card-header">
+              <h6>请选择角色</h6>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form role="form" id="AccountForm">
+              <div class="card-body">
+                <select id='roleChange'>
+                  <option value="1">联盟链委员会管理员</option>
+                  <option value="2">我不是联盟链委员会管理员</option>
+                </select>
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer" id="guild-next">
+                  <button type="button" class="btn btn-block btn-primary btn-flat">下一步</button>
+               </div>
+            </form>
+          </div>
+          <!-- /.card -->
+      </div>  
+      </div>
     </section>
     <!-- /.content -->
   </div>
@@ -82,7 +108,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">自行上传私钥</h4>
+          <h6 class="modal-title">自行上传私钥</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -156,5 +182,6 @@
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/account.js"></script>
+<script src="js/guide.js"></script>
 </body>
 </html>

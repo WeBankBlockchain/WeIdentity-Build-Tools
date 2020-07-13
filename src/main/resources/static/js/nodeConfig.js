@@ -186,7 +186,9 @@ $(document).ready(function(){
         $("#configBtn").removeClass("disabled");
         $("#i-node").removeClass("fa-circle");
         $("#i-node").addClass("fa-check-circle");
-        nodeReady = true;
+				nodeReady = true;
+				sessionStorage.setItem('guide_step', '3')
+				window.location.href = './dbConfig.html'
     }
     
     function step1() {

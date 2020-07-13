@@ -27,12 +27,10 @@ import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.ParamKeyConstant;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.deploy.DeployEvidence;
 import com.webank.weid.contract.deploy.v1.DeployContractV1;
 import com.webank.weid.contract.deploy.v2.DeployContractV2;
-import com.webank.weid.contract.deploy.v2.RegisterAddressV2;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
@@ -47,7 +45,6 @@ import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
@@ -77,8 +74,7 @@ public class DeployService {
     }
     
     private BuildToolService buildToolService = new BuildToolService();
-    private DataBaseService dataBaseService = new DataBaseService();
-    
+  
     public String deploy(FiscoConfig fiscoConfig, DataFrom from) {
         logger.info("[deploy] begin depoly contract...");
         File targetDir = new File(ADMIN_PATH, ECDSA_KEY);
@@ -96,8 +92,6 @@ public class DeployService {
         //开始保存文件
         //将私钥移动到/output/admin中
         copyEcdsa();
-        //TODO 初始化系统需要的表, 暂时先放这步，未来存放系统配置的表得独立先初始化出来
-        dataBaseService.initDataBase();
         return saveDeployInfo(fiscoConfig, from);
     }
     
@@ -619,7 +613,7 @@ public class DeployService {
             String shareHashOld = buildToolService.getEvidenceHash(groupId);
             // 更新配置到链上机构配置中 evidenceAddress.<groupId> 
             String orgId = ConfigUtils.getCurrentOrgId();
-            WeIdPrivateKey privateKey = getCurrentPrivateKey();
+            WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
             ResponseData<Boolean> result = buildToolService.getDataBucket(CnsType.ORG_CONFING).put(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId, hash, privateKey);
             if (result.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
                 return result.getErrorCode() + "-" + result.getErrorMessage();

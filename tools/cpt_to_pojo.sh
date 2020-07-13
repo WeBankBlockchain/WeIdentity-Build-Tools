@@ -57,17 +57,14 @@ function generate_presentation_policy()
 	build_classpath
 	
 	java -cp "$CLASSPATH" com.webank.weid.command.GeneratePolicy $@ --pojoId ${pojoId}
-	
 	if [ ! $? -eq 0 ]; then
         echo "generate presentation policy faild, please check the log -> ../logs/error.log."
         exit $?;
     fi
-    
     presentation_policy=${SOURCE_CODE_DIR}/output/presentation_policy
     if [ ! -d ${presentation_policy} ];then
             mkdir ${presentation_policy}
     fi
-
     if [ -f "presentation_policy.json" ];then
             mv presentation_policy.json ${presentation_policy}
     else

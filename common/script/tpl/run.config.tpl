@@ -16,6 +16,9 @@ blockchain_fiscobcos_version=2
 #your organization name, used for communication on blockchain.
 org_id=
 
+#amop_id
+amop_id=
+
 #chain id
 chain_id=1
 

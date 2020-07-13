@@ -38,6 +38,9 @@ public class CommandArgs {
 
     @Parameter(names = "--org-id", description = "org name")
     private String orgId;
+    
+    @Parameter(names = "--chain-id", description = "chain Id")
+    private String chainId;
 
     @Parameter(names = "--type", description = "type")
     private String type;

@@ -55,10 +55,12 @@ import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.dto.WeIdInfo;
+import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
+import com.webank.weid.service.DataBaseService;
 import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.DeployService;
 import com.webank.weid.service.TransactionService;
@@ -92,6 +94,9 @@ public class BuildToolController {
     @Autowired
     TransactionService transactionService;
     
+    @Autowired
+    DataBaseService dataBaseService;
+    
     @Value("${weid.build.tools.down:false}")
     private String isDownFile;
     
@@ -112,7 +117,7 @@ public class BuildToolController {
     
     @GetMapping("/isReady")
     public boolean isReady() {
-        return nodeCheck && dbCheck;
+        return nodeCheck;
     }
     
     @Description("是否启用主hash")
@@ -156,24 +161,27 @@ public class BuildToolController {
             FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
             fiscoConfig.setChainId(chainId);
             String hash = deployService.deploy(fiscoConfig, DataFrom.WEB);
-            configService.updateChainId(chainId);
+            //configService.updateChainId(chainId);
             logger.info("[deploy] the hash: {}", hash);
             return hash;
         } catch (Exception e) {
             logger.error("[deploy] the contract depoly error.", e);
             return BuildToolsConstant.FAIL;
+        } finally {
+            deployService.clearDeployFile();
         }
     }
     
     @GetMapping("/enableHash/{hash}")
-    public boolean enableHash(@PathVariable("hash") String hash) {
+    public String enableHash(@PathVariable("hash") String hash) {
         logger.info("[enableHash] begin load fiscoConfig...");
         try {
             //  获取老Hash
             String  oldHash = buildToolService.getMainHash();
             // 获取原配置
             FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-            WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+            WeIdPrivateKey currentPrivateKey = DeployService.getWeIdPrivateKey(hash);
+            
             // 获取部署数据
             DeployInfo deployInfo = deployService.getDeployInfoByHashFromChain(hash);
             ContractConfig contract = new ContractConfig();
@@ -196,10 +204,13 @@ public class BuildToolController {
             reloadAddress();
             logger.info("[enableHash] enable the hash {} successFully.", hash);
             deployService.createWeIdForCurrentUser(DataFrom.WEB);
-            return true;
+            return BuildToolsConstant.SUCCESS;
+        } catch (WeIdBaseException e) {
+            logger.error("[enableHash] enable the hash error.", e);
+            return e.getMessage();
         } catch (Exception e) {
             logger.error("[enableHash] enable the hash error.", e);
-            return false;
+            return BuildToolsConstant.FAIL;
         }
     }
     
@@ -214,7 +225,6 @@ public class BuildToolController {
         logger.info("[deploySystemCpt] begin deploy System Cpt...");
         try {
             deployService.deploySystemCpt(hash, DataFrom.WEB);
-            deployService.clearDeployFile();
             return true;
         } catch (Exception e) {
             logger.error("[deploySystemCpt] the System Cpt depoly error.", e);
@@ -352,6 +362,7 @@ public class BuildToolController {
         logger.info("[nodeConfigUpload] begin update run.config...");
         //更新run.config
         String orgId = request.getParameter("orgId");
+        String amopId = request.getParameter("amopId");
         String version = request.getParameter("version");
         String ipPort = request.getParameter("ipPort");
         String groupId = request.getParameter("groupId");
@@ -361,7 +372,7 @@ public class BuildToolController {
             profileActive = privName;
         }
         //根据模板生成配置文件
-        if(configService.processNodeConfig(ipPort, version, orgId, groupId, profileActive)) {
+        if(configService.processNodeConfig(ipPort, version, orgId, amopId, groupId, profileActive)) {
             return BuildToolsConstant.SUCCESS;
         }
         return BuildToolsConstant.FAIL;
@@ -369,12 +380,12 @@ public class BuildToolController {
     
     @Description("节点检查")
     @GetMapping("/checkNode")
-    public boolean checkNode() {
+    public String checkNode() {
         try {
             nodeCheck = false;
             logger.info("[checkNode] begin check the node...");
             if (!configService.isExistsForProperties()) {
-                return false;
+                return "the configuration file does not exist.";
             }
             logger.info("[checkNode] begin load the fiscoConfig...");
             FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
@@ -389,11 +400,17 @@ public class BuildToolController {
             if (checkNode != null && checkNode.check(fiscoConfig)) {
                 logger.info("[checkNode] the node check successfull.");
                 nodeCheck = true;
+                return BuildToolsConstant.SUCCESS;
             }
+            logger.error("[checkNode] checkNode with fail.");
+            return BuildToolsConstant.FAIL;
+        } catch (WeIdBaseException e) {
+            logger.error("[checkNode] checkNode with same exception.", e);
+            return e.getMessage();
         } catch (Exception e) {
-            logger.error("[checkNode] checkVersion with exception.", e);
+            logger.error("[checkNode] checkNode with unkonw exception.", e);
+            return BuildToolsConstant.FAIL;
         }
-        return nodeCheck;
     }
     
     @Description("数据库配置提交")
@@ -421,6 +438,9 @@ public class BuildToolController {
         }
         logger.info("[checkDb] begin check the db...");
         dbCheck = configService.checkDb();
+        if (dbCheck) {
+            dataBaseService.initDataBase();
+        }
         return dbCheck;
     }
     

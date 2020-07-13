@@ -43,7 +43,7 @@
 
     <!-- Main content -->
     <section class="content">
-      <div class="container-fluid">
+      <div class="container-fluid" style='display:none'>
         <!-- Small boxes (Stat box) -->
         <div class="col-md-6 offset-md-3">
             <!-- general form elements -->
@@ -74,8 +74,8 @@
             <!-- /.card -->
         </div>
       </div><!-- /.container-fluid -->
-      <div class='container-fluid guild-step'>
-        <div class="col-md-6 offset-md-3">
+      <div class='container-fluid guild-step' style='display:none'>
+        <div id="selectRoleDiv" class="col-md-6 offset-md-3">
           <!-- general form elements -->
           <div id="AccountDiv" class="card card-primary">
             <div class="card-header">
@@ -83,8 +83,8 @@
             </div>
             <!-- /.card-header -->
             <!-- form start -->
-            <form role="form" id="AccountForm">
-              <div class="card-body">
+            <form role="form" id="AccountFormRole">
+              <div class="card-body" id="selectRole">
                 <select id='roleChange'>
                   <option value="1">联盟链委员会管理员</option>
                   <option value="2">我不是联盟链委员会管理员</option>
@@ -150,7 +150,7 @@
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-default" data-dismiss="modal">关闭Close</button>
-          <button type="button" id="configBtn" onclick="goTo(this, 'nodeConfig.html')"  class="btn btn-primary disabled">下一步</button>
+          <button type="button" id="configBtn" onclick="goTo(this, 'deploy.html')"  class="btn btn-primary disabled">下一步</button>
         </div>
       </div>
       <!-- /.modal-content -->

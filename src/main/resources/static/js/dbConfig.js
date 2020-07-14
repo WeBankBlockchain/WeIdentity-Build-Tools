@@ -105,16 +105,7 @@ $(document).ready(function(){
         $("#configBtn").removeClass("disabled");
         $("#i-db").removeClass("fa-circle");
         $("#i-db").addClass("fa-check-circle");
-			dbReady = true;
-			// 1 - 需要配置公私钥 
-			const guide_weid = '1'
-			if (guide_deployment === '1') {
-				sessionStorage.setItem('guide_step', '4')
-				window.location.href = './index.html'
-			} else {
-				sessionStorage.setItem('guide_step', '5')
-				window.location.href = './deploy.html'
-			}
+		dbReady = true;
     }
     
     function step1() {
@@ -147,7 +138,7 @@ $(document).ready(function(){
 			}
 		});
 		var enjoyhint_script_steps = [{
-		    'click #configBtn': '下一步，前往合约部署。',
+		    'click #configBtn': '下一步',
 		    'showSkip': false
 		}];
 		enjoyhint_instance.set(enjoyhint_script_steps);
@@ -157,7 +148,28 @@ $(document).ready(function(){
 function goConfig(thiObj) {
 	$.get("dbCheckState",function(data,status){
         if(data) {//检查成功
-     	   goTo(thiObj, "deploy.html");
+        	var formData = {};
+    		$.post("checkOrgId", formData, function(value,status){
+    			// true 不需要设置公私钥
+    			const role = sessionStorage.getItem('guide_role')
+    			if (value) {
+    				sessionStorage.setItem('guide_step', '5')
+    				sessionStorage.setItem("guide_set_weid", '0')
+    				sessionStorage.setItem('has_guide', '1')
+    				goTo(thiObj, "deploy.html");
+    			} else {
+    				// false 需要设置公私钥
+    				sessionStorage.setItem("guide_set_weid", '1')
+    				if (role === '1') {
+    					sessionStorage.setItem('guide_step', '4')
+        				goTo(thiObj, "index.html");
+    				} else {
+    					sessionStorage.setItem('guide_step', '5')
+        				goTo(thiObj, "deploy.html");
+    				}
+    				
+    			}
+            })	
         }
      });
 }

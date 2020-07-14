@@ -1,5 +1,4 @@
 $(document).ready(function(){
-	console.log('aaa')
 	bsCustomFileInput.init();
     var hasAccount = false;
     var first = true;
@@ -22,7 +21,9 @@ $(document).ready(function(){
     });
 	
 	$("#nextBtn").click(function(){
-		goTo(this, "nodeConfig.html");
+//		goTo(this, "nodeConfig.html");
+		sessionStorage.setItem('guide_step', '5')
+		goTo(this, "deploy.html");
     });
 	
 	function createAdmin(obj) {
@@ -100,7 +101,7 @@ $(document).ready(function(){
 		}
 		var enjoyhint_instance = new EnjoyHint({});
 		var enjoyhint_script_steps = [{
-		    'click #configBtn': '下一步，配置节点。',
+		    'click #configBtn': '下一步。',
 		    'showSkip': false
 		}];
 		enjoyhint_instance.set(enjoyhint_script_steps);
@@ -117,7 +118,7 @@ $(document).ready(function(){
 			}
 		});
 		var enjoyhint_script_steps = [{
-		    'next #nextBtn': '下一步，配置节点。',
+		    'next #nextBtn': '下一步。',
 		    'nextButton': {
 		        text: "确定"
 		    },

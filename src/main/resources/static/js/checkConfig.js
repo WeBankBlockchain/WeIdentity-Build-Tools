@@ -27,7 +27,7 @@ $(document).ready(function(){
     	$("#modal-message").modal();
     }
     function goToIndex() {
-        window.location.href="index.html";
+        window.location.href="nodeConfig.html";
     }
     
     function showCns() {

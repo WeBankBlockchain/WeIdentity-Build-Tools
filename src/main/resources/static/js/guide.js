@@ -1,27 +1,29 @@
 $(document).ready(function(){
-	let has_guide = false
-	sessionStorage.setItem('guide_role', 1)
+	let has_guide = sessionStorage.getItem('has_guide')
 	const role = sessionStorage.getItem('guide_role')
-	// 是否已部署合约 0-未部署 1 已部署
-	const guide_deployment = '1'
 	const step = sessionStorage.getItem('guide_step')
 	const url = window.location.href
-	//	let step = '4'
 	if (!role) {
 	//	get role and set sessionstorage
+		$.get("getRole",function(value,status){
+			if (value) {
+				sessionStorage.setItem('guide_role', value)
+				if (!step) {
+					sessionStorage.setItem('guide_step', '2')
+					window.location.href='./nodeConfig.html'
+				}
+			}
+    })
 	} else {
 		if (!step) {
-			if (role !== '1' || guide_deployment === '1') {
-				sessionStorage.setItem('guide_step', '2')
-				window.location.href='./nodeConfig.html'
-			}
+			window.location.href='./nodeConfig.html' 
 		}
 	}
 	if (!has_guide) {
 		$('.breadcrumb').hide()
 		$('.d-index').hide()
 		if (url.indexOf('index') > -1) {
-			if (!step && step !== '2') {
+			if (!step) {
 				$('.guild-step').show()
 			} else {
 				$('.container-fluid').show()
@@ -41,7 +43,12 @@ $(document).ready(function(){
 					$('.nav-node').show()
 					break
 				case '5':
-					$('.nav-sql').show()
+					$('.nav_guide_deploy').show()
+					$('.menu-title-deploy').css('display', 'block')
+					const guide_set_weid = sessionStorage.getItem("guide_set_weid")
+					if (role !== '1' || guide_set_weid !== '1') {
+						$('#depolyBtn').hide()
+					}
 					break
 			}
 		}
@@ -50,13 +57,19 @@ $(document).ready(function(){
 		$('.content-header').show()
 		$('.guild-step').hide()
 		$('.menu-item').show()
+		$('.menu-title-deploy').css('display', 'block')
+		$('.menu-title-async').css('display', 'block')
 	}
 	// next btn
 	$('#guild-next').click(function(){
 		const val = $('#roleChange').children('option:selected').val()
-		if (!step) {
-			sessionStorage.setItem('guide_step', '2')
-		}
-		window.location.href='./nodeConfig.html'
+		var formData = {};
+	    formData.roleType = val;
+		$.post("setRole", formData, function(value,status){
+			if (value) {
+				sessionStorage.setItem('guide_step', '2')
+				window.location.href='./nodeConfig.html'
+			}
+        })		
 	})
 })

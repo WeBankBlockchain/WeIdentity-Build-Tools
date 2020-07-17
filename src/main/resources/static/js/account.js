@@ -21,9 +21,7 @@ $(document).ready(function(){
     });
 	
 	$("#nextBtn").click(function(){
-//		goTo(this, "nodeConfig.html");
-		sessionStorage.setItem('guide_step', '5')
-		goTo(this, "deploy.html");
+		goTo(this, "nodeConfig.html");
     });
 	
 	function createAdmin(obj) {
@@ -69,23 +67,14 @@ $(document).ready(function(){
 				$("#nextBtn").removeClass("disabled");
 				if (first) {
 					const role = sessionStorage.getItem('guide_role')
-					if (!role) {
-						step2_1_guide();
-					} else {
-						step2_1();
-					}
+					step2_1();
 				}
 			} else {
 				$(".card-title").html("创建管理员账户的WeId");
 				$("#createDiv").show();
 				hasAccount = false;
 				$("#nextBtn").removeClass("disabled");
-				const role = sessionStorage.getItem('guide_role')
-				if (!role) {
-					step1_guide();
-				} else {
-					step1();;
-				}
+				step1();
 			}
 	    });
 	}
@@ -99,23 +88,7 @@ $(document).ready(function(){
 			}
 		});
 		var enjoyhint_script_steps = [{
-		    'click #createDiv': "请点击【系统自动创建公私钥】或 【自行上传公私钥】"
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
-	}
-	
-	function step1_guide() {
-		if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({
-			onSkip:function(){
-				$.cookie("skip",true);
-			}
-		});
-		var enjoyhint_script_steps = [{
-		    'next #selectRoleDiv': "请选择角色"
+		    'click #createDiv': "请点击【系统自动创建公私钥】或 【自行上传公私钥1】"
 		}];
 		enjoyhint_instance.set(enjoyhint_script_steps);
 		enjoyhint_instance.run();
@@ -154,27 +127,4 @@ $(document).ready(function(){
 		enjoyhint_instance.set(enjoyhint_script_steps);
 		enjoyhint_instance.run();
 	}
-	
-	function step2_1_guide() {
-		if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({
-			onSkip:function(){
-				$.cookie("skip",true);
-			}
-		});
-		var enjoyhint_script_steps = [{
-		    'next #guild-next': '下一步。',
-		    'nextButton': {
-		        text: "确定"
-		    },
-		    'showSkip': true
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
-	}
 });
-
-
-

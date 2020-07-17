@@ -184,7 +184,6 @@ $(document).ready(function(){
         $("#i-node").removeClass("fa-circle");
         $("#i-node").addClass("fa-check-circle");
 		nodeReady = true;
-   	  	sessionStorage.setItem('guide_step', '3')	
     }
     
     function step1() {

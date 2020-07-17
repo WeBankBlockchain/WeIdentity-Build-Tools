@@ -150,7 +150,6 @@ function checkFirstDeploy(value, obj) {
 			enableHash(value, obj, true, null);
 		} else {
 			$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
-			guideSuccess();
 			loadData();
 			showBtn(obj);
 		}
@@ -201,7 +200,6 @@ function deploySystemCpt(hash, deployBtn, enableBtn) {
 		if (value) {
 			$("#messageBody").html($("#messageBody").html() + "<p>系统CPT部署<span class='success-span'>成功</span>。</p>");
 			$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
-			guideSuccess(); 
 			loadData();
 		} else {
 			$("#messageBody").html($("#messageBody").html() + "<p>系统CPT部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
@@ -262,14 +260,4 @@ function downResources() {
 	$.confirm("确定下载该当前配置吗?",function(){
 		window.location.href="downConfig";
     })
-}
-
-function guideSuccess () {
-	sessionStorage.setItem('has_guide', '1')
-	$('.container-fluid').show()
-	$('.content-header').show()
-	$('.guild-step').hide()
-	$('.menu-item').show()
-	$('.menu-title-deploy').css('display', 'block')
-	$('.menu-title-async').css('display', 'block')
 }

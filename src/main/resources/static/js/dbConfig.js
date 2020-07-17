@@ -148,26 +148,7 @@ $(document).ready(function(){
 function goConfig(thiObj) {
 	$.get("dbCheckState",function(data,status){
         if(data) {//检查成功
-        	var formData = {};
-    		$.post("checkOrgId", formData, function(value,status){
-    			// true 不需要设置公私钥
-    			const role = sessionStorage.getItem('guide_role')
-    			if (value) {
-    				sessionStorage.setItem('guide_step', '5')
-    				sessionStorage.setItem("guide_set_weid", '0')
-    				sessionStorage.setItem('has_guide', '1')
-    				goTo(thiObj, "deploy.html");
-    			} else {
-    				// false 需要设置公私钥
-    				sessionStorage.setItem("guide_set_weid", '1')
-    				if (role === '1') {
-    					sessionStorage.setItem('guide_step', '4')
-        				goTo(thiObj, "index.html");
-    				} else {
-    					sessionStorage.setItem('guide_step', '5')
-        				goTo(thiObj, "deploy.html");
-    				}
-    				
+        	goTo(thiObj, "deploy.html");	
     			}
             })	
         }

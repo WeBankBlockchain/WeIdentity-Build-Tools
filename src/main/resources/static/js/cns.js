@@ -59,14 +59,6 @@ function enableCns(obj, orgId) {
 	 $.get("enableCns/" + orgId,function(data,status){
         if (data) {
             $("#messageBody").html($("#messageBody").html()+"<p>CNS启用成功.</p>");
-            // 完成启动 指引步骤完成
-            sessionStorage.setItem('has_guide', '1')
-        	$('.container-fluid').show()
-        	$('.content-header').show()
-        	$('.guild-step').hide()
-        	$('.menu-item').show()
-        	$('.menu-title-deploy').css('display', 'block')
-        	$('.menu-title-async').css('display', 'block')
     	} else {
     		$("#messageBody").html($("#messageBody").html()+"<p>CNS启用失败.</p>");
     	}

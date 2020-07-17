@@ -635,11 +635,8 @@ public class DeployService {
     
     public boolean setRoleType(String roleType) {
         File roleFile = new File(ADMIN_PATH, ROLE_FILE);
-        if (!roleFile.exists()) {
-            FileUtils.writeToFile(roleType, roleFile.getAbsolutePath(), FileOperator.OVERWRITE);
-            return true;
-        }
-        return false;
+        FileUtils.writeToFile(roleType, roleFile.getAbsolutePath(), FileOperator.OVERWRITE);
+        return true;
     }
     
     public String getRoleType() {

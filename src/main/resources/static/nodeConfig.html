@@ -68,10 +68,6 @@
                     <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
                   </div>
                   <div class="form-group">
-                    <label for="amopId">通讯ID</label> <span style="display: inline;color: gray;">此ID用于链上AMOP通讯</span>
-                    <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
-                  </div>
-                  <div class="form-group">
                         <label>部署环境</label>
                         <select  id="cnsProFileActive" name="cnsProFileActive" class="form-control">
                           <option value="prd">生产环境</option>
@@ -92,6 +88,10 @@
                     <div style="display:block; font-size: 13px;color: gray;">例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
                     <div style="display:block; font-size: 13px;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
                   
+                  </div>
+                  <div class="form-group">
+                    <label for="ipPort">链ID(chain_id)</label><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="display: inline;color: blue;">什么是chain id?</span></a>
+                    <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
                   </div>
                   <div class="form-group">
                     <label for="ipPort">主群组ID (Main group ID)</label>
@@ -137,7 +137,7 @@
                         </div>
                       </div>
                   </div>
-                  <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
+                  <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk.html#fisco-bcos" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
                 </div>
                 </form>
                 <!-- /.card-body -->
@@ -195,6 +195,5 @@
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/nodeConfig.js"></script>
-<script src="js/guide.js"></script>
 </body>
 </html>

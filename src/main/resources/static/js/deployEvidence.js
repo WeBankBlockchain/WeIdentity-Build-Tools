@@ -25,20 +25,20 @@ $(document).ready(function(){
 	    formData.groupId = $("#groupId").val();
     	$.post("deployEvidence", formData, function(value,status){
     		// 部署成功
-           if (value != "") {
-        	   $("#messageBody").html("<p>存证部署<span class='success-span'>成功</span>。</p>");
-        	   checkFirstDeploy(value, formData.groupId);
+           if (value) {
+        	   $("#confirmMessageBody").html("<p>存证部署<span class='success-span'>成功</span>。</p>");
+        	   loadData();
         	   isClose = true;
            } else {
-        	   $("#messageBody").html("<p>存证部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+        	   $("#confirmMessageBody").html("<p>存证部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
            }
            $($this).html(btnValue);
            $($this).removeClass("disabled");
-           $("#modal-message").modal();
+           $("#modal-confirm-message").modal();
         })
     });
     //关闭对话框
-    $('#modal-confirm-message, #modal-message').on('hide.bs.modal', function () {
+    $('#modal-confirm-message').on('hide.bs.modal', function () {
 		if (isClose) {
 			$("#modal-evidence-deploy").modal("hide");
 		}
@@ -82,17 +82,6 @@ function loadData() {
  		}); 
   })
 }
-
-function checkFirstDeploy(hash, groupId) {
-	$.get("isEnableEvidenceCns/" + groupId ,function(data,status){
-		if (data == true) {//说明为首次部署，则调用启用逻辑
-			enableEvidenHash(hash, groupId);
-		} else {
-			loadData();
-		}
-	});
-}
-
 function processCnsBtn() {
 	$("button[name='cnsEnableBtn']").each(function(){
 		var index = $(this).attr("class").indexOf("true");
@@ -102,7 +91,6 @@ function processCnsBtn() {
 		}
 	})
 }
-
 function removeHash(hash, obj) {
 	$.confirm("是否确定删除该CNS数据?",function() {
 		var disabled = $(obj).attr("class").indexOf("disabled");
@@ -139,27 +127,20 @@ function enableHash(hash, groupId) {
 	$.confirm(message,function() {
 		$("#messageBody").html("<p>CNS启用中，请稍等...</p>");
 		$("#modal-message").modal();
-		enableEvidenHash(hash, groupId);
+		var formData = {};
+	    formData.hash = hash;
+	    formData.groupId = groupId;
+		$.post("enableShareCns", formData, function(value,status){
+			if (value) {
+				$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='success-span'>成功</span>。</p>");
+				loadData();
+			} else {
+				$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
+			}
+			$("#modal-message").modal();
+		});
 	});
 }
-
-function enableEvidenHash(hash, groupId) {
-	var formData = {};
-    formData.hash = hash;
-    formData.groupId = groupId;
-	$.post("enableShareCns", formData, function(value,status){
-		if (value == "success") {
-			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='success-span'>成功</span>。</p>");
-			loadData();
-		} else if (value == "fail") {
-			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
-		} else {
-			$("#messageBody").html($("#messageBody").html() + "<p>CNS启用<span class='fail-span'>失败</span>，原因：" + value + "</p>");
-		}
-		$("#modal-message").modal();
-	});
-}
-
 
 var deployDivTemplate = $("#deployDiv").html();
 function showDeploy(hash, weId) {

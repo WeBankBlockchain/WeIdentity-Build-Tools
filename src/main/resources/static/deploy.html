@@ -11,14 +11,6 @@
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  <style>
-    .form-group span{
-        font-size:12px;
-        color:red;
-        display: none;
-        float: right;
-    }
-  </style>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -67,7 +59,6 @@
                   <th>CNS</th>
                   <th>部署账户</th>
                   <th>权威机构名称</th>
-                  <th>群组</th>
                   <th style="display: none">状态</th>
                   <th>创建时间</th>
                   <th width="400px">操作</th>
@@ -78,7 +69,6 @@
                     <td><a href="javascript:showDeploy('${hash}', '${weId}')"> ${hashShow} </a></td>
                     <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
                     <td> ${issuer} </td>
-                    <td> ${groupId} </td>
                     <th style="display: none">${enable}</th>
                     <td>${createTime}</td>
                     <td>
@@ -163,10 +153,6 @@
                   <td>Specific Issuer 智能合约地址</td>
                   <td>${specificAddress}</td>
                 </tr>
-                <tr>
-                  <td>Chain Id</td>
-                  <td>${chainId}</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -179,33 +165,6 @@
     </div>
     <!-- /.modal-dialog -->
   </div>
-  
-  <!-- 主合约部署 -->
-  <div class="modal fade" id="modal-deploy">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">主群组部署合约</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div  class="modal-body">
-          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
-            <div class="form-group">
-               <label for="ipPort">链ID(chain_id)</label><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="display: inline;color: blue;">什么是chain id?</span></a>
-               <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
-             </div>
-          </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" id="mainDeploy" class="btn btn-block btn-primary btn-flat">确定 </button>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-    </div>
   <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
@@ -230,6 +189,5 @@
 <script src="dist/js/demo.js"></script>
 <script src="js/checkConfig.js"></script>
 <script src="js/deploy.js"></script>
-<script src="js/guide.js"></script>
 </body>
 </html>

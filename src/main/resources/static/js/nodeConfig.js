@@ -4,10 +4,10 @@ $(document).ready(function(){
 	//获取配置
     $.get("loadConfig",function(data,status){
         $("#nodeForm  #orgId").val(data.org_id);
-        $("#nodeForm  #amopId").val(data.amop_id);
         $("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
         $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
         $("#nodeForm  #ipPort").val(data.blockchain_address);
+        $("#nodeForm  #chainId").val(data.chain_id);
         $("#nodeForm  #groupId").val(data.group_id);
         caDisplay(data.blockchain_fiscobcos_version);
         checkCa(data);
@@ -65,10 +65,10 @@ $(document).ready(function(){
 	    formData.append("file", $("#nodeKeyFile")[0].files[0]);
 	    formData.append("file", $("#clientKeyStoreFile")[0].files[0]);
 	    formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
-	    formData.append("amopId", $.trim($("#nodeForm  #amopId").val()));
 	    formData.append("version", $("#nodeForm  #version").val());
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
 	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
+	    formData.append("chainId", $.trim($("#nodeForm  #chainId").val()));
 	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
@@ -99,13 +99,18 @@ $(document).ready(function(){
     	if (orgId.length == 0) {
     		return "请输入您的机构名称";
     	}
-    	var amopId = $.trim($("#nodeForm  #amopId").val());
-    	if (amopId.length == 0) {
-    		return "请输入您的通讯ID";
-    	}
+    	
     	var ipPort = $.trim($("#nodeForm  #ipPort").val());
     	if (ipPort.length == 0) {
     		return "请输入您的节点IP与Port";
+    	}
+    	var chainId = $.trim($("#nodeForm  #chainId").val());
+    	if (chainId.length == 0) {
+    		return "请输入您的chainId";
+    	}
+    	var r = /^[1-9][0-9]*$/;
+    	if(!r.test(chainId)) {
+    		return "chainId必须为整数";
     	}
     	var groupId = $.trim($("#nodeForm  #groupId").val());
     	if (groupId.length == 0) {
@@ -142,15 +147,13 @@ $(document).ready(function(){
     
     function checkNode() {
     	$.get("checkNode",function(data,status){
-            if(data == "success") {//检查成功
+            if(data) {//检查成功
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
          	   $("#configBtn").removeClass("disabled");
          	  disabledInput();
          	  step2();
-            } else if (data == "fail"){//检查失败
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
             } else {//检查失败
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
+         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
             }
          });
     }
@@ -167,10 +170,10 @@ $(document).ready(function(){
     
     function disabledInput() {
     	$("#nodeForm  #orgId").attr("disabled",true);
-    	$("#nodeForm  #amopId").attr("disabled",true);
         $("#nodeForm  #version").attr("disabled",true);
         $("#nodeForm  #cnsProFileActive").attr("disabled",true);
         $("#nodeForm  #ipPort").attr("disabled",true);
+        $("#nodeForm  #chainId").attr("disabled",true);
         $("#nodeForm  #groupId").attr("disabled",true);
         $("#caCrtFile").attr("disabled",true);
         $("#caCrtSpan").hide();
@@ -183,7 +186,7 @@ $(document).ready(function(){
         $("#configBtn").removeClass("disabled");
         $("#i-node").removeClass("fa-circle");
         $("#i-node").addClass("fa-check-circle");
-		nodeReady = true;
+        nodeReady = true;
     }
     
     function step1() {

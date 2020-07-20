@@ -27,7 +27,7 @@ $(document).ready(function(){
     	$("#modal-message").modal();
     }
     function goToIndex() {
-        window.location.href="nodeConfig.html";
+        window.location.href="index.html";
     }
     
     function showCns() {
@@ -41,7 +41,7 @@ $(document).ready(function(){
     
     function isEnableMasterCns() {
     	$.get("isEnableMasterCns",function(data,status){
-    	    if(data == true) {
+    	    if(!data) {
     	    	$('#modal-message').on('hide.bs.modal', function () {
     	    		goToDeploy();
     	    	})

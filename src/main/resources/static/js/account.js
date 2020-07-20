@@ -66,7 +66,6 @@ $(document).ready(function(){
 				hasAccount = true;
 				$("#nextBtn").removeClass("disabled");
 				if (first) {
-					const role = sessionStorage.getItem('guide_role')
 					step2_1();
 				}
 			} else {
@@ -99,10 +98,9 @@ $(document).ready(function(){
 			return;
 		}
 		var enjoyhint_instance = new EnjoyHint({});
-		const role = sessionStorage.getItem('guide_role')
 		var enjoyhint_script_steps = [{
-			'click #configBtn': '下一步。',
-			 'showSkip': false
+		    'click #configBtn': '下一步，配置节点。',
+		    'showSkip': false
 		}];
 		enjoyhint_instance.set(enjoyhint_script_steps);
 		enjoyhint_instance.run();
@@ -118,7 +116,7 @@ $(document).ready(function(){
 			}
 		});
 		var enjoyhint_script_steps = [{
-		    'next #nextBtn': '下一步。',
+		    'next #nextBtn': '下一步，配置节点。',
 		    'nextButton': {
 		        text: "确定"
 		    },
@@ -128,3 +126,6 @@ $(document).ready(function(){
 		enjoyhint_instance.run();
 	}
 });
+
+
+

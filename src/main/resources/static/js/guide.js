@@ -14,30 +14,75 @@ $(document).ready(function(){
 	        prevEl: '.swiper-button-prev',
 	      },
 	})
-	const role = sessionStorage.getItem('guide_role')
+	// 上一步按钮
+	$('.prevBtn').click(function(){
+		$('.swiper-button-prev').trigger('click');
+	})
+	let role = sessionStorage.getItem('guide_role')
+	// 选择角色
+	$(".role_part").click(function(){
+		let r = sessionStorage.getItem('guide_role')
+		// 如果角色已存在则不允许切换
+		if (!r) {
+			$(".role_part").each(function(){
+				$(this).removeClass("role_active")
+			})
+			$(this).addClass("role_active")
+		}
+	})
 	if (!role) {
 	//	get role and set sessionstorage
 		$.get("getRole",function(value,status){
 			if (value) {
-			} else {
-			}
+				sessionStorage.setItem('guide_role', value)
+				$("#messageBody").html("<p>检测到您已创建角色，无需再创建，请直接点击下一步</p>");
+				$("#modal-message").modal();
+				role = value
+	           $(".role_part").each(function(){
+						$(this).removeClass("role_active")
+					})
+					let part = $(".role_part")
+					if (value == 1) {
+						$(part[0]).addClass("role_active")
+					} else if (value == 2) {
+						$(part[1]).addClass("role_active")
+					}
+					$('.swiper-button-next').trigger('click');
+					// 转节点配置
+					toNodeConfig();
+				}
 		})
 	} else {
-		
+		$("#messageBody").html("<p>检测到您已创建角色，无需再创建，请直接点击下一步</p>");
+		$("#modal-message").modal();
+		let r = sessionStorage.getItem('guide_role')
+		let part = $(".role_part")
+		if (r == 1) {
+			$(part[0]).addClass("role_active")
+		} else if (r == 2) {
+			$(part[1]).addClass("role_active")
+		}
 	}
 	// 点击选中角色按钮
-	$('#selectRoleBtn').click(function(){
-		const val = $('#roleChange').children('option:selected').val()
-		var formData = {};
-	    formData.roleType = val;
-		$.post("setRole", formData, function(value,status){
-			if (value) {
-				sessionStorage.setItem('guide_step', '2')
-				$('.swiper-button-next').trigger('click');
-				// 转节点配置
-				toNodeConfig();
-			}
-        })		
+	$('#role-next').click(function(){
+		// 如果有角色则直接跳转
+		if (role) {
+			$('.swiper-button-next').trigger('click');
+			// 转节点配置
+			toNodeConfig();
+		} else {
+			const val = $('.role_active').attr('type')
+			var formData = {};
+			formData.roleType = val;
+			$.post("setRole", formData, function(value,status){
+				if (value) {
+					$('.swiper-button-next').trigger('click');
+					// 转节点配置
+					toNodeConfig();
+				}
+			})	
+		}
+			
 	})
 	// 转节点配置，初始化已有的相关数据
 	function toNodeConfig() {
@@ -204,6 +249,8 @@ $(document).ready(function(){
             $("#dbForm  #mysql_username").val(data.mysql_username);
             $("#dbForm  #mysql_password").val(data.mysql_password);
         });
+    	$("#messageBody").html("<p>说明<span class='success-span'>如果您需要使用到下列功能则需要配置数据库</span><br/>1.xxxxx<br/>2.xxxxxxx<br/>3......</p>");
+    	$("#modal-message").modal();
     }
     
     // 提交数据库配置
@@ -346,9 +393,26 @@ $(document).ready(function(){
 	        }
 	    })
 	}
+	// 点击跳过	
+	$('#dbPassBtn').click(function(){
+		if (role == '1') {
+			var formData = {};
+			$.post("checkOrgId", formData, function(value,status){
+				if (value) {
+					
+					$('.swiper-button-next').trigger('click');
+				} else {
+					// 流程走完
+					window.location.href="deploy.html";
+				}
+			})	
+		} else {
+			// 流程走完
+			window.location.href="deploy.html";
+		}
+	})
 	
 	$("#nextBtn").click(function(){
 		window.location.href="deploy.html";
 	})
 })
-

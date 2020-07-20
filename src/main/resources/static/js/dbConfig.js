@@ -105,7 +105,7 @@ $(document).ready(function(){
         $("#configBtn").removeClass("disabled");
         $("#i-db").removeClass("fa-circle");
         $("#i-db").addClass("fa-check-circle");
-		dbReady = true;
+        dbReady = true;
     }
     
     function step1() {
@@ -138,7 +138,7 @@ $(document).ready(function(){
 			}
 		});
 		var enjoyhint_script_steps = [{
-		    'click #configBtn': '下一步',
+		    'click #configBtn': '下一步，前往合约部署。',
 		    'showSkip': false
 		}];
 		enjoyhint_instance.set(enjoyhint_script_steps);
@@ -148,9 +148,7 @@ $(document).ready(function(){
 function goConfig(thiObj) {
 	$.get("dbCheckState",function(data,status){
         if(data) {//检查成功
-        	goTo(thiObj, "deploy.html");	
-    			}
-            })	
+     	   goTo(thiObj, "deploy.html");
         }
      });
 }

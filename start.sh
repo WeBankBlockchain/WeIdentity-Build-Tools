@@ -42,7 +42,7 @@ nohup java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.app.BuildToolApplicatio
 echo -n "starting..."
 
 count=0
-while [ ${running} = false ] 
+while [ ${running} = false ]
 do
     checkServer
     sleep 1
@@ -54,12 +54,36 @@ do
     echo -n "."
 done
 
-echo 
+addEnv() {
+    sed '/BUILD_TOOL_HOME/d' $1 > $1.tempforinforsuite
+    cat $1.tempforinforsuite > $1
+
+    echo "BUILD_TOOL_HOME=$BUILD_TOOL_HOME" >> $1
+    echo "export BUILD_TOOL_HOME" >> $1
+    source $1
+}
+
+
+echo
+echo "setting env variables..."
+BUILD_TOOL_HOME=`pwd`
+export BUILD_TOOL_HOME
+cd ~
+if [ -f ".bash_profile" ];then
+    addEnv .bash_profile
+elif [ -f ".bash_login" ];then
+    addEnv .bash_login
+else
+    if [ ! -f ".profile" ]; then
+      touch .profile
+    fi
+    addEnv .profile
+fi
 
 if [ ${running} = true ];then
     echo "the server start successfully."
     echo "the server url:  http://127.0.0.1:"${port}"/index.html"
-else 
+else
     if [ $count == 30 ]; then
         echo "the server start timeout, please check the log -> ./logs/error.log."
         exit 1;

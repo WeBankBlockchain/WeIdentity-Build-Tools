@@ -53,12 +53,35 @@
   	.content{
   		margin-top:2.5rem;
   	}
-  	.form-group span{
-        font-size:12px;
-        color:red;
-        display: none;
-        float: right;
-    }
+  	.role_body{
+  		display:flex;
+  		justify-content: space-between;
+  	}
+	.role_body .role_part{
+		width:45%;
+		text-align: center;
+		border:1px solid #ddd;
+		font-size: 18px;
+    	padding: 20px;
+		cursor: pointer;
+	}
+	.role_active{
+		background:#007bff;
+		color:#fff;
+	}
+	.node_part,.db-part{
+		display: flex;
+		justify-content: space-between;
+		padding:1rem 2rem;
+	}
+	.node_part .btn-primary{
+		width:45%;
+		margin:0;
+	}
+	.db-part .btn-primary{
+		width:30%;
+		margin:0;
+	}
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" style='height:100%;'>
@@ -70,36 +93,32 @@
   </ul>
   <div class="swiper-container swiper-no-swiping">
     <div class="swiper-pagination"></div>
-    <div class="swiper-wrapper">
+    <div class="swiper-wrapper swiper-no-swiping">
 			<div class="swiper-slide">
-				<div class="content-wrapper">
-					<section class="content">
-						<div class='container-fluid guild-step'>
-							<div class="col-md-6 offset-md-3">
-								<div id="AccountDiv" class="card card-primary">
-									<div class="card-header">
-										<h6>请选择角色</h6>
+					<div class="content-wrapper">
+						<section class="content">
+							<div class='container-fluid guild-step'>
+								<div class="col-md-6 offset-md-3">
+									<div id="AccountDiv" class="card card-primary">
+										<div class="card-header">
+											<h6>请选择角色</h6>
+										</div>
+										<div class="card-body role_body">
+											<div class='role_part role_active' type='1'>我是联盟链委员会管理员</div>
+											<div class='role_part' type='2'>我不是联盟链委员会管理员</div>
+										</div>
+										<div class="card-footer" id="role-next">
+											<button type="button" class="btn btn-block btn-primary btn-flat">下一步</button>
+										</div>
 									</div>
-									<form role="form" id="AccountForm">
-										<div class="card-body">
-											<select id='roleChange'>
-												<option value="1">联盟链委员会管理员</option>
-												<option value="2">我不是联盟链委员会管理员</option>
-											</select>
-										</div>
-										<div class="card-footer" id="guild-next">
-											<button type="button" id="selectRoleBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
-										</div>
-									</form>
 								</div>
-							</div>  
-					</section>
-				</div>
+							</div>
+						</section>
+					</div>
 			</div>
-	      <div class="swiper-slide">
-	          <div class="content-wrapper">
-	        	<section class="content">			      
-	        	  <div class="container-fluid">
+	    <div class="swiper-slide">
+	      <div class="content-wrapper">
+	        	<section class="content">			      <div class="container-fluid">
 			        <div class="col-md-6 offset-md-3">
 			            <div class="card card-primary">
 			              <div class="card-header">
@@ -110,10 +129,6 @@
 			                  <div class="form-group">
 			                    <label for="orgId">机构名称</label>
 			                    <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
-			                  </div>
-			                  <div class="form-group">
-			                    <label for="amopId">通讯ID</label> <span style="display: inline;color: gray;">此ID用于链上AMOP通讯</span>
-			                    <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
 			                  </div>
 			                  <div class="form-group">
 			                        <label>部署环境</label>
@@ -183,23 +198,24 @@
 			                  <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk.html#fisco-bcos" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
 			                </div>
 			                </form>
-			                <div class="card-footer">
+			                <div class="node_part">
+							  <button type="button" class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
 			                  <button type="button" id="postNodeBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
 			                </div>
 			            </div>
 			        </div>
 			      </div>
 			    </section>
-	          </div>
-	      </div>
-	      <div class="swiper-slide">
+	    	</div>
+	    </div>
+	    <div class="swiper-slide">
         	<div class='content-wrapper'>
         	  <section class="content">
 			      <div class="container-fluid">
 			        <div class="col-md-6 offset-md-3">
 			            <div class="card card-primary">
 			              <div class="card-header">
-			                <h3 class="card-title">数据库配置</h3>
+			                <h3 class="card-title">数据库配置(可选)</h3>
 			              </div>
 
 			              <form role="form" id="dbForm">
@@ -229,8 +245,10 @@
 			                  </div>
 			                </div>
 
-			                <div class="card-footer">
-			                  <button type="button"  id="postDbBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
+			                <div class="db-part">
+			                  <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+			                  <button type="button"  id="dbPassBtn" class="btn btn-block btn-primary btn-flat">跳过</button>
+			                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
 			                </div>
 			              </form>
 			            </div>
@@ -241,22 +259,22 @@
 			</div>
 		  <div class="swiper-slide">
 			 <div class="content-wrapper">
-		        <section class="content">
+		      <section class="content">
 			      <div class="container-fluid">
 			        <!-- Small boxes (Stat box) -->
 			        <div class="col-md-6 offset-md-3">
 			            <!-- general form elements -->
 			            <div id="AccountDiv" class="card card-primary">
 			              <div class="card-header">
-			                <h3 class="card-title"> </h3>
+			                <h3 class="card-title">生成秘钥</h3>
 			              </div>
 			              <!-- /.card-header -->
 			              <!-- form start -->
 			              <form role="form" id="AccountForm">
 			                <div class="card-body" >
-			                  <div class="form-group" id="createDiv" style="display:none;margin-top: 15px"> 
+			                  <div class="form-group" id="createDiv" margin-top: 15px"> 
 			                    <button type="button"  id="createBySysBtn" class="btn btn-inline btn-primary btn-flat" style="width: 45%;">系统自动创建公私钥 </button>
-			                    <div style="width: 8%;display: inline-block;text-align: center;">或</div>
+			                    <span style="width: 8%;display: inline-block;text-align: center;">或</span>
 			                    <button type="button" data-toggle="modal" data-target="#modal-create-pri" id="createByPri" class="btn btn-inline btn-primary btn-flat" style="width: 45%;">自行上传私钥</button>
 			                  </div>
 			                  <div class="form-group" id="accountDiv" style='display:none'>
@@ -273,106 +291,53 @@
 			            <!-- /.card -->
 			        </div>
 			      </div><!-- /.container-fluid -->
-			    </section>
+					</section>
+					<div class="modal fade" id="modal-create-pri">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h6 class="modal-title">自行上传私钥</h4>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div  class="modal-body">
+									<div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+									<form id="KeyForm" role="form">
+										<div class="form-group row">
+											 <div class="col-sm-12">
+													 <div class="input-group">
+														 <div class="custom-file">
+															 <input type="file" class="custom-file-input" id="privateKeyFile"   name="privateKeyFile">
+															 <label class="custom-file-label" for="privateKeyFile">选择私钥文件...</label>
+														 </div>
+													 </div>
+											 </div>
+										 </div>
+										 </form>
+									</div>
+								</div>
+								<div class="modal-footer justify-content-between">
+									<button type="button" id="craeteByPrivBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
+								</div>
+							</div>
+							<!-- /.modal-content -->
+						</div>
+						<!-- /.modal-dialog -->
+					</div>
 			 </div>
-		  </div>
+			</div>
+			<div class="swiper-slide">
+				<include src="/guideDeploy.html"></include>
+			</div>
 			<div style='display:none' class="swiper-button-next"></div>
 			<div style='display:none' class="swiper-button-prev"></div>
 		</div>
   </div>
+	<include src="common/foot.html"></include>
 </div>
 <!-- ./wrapper -->
- <div class="modal fade" id="modal-default">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">温馨提示</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div id="checkBody" class="modal-body">
-          <p>配置检查中..&hellip;</p>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">关闭Close</button>
-          <button type="button" id="goNext" class="btn btn-primary disabled">下一步</button>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-  </div>
-  <div class="modal fade" id="modal-message">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">温馨提示</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div id="messageBody" class="modal-body show-new-line">
-          <p>&hellip;</p>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
-<div class="modal fade" id="modal-create-pri">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h6 class="modal-title">自行上传私钥</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div  class="modal-body">
-          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
-          <form id="KeyForm" role="form">
-            <div class="form-group row">
-               <div class="col-sm-12">
-                   <div class="input-group">
-                     <div class="custom-file">
-                       <input type="file" class="custom-file-input" id="privateKeyFile"   name="privateKeyFile">
-                       <label class="custom-file-label" for="privateKeyFile">选择私钥文件...</label>
-                     </div>
-                   </div>
-               </div>
-             </div>
-             </form>
-          </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" id="craeteByPrivBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-  </div>
-  <!-- /.modal-dialog -->
-  <div class="modal fade" id="modal-confirm">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">温馨提示</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div id="confirmBody" class="modal-body show-new-line" >
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-          <button type="button" id="confirmBtn" class="btn btn-primary">确定</button>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-  </div>
+
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- jQuery UI 1.11.4 -->

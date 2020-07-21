@@ -11,84 +11,10 @@
   <link href="plugins/enjoyhint/enjoyhint.css" rel="stylesheet">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  <link rel="stylesheet" href="plugins/swiper/swiper.min.css">
+	<link rel="stylesheet" href="plugins/swiper/swiper.min.css">
+	<link rel="stylesheet" href="dist/css/guide.css">
   <script src="plugins/swiper/swiper.min.js"></script>
   <script src="dist/js/include.js"></script>
-  <style>
-	html,body{
-			height:100% !important;
-		}
-  	.wrapper{
-			position: relative;
-			height:100%;
-		}
-  	.navbar-nav{
-			position: absolute;
-			width:100%;
-			top:0;
-			left:0;
-			z-index:99;
-			background:#fff;
-  	}
-	.swiper-container{
-			position: absolute;
-			top:40px;
-			left:0;
-			right:0;
-			bottom:25px;
-		}
-	.swiper-slide{
-		overflow:auto;
-		}
-  	.content-wrapper{
-  	  margin-left:0 !important;
-      display: flow-root;
-      min-height: auto !important;
-      background:#fff;
-    }
-  	.navbar-nav{
-  		border-bottom: 1px solid #dee2e6;
-  		padding-left:24px;
-  	}
-  	.content{
-  		margin-top:2.5rem;
-  	}
-  	.role_body{
-  		display:flex;
-  		justify-content: space-between;
-  	}
-	.role_body .role_part{
-		width:45%;
-		text-align: center;
-		border:1px solid #ddd;
-		font-size: 18px;
-    	padding: 20px;
-		cursor: pointer;
-	}
-	.role_active{
-		background:#007bff;
-		color:#fff;
-	}
-	.node_part,.db-part{
-		display: flex;
-		justify-content: space-between;
-		padding:1rem 2rem;
-	}
-	.node_part .btn-primary{
-		width:45%;
-		margin:0;
-	}
-	.db-part .btn-primary{
-		width:30%;
-		margin:0;
-	}
-	.form-group span{
-        font-size:12px;
-        color:red;
-        display: none;
-        float: right;
-    }
-  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" style='height:100%;'>
 <div class="wrapper">
@@ -338,7 +264,23 @@
 			 </div>
 			</div>
 			<div class="swiper-slide">
-				<button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">主群组部署合约</button>
+				<div class="content-wrapper">
+					<section class="content">
+						<div class='container-fluid guild-step'>
+							<div class="col-md-6 offset-md-3">
+								<div id="AccountDiv" class="card card-primary">
+									<div class="card-header">
+										<h6>部署合约</h6>
+									</div>
+									<div class="card-body role_body">
+										<button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat" style='width:70%;margin:auto'>主群组部署合约</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+				<!-- <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">主群组部署合约</button> -->
 			</div>
 			<div style='display:none' class="swiper-button-next"></div>
 			<div style='display:none' class="swiper-button-prev"></div>

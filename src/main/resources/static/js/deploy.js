@@ -1,4 +1,10 @@
 $(document).ready(function(){
+	$.get("getRole",function(value,status){
+		console.log(value)
+		if (value === '2') {
+			$('#depolyBtn').hide()
+		}
+	})
     $("#depolyBtn").click(function(){
         var $this = this;
         $.get("isReady",function(data,status){

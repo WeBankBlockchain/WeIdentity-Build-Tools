@@ -41,7 +41,7 @@ $(document).ready(function(){
     
     function isEnableMasterCns() {
     	$.get("isEnableMasterCns",function(data,status){
-    	    if(!data) {
+    	    if(data) {
     	    	$('#modal-message').on('hide.bs.modal', function () {
     	    		goToDeploy();
     	    	})

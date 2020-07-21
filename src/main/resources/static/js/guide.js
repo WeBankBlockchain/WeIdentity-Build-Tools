@@ -71,6 +71,7 @@ $(document).ready(function(){
 			toNodeConfig();
 		} else {
 			const val = $('.role_active').attr('type')
+			role = val
 			var formData = {};
 			formData.roleType = val;
 			$.post("setRole", formData, function(value,status){
@@ -226,17 +227,17 @@ $(document).ready(function(){
     	$.get("checkNode",function(data,status){
             if(data == "success") {//检查成功
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-							$("#goNext").removeClass("disabled");
-							$("#goNext").addClass("nodeGoNext");
-						 //disabledInput(); //禁止修改操作
-         	   $("#goNext").click(function(){
-							let hasClass = $(this).hasClass('nodeGoNext')	
-							if (hasClass) {
-								$("#modal-default").modal("hide");
-								$("#goNext").removeClass("nodeGoNext");
-				  			$('.swiper-button-next').trigger('click');
-         		  	toDbConfig();
-							}
+				$("#goNext").removeClass("disabled");
+				$("#goNext").addClass("nodeGoNext");
+				//disabledInput(); //禁止修改操作
+         	    $("#goNext").click(function(){
+					let hasClass = $(this).hasClass('nodeGoNext')	
+					if (hasClass) {
+						$("#modal-default").modal("hide");
+						$("#goNext").removeClass("nodeGoNext");
+						$('.swiper-button-next').trigger('click');
+						toDbConfig();
+					}
          	   })
             } else if (data == "fail"){//检查失败
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
@@ -332,21 +333,16 @@ $(document).ready(function(){
 									$("#goNext").removeClass("nodeGoNext");
 									$("#goNext").removeClass("bdGoNext");
 									$("#modal-default").modal("hide");
-									if (role == '1') {
-										var formData = {};
-										$.post("checkOrgId", formData, function(value,status){
-											if (value) {
-												// 流程走完
-												window.location.href="deploy.html";
-											} else {
-												$('.swiper-button-next').trigger('click');
-												toAccount();
-											}
-										})	
-									} else {
-										// 流程走完
-										window.location.href="deploy.html";
-									}
+									var formData = {};
+									$.post("checkOrgId", formData, function(value,status){
+										if (value) {
+											// 流程走完
+											window.location.href="deploy.html";
+										} else {
+											$('.swiper-button-next').trigger('click');
+											toAccount();
+										}
+									})	
 								}	
           	  })
            } else {//检查失败
@@ -413,27 +409,31 @@ $(document).ready(function(){
 	            } else {
 	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
 	            	$("#configBtn").removeClass("disabled");
+	            	$("#goNext").click(function(){
+	            		if (role == "2") {
+	            			window.location.href="deploy.html";
+	            		} else {
+	            			$('.swiper-button-next').trigger('click');
+		            		$("#modal-default").modal("hide");
+		            		$("#modal-create-pri").modal("hide");
+	            		}
+	            	})
 	            }
 	        }
 	    })
 	}
 	// 点击跳过	
 	$('#dbPassBtn').click(function(){
-		if (role == '1') {
-			var formData = {};
-			$.post("checkOrgId", formData, function(value,status){
-				if (value) {
-					// 流程走完
-					window.location.href="deploy.html";
-				} else {
-					$('.swiper-button-next').trigger('click');
-					toAccount();
-				}
-			})	
-		} else {
-			// 流程走完
-			window.location.href="deploy.html";
-		}
+		var formData = {};
+		$.post("checkOrgId", formData, function(value,status){
+			if (value) {
+				// 流程走完
+				window.location.href="deploy.html";
+			} else {
+				$('.swiper-button-next').trigger('click');
+				toAccount();
+			}
+		})	
 	})
 	
 	$("#nextBtn").click(function(){

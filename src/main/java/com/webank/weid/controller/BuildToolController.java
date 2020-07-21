@@ -773,7 +773,10 @@ public class BuildToolController {
         boolean isExist= buildToolService.checkOrgId(ConfigUtils.getCurrentOrgId());
         // 如果存在
         if (isExist) {
-            deployService.createAdmin(null);
+            String address = deployService.checkAdmin();
+            if (StringUtils.isBlank(address)) {
+                deployService.createAdmin(null);
+            }
         }
         return isExist;
     }

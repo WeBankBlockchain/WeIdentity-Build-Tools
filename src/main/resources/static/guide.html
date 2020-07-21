@@ -82,6 +82,12 @@
 		width:30%;
 		margin:0;
 	}
+	.form-group span{
+        font-size:12px;
+        color:red;
+        display: none;
+        float: right;
+    }
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" style='height:100%;'>
@@ -130,6 +136,10 @@
 			                    <label for="orgId">机构名称</label>
 			                    <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
 			                  </div>
+			                  <div class="form-group">
+                                <label for="amopId">通讯ID</label> <span style="display: inline;color: gray;">此ID用于链上AMOP通讯</span>
+                                <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
+                              </div>
 			                  <div class="form-group">
 			                        <label>部署环境</label>
 			                        <select  id="cnsProFileActive" name="cnsProFileActive" class="form-control">
@@ -248,7 +258,7 @@
 			                <div class="db-part">
 			                  <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
 			                  <button type="button"  id="dbPassBtn" class="btn btn-block btn-primary btn-flat">跳过</button>
-			                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
+			                  <button type="button"  id="postDbBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
 			                </div>
 			              </form>
 			            </div>
@@ -328,16 +338,74 @@
 			 </div>
 			</div>
 			<div class="swiper-slide">
-				<include src="/guideDeploy.html"></include>
+				<button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">主群组部署合约</button>
 			</div>
 			<div style='display:none' class="swiper-button-next"></div>
 			<div style='display:none' class="swiper-button-prev"></div>
 		</div>
   </div>
-	<include src="common/foot.html"></include>
-</div>
-<!-- ./wrapper -->
 
+<div class="modal fade" id="modal-create-pri">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title">自行上传私钥</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          <form id="KeyForm" role="form">
+            <div class="form-group row">
+               <div class="col-sm-12">
+                   <div class="input-group">
+                     <div class="custom-file">
+                       <input type="file" class="custom-file-input" id="privateKeyFile"   name="privateKeyFile">
+                       <label class="custom-file-label" for="privateKeyFile">选择私钥文件...</label>
+                     </div>
+                   </div>
+               </div>
+             </div>
+             </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="craeteByPrivBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+  </div>
+    <!-- ./wrapper -->
+    <!-- 主合约部署 -->
+    <div class="modal fade" id="modal-deploy" >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">主群组部署合约</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <div class="form-group">
+               <label for="ipPort">链ID(chain_id)</label><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="display: inline;color: blue;">什么是chain id?</span></a>
+               <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
+             </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="mainDeploy" class="btn btn-block btn-primary btn-flat">确定 </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+    </div>
+    <include src="common/foot.html"></include>
+</div>
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- jQuery UI 1.11.4 -->
@@ -353,6 +421,7 @@
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/guide.js"></script>
+<script src="js/deploy.js"></script>
 </body>
 <script>          
 </script>

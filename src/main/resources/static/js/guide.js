@@ -8,7 +8,7 @@ $(document).ready(function(){
 		  	},
 			paginationClickable:true,
 			spaceBetween:30,
-			noSwiping: false,
+			noSwiping: true,
 			navigation: {
 	        nextEl: '.swiper-button-next',
 	        prevEl: '.swiper-button-prev',
@@ -249,7 +249,7 @@ $(document).ready(function(){
             $("#dbForm  #mysql_username").val(data.mysql_username);
             $("#dbForm  #mysql_password").val(data.mysql_password);
         });
-    	$("#messageBody").html("<p>说明<span class='success-span'>如果您需要使用到下列功能则需要配置数据库</span><br/>1.xxxxx<br/>2.xxxxxxx<br/>3......</p>");
+    	$("#messageBody").html("<p>说明<span class='success-span'>如果您需要使用到下列功能则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能</p>");
     	$("#modal-message").modal();
     }
     
@@ -399,11 +399,11 @@ $(document).ready(function(){
 			var formData = {};
 			$.post("checkOrgId", formData, function(value,status){
 				if (value) {
-					
-					$('.swiper-button-next').trigger('click');
-				} else {
 					// 流程走完
 					window.location.href="deploy.html";
+				} else {
+					$('.swiper-button-next').trigger('click');
+					toAccount();
 				}
 			})	
 		} else {
@@ -413,6 +413,6 @@ $(document).ready(function(){
 	})
 	
 	$("#nextBtn").click(function(){
-		window.location.href="deploy.html";
+		$('.swiper-button-next').trigger('click');
 	})
 })

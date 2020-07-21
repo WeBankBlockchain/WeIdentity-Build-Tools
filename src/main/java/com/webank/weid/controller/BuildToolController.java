@@ -200,6 +200,13 @@ public class BuildToolController {
             DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
             // 节点启用新hash并停用原hash
             deployService.enableHash(CnsType.DEFAULT, hash, oldHash);
+            // 初始化机构cns 目的是当admin首次部署合约未启用evidenceHash之前，用此私钥占用其配置空间，并且vpc2可以检测出已vpc1已配置
+            // 此方法为存写入方法，每次覆盖
+            buildToolService.getDataBucket(CnsType.ORG_CONFING).put(
+                fiscoConfig.getCurrentOrgId(), 
+                WeIdConstant.CNS_EVIDENCE_ADDRESS + 0, "0x0", 
+                currentPrivateKey
+            );
             //重新加载合约地址
             reloadAddress();
             logger.info("[enableHash] enable the hash {} successFully.", hash);

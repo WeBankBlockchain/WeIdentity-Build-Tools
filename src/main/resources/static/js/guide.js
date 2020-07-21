@@ -47,7 +47,6 @@ $(document).ready(function(){
 					} else if (value == 2) {
 						$(part[1]).addClass("role_active")
 					}
-					$('.swiper-button-next').trigger('click');
 					// 转节点配置
 					toNodeConfig();
 				}
@@ -227,12 +226,17 @@ $(document).ready(function(){
     	$.get("checkNode",function(data,status){
             if(data == "success") {//检查成功
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-         	   $("#goNext").removeClass("disabled");
-         	  //disabledInput(); //禁止修改操作
+							$("#goNext").removeClass("disabled");
+							$("#goNext").addClass("nodeGoNext");
+						 //disabledInput(); //禁止修改操作
          	   $("#goNext").click(function(){
-         		  $("#modal-default").modal("hide");
-         		  $('.swiper-button-next').trigger('click');
-         		  toDbConfig();
+							let hasClass = $(this).hasClass('nodeGoNext')	
+							if (hasClass) {
+								$("#modal-default").modal("hide");
+								$("#goNext").removeClass("nodeGoNext");
+				  			$('.swiper-button-next').trigger('click');
+         		  	toDbConfig();
+							}
          	   })
             } else if (data == "fail"){//检查失败
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
@@ -249,7 +253,7 @@ $(document).ready(function(){
             $("#dbForm  #mysql_username").val(data.mysql_username);
             $("#dbForm  #mysql_password").val(data.mysql_password);
         });
-    	$("#messageBody").html("<p>说明<span class='success-span'>如果您需要使用到下列功能则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能</p>");
+    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能</p>");
     	$("#modal-message").modal();
     }
     
@@ -318,13 +322,33 @@ $(document).ready(function(){
     	$.get("checkDb",function(data,status){
            if(data) {//检查成功
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-        	   $("#goNext").removeClass("disabled");
-        	   //disabledInput();
+						 $("#goNext").removeClass("disabled");
+						 //disabledInput();
+						 $("#goNext").addClass("bdGoNext");
         	   $("#goNext").click(function(){
-          		  $("#modal-default").modal("hide");
-          		  $('.swiper-button-next').trigger('click');
-          		  toAccount();
-          	   })
+								let hasClass = $(this).hasClass('bdGoNext')	
+								if (hasClass) {
+									$("#modal-default").modal("hide");
+									$("#goNext").removeClass("nodeGoNext");
+									$("#goNext").removeClass("bdGoNext");
+									$("#modal-default").modal("hide");
+									if (role == '1') {
+										var formData = {};
+										$.post("checkOrgId", formData, function(value,status){
+											if (value) {
+												// 流程走完
+												window.location.href="deploy.html";
+											} else {
+												$('.swiper-button-next').trigger('click');
+												toAccount();
+											}
+										})	
+									} else {
+										// 流程走完
+										window.location.href="deploy.html";
+									}
+								}	
+          	  })
            } else {//检查失败
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }

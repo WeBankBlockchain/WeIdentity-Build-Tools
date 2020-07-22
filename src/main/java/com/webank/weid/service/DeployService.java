@@ -42,6 +42,7 @@ import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.fisco.WeServerUtils;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
@@ -436,16 +437,11 @@ public class DeployService {
      * @return 返回群组列表
      */
     public List<String> getAllGroup() {
-        try {
-            Web3j web3j = (Web3j)BaseService.getWeb3j();
-            List<String> list = web3j.getGroupList().send().getGroupList();
-            return list.stream()
-                .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
-                .collect(Collectors.toList());
-        } catch (IOException e) {
-            logger.error("[getAllGroup] get all group has error.", e);
-            return null;
-        }
+        List<String> list = WeServerUtils.getGroupList();
+        return list.stream()
+            .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
+            .collect(Collectors.toList());
+
     }
     
     /**

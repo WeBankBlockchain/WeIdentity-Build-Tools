@@ -105,16 +105,7 @@ $(document).ready(function(){
         $("#configBtn").removeClass("disabled");
         $("#i-db").removeClass("fa-circle");
         $("#i-db").addClass("fa-check-circle");
-			dbReady = true;
-			// 1 - 需要配置公私钥 
-			const guide_weid = '1'
-			if (guide_deployment === '1') {
-				sessionStorage.setItem('guide_step', '4')
-				window.location.href = './index.html'
-			} else {
-				sessionStorage.setItem('guide_step', '5')
-				window.location.href = './deploy.html'
-			}
+        dbReady = true;
     }
     
     function step1() {

@@ -2,6 +2,7 @@ package com.webank.weid.service.v2;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.controller.BuildToolController;
 import com.webank.weid.exception.InitWeb3jException;
+import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.service.CheckNodeFace;
 
 public class CheckNodeServiceV2 implements CheckNodeFace {
@@ -38,19 +40,24 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
                 service.run();
             } catch (Exception e) {
                 logger.error("[check] the service run fail.", e);
-                throw new InitWeb3jException(e);
+                throw e;
             }
             ChannelEthereumService channelEthereumService = new ChannelEthereumService();
             channelEthereumService.setChannelService(service);
             Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
             if (web3j == null) {
                 logger.error("[check] build the web3j fail.");
-                throw new InitWeb3jException();
+                throw new WeIdBaseException("init web3j fail.");
+            }
+            // 检查群组配置
+            List<String> groupList = web3j.getGroupList().send().getGroupList();
+            if (!groupList.contains(fiscoConfig.getGroupId())) {
+                throw new WeIdBaseException("the groupId does not exist.");
             }
             Credentials  credentials = GenCredential.create();
             if (credentials == null) {
-                logger.error("[check] crate the Credentials fail.");
-                throw new InitWeb3jException();
+                logger.error("[check] create the Credentials fail.");
+                throw new WeIdBaseException("the Credentials create fail.");
             }
             int number = 0;
             try {
@@ -59,10 +66,12 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
                 return true;
             } catch (Exception e) {
                 logger.error("[check] get the BlockNumber fail.", e);
+                throw new WeIdBaseException("can not get the blockNumber.");
             } finally {
                 channelConnections.stopWork();
             }
-            return false;
+        } catch (WeIdBaseException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("[check] check the node fail.", e);
             return false;

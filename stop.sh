@@ -9,7 +9,11 @@ getPid;
 
 if [ -n "$buildTool_pid" ];then
    kill -9 $buildTool_pid
-   echo "the server stop success."
+   echo "-----------------------------------------------"
+   echo "The weid-build-tools web server stopped successfully."
+   echo "-----------------------------------------------"
 else 
-   echo "the server already stop."
+   echo "-----------------------------------------------"
+   echo "The weid-build-tools web server already stopped successfully."
+   echo "-----------------------------------------------"
 fi

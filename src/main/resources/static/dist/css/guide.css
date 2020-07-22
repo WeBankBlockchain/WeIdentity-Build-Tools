@@ -1,0 +1,73 @@
+html,body{
+  height:100% !important;
+}
+.wrapper{
+  position: relative;
+  height:100%;
+}
+.navbar-nav{
+  position: absolute;
+  width:100%;
+  top:0;
+  left:0;
+  z-index:99;
+  background:#fff;
+}
+.swiper-container{
+  position: absolute;
+  top:40px;
+  left:0;
+  right:0;
+  bottom:25px;
+}
+.swiper-slide{
+overflow:auto;
+}
+.content-wrapper{
+  margin-left:0 !important;
+  display: flow-root;
+  min-height: auto !important;
+  background:#fff;
+}
+.navbar-nav{
+  border-bottom: 1px solid #dee2e6;
+  padding-left:24px;
+}
+.content{
+  margin-top:2.5rem;
+}
+.role_body{
+  display:flex;
+  justify-content: space-between;
+}
+.role_body .role_part{
+width:45%;
+text-align: center;
+border:1px solid #ddd;
+font-size: 18px;
+  padding: 20px;
+cursor: pointer;
+}
+.role_active{
+background:#007bff;
+color:#fff;
+}
+.node_part,.db-part{
+display: flex;
+justify-content: space-between;
+padding:1rem 2rem;
+}
+.node_part .btn-primary{
+width:45%;
+margin:0;
+}
+.db-part .btn-primary{
+width:30%;
+margin:0;
+}
+.form-group span{
+    font-size:12px;
+    color:red;
+    display: none;
+    float: right;
+}

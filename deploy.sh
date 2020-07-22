@@ -44,7 +44,8 @@ function deploy_contract()
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
     build_classpath
-    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.DeployContract $@
+
+    java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.DeployContract --chain-id ${chain_id}  $@ 
     
     if [ ! $? -eq 0 ]; then
         echo "deploy contract failed, please check."

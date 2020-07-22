@@ -13,6 +13,8 @@ public class CnsInfo extends BaseDto {
     private boolean showDeployCptBtn;
     private boolean needDeployCpt;
     private String issuer;
+    private String groupId;
+    private String roleType;
 
     public void setWeId(String weId) {
         this.weId = weId;

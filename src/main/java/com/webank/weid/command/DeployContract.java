@@ -24,10 +24,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
+import com.webank.weid.config.ContractConfig;
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
+import com.webank.weid.contract.deploy.v2.DeployContractV2;
+import com.webank.weid.dto.DeployInfo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.DeployService;
 import com.webank.weid.util.FileUtils;
@@ -41,6 +46,7 @@ public class DeployContract extends StaticConfig {
     
     private static DeployService deployService = new DeployService();
     private static ConfigService configService = new ConfigService();
+    private static BuildToolService buildToolService = new BuildToolService();
     
     public static void main(String[] args) {
         logger.info("[DeployContract] execute contract deployment.");
@@ -50,20 +56,35 @@ public class DeployContract extends StaticConfig {
             .addObject(commandArgs)
             .build()
             .parse(args);
+        String chainId = commandArgs.getChainId();
         String privateKeyFile = commandArgs.getPrivateKey();
+        // 说明给了私钥文件
         if (StringUtils.isNotBlank(privateKeyFile)) {
             String privateKey = FileUtils.readFile(privateKeyFile);
             deployService.createAdmin(privateKey);
         }
-        
+        // 获取配置
         FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+        fiscoConfig.setChainId(chainId);
+        // 部署合约
         String hash = deployService.deploy(fiscoConfig, DataFrom.COMMAND);
         System.out.println("the contract deploy successfully  --> hash : " +  hash);
-       //配置启用新hash
-        configService.enableHash(hash);
+        // 配置启用新hash
+        String  oldHash = buildToolService.getMainHash();
+        // 获取部署数据
+        DeployInfo deployInfo = deployService.getDeployInfoByHashFromChain(hash);
+        ContractConfig contract = new ContractConfig();
+        contract.setWeIdAddress(deployInfo.getWeIdAddress());
+        contract.setIssuerAddress(deployInfo.getAuthorityAddress());
+        contract.setSpecificIssuerAddress(deployInfo.getSpecificAddress());
+        contract.setEvidenceAddress(deployInfo.getEvidenceAddress());
+        contract.setCptAddress(deployInfo.getCptAddress());
+        WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+        // 写入全局配置中
+        DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
         System.out.println("begin enable the hash.");
-        //节点启用新hash并停用原hash
-        deployService.enableHash(CnsType.DEFAULT, hash, fiscoConfig.getCnsContractFollow());
+        // 节点启用新hash并停用原hash
+        deployService.enableHash(CnsType.DEFAULT, hash, oldHash);
         //重新加载合约地址
         configService.reloadAddress();
         System.out.println("begin create the weId for admin and deploy the systemCpt.");

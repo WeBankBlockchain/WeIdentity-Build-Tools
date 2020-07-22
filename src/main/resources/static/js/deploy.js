@@ -1,3 +1,4 @@
+var deployed = false;
 $(document).ready(function(){
 	$.get("getRole",function(value,status){
 		console.log(value)
@@ -35,6 +36,7 @@ $(document).ready(function(){
             return;
     	}
     	isClose = true;
+    	deployed = false;
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
@@ -57,6 +59,9 @@ $(document).ready(function(){
     $('#modal-confirm-message1').on('hide.bs.modal', function () {
     	if (isClose) {
     		$("#modal-deploy").modal("hide");
+    	}
+    	if (url != "deploy.html" && deployed) {
+			window.location.href="deploy.html";
     	}
 	})
 	$("#confirmMessage1Btn").click(function(){
@@ -182,6 +187,7 @@ function checkFirstDeploy(value, obj) {
 			enableHash(value, obj, true, null);
 		} else {
 			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
+			deployed = true;
 			loadData();
 			showBtn(obj);
 		}
@@ -235,6 +241,7 @@ function deploySystemCpt(hash, deployBtn, enableBtn) {
 		if (value) {
 			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>系统CPT部署<span class='success-span'>成功</span>。</p>");
 			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
+			deployed = true;
 			loadData();
 		} else {
 			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>系统CPT部署<span class='fail-span'>失败</span>，请联系管理员。</p>");

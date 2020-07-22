@@ -23,8 +23,8 @@ public class EnableShareCns extends StaticConfig {
             System.exit(1);
         }
         System.out.println("[EnableShareCns] beign enable new cns for evidence, cns = " + hash);
-        boolean restult = deployService.enableShareCns(hash);
-        if (restult) {
+        String restult = deployService.enableShareCns(hash);
+        if (restult.equals("success")) {
             System.out.println("[EnableShareCns] new cns enable successfully."); 
             System.exit(0);
         } else {

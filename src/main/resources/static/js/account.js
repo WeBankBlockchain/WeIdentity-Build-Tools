@@ -1,5 +1,4 @@
 $(document).ready(function(){
-	console.log('aaa')
 	bsCustomFileInput.init();
     var hasAccount = false;
     var first = true;

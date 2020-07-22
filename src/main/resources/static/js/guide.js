@@ -394,7 +394,7 @@ $(document).ready(function(){
 	    var formData = new FormData();
 	    formData.append("ecdsa", $("#privateKeyFile")[0].files[0]);
 	    $("#checkBody").html("<p>账户创建中,请稍后...</p>");
-	    $("#configBtn").addClass("disabled");
+	    $("#goNext").addClass("disabled");
 	    $("#modal-default").modal();
 	    $.ajax({
 	        url:'createAdmin', /*接口域名地址*/
@@ -405,10 +405,9 @@ $(document).ready(function(){
 	        success:function(res) {
 	            if (res=="fail") {
 	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            	$("#postBtn").removeClass("disabled");
 	            } else {
 	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
-	            	$("#configBtn").removeClass("disabled");
+	            	$("#goNext").removeClass("disabled");
 	            	$("#goNext").click(function(){
 	            		if (role == "2") {
 	            			window.location.href="deploy.html";
@@ -419,6 +418,8 @@ $(document).ready(function(){
 	            		}
 	            	})
 	            }
+	            $(obj).removeClass("disabled");
+	            toAccount();
 	        }
 	    })
 	}

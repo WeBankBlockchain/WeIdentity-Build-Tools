@@ -62,12 +62,6 @@ $(document).ready(function(){
     	var thisObj = this;
     	var disabled = $(thisObj).attr("class").indexOf("disabled");
         if(disabled > 0) return;
-	    var file = $("#cptJsonFile")[0].files[0];
-	    if (file == null || !vaildFileName(file.name)) {
-	    	$("#messageBody").html("<p>请选择正确的Json格式文件</p>");
-	    	$("#modal-message").modal();
-	    	return;
-	    }
 	    var cptJson = null;
 	    try {
 	    	cptJson = JSON.stringify(editor.get());
@@ -83,7 +77,6 @@ $(document).ready(function(){
 	    }
 	    var cptId = $("#nodeForm  #registerCptId").val();
 	    var formData = new FormData();
-	    formData.append("fileName", file.name);
 	    formData.append("cptJson", cptJson);
 	    formData.append("cptId", cptId);
 	    var btnValue = $(thisObj).html();

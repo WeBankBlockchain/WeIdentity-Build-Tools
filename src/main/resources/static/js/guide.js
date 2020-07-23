@@ -362,8 +362,8 @@ $(document).ready(function(){
         			   $.post("checkOrgId", formData, function(value,status){
         				  if (value) {
         					  // 流程走完
-        					  window.location.href="deploy.html";
         					  sessionStorage.removeItem('guide_step')
+        					  toIndex();
         				  } else {
         					  $('.swiper-button-next').trigger('click');
         					  sessionStorage.setItem('guide_step', '3')
@@ -475,8 +475,8 @@ $(document).ready(function(){
 	            	$("#goNext").removeClass("disabled");
 	            	$("#goNext").click(function(){
 	            		if (role == "2") {
-	            			window.location.href="deploy.html";
 	            			sessionStorage.removeItem('guide_step')
+	            			toIndex();
 	            		} else {
 	            			$('.swiper-button-next').trigger('click');
 		            		$("#modal-default").modal("hide");
@@ -496,8 +496,8 @@ $(document).ready(function(){
 		$.post("checkOrgId", formData, function(value,status){
 			if (value) {
 				// 流程走完
-				window.location.href="deploy.html";
 				sessionStorage.removeItem('guide_step')
+				toIndex();
 			} else {
 				$('.swiper-button-next').trigger('click');
 				sessionStorage.setItem('guide_step', '3')
@@ -507,7 +507,19 @@ $(document).ready(function(){
 	})
 	
 	$("#nextBtn").click(function(){
-		$('.swiper-button-next').trigger('click');
-		sessionStorage.setItem('guide_step', '4')
+		if(role == "2") {
+			toIndex();
+		} else {
+			$('.swiper-button-next').trigger('click');
+			sessionStorage.setItem('guide_step', '4')
+		}
 	})
+	
+	function toIndex() {
+		var formData = {};
+		formData.step = "5";
+		$.post("setGuideStatus", formData, function(value,status){
+			window.location.href="index.html";
+		})	
+	}
 })

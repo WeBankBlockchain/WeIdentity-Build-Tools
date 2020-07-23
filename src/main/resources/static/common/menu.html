@@ -18,10 +18,10 @@
       <!-- Sidebar Menu -->
       <nav id="menuNav" class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-         <!-- <li class="nav-item  menu-open">
+         <li class="nav-item  menu-open">
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="index.html" class="nav-link">
+                <a href="account.html" class="nav-link">
                   <i id = "i-account" class="far fa-circle nav-icon"></i>
                   <p>配置admin账户</p>
                 </a>
@@ -39,7 +39,7 @@
                 </a>
               </li>
             </ul>
-          </li> -->
+          </li>
           
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link">
@@ -51,7 +51,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="deploy.html" title="Deploy WeIdentity Contract"  class="nav-link">
+                <a href="index.html" title="Deploy WeIdentity Contract"  class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>主群组部署合约</p>
                 </a>
@@ -74,13 +74,13 @@
                   <p>WeID管理</p>
                 </a>
               </li>
-              <li class="nav-item">
+              <li id="authorityLi" class="nav-item" style="display: none">
                 <a href="registerIssuer.html" title="Authority Issuer" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>权威凭证发行者</p>
                 </a>
               </li>
-              <li class="nav-item">
+              <li id="specificLi" class="nav-item" style="display: none">
                 <a href="registerSpecific.html" title="Specific Issuer" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>特定类型的发行者</p>
@@ -154,8 +154,16 @@ $(document).ready(function(){
 		$(".async-form").addClass("active")
 		$(".async-menu").addClass("menu-open")
 	}
-
+	$.get("getRole",function(value,status){
+        console.log(value)
+        if (value === '1') {
+            $('#authorityLi').show()
+            $('#specificLi').show()
+        }
+    })
 	checkAdmin();
+	checkNode();
+	checkDb();
 	//加载状态
 	function checkAdmin() {
 		$.get("checkAdmin",function(data,status){
@@ -163,7 +171,6 @@ $(document).ready(function(){
 	            $("#i-account").removeClass("fa-circle");
 	            $("#i-account").addClass("fa-check-circle");
 	        }
-	        checkNode();
 	    });
 	}
 	
@@ -173,7 +180,6 @@ $(document).ready(function(){
                 $("#i-node").removeClass("fa-circle");
                 $("#i-node").addClass("fa-check-circle");
             }
-            checkDb();
         })
 	}
 	

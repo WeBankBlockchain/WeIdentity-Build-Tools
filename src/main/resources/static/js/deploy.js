@@ -1,24 +1,17 @@
 var deployed = false;
 $(document).ready(function(){
 	$.get("getRole",function(value,status){
-		if (value === '2') {
-			$('#depolyBtn').hide()
+		console.log(value)
+		if (value === '1') {
+			$('#depolyBtn').show()
 		}
 	})
     $("#depolyBtn").click(function(){
-        var $this = this;
-        $.get("isReady",function(data,status){
-            if(data) {
-            	$("#modal-deploy").modal();
-            } else {
-                $("#messageBody").html("<p>配置未准备完成，不可部署</p>");
-                $("#modal-message").modal();
-            }
-        });
+    	$("#modal-deploy").modal();
     });
     var url = window.location.pathname;
     url = url.substring(1);
-    if (url == "deploy.html") {
+    if (url == "index.html") {
     	if (!isReady) {
         	return;
         }
@@ -59,19 +52,24 @@ $(document).ready(function(){
     	if (isClose) {
     		$("#modal-deploy").modal("hide");
     	}
-    	if (url != "deploy.html" && deployed) {
-			window.location.href="deploy.html";
+    	if (url != "index.html" && deployed) {
+    		sessionStorage.removeItem('guide_step')
+    		toIndex();
     	}
 	})
 	$("#confirmMessage1Btn").click(function(){
 		var disabled = $(this).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
-		if (url != "deploy.html") {
-			sesstionStorage.removeItem('guide_step')
-			window.location.href="deploy.html";
-    	}
 		$("#modal-confirm-message1").modal("hide");
 	})
+	
+	function toIndex() {
+		var formData = {};
+		formData.step = "5";
+		$.post("setGuideStatus", formData, function(value,status){
+			window.location.href="index.html";
+		})	
+	}
 });
 
 var template = $("#data-tbody").html();

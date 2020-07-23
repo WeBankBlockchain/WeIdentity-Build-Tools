@@ -157,6 +157,9 @@ public class ConfigService {
         String userName = PropertyUtils.getProperty(userNameKey);
         String passWordKey = "datasource1." + DataDriverConstant.JDBC_USER_PASSWORD;
         String passWord = PropertyUtils.getProperty(passWordKey);
+        if (StringUtils.isBlank(dbUrl) || StringUtils.isBlank(userName) || StringUtils.isBlank(passWord)) {
+            return false;
+        }
         Connection connection = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

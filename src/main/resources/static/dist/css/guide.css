@@ -105,6 +105,7 @@ html,body{
     display: flow-root;
     min-height: auto !important;
     background:#fff;
+    height: 100vh;
 }
 .navbar-nav{
     border-bottom: 1px solid #dee2e6;

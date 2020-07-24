@@ -13,11 +13,13 @@ $(document).ready(function(){
 		  	initialSlide: step,
 			paginationClickable:true,
 			spaceBetween:30,
-			noSwiping: true,
+			noSwiping: false,
 			navigation: {
 		        nextEl: '.swiper-button-next',
 		        prevEl: '.swiper-button-prev',
 			},
+			mousewheelEventsTarged : '.swiper-slide',
+			mousewheelControl: true,
 	        observer:true,
 			observeParents:true
 	})
@@ -390,7 +392,7 @@ $(document).ready(function(){
     		var thisObj = this;
 			var disabled = $(thisObj).attr("class").indexOf("disabled");
 	        if(disabled > 0) return;
-	        $.confirm("确定系统自动创建 admin 账户的公私钥?",function(){
+	        $.confirm("请确认，系统将自动为管理员的 WeID 创建公私钥?",function(){
 				createAdmin(thisObj);
 		    })
     	} else {
@@ -427,7 +429,7 @@ $(document).ready(function(){
 		var thisObj = this;
 		var disabled = $(thisObj).attr("class").indexOf("disabled");
         if(disabled > 0) return;
-        $.confirm("是否确定根据当前私钥文件创建账户?",function(){
+        $.confirm("请确认，是否使用当前私钥文件为管理员的 WeID 创建公私钥?",function(){
 			createAdmin(thisObj);
 	    })
     });

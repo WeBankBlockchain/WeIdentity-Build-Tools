@@ -1,7 +1,6 @@
 var deployed = false;
 $(document).ready(function(){
 	$.get("getRole",function(value,status){
-		console.log(value)
 		if (value === '2') {
 			$('#depolyBtn').hide()
 		}
@@ -68,6 +67,7 @@ $(document).ready(function(){
 		var disabled = $(this).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
 		if (url != "deploy.html") {
+			sesstionStorage.removeItem('guide_step')
 			window.location.href="deploy.html";
     	}
 		$("#modal-confirm-message1").modal("hide");

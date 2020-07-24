@@ -1,60 +1,68 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
 	// swiper 控制器
+	var step = sessionStorage.getItem('guide_step')
+	var role = sessionStorage.getItem('guide_role')
+	if (step) {
+		step = Number(step)
+	} else {
+		step = 0
+	}
+	checkStep(step)
 	var mySwiper = new Swiper ('.swiper-container', {
-		  	pagination: {
-		  		el: '.swiper-pagination',
-		  		type: 'progressbar'
-		  	},
+		  	initialSlide: step,
 			paginationClickable:true,
 			spaceBetween:30,
 			noSwiping: true,
 			navigation: {
-	        nextEl: '.swiper-button-next',
-	        prevEl: '.swiper-button-prev',
-	      },
+		        nextEl: '.swiper-button-next',
+		        prevEl: '.swiper-button-prev',
+			},
+	        observer:true,
+			observeParents:true
 	})
+	
 	// 上一步按钮
 	$('.prevBtn').click(function(){
+		let s = Number(sessionStorage.getItem('guide_step'))
+		s--
+		checkStep(s)
+		sessionStorage.setItem('guide_step', s)
 		$('.swiper-button-prev').trigger('click');
 	})
-	let role = sessionStorage.getItem('guide_role')
+	
 	// 选择角色
 	$(".role_part").click(function(){
 		let r = sessionStorage.getItem('guide_role')
-		// 如果角色已存在则不允许切换
-		if (!r) {
-			$(".role_part").each(function(){
-				$(this).removeClass("role_active")
-			})
-			$(this).addClass("role_active")
-		}
+		$(".role_part").each(function(){
+			$(this).removeClass("role_active")
+		})
+		$(this).addClass("role_active")
 	})
 	if (!role) {
 	//	get role and set sessionstorage
 		$.get("getRole",function(value,status){
 			if (value) {
 				sessionStorage.setItem('guide_role', value)
-				$("#messageBody").html("<p>检测到您已创建角色，无需再创建，请直接点击下一步</p>");
-				$("#modal-message").modal();
 				role = value
-	           $(".role_part").each(function(){
-						$(this).removeClass("role_active")
-					})
-					let part = $(".role_part")
-					if (value == 1) {
-						$(part[0]).addClass("role_active")
-					} else if (value == 2) {
-						$(part[1]).addClass("role_active")
-					}
-					// 转节点配置
-					toNodeConfig();
+	            $(".role_part").each(function(){
+				  $(this).removeClass("role_active")
+	            })
+				let part = $(".role_part")
+				if (value == 1) {
+					$(part[0]).addClass("role_active")
+				} else if (value == 2) {
+					$(part[1]).addClass("role_active")
 				}
+				// 转节点配置
+				toNodeConfig();
+			}
 		})
 	} else {
-		$("#messageBody").html("<p>检测到您已创建角色，无需再创建，请直接点击下一步</p>");
-		$("#modal-message").modal();
 		let r = sessionStorage.getItem('guide_role')
+		$(".role_part").each(function(){
+			$(this).removeClass("role_active")
+	    })
 		let part = $(".role_part")
 		if (r == 1) {
 			$(part[0]).addClass("role_active")
@@ -65,6 +73,7 @@ $(document).ready(function(){
 	// 点击选中角色按钮
 	$('#role-next').click(function(){
 		// 如果有角色则直接跳转
+		sessionStorage.setItem('guide_step', '1')
 		if (role) {
 			$('.swiper-button-next').trigger('click');
 			// 转节点配置
@@ -84,6 +93,21 @@ $(document).ready(function(){
 		}
 			
 	})
+	function checkStep(e) {
+		switch (e) {
+		 	case 0:
+		 		break;
+		 	case 1:
+		 		toNodeConfig();
+		 		break;
+		 	case 2:
+		 		toDbConfig();
+		 		break;
+		 	case 3:
+		 		toAccount();;
+	 			break;		
+		}
+	}	 
 	// 转节点配置，初始化已有的相关数据
 	function toNodeConfig() {
 		//获取配置
@@ -233,6 +257,7 @@ $(document).ready(function(){
          	    $("#goNext").click(function(){
 					let hasClass = $(this).hasClass('nodeGoNext')	
 					if (hasClass) {
+						sessionStorage.setItem('guide_step', '2')
 						$("#modal-default").modal("hide");
 						$("#goNext").removeClass("nodeGoNext");
 						$('.swiper-button-next').trigger('click');
@@ -323,33 +348,58 @@ $(document).ready(function(){
     	$.get("checkDb",function(data,status){
            if(data) {//检查成功
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-						 $("#goNext").removeClass("disabled");
-						 //disabledInput();
-						 $("#goNext").addClass("bdGoNext");
+			   $("#goNext").removeClass("disabled");
+			   //disabledInput();
+			   $("#goNext").addClass("bdGoNext");
         	   $("#goNext").click(function(){
-								let hasClass = $(this).hasClass('bdGoNext')	
-								if (hasClass) {
-									$("#modal-default").modal("hide");
-									$("#goNext").removeClass("nodeGoNext");
-									$("#goNext").removeClass("bdGoNext");
-									$("#modal-default").modal("hide");
-									var formData = {};
-									$.post("checkOrgId", formData, function(value,status){
-										if (value) {
-											// 流程走完
-											window.location.href="deploy.html";
-										} else {
-											$('.swiper-button-next').trigger('click');
-											toAccount();
-										}
-									})	
-								}	
+        		   let hasClass = $(this).hasClass('bdGoNext')	
+        		   if (hasClass) {
+        			   $("#modal-default").modal("hide");
+        			   $("#goNext").removeClass("nodeGoNext");
+        			   $("#goNext").removeClass("bdGoNext");
+        			   $("#modal-default").modal("hide");
+        			   var formData = {};
+        			   $.post("checkOrgId", formData, function(value,status){
+        				  if (value) {
+        					  // 流程走完
+        					  window.location.href="deploy.html";
+        					  sessionStorage.removeItem('guide_step')
+        				  } else {
+        					  $('.swiper-button-next').trigger('click');
+        					  sessionStorage.setItem('guide_step', '3')
+        					  toAccount();
+        				  }
+        			   })	
+        		   }	
           	  })
            } else {//检查失败
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
         });
     }
+    // 点击选择生成秘钥
+    $('.key_item').click(function(){
+    	$('.key_item').removeClass('active_key')
+    	$(this).addClass('active_key')
+    })
+    // 选择完秘钥方式点击下一步
+    $('#caretKeyBtn').click(function(){
+    	let type = $('.active_key').attr('type')
+    	if (type == 1) {
+    		// 系统自动创建公钥
+    		var thisObj = this;
+			var disabled = $(thisObj).attr("class").indexOf("disabled");
+	        if(disabled > 0) return;
+	        $.confirm("确定系统自动创建 admin 账户的公私钥?",function(){
+				createAdmin(thisObj);
+		    })
+    	} else {
+    		// 选择私钥
+    		$('#modal-create-pri').modal()
+    	}
+    })
+    
+    
     var hasAccount = false;
     // 转到账户配置
     function toAccount() {
@@ -361,10 +411,12 @@ $(document).ready(function(){
 				$("#accountDiv").show();
 				$("#nextDiv").show();
 				$("#account").val(data);
+				$('#key-part').hide()
 				hasAccount = true;
 			} else {
 				$(".card-title").html("创建管理员账户的WeId");
 				$("#createDiv").show();
+				$('#key-part').show()
 				hasAccount = false;
 			}
 			$("#nextBtn").removeClass("disabled");
@@ -388,7 +440,7 @@ $(document).ready(function(){
 			createAdmin(thisObj);
 	    })
     });
-	
+
 	function createAdmin(obj) {
 		$(obj).addClass("disabled");
 	    var formData = new FormData();
@@ -405,16 +457,31 @@ $(document).ready(function(){
 	        success:function(res) {
 	            if (res=="fail") {
 	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+//	            	$("#postBtn").removeClass("disabled");
+	            	$(obj).removeClass("disabled");
 	            } else {
 	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
+	            	// 新增的内容开始
+	            	$(".card-title").html("当前admin账户");
+	            	$("#createDiv").hide();
+					$("#accountDiv").show();
+					$("#nextDiv").show();
+					$("#account").val(res);
+					$('#key-part').hide()
+					hasAccount = true;
+					$("#nextBtn").removeClass("disabled");
+					// 新增的内容结束
+//	            	$("#configBtn").removeClass("disabled");
 	            	$("#goNext").removeClass("disabled");
 	            	$("#goNext").click(function(){
 	            		if (role == "2") {
 	            			window.location.href="deploy.html";
+	            			sessionStorage.removeItem('guide_step')
 	            		} else {
 	            			$('.swiper-button-next').trigger('click');
 		            		$("#modal-default").modal("hide");
 		            		$("#modal-create-pri").modal("hide");
+		            		sessionStorage.setItem('guide_step', '4')
 	            		}
 	            	})
 	            }
@@ -430,8 +497,10 @@ $(document).ready(function(){
 			if (value) {
 				// 流程走完
 				window.location.href="deploy.html";
+				sessionStorage.removeItem('guide_step')
 			} else {
 				$('.swiper-button-next').trigger('click');
+				sessionStorage.setItem('guide_step', '3')
 				toAccount();
 			}
 		})	
@@ -439,5 +508,6 @@ $(document).ready(function(){
 	
 	$("#nextBtn").click(function(){
 		$('.swiper-button-next').trigger('click');
+		sessionStorage.setItem('guide_step', '4')
 	})
 })

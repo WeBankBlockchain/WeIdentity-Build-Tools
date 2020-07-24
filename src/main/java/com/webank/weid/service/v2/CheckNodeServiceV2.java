@@ -2,14 +2,11 @@ package com.webank.weid.service.v2;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.fisco.bcos.channel.client.Service;
 import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
-import org.fisco.bcos.web3j.crypto.Credentials;
-import org.fisco.bcos.web3j.crypto.gm.GenCredential;
 import org.fisco.bcos.web3j.protocol.Web3j;
 import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.fisco.bcos.web3j.protocol.core.methods.response.BlockNumber;
@@ -20,7 +17,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.controller.BuildToolController;
-import com.webank.weid.exception.InitWeb3jException;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.service.CheckNodeFace;
 
@@ -44,29 +40,28 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
             }
             ChannelEthereumService channelEthereumService = new ChannelEthereumService();
             channelEthereumService.setChannelService(service);
-            Web3j web3j = Web3j.build(channelEthereumService, service.getGroupId());
+            Web3j web3j = Web3j.build(channelEthereumService, 0);
             if (web3j == null) {
                 logger.error("[check] build the web3j fail.");
                 throw new WeIdBaseException("init web3j fail.");
             }
-            // 检查群组配置
-            List<String> groupList = web3j.getGroupList().send().getGroupList();
-            if (!groupList.contains(fiscoConfig.getGroupId())) {
-                throw new WeIdBaseException("the groupId does not exist.");
-            }
-            Credentials  credentials = GenCredential.create();
-            if (credentials == null) {
-                logger.error("[check] create the Credentials fail.");
-                throw new WeIdBaseException("the Credentials create fail.");
-            }
-            int number = 0;
+//            // 检查群组配置
+//            List<String> groupList = web3j.getGroupList().send().getGroupList();
+//            if (!groupList.contains(fiscoConfig.getGroupId())) {
+//                throw new WeIdBaseException("the groupId does not exist.");
+//            }
+//            Credentials  credentials = GenCredential.create();
+//            if (credentials == null) {
+//                logger.error("[check] create the Credentials fail.");
+//                throw new WeIdBaseException("the Credentials create fail.");
+//            }
             try {
-                number = this.getBlockNumber(web3j);
-                logger.info("[check] the current blockNumber is {}", number);
+                web3j.getGroupList().send().getGroupList();
+                logger.info("[check] check node successfully.");
                 return true;
             } catch (Exception e) {
-                logger.error("[check] get the BlockNumber fail.", e);
-                throw new WeIdBaseException("can not get the blockNumber.");
+                logger.error("[check] check node fail.", e);
+                throw new WeIdBaseException("can not connection the node.");
             } finally {
                 channelConnections.stopWork();
             }

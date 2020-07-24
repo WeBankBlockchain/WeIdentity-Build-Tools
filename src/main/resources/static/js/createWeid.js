@@ -1,3 +1,4 @@
+var role = "3";
 $(document).ready(function(){
 	if (!isReady) {
     	return;
@@ -5,7 +6,11 @@ $(document).ready(function(){
     loadData();
     // 初始化控件
     bsCustomFileInput.init();
-    
+    $.ajaxSettings.async = false;
+    $.get("getRole",function(value,status){
+    	role = value
+    })
+    $.ajaxSettings.async = true;
     $("#createBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
@@ -240,10 +245,18 @@ function loadData() {
 
 function processIssuerBtn() {
 	$("button[name='registerIssueBtn']").each(function(){
-		var index = $(this).attr("class").indexOf("true");
-		if(index > 0) {
-			$(this).attr("disabled",true);
-			$(this).html("已成为权威凭证发行者");
+		if (role == "1") {
+			$(this).show();
+			var index = $(this).attr("class").indexOf("true");
+			if(index > 0) {
+				$(this).attr("disabled",true);
+				$(this).html("已成为权威凭证发行者");
+			}
+		}
+	});
+	$("button[name='addToIssuerTypeBtn']").each(function(){
+		if (role == "1") {
+			$(this).show();
 		}
 	});
 	$.get("isDownFile",function(data,status){

@@ -102,22 +102,24 @@ public class BuildToolController {
     
     @GetMapping("/nodeCheckState")
     public boolean nodeCheckState() {
-        return nodeCheck;
+        if (!nodeCheck) {
+            String result = checkNode();
+            return BuildToolsConstant.SUCCESS.equals(result);
+        }
+        return true;
     }
     
     @GetMapping("/dbCheckState")
     public boolean dbCheckState() {
-        return dbCheck;
+        if (!dbCheck) {
+            return checkDb();
+        }
+        return true;
     }
     
     @GetMapping("/isDownFile")
     public boolean isDownFile() {
         return isDownFile.equals("true");
-    }
-    
-    @GetMapping("/isReady")
-    public boolean isReady() {
-        return nodeCheck;
     }
     
     @Description("是否启用主hash")
@@ -407,6 +409,7 @@ public class BuildToolController {
             if (checkNode != null && checkNode.check(fiscoConfig)) {
                 logger.info("[checkNode] the node check successfull.");
                 nodeCheck = true;
+                //configService.reloadAddress();
                 return BuildToolsConstant.SUCCESS;
             }
             logger.error("[checkNode] checkNode with fail.");
@@ -529,14 +532,14 @@ public class BuildToolController {
         logger.info("[registerCpt] begin save the cpt json file...");
         String cptJson = request.getParameter("cptJson");
         cptJson = StringEscapeUtils.unescapeHtml(cptJson);
-        String fileName = request.getParameter("fileName");
-        fileName = fileName.substring(0, fileName.lastIndexOf("."));
-        fileName = FileUtils.getSecurityFileName(fileName);
+        String fileName = DataToolUtils.getUuId32();
         File targetFIle = new File("output/", fileName + ".json");
         FileUtils.writeToFile(cptJson, targetFIle.getAbsolutePath(), FileOperator.OVERWRITE);
         logger.info("[registerCpt] begin register cpt...");
         String cptId = request.getParameter("cptId");
         try {
+            //判断当前账户是否注册成weid，如果没有则创建weid
+            deployService.createWeIdForCurrentUser(DataFrom.WEB);
             return buildToolService.registerCpt(targetFIle, cptId, DataFrom.WEB);
         } catch (Exception e) {
             logger.error("[registerCpt] register cpt has error.", e);
@@ -786,5 +789,17 @@ public class BuildToolController {
             }
         }
         return isExist;
+    }
+    
+    @Description("设置引导完成状态")
+    @PostMapping("/setGuideStatus")
+    public boolean setGuideStatus(@RequestParam(value = "step") String step) {
+        return deployService.setGuideStatus(step);
+    }
+    
+    @Description("获取引导状态")
+    @GetMapping("/getGuideStatus")
+    public String getGuideStatus() {
+        return deployService.getGuideStatus();
     }
 }

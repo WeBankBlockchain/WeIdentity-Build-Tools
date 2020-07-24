@@ -10,7 +10,7 @@ $(document).ready(function(){
 			forceParse: 0,
 			format:"yyyy-mm-dd"
 	});
-	if (!isReady) {
+	if (!isReady || !isReadyForDb) {
 		return;
     }
 	query();

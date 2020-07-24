@@ -20,8 +20,8 @@
 <div class="wrapper">
   <ul class="navbar-nav">
     <li class="nav-item col-md-6 offset-md-3">
-            <span>WeId-Web-Tool</span>
-            <span id="openLog">后台日志</span>
+            <span>WeIdentity 部署工具</span>
+            <span id="openLog">查看后台日志</span>
     </li>
   </ul>
   <div class="swiper-container swiper-no-swiping">
@@ -33,24 +33,24 @@
                                 <div class="col-md-6 offset-md-3">
                                     <div id="AccountDiv" class="card card-primary">
                                         <div class="card-header">
-                                            <h6>请选择角色</h6>
+                                            <h6>请选择您的角色</h6>
                                             <span class='guide_notice'>
                                                 <img src="./dist/img/icon-question.svg" alt="">
-                                                什么是联盟委员会管理员
+                                                什么是"联盟链委员会管理员"
                                             </span>
                                         </div>
                                         <div class="card-body role_body">
                                             <div class='role_part role_active' type='1'>
                                                 <span>
                                                     <img class='role_icon' src='./dist/img/icon1-member.svg'>
-                                                    我不是联盟链委员会管理员
+                                                    我是"联盟链委员会管理员"
                                                 </span>
                                                 <img class='selected_icon' src="./dist/img/icon-select.svg" alt="">
                                             </div>
                                             <div class='role_part' type='2'>
                                                 <span>
                                                     <img class='role_icon' src="./dist/img/icon1-not.svg" alt="">
-                                                    不是联盟链委员会管理员
+                                                    我不是"联盟链委员会管理员"
                                                 </span>
                                                 <img class='selected_icon' src="./dist/img/icon-select.svg" alt="">
                                             </div>
@@ -87,7 +87,7 @@
                     <div class='guide_step_item'>
                         <span>4</span>
                         <img src="./dist/img/icon-hook.svg" alt="">
-                        <p>部署合约</p>
+                        <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                     </div>
                 </div>
                 <div class="container-fluid">
@@ -212,7 +212,7 @@
                         <div class='guide_step_item'>
                             <span>4</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
-                            <p>部署合约</p>
+                            <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                         </div>
                     </div>
                   <div class="container-fluid">
@@ -232,8 +232,8 @@
                               </div>
                               <div class="form-group">
                                 <label for="mysql_database">数据库名称</label>
+                                <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">* 数据库需要提前自己搭建好，并建立好数据库，数据库名称(DataBase Name)可以自行决定</div>
                                 <input type="text" class="form-control" id="mysql_database" placeholder="Enter DataBase Name">
-                                <div style="display:block; font-size: 13px;color: gray;margin-top: 10px;">* 数据库需要提前自己搭建好，并建立好数据库，数据库名称(DataBase Name)可以自行决定</div>
                               </div>
                               <div class="form-group">
                                 <label for="mysql_username">数据库用户名</label>
@@ -286,7 +286,7 @@
                         <div class='guide_step_item'>
                             <span>4</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
-                            <p>部署合约</p>
+                            <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                         </div>
                     </div>
                   <div class="container-fluid">
@@ -295,7 +295,7 @@
                         <!-- general form elements -->
                         <div id="AccountDiv" class="card card-primary">
                           <div class="card-header">
-                            <h3 class="card-title">选择生成秘钥方式</h3>
+                            <h3 class="card-title">创建管理员WeID</h3>
                           </div>
                           <!-- /.card-header -->
                           <!-- form start -->
@@ -361,14 +361,14 @@
                             <div class='guide_step_item guide_step_active'>
                                 <span>4</span>
                                 <img src="./dist/img/icon-hook.svg" alt="">
-                                <p>部署合约</p>
+                                <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                             </div>
                         </div>
                         <div class='container-fluid guild-step'>
                             <div class="col-md-6 offset-md-3">
                                 <div id="AccountDiv" class="card card-primary">
                                     <div class="card-header">
-                                        <h6>链ID(chain_id)</h6>
+                                        <h6>为WeIdentity DID 设置链ID （chain-id）</h6>
                                     </div>
                                     <div class="card-body role_body" style='padding:0 1.25rem;'>
                                     <div class="form-group" style='width:100%;'><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="color: #017CFF;">
@@ -402,6 +402,7 @@
           </button>
         </div>
         <div  class="modal-body">
+          <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">备注：支持椭圆曲线的公私钥，并且为十进制私钥数据。</p>
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
           <form id="KeyForm" role="form">
             <div class="form-group row">

@@ -423,6 +423,13 @@ public class BuildToolController {
         }
     }
     
+    @Description("提交群组Id")
+    @PostMapping("/setGroupId")
+    public boolean setMasterGroupId(@RequestParam("groupId") String groupId) {
+        logger.info("[setMasterGroupId] begin set the groupId = {}.", groupId);
+        return configService.setMasterGroupId(groupId);
+    }
+    
     @Description("数据库配置提交")
     @PostMapping("/submitDbConfig")
     public String submitDbConfig(HttpServletRequest request) {
@@ -696,9 +703,11 @@ public class BuildToolController {
     }
     
     @Description("获取群组列表")
-    @GetMapping("/getAllGroup")
-    public List<Map<String,String>> getAllGroup() {
-        List<String> allGroup = deployService.getAllGroup();
+    @GetMapping("/getAllGroup/{filterMaster}")
+    public List<Map<String,String>> getAllGroup(
+        @PathVariable(value = "filterMaster") boolean filterMaster
+    ) {
+        List<String> allGroup = deployService.getAllGroup(filterMaster);
         List<Map<String,String>> result = new ArrayList<Map<String,String>>();
         if (allGroup != null) {
             for (String string : allGroup) {

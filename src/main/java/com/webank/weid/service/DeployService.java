@@ -1,7 +1,6 @@
 package com.webank.weid.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcos.web3j.crypto.Keys;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
-import org.fisco.bcos.web3j.protocol.Web3j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -436,14 +434,17 @@ public class DeployService {
 
     /**
      * 获取群组列表
+     * @param filterMaster 是否过滤主群组
      * @return 返回群组列表
      */
-    public List<String> getAllGroup() {
+    public List<String> getAllGroup(boolean filterMaster) {
         List<String> list = WeServerUtils.getGroupList();
-        return list.stream()
-            .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
-            .collect(Collectors.toList());
-
+        if (filterMaster) {
+            return list.stream()
+                    .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
+                    .collect(Collectors.toList());
+        }
+       return list;
     }
     
     /**
@@ -465,7 +466,7 @@ public class DeployService {
         boolean isMatch =  buildToolService.isMatchThePrivateKey();
         Map<String, String> cache = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(list)) {
-            List<String> allGroup = getAllGroup();
+            List<String> allGroup = getAllGroup(true);
             for (HashContract hashContract : list) {
                 ShareInfo share = new ShareInfo();
                 share.setTime(hashContract.getTime());
@@ -599,7 +600,7 @@ public class DeployService {
     public String enableShareCns(String hash) {
         logger.info("[enableShareCns] begin enable new hash...");
         try {
-            List<String> allGroup = getAllGroup();
+            List<String> allGroup = getAllGroup(true);
             // 查询hash对应的群组
             String groupId = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
             String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();

@@ -76,24 +76,18 @@ $(document).ready(function(){
 	$('#role-next').click(function(){
 		// 如果有角色则直接跳转
 		sessionStorage.setItem('guide_step', '1')
-		if (role) {
-			$('.swiper-button-next').trigger('click');
-			// 转节点配置
-			toNodeConfig();
-		} else {
-			const val = $('.role_active').attr('type')
-			role = val
-			var formData = {};
-			formData.roleType = val;
-			$.post("setRole", formData, function(value,status){
-				if (value) {
-					$('.swiper-button-next').trigger('click');
-					// 转节点配置
-					toNodeConfig();
-				}
-			})	
-		}
-			
+		const val = $('.role_active').attr('type')
+		role = val
+		sessionStorage.setItem('guide_role', role)
+		var formData = {};
+		formData.roleType = val;
+		$.post("setRole", formData, function(value,status){
+			if (value) {
+				$('.swiper-button-next').trigger('click');
+				// 转节点配置
+				toNodeConfig();
+			}
+		})
 	})
 	function checkStep(e) {
 		switch (e) {

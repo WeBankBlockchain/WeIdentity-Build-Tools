@@ -9,7 +9,7 @@ $(document).ready(function(){
     });
     
     //加载issuerTypeList
-    $("#groupId").loadSelect("getAllGroup","value", "value",function(data){
+    $("#groupId").loadSelect("getAllGroup/true","value", "value",function(data){
     });
     
     var isClose = false;

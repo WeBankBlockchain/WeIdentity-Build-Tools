@@ -115,13 +115,32 @@ public class ConfigService {
                 buffer.append(string).append("\n");
                 continue;
             }
-            if (string.startsWith("chainId")) {
+            if (string.startsWith("chain_id")) {
                 buffer.append("chain_id=").append(chainId).append("\n");
             } else {
                 buffer.append(string).append("\n");
             }
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+    }
+    
+    public boolean setMasterGroupId(String groupId) {
+        List<String> listStr = FileUtils.readFileToList("run.config");
+        StringBuffer buffer = new StringBuffer();
+        for (String string : listStr) {
+            if (string.startsWith("#") || string.indexOf("=") == -1) {
+                buffer.append(string).append("\n");
+                continue;
+            }
+            if (string.startsWith("group_id")) {
+                buffer.append("group_id=").append(groupId).append("\n");
+            } else {
+                buffer.append(string).append("\n");
+            }
+        }
+        FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        //根据模板生成配置文件
+        return generateProperties();
     }
     
     public boolean processDbConfig(String address, String database, String username, String password) {

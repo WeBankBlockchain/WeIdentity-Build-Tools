@@ -72,8 +72,8 @@
 	                <td>
 	                      <button type="button" onclick="downEcdsaPubKey('${id}')" class="btn btn-inline btn-primary btn-flat display-none" style="display: none" downFile="file">下载公钥文件</button>
 	                      <button type="button" onclick="downEcdsaKey('${id}')" class="btn btn-inline btn-primary btn-flat" style="display: none" downFile="file">下载私钥文件</button>
-	                      <button type="button" name="registerIssueBtn" onclick="registerIssue('${weId}')" title="注册为Authority Issuer" class="btn btn-inline btn-primary btn-flat ${issuer}" >注册为权威凭证发行者</button>
-	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" >注册为特定类型的发行者</button>
+	                      <button type="button" name="registerIssueBtn" onclick="registerIssue('${weId}')" title="注册为Authority Issuer" class="btn btn-inline btn-primary btn-flat ${issuer}" style="display: none" >注册为权威凭证发行者</button>
+	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" style="display: none" >注册为特定类型的发行者</button>
 	                </td>
 	              </tr>
                 </tbody>
@@ -172,9 +172,6 @@
             <div class="form-group">
               <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-block btn-primary btn-flat">系统自动创建公私钥来创建WeID</button>
             </div>
-            <div class="form-group">
-                <div class="col-sm-10"><span style="font-size: 13px;color: gray">* 只有是群组的admin，才能作为代理创建WeID。</span></div>
-            </div>
           </div>
         </div>
       </div>
@@ -238,6 +235,9 @@
                        <label id="publicKey-label" class="custom-file-label" for="publicKey">选择公钥文件...</label>
                      </div>
                    </div>
+                   <div class="form-group">
+	                 <div class="col-sm-10"><span style="font-size: 13px;color: gray">* 只有是联盟链委员会管理员，才能作为代理创建WeID。</span></div>
+	              </div>
                </div>
              </div>
              </form>

@@ -59,9 +59,11 @@ public class DeployService {
     private static final String ECDSA_KEY = "ecdsa_key";
     private static final String ECDSA_PUB_KEY = "ecdsa_key.pub";
     private static final String ROLE_FILE = "role";
+    private static final String GUIDE_FILE = "guide";
     private static final String ADMIN_PATH = "output/admin";
     public static final String DEPLOY_PATH = "output/deploy";
     public static final String SHARE_PATH = "output/share";
+    private static final String OTHER_PATH = "output/other";
     
     private static final String AUTH_ADDRESS_FILE_NAME = "authorityIssuer.address";
     private static final String CPT_ADDRESS_FILE_NAME = "cptController.address";
@@ -630,13 +632,30 @@ public class DeployService {
     
     
     public boolean setRoleType(String roleType) {
-        File roleFile = new File(ADMIN_PATH, ROLE_FILE);
+        File roleFile = new File(OTHER_PATH, ROLE_FILE);
         FileUtils.writeToFile(roleType, roleFile.getAbsolutePath(), FileOperator.OVERWRITE);
         return true;
     }
     
     public String getRoleType() {
-        File roleFile = new File(ADMIN_PATH, ROLE_FILE);;
+        File roleFile = new File(OTHER_PATH, ROLE_FILE);
+        if (!roleFile.exists()) {
+            return StringUtils.EMPTY;
+        }
         return FileUtils.readFile(roleFile.getAbsolutePath());
+    }
+    
+    public boolean setGuideStatus(String step) {
+        File guideFile = new File(OTHER_PATH, GUIDE_FILE);
+        FileUtils.writeToFile(step, guideFile.getAbsolutePath(), FileOperator.OVERWRITE);
+        return true;
+    }
+    
+    public String getGuideStatus() {
+        File guideFile = new File(OTHER_PATH, GUIDE_FILE);
+        if (!guideFile.exists()) {
+            return StringUtils.EMPTY;
+        }
+        return FileUtils.readFile(guideFile.getAbsolutePath());
     }
 }

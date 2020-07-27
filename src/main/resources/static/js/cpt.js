@@ -46,7 +46,6 @@ $(document).ready(function(){
 	})
 	
 	
-    
 	//json编辑器
     var options = {
 		mode: 'code',
@@ -57,6 +56,7 @@ $(document).ready(function(){
 	};
 
     var editor = new JSONEditor(jQuery("#jsonContent").get(0), options);
+    editor.setText("");
     //注册CPT
     $("#registerCpt").click(function(){
     	var thisObj = this;
@@ -107,6 +107,31 @@ $(document).ready(function(){
 	    })
     })
     
+    $('.template_btn').click(function(){
+    	let cptJson = editor.getText()
+    	try {
+    		var $this = this;
+    		var orginCode = $($this).next().find('pre').text();
+	    	if (!cptJson || cptJson == '{}') {
+	    		editor.setText(orginCode);
+	    	} else {
+	    		let code = JSON.stringify(JSON.parse(orginCode))
+	    		cptJson = JSON.stringify(JSON.parse(cptJson))
+	    		if (cptJson != code) {
+	    			$.confirm("确认要覆盖下列代码片段?",function() {
+		    			editor.setText(orginCode);
+		    		})
+	    		}
+	    	}
+    	} catch (e) {
+	    	$("#messageBody").html("<pre>Error：" + e.message + "</pre>");
+    		$("#modal-message").modal();
+    		return;
+	    }
+		
+	})
+    
+    
     function vaildFileName(fileName) {
     	var v = fileName.substring(fileName.lastIndexOf("."));
     	if (v != ".json" && v != ".JSON") {
@@ -117,7 +142,7 @@ $(document).ready(function(){
 	$("#cptJsonFile").change(function(){
     	var file = $("#cptJsonFile")[0].files[0];
     	if (file == null || file == undefined) {
-    		editor.set(JSON.parse("{}"));
+    		editor.setText("");
     	} else {
     		let reader = new FileReader();
             reader.readAsText(file, 'utf-8');
@@ -132,7 +157,7 @@ $(document).ready(function(){
     });
     
     $('#modal-register-cpt').on('hide.bs.modal', function () {
-    	editor.set(JSON.parse("{}"));
+    	editor.setText("");
     	$("#cptJsonFile").val("");
 		$(".custom-file-label").html("选择CPT文件...");
 	})

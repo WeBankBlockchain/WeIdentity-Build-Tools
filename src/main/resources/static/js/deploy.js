@@ -1,7 +1,6 @@
 var deployed = false;
 $(document).ready(function(){
 	$.get("getRole",function(value,status){
-		console.log(value)
 		if (value === '1') {
 			$('#depolyBtn').show()
 		}

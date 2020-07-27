@@ -196,9 +196,9 @@ $(document).ready(function(){
     	
 	})
 	
-	$.get("getWeIdPath",function(value,status){
-       $("#weidDir").html("当前WeID存放路径: " + value);
-    })
+//	$.get("getWeIdPath",function(value,status){
+//       $("#weidDir").html("当前WeID存放路径: " + value);
+//    })
 });
 var template = $("#data-tbody").html();
 var  table;

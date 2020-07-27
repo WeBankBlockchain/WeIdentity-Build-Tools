@@ -1,15 +1,27 @@
 $(document).ready(function(){
+	var hashChildGroup = false;
+	$("#depolyBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	//判断是否有子群组
+        	if (hashChildGroup) {
+        		$("#modal-evidence-deploy").modal();
+        	} else {
+        		$("#messageBody").html("<p>当前“WeIdentity 部署工具”连接的区块链节点只加入了一个区块链群组，且这个群组是主群组。我们不支持在主群组上额外部署 Evidence 智能合约。</p>");
+    	       	$("#modal-message").modal();
+        	}
+        }
+    });
 	if (!isReady) {
     	return;
     }
     loadData();
-
-    $("#depolyBtn").click(function(){
-    	$("#modal-evidence-deploy").modal();
-    });
-    
     //加载issuerTypeList
     $("#groupId").loadSelect("getAllGroup/true","value", "value",function(data){
+    	if (data.length > 0) {
+    		hashChildGroup = true;
+    	}
     });
     
     var isClose = false;
@@ -34,10 +46,10 @@ $(document).ready(function(){
         	   isClose = true;
            } else {
         	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>存证部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+        	   $("#confirmMessage1Btn").removeClass("disabled");
            }
            $($this).html(btnValue);
            $($this).removeClass("disabled");
-           $("#confirmMessage1Btn").removeClass("disabled");
            $("#modal-confirm-message1").modal();
         })
     });
@@ -99,6 +111,7 @@ function checkFirstDeploy(hash, groupId) {
 			enableEvidenHash(hash, groupId);
 		} else {
 			loadData();
+			$("#confirmMessage1Btn").removeClass("disabled");
 		}
 	});
 }

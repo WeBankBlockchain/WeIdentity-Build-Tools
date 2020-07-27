@@ -18,6 +18,14 @@ $(document).ready(function(){
 });
 
 function query() {
+	if (!isReadyForDb) {
+		showConfigMessage();
+		return;
+    }
+	if (!isReady) {
+		showMessageForNodeException();
+		return;
+    }
 	//加载部署数据
 	$('#example2').DataTable({
       "paging": true,

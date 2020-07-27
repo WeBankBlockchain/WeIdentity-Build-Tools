@@ -1,11 +1,18 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
-	if (!isReady) {
-    	return;
-    }
-    loadData();
-
+    $("#openRegisterCpt").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#modal-register-cpt").modal();
+        }
+    });
+    
     $("#cptToPojoBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+    		return;
+        }
     	var $this = this;
     	var cptIds = getCptIds();
         if (cptIds.length == 0) {
@@ -44,8 +51,12 @@ $(document).ready(function(){
 			$("#modal-register-cpt").modal("hide");
 		}
 	})
-	
-	
+
+	if (!isReady) {
+    	return;
+    }
+    loadData();
+
 	//json编辑器
     var options = {
 		mode: 'code',
@@ -151,10 +162,6 @@ $(document).ready(function(){
             };
     	}
     })
-    
-    $("#openRegisterCpt").click(function(){
-    	$("#modal-register-cpt").modal();
-    });
     
     $('#modal-register-cpt').on('hide.bs.modal', function () {
     	editor.setText("");

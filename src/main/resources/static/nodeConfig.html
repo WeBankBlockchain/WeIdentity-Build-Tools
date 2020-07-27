@@ -93,10 +93,6 @@
                                 <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
                               </div>
                               <div class="form-group">
-                                <label for="ipPort">主群组ID (Main group ID)</label>
-                                <input type="text" class="form-control" id="groupId" name="groupId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter groupId">
-                              </div>
-                              <div class="form-group">
                                     <label for="caCrtFile">ca.crt证书</label> 
                                     <div class="input-group">
                                       <div class="custom-file">
@@ -140,7 +136,7 @@
                                     <span id="cllientKeyStoreSpan"></span>
                                   </div>
                               </div>
-                              <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk.html#fisco-bcos" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
+                              <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
                             </div>
                             </form>
                 <!-- /.card-body -->

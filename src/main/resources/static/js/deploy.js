@@ -1,12 +1,17 @@
 var deployed = false;
+var mainDeployBtnName;
 $(document).ready(function(){
 	$.get("getRole",function(value,status){
 		if (value === '1') {
 			$('#depolyBtn').show()
 		}
 	})
-    $("#depolyBtn").click(function(){
-    	$("#modal-deploy").modal();
+	$("#depolyBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#modal-deploy").modal();
+        }
     });
     var url = window.location.pathname;
     url = url.substring(1);
@@ -16,7 +21,6 @@ $(document).ready(function(){
         }
         loadData();
     }
-    
     var isClose = true;
     $("#mainDeploy").click(function(){
     	var chainId = $("#chainId").val();
@@ -32,7 +36,8 @@ $(document).ready(function(){
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         $($this).addClass("disabled");
-        $($this).html("合约部署中,  请稍等...");
+        mainDeployBtnName = $($this).html();
+        $($this).html("部署中...");
         $("#confirmMessage1Body").html("<p>合约部署中，请稍等...</p>");
         $("#confirmMessage1Btn").addClass("disabled");
         $("#modal-confirm-message1").modal();
@@ -261,11 +266,11 @@ function deployCpt(hash, obj) {
 
 function showBtn(btnObj) {
 	if (btnObj != null) {
-		$(btnObj).html("主群组部署合约");
+		$(btnObj).html(mainDeployBtnName);
 	    $(btnObj).removeClass("disabled");
 	    $("#modal-confirm-message1").modal();
 	}
-	 $("#confirmMessage1Btn").removeClass("disabled");
+	$("#confirmMessage1Btn").removeClass("disabled");
 }
 
 function showEnableBtn(btnObj) {

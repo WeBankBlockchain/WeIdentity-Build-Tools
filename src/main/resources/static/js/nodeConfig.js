@@ -7,7 +7,6 @@ $(document).ready(function(){
         $("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
         $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
         $("#nodeForm  #ipPort").val(data.blockchain_address);
-        $("#nodeForm  #groupId").val(data.group_id);
         caDisplay(data.blockchain_fiscobcos_version);
         checkCa(data);
 //        $.get("nodeCheckState",function(data,status){
@@ -69,7 +68,6 @@ $(document).ready(function(){
 	    formData.append("version", $("#nodeForm  #version").val());
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
 	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
-	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
 	    $("#confirmMessage1Body").html("<p>配置提交中,请稍后...</p>");
 	    $("#confirmMessage1Btn").addClass("disabled");
 	    $("#modal-confirm-message1").modal();
@@ -109,14 +107,6 @@ $(document).ready(function(){
     	var ipPort = $.trim($("#nodeForm  #ipPort").val());
     	if (ipPort.length == 0) {
     		return "请输入您的节点IP与Port";
-    	}
-    	var groupId = $.trim($("#nodeForm  #groupId").val());
-    	if (groupId.length == 0) {
-    		return "请输入您的groupId";
-    	}
-    	var r = /^[1-9][0-9]*$/;
-    	if(!r.test(groupId)) {
-    		return "groupId必须为整数";
     	}
     	// 检查上传文件是否跟要求一致
     	var caCrtFile = $("#caCrtFile")[0].files[0];
@@ -172,7 +162,6 @@ $(document).ready(function(){
         $("#nodeForm  #version").attr("disabled",true);
         $("#nodeForm  #cnsProFileActive").attr("disabled",true);
         $("#nodeForm  #ipPort").attr("disabled",true);
-        $("#nodeForm  #groupId").attr("disabled",true);
         $("#caCrtFile").attr("disabled",true);
         $("#caCrtSpan").hide();
         $("#nodeCrtFile").attr("disabled",true);

@@ -485,14 +485,14 @@ function showWeId(weId) {
 
 function showDId(weId) {
 	$.get("getWeIdPath",function(value,status){
-		$("#messageBody").html("<p class='select_part'><label>WeId:</label>" +"<input readonly onClick='select_copy(this)' value='"+ weId +"' /></p>");
+		$("#messageBody").html("<p class='select_part'><label>WeId:</label>" +"<input readonly onClick='select_copy(this,event)' value='"+ weId +"' /></p>");
 	    var data = value + "/" + weId.split(":")[3];
-	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeId公钥存放路径:</label><textarea onClick='select_copy(this)' readonly>" + data + "</textarea></p>");
+	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeId公钥存放路径:</label><textarea onClick='select_copy(this,event)' readonly>" + data + "</textarea></p>");
 	    $("#modal-message").modal();
 	})
 }
 
-function select_copy (e){
+function select_copy (e, event){
 	$(e).select();
 	document.execCommand("Copy");
 	var div = document.createElement('div')
@@ -502,17 +502,19 @@ function select_copy (e){
 	setTimeout(function(){
 		$(div).remove()
 	}, 1000)
+//	var showbox = showMessage(e,"已复制", event);
+//	setTimeout(function(){
+//		$(showbox).remove();
+//	}, 1000)
 }
 
-function showMessage(thisObj, message) {
+function showMessage(thisObj, message, event) {
 	var posX = 0, posY = 0;
 	var event = event || window.event;
 	if (event.pageX || event.pageY) {
-		alert("1")
 	    posX = event.pageX - document.documentElement.scrollLeft;;
 	    posY = event.pageY - document.documentElement.scrollTop;;
 	} else if (event.clientX || event.clientY) {
-		alert("2")
 	    posX = event.clientX - document.documentElement.scrollLeft - document.body.scrollLeft;
 	    posY = event.clientY - document.documentElement.scrollTop - document.body.scrollTop;
 	}
@@ -530,6 +532,7 @@ function showMessage(thisObj, message) {
                   background: '#fff',
                 }).addClass("showbox");
     showbox.insertAfter(thisObj);
+    return showbox;
 }
 
 function hideMessage() {

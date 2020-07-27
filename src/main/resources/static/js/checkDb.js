@@ -4,25 +4,16 @@ $(document).ready(function(){
 	$.ajaxSettings.async = false;
     $.get("dbCheckState",function(data,status){
     	if(!data) {
-    		$('#modal-message').on('hide.bs.modal', function () {
-    			goToDbConfig();
-	    	})
-    		showTime();
-    		setInterval(showTime,1000);
-            setTimeout(goToDbConfig,5000);
+    		showConfigMessage();
     	} else {
     		isReadyForDb = true;
     	}
     });
     $.ajaxSettings.async = true;
-    function showTime() {
-    	times--;
-    	$("#messageBody").html("<p>数据库配置异常，" + times + "秒后自动进入数据库配置页面。</p>");
-    	$("#modal-message").modal();
-    }
-    function goToDbConfig() {
-        window.location.href="dbConfig.html";
-    }
 });
 
-
+function showConfigMessage() {
+	$("#configType").val("1");
+	$("#configBody").html("<p>您数据库配置异常，如果需要使用存证(Evidence)异步上链功能，请配置数据库。</p>");
+	$("#modal-config").modal();
+}

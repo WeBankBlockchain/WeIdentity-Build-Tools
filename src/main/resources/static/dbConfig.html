@@ -18,6 +18,34 @@
         display: none;
         float: right;
     }
+    .warning_box{
+		position: relative;
+		border:1px solid #ddd;
+	}
+	.warning_box .sql_warning{
+		position: absolute;
+	    right: -280px;
+	    top: 0;
+	    background: #fff;
+	    padding: 10px;
+	    border: 1px solid #ddd;
+	    border-radius: 4px;
+	}
+	
+	.sql_warning .warning_title{
+		font-family: PingFangSC-Medium;
+		font-size: 14px;
+		color: #333333;
+		line-height: 22px;
+		margin-bottom:10px;
+	}
+	
+	.sql_warning p{
+		font-size: 12px;
+		color: #666666;
+		line-height: 20px;
+		margin-bottom:5px;
+	}
   </style>
   <script src="dist/js/include.js"></script>
 </head>
@@ -55,7 +83,7 @@
         <!-- Small boxes (Stat box) -->
         <div class="col-md-6 offset-md-3">
             <!-- general form elements -->
-            <div class="card card-primary">
+            <div class="card card-primary warning_box">
               <div class="card-header">
                 <h3 class="card-title">数据库配置</h3>
               </div>
@@ -92,8 +120,15 @@
                 <div class="card-footer">
                   <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">完成</button>
                 </div>
-              </form>
-            </div>
+             </form>
+             <div class='sql_warning'>
+                 <div class='warning_title'>温馨提示</div>
+                  	<p>如果您需要使用到下列功能则需要配置数据库</p>
+                  	<p>1.Transportation相关组件功能</p>
+                   	<p>2.Evidence异步存证功能</p>
+                    <p>3.Persistence数据存储功能</p>
+                 </div>	
+             </div>
             <!-- /.card -->
         </div>
       </div><!-- /.container-fluid -->

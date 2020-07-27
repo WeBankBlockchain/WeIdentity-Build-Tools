@@ -26,7 +26,7 @@
   </ul>
   <div class="swiper-container swiper-no-swiping">
     <div class="swiper-wrapper">
-            <div class="swiper-slide">
+        <div class="swiper-slide">
                     <div class="content-wrapper">
                         <section class="content">
                             <div class='container-fluid guild-step'>
@@ -76,16 +76,21 @@
                     </div>
                     <div class='guide_step_item'>
                         <span>2</span>
+                         <img src="./dist/img/icon-hook.svg" alt="">
+                         <p>设置主群主ID</p>
+                        </div>
+                    <div class='guide_step_item'>
+                        <span>3</span>
                         <img src="./dist/img/icon-hook.svg" alt="">
                         <p>数据库配置(可选)</p>
                     </div>
                     <div class='guide_step_item'>
-                        <span>3</span>
+                        <span>4</span>
                         <img src="./dist/img/icon-hook.svg" alt="">
-                        <p>生成秘钥</p>
+                        <p>创建管理员WeID</p>
                     </div>
                     <div class='guide_step_item'>
-                        <span>4</span>
+                        <span>5</span>
                         <img src="./dist/img/icon-hook.svg" alt="">
                         <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                     </div>
@@ -123,10 +128,10 @@
                                 <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
                                 <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
                               </div>
-                              <div class="form-group">
+                              <!-- <div class="form-group">
                                 <label for="ipPort">主群组ID (Main group ID)</label>
                                 <input type="text" class="form-control" id="groupId" name="groupId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter groupId">
-                              </div>
+                              </div> -->
                               <div class="form-group">
                                     <label for="caCrtFile">ca.crt证书</label>
                                     <div class="input-group">
@@ -190,6 +195,58 @@
             </div>
         </div>
         <div class="swiper-slide">
+            <div class="content-wrapper">
+                <section class="content">
+                   	<div class='guide_step_part col-md-6 offset-md-3'>
+                      	<div class='bottom_line'></div>
+                        <div class='guide_step_item guide_step_complated'>
+                             <span>1</span>
+                             <img src="./dist/img/icon-hook.svg" alt="">
+                             <p>节点配置</p>
+                       	</div>
+                       	<div class='guide_step_item guide_step_active'>
+                            <span>2</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>设置主群主ID</p>
+                        </div>
+                        <div class='guide_step_item'>
+                            <span>3</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>数据库配置(可选)</p>
+                        </div>
+                        <div class='guide_step_item'>
+                             <span>4</span>
+                             <img src="./dist/img/icon-hook.svg" alt="">
+                             <p>创建管理员WeID</p>
+                        </div>
+                        <div class='guide_step_item '>
+                             <span>5</span>
+                             <img src="./dist/img/icon-hook.svg" alt="">
+                             <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
+                        </div>
+                      </div>
+                      <div class='container-fluid guild-step'>
+                            <div class="col-md-6 offset-md-3">
+                                <div id="AccountDiv" class="card card-primary">
+                                    <div class="card-header">
+                                        <h6>设置主群主ID</h6>
+                                    </div>
+                                    <div class="card-body role_body" style='padding:0 1.25rem;'>
+                                    	<div class="form-group" style='width:100%;'>
+		                                    <select  id="guide_groupID" name="version" class="form-control"></select>
+                                     	</div>
+                                    </div>
+                                    <div class="db-part">
+                                      <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                                      <button type="button"  id="setGroupId" class="btn btn-block btn-primary btn-flat">下一步</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                   </section>
+             </div>
+        </div>
+        <div class="swiper-slide">
             <div class='content-wrapper'>
               <section class="content">
                   <div class='guide_step_part col-md-6 offset-md-3'>
@@ -199,15 +256,20 @@
                             <img src="./dist/img/icon-hook.svg" alt="">
                             <p>节点配置</p>
                         </div>
-                        <div class='guide_step_item guide_step_active'>
+                        <div class='guide_step_item guide_step_complated'>
                             <span>2</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>设置主群主ID</p>
+                        </div>
+                        <div class='guide_step_item guide_step_active'>
+                            <span>3</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
                             <p>数据库配置(可选)</p>
                         </div>
                         <div class='guide_step_item'>
                             <span>3</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
-                            <p>生成秘钥</p>
+                            <p>创建管理员WeID</p>
                         </div>
                         <div class='guide_step_item'>
                             <span>4</span>
@@ -263,7 +325,7 @@
                 </section>
              </div>
             </div>
-          <div class="swiper-slide">
+        <div class="swiper-slide">
              <div class="content-wrapper">
               <section class="content">
                   <div class='guide_step_part col-md-6 offset-md-3'>
@@ -276,15 +338,20 @@
                         <div class='guide_step_item guide_step_complated'>
                             <span>2</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>设置主群主ID</p>
+                        </div>
+                        <div class='guide_step_item guide_step_complated'>
+                            <span>3</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
                             <p>数据库配置(可选)</p>
                         </div>
                         <div class='guide_step_item guide_step_active'>
-                            <span>3</span>
+                            <span>4</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
-                            <p>生成秘钥</p>
+                            <p>创建管理员WeID</p>
                         </div>
                         <div class='guide_step_item'>
-                            <span>4</span>
+                            <span>5</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
                             <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                         </div>
@@ -338,7 +405,7 @@
                 </section>
              </div>
             </div>
-            <div class="swiper-slide">
+        <div class="swiper-slide">
                 <div class="content-wrapper">
                     <section class="content">
                         <div class='guide_step_part col-md-6 offset-md-3'>
@@ -349,17 +416,22 @@
                                 <p>节点配置</p>
                             </div>
                             <div class='guide_step_item guide_step_complated'>
-                                <span>2</span>
+	                            <span>2</span>
+	                            <img src="./dist/img/icon-hook.svg" alt="">
+	                            <p>设置主群主ID</p>
+	                        </div>
+                            <div class='guide_step_item guide_step_complated'>
+                                <span>3</span>
                                 <img src="./dist/img/icon-hook.svg" alt="">
                                 <p>数据库配置(可选)</p>
                             </div>
                             <div class='guide_step_item guide_step_complated'>
-                                <span>3</span>
+                                <span>4</span>
                                 <img src="./dist/img/icon-hook.svg" alt="">
-                                <p>生成秘钥</p>
+                                <p>创建管理员WeID</p>
                             </div>
                             <div class='guide_step_item guide_step_active'>
-                                <span>4</span>
+                                <span>5</span>
                                 <img src="./dist/img/icon-hook.svg" alt="">
                                 <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
                             </div>
@@ -388,9 +460,9 @@
                 </div>
                 <!-- <button type="button" id="depolyBtn" class="btn btn-inline btn-primary btn-flat">主群组部署合约</button> -->
             </div>
-            <div style='display:none' class="swiper-button-next"></div>
-            <div style='display:none' class="swiper-button-prev"></div>
-        </div>
+        <div style='display:none' class="swiper-button-next"></div>
+        <div style='display:none' class="swiper-button-prev"></div>
+    </div>
   </div>
   <div class="modal fade" id="modal-create-pri">
     <div class="modal-dialog">

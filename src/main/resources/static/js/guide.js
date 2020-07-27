@@ -97,9 +97,12 @@ $(document).ready(function(){
 		 		toNodeConfig();
 		 		break;
 		 	case 2:
-		 		toDbConfig();
+		 		getIdList();
 		 		break;
 		 	case 3:
+		 		toDbConfig();
+		 		break;
+		 	case 4:
 		 		toAccount();;
 	 			break;		
 		}
@@ -113,7 +116,7 @@ $(document).ready(function(){
 	        $("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
 	        $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
 	        $("#nodeForm  #ipPort").val(data.blockchain_address);
-	        $("#nodeForm  #groupId").val(data.group_id);
+//	        $("#nodeForm  #groupId").val(data.group_id);
 	        caDisplay(data.blockchain_fiscobcos_version);
 	        checkCa(data);
 	    });
@@ -172,7 +175,7 @@ $(document).ready(function(){
 	    formData.append("version", $("#nodeForm  #version").val());
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
 	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
-	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
+//	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#goNext").addClass("disabled");
@@ -208,14 +211,14 @@ $(document).ready(function(){
 		if (ipPort.length == 0) {
 			return "请输入您的节点IP与Port";
 		}
-		var groupId = $.trim($("#nodeForm  #groupId").val());
-		if (groupId.length == 0) {
-			return "请输入您的groupId";
-		}
-		var r = /^[1-9][0-9]*$/;
-		if(!r.test(groupId)) {
-			return "groupId必须为整数";
-		}
+//		var groupId = $.trim($("#nodeForm  #groupId").val());
+//		if (groupId.length == 0) {
+//			return "请输入您的groupId";
+//		}
+//		var r = /^[1-9][0-9]*$/;
+//		if(!r.test(groupId)) {
+//			return "groupId必须为整数";
+//		}
 		// 检查上传文件是否跟要求一致
 		var caCrtFile = $("#caCrtFile")[0].files[0];
 		if (caCrtFile != null && caCrtFile.name != "ca.crt") {
@@ -257,7 +260,8 @@ $(document).ready(function(){
 						$("#modal-default").modal("hide");
 						$("#goNext").removeClass("nodeGoNext");
 						$('.swiper-button-next').trigger('click');
-						toDbConfig();
+//						toDbConfig();
+						getIdList()
 					}
          	   })
             } else if (data == "fail"){//检查失败
@@ -267,6 +271,34 @@ $(document).ready(function(){
             }
          });
     }
+    // 获取群主ID
+    function getIdList() {
+		$("#guide_groupID").loadSelect("getAllGroup/false","value", "value",function(data){
+	    	$.get("loadConfig",function(data,status){
+	    		//获取设置的groupId
+	    		const id = data.group_id
+	    		const str = "option[value='"+ id +"']"
+	    		$("#guide_groupID").find(str).attr("selected",true);
+		    })
+		});
+    	
+    }
+    // 点击群组ID下一步
+    $('#setGroupId').click(function(){
+    	let val = $('#guide_groupID').find('option:selected').val()
+    	const formData = {}
+    	formData.groupId = val
+    	$.post("setGroupId", formData, function(value,status){
+			if (value) {
+		    	sessionStorage.setItem('guide_step', '3')
+				$('.swiper-button-next').trigger('click');
+				toDbConfig();
+			} else {
+				$("#checkBody").html($("#checkBody").html() + "<p>设置主群组ID<span class='fail-span'>失败</span></p>");
+			}
+		})
+
+    })
     
     function toDbConfig() {
     	$.get("loadConfig",function(data,status){
@@ -362,7 +394,7 @@ $(document).ready(function(){
         					  toIndex();
         				  } else {
         					  $('.swiper-button-next').trigger('click');
-        					  sessionStorage.setItem('guide_step', '3')
+        					  sessionStorage.setItem('guide_step', '4')
         					  toAccount();
         				  }
         			   })	

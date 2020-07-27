@@ -483,13 +483,36 @@ function showWeId(weId) {
 	$("#modal-message").modal();
 }
 
+function showDId(weId) {
+	$.get("getWeIdPath",function(value,status){
+		$("#messageBody").html("<p class='select_part'><label>WeId:</label>" +"<input readonly onClick='select_copy(this)' value='"+ weId +"' /></p>");
+	    var data = value + "/" + weId.split(":")[3];
+	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeId公钥存放路径:</label><textarea onClick='select_copy(this)' readonly>" + data + "</textarea></p>");
+	    $("#modal-message").modal();
+	})
+}
+
+function select_copy (e){
+	$(e).select();
+	document.execCommand("Copy");
+	var div = document.createElement('div')
+	$(div).addClass('log_part')
+	$(div).html('<p>内容已复制</p>')
+	$(document.body).append(div)
+	setTimeout(function(){
+		$(div).remove()
+	}, 1000)
+}
+
 function showMessage(thisObj, message) {
 	var posX = 0, posY = 0;
 	var event = event || window.event;
 	if (event.pageX || event.pageY) {
+		alert("1")
 	    posX = event.pageX - document.documentElement.scrollLeft;;
 	    posY = event.pageY - document.documentElement.scrollTop;;
 	} else if (event.clientX || event.clientY) {
+		alert("2")
 	    posX = event.clientX - document.documentElement.scrollLeft - document.body.scrollLeft;
 	    posY = event.clientY - document.documentElement.scrollTop - document.body.scrollTop;
 	}

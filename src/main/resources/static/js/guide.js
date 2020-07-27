@@ -13,7 +13,7 @@ $(document).ready(function(){
 		  	initialSlide: step,
 			paginationClickable:true,
 			spaceBetween:30,
-			noSwiping: false,
+			noSwiping: true,
 			navigation: {
 		        nextEl: '.swiper-button-next',
 		        prevEl: '.swiper-button-prev',
@@ -83,6 +83,7 @@ $(document).ready(function(){
 		formData.roleType = val;
 		$.post("setRole", formData, function(value,status){
 			if (value) {
+				nav();
 				$('.swiper-button-next').trigger('click');
 				// 转节点配置
 				toNodeConfig();
@@ -90,6 +91,9 @@ $(document).ready(function(){
 		})
 	})
 	function checkStep(e) {
+		if (e != 0) {
+			nav();
+		}
 		switch (e) {
 		 	case 0:
 		 		break;
@@ -106,7 +110,19 @@ $(document).ready(function(){
 		 		toAccount();;
 	 			break;		
 		}
-	}	 
+	}
+	
+	function nav() {
+		$(".guide_step_part > .guide_step_item > span").each(function(){
+			var $step = $(this).html();
+			if ($step == 5 && role == 2) {
+				$(this).parent().hide();
+			} else {
+				$(this).parent().show();
+			}
+		})
+	}
+	
 	// 转节点配置，初始化已有的相关数据
 	function toNodeConfig() {
 		//获取配置
@@ -278,7 +294,7 @@ $(document).ready(function(){
 	    		//获取设置的groupId
 	    		const id = data.group_id
 	    		const str = "option[value='"+ id +"']"
-	    		$("#guide_groupID").find(str).attr("selected",true);
+	    		$("#guide_groupID").find(str).prop("selected",true);
 		    })
 		});
     	
@@ -307,7 +323,7 @@ $(document).ready(function(){
             $("#dbForm  #mysql_username").val(data.mysql_username);
             $("#dbForm  #mysql_password").val(data.mysql_password);
         });
-    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能</p>");
+    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能</p>");
     	$("#modal-message").modal();
     }
     
@@ -388,14 +404,17 @@ $(document).ready(function(){
         			   $("#modal-default").modal("hide");
         			   var formData = {};
         			   $.post("checkOrgId", formData, function(value,status){
-        				  if (value) {
+        				  if (value == 1) {
         					  // 流程走完
         					  sessionStorage.removeItem('guide_step')
         					  toIndex();
-        				  } else {
+        				  } else if (value == 0){
         					  $('.swiper-button-next').trigger('click');
         					  sessionStorage.setItem('guide_step', '4')
         					  toAccount();
+        				  } else {
+        					  $("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
+        			    	  $("#modal-message").modal();
         				  }
         			   })	
         		   }	
@@ -435,7 +454,7 @@ $(document).ready(function(){
 		$("#createDiv").hide();
 		$.get("checkAdmin",function(data,status){
 			if (data != "") {
-				$(".card-title").html("当前admin账户");
+				$(".card-title").html("当前管理员的 WeID 已经存在（目前不支持修改）");
 				$("#accountDiv").show();
 				$("#nextDiv").show();
 				$("#account").val(data);
@@ -509,7 +528,7 @@ $(document).ready(function(){
 	            			$('.swiper-button-next').trigger('click');
 		            		$("#modal-default").modal("hide");
 		            		$("#modal-create-pri").modal("hide");
-		            		sessionStorage.setItem('guide_step', '4')
+		            		sessionStorage.setItem('guide_step', '5')
 	            		}
 	            	})
 	            }
@@ -522,14 +541,17 @@ $(document).ready(function(){
 	$('#dbPassBtn').click(function(){
 		var formData = {};
 		$.post("checkOrgId", formData, function(value,status){
-			if (value) {
+			if (value == 1) {
 				// 流程走完
 				sessionStorage.removeItem('guide_step')
 				toIndex();
-			} else {
+			} else if (value == 0){
 				$('.swiper-button-next').trigger('click');
-				sessionStorage.setItem('guide_step', '3')
+				sessionStorage.setItem('guide_step', '4')
 				toAccount();
+			} else {
+				$("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
+	    	    $("#modal-message").modal();
 			}
 		})	
 	})
@@ -539,7 +561,7 @@ $(document).ready(function(){
 			toIndex();
 		} else {
 			$('.swiper-button-next').trigger('click');
-			sessionStorage.setItem('guide_step', '4')
+			sessionStorage.setItem('guide_step', '5')
 		}
 	})
 	

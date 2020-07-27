@@ -89,9 +89,13 @@ function loadData() {
 }
 
 function registerIssuer() {
-	$("#registerIssuerWeId").val("");
-	$("#registerIssuerName").val("");
-    $("#modal-register-issue").modal();
+	if (!isReady) {
+		showMessageForNodeException();
+    } else {
+    	$("#registerIssuerWeId").val("");
+    	$("#registerIssuerName").val("");
+        $("#modal-register-issue").modal();
+    }
 }
 
 function removeIssuer(obj, weId) {

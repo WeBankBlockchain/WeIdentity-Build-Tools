@@ -32,6 +32,13 @@
                   <p>配置区块链节点</p>
                 </a>
               </li>
+              <li class="nav-item" >
+                <a href="group.html" class="nav-link" >
+                  <i id = "i-group" class="far fa-circle nav-icon"></i>
+                  <p>配置主群组</p>
+                </a>
+              </li>
+              
               <li class="nav-item">
                 <a href="dbConfig.html" class="nav-link">
                   <i id = "i-db" class="far fa-circle nav-icon"></i>
@@ -53,13 +60,13 @@
               <li class="nav-item">
                 <a href="index.html" title="Deploy WeIdentity Contract"  class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>主群组部署合约</p>
+                  <p>部署 WeIdentity 智能合约</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="deployEvidence.html" title="Deploy Evidence Contract"  class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>部署Evidence合约</p>
+                  <p>部署 Evidence 智能合约</p>
                 </a>
               </li>
 <!--               <li class="nav-item">
@@ -161,35 +168,27 @@ $(document).ready(function(){
             $('#specificLi').show()
         }
     })
-	checkAdmin();
-	checkNode();
-	checkDb();
+	checkState();
 	//加载状态
-	function checkAdmin() {
-		$.get("checkAdmin",function(data,status){
-	        if (data != "") {
+	function checkState() {
+		$.get("checkState",function(data,status){
+	        if (data.adminState) {
 	            $("#i-account").removeClass("fa-circle");
 	            $("#i-account").addClass("fa-check-circle");
 	        }
-	    });
-	}
-	
-	function checkNode() {
-		$.get("nodeCheckState",function(data,status){
-            if(data) {//检查成功
-                $("#i-node").removeClass("fa-circle");
+	        if (data.nodeState) {
+	        	$("#i-node").removeClass("fa-circle");
                 $("#i-node").addClass("fa-check-circle");
             }
-        })
-	}
-	
-	function checkDb() {
-		$.get("dbCheckState",function(data,status){
-            if(data) {//检查成功
-                $("#i-db").removeClass("fa-circle");
+	        if (data.dbState) {
+	        	$("#i-db").removeClass("fa-circle");
                 $("#i-db").addClass("fa-check-circle");
             }
-         });
+	        if (data.groupState) {
+	        	$("#i-group").removeClass("fa-circle");
+                $("#i-group").addClass("fa-check-circle");
+            }
+	    });
 	}
 })
 

@@ -56,7 +56,30 @@ do
     echo -n "."
 done
 
-echo 
+addEnv() {
+    sed '/BUILD_TOOL_HOME/d' $1 > $1.tempforinforsuite
+    cat $1.tempforinforsuite > $1
+
+    echo "BUILD_TOOL_HOME=$BUILD_TOOL_HOME" >> $1
+    echo "export BUILD_TOOL_HOME" >> $1
+    source $1
+}
+
+echo
+echo "setting env variables..."
+BUILD_TOOL_HOME=`pwd`
+export BUILD_TOOL_HOME
+cd ~
+if [ -f ".bash_profile" ];then
+    addEnv .bash_profile
+elif [ -f ".bash_login" ];then
+    addEnv .bash_login
+else
+    if [ ! -f ".profile" ]; then
+      touch .profile
+    fi
+    addEnv .profile
+fi
 
 if [ ${running} = true ];then
     echo "-----------------------------------------------"

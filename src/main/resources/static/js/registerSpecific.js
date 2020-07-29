@@ -1,5 +1,12 @@
 $(document).ready(function(){
-	
+	$("#registerIssuerTypeBtn").click(function(){
+		if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#addIssuerType").val("");
+        	$("#modal-register-issue-type").modal();
+        }
+    });
     if (!isReady) {
     	return;
     }
@@ -42,10 +49,7 @@ $(document).ready(function(){
         })
     });
     
-    $("#registerIssuerTypeBtn").click(function(){
-    	$("#addIssuerType").val("");
-    	$("#modal-register-issue-type").modal();
-    });
+    
     $("#addToIssuerType").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");

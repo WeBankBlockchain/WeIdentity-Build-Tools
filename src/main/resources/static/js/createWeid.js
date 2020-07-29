@@ -1,5 +1,12 @@
 var role = "3";
 $(document).ready(function(){
+	$("#showCreateBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#modal-show-create-weid").modal();
+        }
+    });
 	if (!isReady) {
     	return;
     }
@@ -278,6 +285,7 @@ function downEcdsaPubKey(address) {
 
 function registerIssue(weId) {
 	$("#registerIssuerWeId").val(weId);
+	$("#registerIssuerName").val("");
     $("#modal-register-issue").modal();
 }
 

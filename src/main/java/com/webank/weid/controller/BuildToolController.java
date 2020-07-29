@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.controller;
 
 import java.io.File;
@@ -66,9 +85,9 @@ import com.webank.weid.service.DeployService;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
-import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.PropertyUtils;
 import com.webank.weid.util.WeIdUtils;
 
 @RestController
@@ -116,6 +135,23 @@ public class BuildToolController {
         }
         return true;
     }
+    
+    @GetMapping("/groupCheckState")
+    public boolean groupCheckState() {
+        String groupId = configService.loadConfig().get("group_id");
+        return deployService.getAllGroup(false).contains(groupId);
+    }
+    
+    @GetMapping("/checkState")
+    public Map<String, Boolean> checkState() {
+        Map<String, Boolean> result = new HashMap<String, Boolean>();
+        result.put("adminState", StringUtils.isNotBlank(checkAdmin()));
+        result.put("nodeState", nodeCheckState());
+        result.put("dbState", dbCheckState());
+        result.put("groupState", groupCheckState());
+        return result;
+    }
+    
     
     @GetMapping("/isDownFile")
     public boolean isDownFile() {
@@ -374,7 +410,10 @@ public class BuildToolController {
         String amopId = request.getParameter("amopId");
         String version = request.getParameter("version");
         String ipPort = request.getParameter("ipPort");
-        String groupId = request.getParameter("groupId");
+        String groupId = configService.loadConfig().get("group_id");
+        if (StringUtils.isBlank(groupId)) {
+            groupId = "0";
+        }
         String profileActive = request.getParameter("cnsProFileActive");
         String privName = request.getParameter("privName");
         if (profileActive.equals("priv")) {
@@ -427,7 +466,9 @@ public class BuildToolController {
     @PostMapping("/setGroupId")
     public boolean setMasterGroupId(@RequestParam("groupId") String groupId) {
         logger.info("[setMasterGroupId] begin set the groupId = {}.", groupId);
-        return configService.setMasterGroupId(groupId);
+        boolean result = configService.setMasterGroupId(groupId);
+        PropertyUtils.reload();
+        return result;
     }
     
     @Description("数据库配置提交")
@@ -785,19 +826,28 @@ public class BuildToolController {
         return deployService.getRoleType();
     }
     
-    @Description("判断当前机构是否存在机构配置，如果存在则不需要配置机构私钥，系统默认配置机构私钥")
+    @Description("判断当前机构是否存在机构配置，如果存在则不需要配置机构私钥，系统默认配置机构私钥。"
+            + "返回： 1：存在，0：不存在，2：异常。")
     @PostMapping("/checkOrgId")
-    public boolean checkOrgId() {
-        // 判断是否存在机构配置
-        boolean isExist= buildToolService.checkOrgId(ConfigUtils.getCurrentOrgId());
-        // 如果存在
-        if (isExist) {
-            String address = deployService.checkAdmin();
-            if (StringUtils.isBlank(address)) {
-                deployService.createAdmin(null);
+    public int checkOrgId() {
+        try {
+            logger.info("[checkOrgId] begin check the orgId.");
+            // 判断是否存在机构配置
+            FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+            CheckNodeFace checkNode = new CheckNodeServiceV2();
+            boolean isExist = checkNode.checkOrgId(fiscoConfig);
+            // 如果存在
+            if (isExist) {
+                String address = deployService.checkAdmin();
+                if (StringUtils.isBlank(address)) {
+                    deployService.createAdmin(null);
+                }
             }
+            return isExist ? 1 : 0;
+        } catch (Exception e) {
+            logger.error("[checkOrgId] check orgId is exist has error.", e);
+            return 2;
         }
-        return isExist;
     }
     
     @Description("设置引导完成状态")

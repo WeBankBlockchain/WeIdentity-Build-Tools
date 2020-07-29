@@ -52,7 +52,7 @@ $(document).ready(function(){
 		$("#createDiv").hide();
 		$.get("checkAdmin",function(data,status){
 			if (data != "") {
-				$(".card-title").html("当前admin账户");
+				$(".card-title").html("当前管理员的 WeID 已经存在（目前不支持修改）");
 				$("#accountDiv").show();
 				$("#account").val(data);
 				$("#i-account").removeClass("fa-circle");

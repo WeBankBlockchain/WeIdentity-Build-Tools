@@ -102,10 +102,23 @@
                             <div class="card-body">
                               <div class="form-group">
                                 <label for="orgId">机构名称</label>
+                              	<a href="#" target="blank_" style='display:block'>
+	                                <img src="./dist/img/icon-question.svg" alt="">
+	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                                    	如何设置机构名称？
+	                                </span>
+                                </a>
                                 <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
                               </div>
                               <div class="form-group">
-                                <label for="amopId">通讯ID</label> <span style="color: gray;">此ID用于链上AMOP通讯</span>
+                                <label for="amopId">通讯ID</label>
+                                <a href="#" target="blank_" style='display:block'>
+	                                <img src="./dist/img/icon-question.svg" alt="">
+	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                                    	如何设置通讯ID
+	                                </span>
+                                </a>
+                                <span style="color: gray;">此ID用于链上AMOP通讯</span>
                                 <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
                               </div>
                               <div class="form-group">
@@ -179,7 +192,7 @@
                               <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_">
                                 <img src="./dist/img/icon-question.svg" alt="">
                                 <span style="color:#017CFF;font-size:12px;">
-                                    如何获取证书?
+                                    	如何获取证书?
                                 </span>
                                 </a>
                             </div>
@@ -231,6 +244,14 @@
                                     <div class="card-header">
                                         <h6>选择一个FISCO-BCOS的群组，作为 WeIdentity 的主群组（即部署 WeIdentity 智能合约的群组）</h6>
                                     </div>
+                                    <div class="card-header" style='padding-top:0'>
+                                    	<a href="#" target="blank_" style='display:block'>
+			                           <img src="./dist/img/icon-question.svg" alt="">
+			                           <span style="color:#017CFF;font-size:12px;display:inline-block">
+			                                    	什么是群组？
+			                                </span>
+		                                </a>
+		                            </div>
                                     <div class="card-body role_body" style='padding:0 1.25rem;'>
                                     	<div class="form-group" style='width:100%;'>
 		                                    <select  id="guide_groupID" name="version" class="form-control"></select>
@@ -312,19 +333,27 @@
                               <button type="button"  id="postDbBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
                             </div>
                           </form>
-                          <div class='sql_warning'>
+            			  <div class='sql_warning'>
                             <div class='warning_title'>温馨提示</div>
                             <p>如果您需要使用到下列功能，则需要配置数据库</p>
                             <p>1.Transportation相关组件功能</p>
                             <p>2.Evidence异步存证功能</p>
-                            <p>3.Persistence数据存储功能</p>
+                            <p>3.Persistence数据存储功能(例如：存储Credential)</p>
+                           	<p>
+                           		<a href="#" target="blank_" style='display:block'>
+			                           <img src="./dist/img/icon-question.svg" alt="">
+			                           <span style="color:#017CFF;font-size:12px;display:inline-block">
+			                                    	配置教程
+			                                </span>
+		                                </a>
+                           	</p>
                           </div>
                         </div>
                     </div>
                   </div>
                 </section>
              </div>
-            </div>
+         </div>
         <div class="swiper-slide">
              <div class="content-wrapper">
               <section class="content">
@@ -364,6 +393,14 @@
                           <div class="card-header">
                             <h3 class="card-title">创建管理员WeID</h3>
                           </div>
+                          <div class="card-header" style='padding-top:0;padding-bottom:0'>
+                            <a href="#" target="blank_" style='display:block'>
+				                <img src="./dist/img/icon-question.svg" alt="">
+				                <span style="color:#017CFF;font-size:12px;display:inline-block">
+				                     	什么是管理员？
+				                 </span>
+		                     </a>
+		                  </div>
                           <!-- /.card-header -->
                           <!-- form start -->
                           <form role="form" id="AccountForm">
@@ -376,7 +413,8 @@
                                     <span class='item_out_role'>
                                         <span></span>
                                     </span>
-                                    <p>系统自动创建公私钥</p>
+                                    <p>系统自动创建公私钥
+                                    </p>
                                 </div>
                                 <div class='key_item' type='2'>
                                     <span class='item_out_role'>
@@ -473,7 +511,9 @@
           </button>
         </div>
         <div  class="modal-body">
-          <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">备注：支持椭圆曲线的公私钥，并且为十进制私钥数据。</p>
+          <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">备注：支持椭圆曲线的公私钥，并且为十进制私钥数据。
+          	<a href="#" target="blank_"><img src="./dist/img/icon-question.svg" alt=""><span style="color:#017CFF;font-size:12px;display:inline-block">如何生成私钥？</span></a>
+		  </p>
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
           <form id="KeyForm" role="form">
             <div class="form-group row">

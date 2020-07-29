@@ -1,11 +1,11 @@
 var deployed = false;
 var mainDeployBtnName;
+let sessionRole;
 $(document).ready(function(){
-	$.get("getRole",function(value,status){
-		if (value === '1') {
-			$('#depolyBtn').show()
-		}
-	})
+	sessionRole = getRole();
+	if (sessionRole === '1') {
+		$('#depolyBtn').show()
+	}
 	$("#depolyBtn").click(function(){
     	if (!isReady) {
     		showMessageForNodeException();
@@ -84,51 +84,49 @@ function loadData() {
     if (url == "guide.html") {
        return;
     }
-    $.get("getRole",function(value,status){
-    	var message = "您还没有部署主合约，请先部署主合约";
-    	if (value == "2") {
-    		message = "当前主群组管理员还没有部署主合约，请联系主群组管理员部署主合约";
-    	}
-    	$.get("getDeployList",function(data,status){
-       		if(table != null) {
-      			table.destroy();
-      		}
-      		$("#data-tbody").renderData(template,data);
-      		table = $('#example2').DataTable({
-      	      "paging": true,
-      	      "lengthChange": false,
-      	      "searching": true,
-      	      "ordering": true,
-      	      "info": false,
-      	      "autoWidth": false,
-      	      "order": [[ 3, "desc" ], [ 4, "desc" ]],
-    	  	  "aoColumnDefs": [
-    	          { "sType": "operation-column", "aTargets": [6] },    //指定列号使用自定义排序
-    	      ],
-    	      "oLanguage": {
-    	    	  "sZeroRecords": message,
-      	    	  "oPaginate": {
-    	            "sFirst":    "第一页",
-    	            "sPrevious": " 上一页 ",
-    	            "sNext":     " 下一页 ",
-    	            "sLast":     " 最后一页 "
-    	          }
-    	      }
-      		});
-      		processCnsBtn();
-      		table.on('draw', function () {
-      			processCnsBtn();
-      		}); 
-       		
-       		$.get("isDownFile",function(data,status){
-    			if(data) {
-    				$("button[downFile='file']").each(function(){
-    					$(this).css("display","inline-block");
-    		  		})
-    			}
-    		})
-       })
-	})
+	var message = "您还没有部署主合约，请先部署主合约";
+	if (sessionRole == "2") {
+		message = "当前主群组管理员还没有部署主合约，请联系主群组管理员部署主合约";
+	}
+	$.get("getDeployList",function(data,status){
+   		if(table != null) {
+  			table.destroy();
+  		}
+  		$("#data-tbody").renderData(template,data);
+  		table = $('#example2').DataTable({
+  	      "paging": true,
+  	      "lengthChange": false,
+  	      "searching": true,
+  	      "ordering": true,
+  	      "info": false,
+  	      "autoWidth": false,
+  	      "order": [[ 3, "desc" ], [ 4, "desc" ]],
+	  	  "aoColumnDefs": [
+	          { "sType": "operation-column", "aTargets": [6] },    //指定列号使用自定义排序
+	      ],
+	      "oLanguage": {
+	    	  "sZeroRecords": message,
+  	    	  "oPaginate": {
+	            "sFirst":    "第一页",
+	            "sPrevious": " 上一页 ",
+	            "sNext":     " 下一页 ",
+	            "sLast":     " 最后一页 "
+	          }
+	      }
+  		});
+  		processCnsBtn();
+  		table.on('draw', function () {
+  			processCnsBtn();
+  		}); 
+   		
+   		$.get("isDownFile", function(data,status){
+			if(data) {
+				$("button[downFile='file']").each(function(){
+					$(this).css("display","inline-block");
+		  		})
+			}
+		})
+   })
 }
 
 function processCnsBtn() {

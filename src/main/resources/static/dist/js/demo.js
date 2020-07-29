@@ -485,9 +485,9 @@ function showWeId(weId) {
 
 function showDId(weId) {
 	$.get("getWeIdPath",function(value,status){
-		$("#messageBody").html("<p class='select_part'><label>WeId:</label>" +"<input readonly onClick='select_copy(this,event)' value='"+ weId +"' /></p>");
+		$("#messageBody").html("<p class='select_part'><label>WeID:</label>" +"<input readonly onClick='select_copy(this,event)' value='"+ weId +"' /></p>");
 	    var data = value + "/" + weId.split(":")[3];
-	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeId公钥存放路径:</label><textarea onClick='select_copy(this,event)' readonly>" + data + "</textarea></p>");
+	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeID公钥存放路径:</label><textarea onClick='select_copy(this,event)' readonly>" + data + "</textarea></p>");
 	    $("#modal-message").modal();
 	})
 }
@@ -537,4 +537,29 @@ function showMessage(thisObj, message, event) {
 
 function hideMessage() {
 	$(".showbox").remove();
+}
+
+loadModal();
+function loadModal() {
+	var body = $('body');
+	var modalDiv = $("<div></div>").appendTo(body);
+	$.ajaxSettings.async = false;
+	$.get("../../common/modal.html",function(value,status){
+		modalDiv.html(value);
+	})
+	$.ajaxSettings.async = true;
+}
+function getRole() {
+	var role = sessionStorage.getItem('guide_role');
+	if (!role) {
+		$.ajaxSettings.async = false;
+		$.get("getRole",function(value,status){
+			if (value) {
+				role = value;
+				sessionStorage.setItem("guide_role", role);
+			}
+		})
+		$.ajaxSettings.async = true;
+	}
+	return role;
 }

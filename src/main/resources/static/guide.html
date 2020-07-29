@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-  <link href="plugins/enjoyhint/enjoyhint.css" rel="stylesheet">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/swiper/swiper.min.css">
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="dist/css/guide.css">
-  <script src="plugins/swiper/swiper.min.js"></script>
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
+  <script src="plugins/swiper/swiper.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -72,7 +73,7 @@
                     <div class='guide_step_item guide_step_active'>
                         <span>1</span>
                         <img src="./dist/img/icon-hook.svg" alt="">
-                        <p>节点配置</p>
+                        <p>区块链节点配置</p>
                     </div>
                     <div class='guide_step_item'>
                         <span>2</span>
@@ -97,7 +98,7 @@
                 </div>
                 <div class="container-fluid">
                     <div class="col-md-6 offset-md-3">
-                        <div class="card card-primary">
+                        <div class="card card-primary warning_box">
                           <form id="nodeForm" role="form">
                             <div class="card-body">
                               <div class="form-group">
@@ -121,7 +122,7 @@
                                 <span style="color: gray;">此ID用于链上AMOP通讯</span>
                                 <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
                               </div>
-                              <div class="form-group">
+                              <div class="form-group display-none">
                                     <label>部署环境</label>
                                     <select  id="cnsProFileActive" name="cnsProFileActive" class="form-control">
                                       <option value="prd">生产环境</option>
@@ -130,7 +131,7 @@
                                     </select>
                               </div>
                               <div class="form-group">
-                                    <label for="version">节点版本</label> <span style="color: gray;">目前只支持2.0的FISCO-BCOS版本</span>
+                                    <label for="version">节点版本</label> <span style="color: gray;">目前只支持2.X的FISCO-BCOS版本</span>
                                     <select  id="version" name="version" class="form-control">
                                       <option value="2">FISCO-BCOS 2.X</option>
                                     </select>
@@ -197,6 +198,14 @@
                                 </a>
                             </div>
                             </form>
+                            <div class='sql_warning' style='right:-160px'>
+                               <a href="#" target="blank_" style='display:block'>
+                                <img src="./dist/img/icon-question.svg" alt="">
+                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+                                                                            点击查看配置配置教程
+                                </span>
+                               </a>
+                            </div>
                             <div class="node_part">
                               <button type="button" class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
                               <button type="button" id="postNodeBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
@@ -215,7 +224,7 @@
                         <div class='guide_step_item guide_step_complated'>
                              <span>1</span>
                              <img src="./dist/img/icon-hook.svg" alt="">
-                             <p>节点配置</p>
+                             <p>区块链节点配置</p>
                        	</div>
                        	<div class='guide_step_item guide_step_active'>
                             <span>2</span>
@@ -275,7 +284,7 @@
                         <div class='guide_step_item guide_step_complated'>
                             <span>1</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
-                            <p>节点配置</p>
+                            <p>区块链节点配置</p>
                         </div>
                         <div class='guide_step_item guide_step_complated'>
                             <span>2</span>
@@ -304,8 +313,8 @@
                           <form role="form" id="dbForm">
                             <div id="dbFormDiv" class="card-body">
                             <div class="form-group">
-                                    <label for="version">数据库类型</label> <span style="color: gray;">目前暂只支持MySql数据库</span>
-                                    <select  id="version" name="version" class="form-control">
+                                    <label for="sql_version">数据库类型</label> <span style="color: gray;">目前暂只支持MySql数据库</span>
+                                    <select  id="sql_version" name="sql_version" class="form-control">
                                       <option value="mysql">MYSQL</option>
                                     </select>
                               </div>
@@ -362,7 +371,7 @@
                         <div class='guide_step_item guide_step_complated'>
                             <span>1</span>
                             <img src="./dist/img/icon-hook.svg" alt="">
-                            <p>节点配置</p>
+                            <p>区块链节点配置</p>
                         </div>
                         <div class='guide_step_item guide_step_complated'>
                             <span>2</span>
@@ -451,7 +460,7 @@
                             <div class='guide_step_item guide_step_complated'>
                                 <span>1</span>
                                 <img src="./dist/img/icon-hook.svg" alt="">
-                                <p>节点配置</p>
+                                <p>区块链节点配置</p>
                             </div>
                             <div class='guide_step_item guide_step_complated'>
 	                            <span>2</span>
@@ -536,25 +545,11 @@
       <!-- /.modal-content -->
     </div>
   </div>
-    <!-- ./wrapper -->
-    <include src="common/foot.html" style='opactiy:0'></include>
 </div>
 <!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
-<script src="plugins/jquery/jquery.cookie.js"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-<script src="plugins/enjoyhint/enjoyhint.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
+<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="js/guide.js"></script>
 <script src="js/deploy.js"></script>
 </body>

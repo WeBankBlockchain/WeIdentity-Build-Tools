@@ -323,7 +323,7 @@ $(document).ready(function(){
             $("#dbForm  #mysql_username").val(data.mysql_username);
             $("#dbForm  #mysql_password").val(data.mysql_password);
         });
-    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能</p>");
+    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
     	$("#modal-message").modal();
     }
     

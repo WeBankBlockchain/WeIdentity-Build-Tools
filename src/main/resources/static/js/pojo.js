@@ -1,5 +1,13 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
+	$("#policyToPojoBtn").click(function(){
+		if (!isReady) {
+			showMessageForNodeException();
+	    } else {
+	    	$("#modal-policy-to-pojo").modal();
+	    }
+    })
+    
 	if (!isReady) {
     	return;
     }
@@ -39,19 +47,16 @@ $(document).ready(function(){
 		}
 	};
 	var editor = new JSONEditor(jQuery("#jsonContent").get(0), options);
-    $("#policyToPojoBtn").click(function(){
-    	$("#modal-policy-to-pojo").modal();
-    })
-    
+	editor.setText("");
     $("#policyJsonFile").change(function(){
     	var file = $("#policyJsonFile")[0].files[0];
     	if (file == null || file == undefined) {
-    		editor.set(JSON.parse("{}"));
+    		editor.setText("");
     	} else {
     		let reader = new FileReader();
             reader.readAsText(file, 'utf-8');
             reader.onload = function(e, rs) {
-              editor.set(JSON.parse(e.target.result));
+              editor.setText(e.target.result);
             };
     	}
     })
@@ -61,7 +66,7 @@ $(document).ready(function(){
     		var thisObj = this;
     		var disabled = $(thisObj).attr("class").indexOf("disabled");
             if(disabled > 0) return;
-    		var policy = JSON.stringify(editor.get());
+    		var policy = editor.getText();
     		var formData = new FormData();
 		    formData.append("policy", policy);
 		    var btnValue = $(thisObj).html();
@@ -101,7 +106,7 @@ $(document).ready(function(){
 		}
 	})
 	$('#modal-policy-to-pojo').on('hide.bs.modal', function () {
-    	editor.set(JSON.parse("{}"));
+    	editor.setText("");
     	$("#policyJsonFile").val("");
 		$(".custom-file-label").html("选择策略文件...");
 	})

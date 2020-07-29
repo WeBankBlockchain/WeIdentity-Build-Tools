@@ -37,6 +37,7 @@
     	max-height:500px;
     	overflow:auto;
     	position: relative;
+    	display: none;
     	
   	}
 
@@ -167,38 +168,35 @@
              		 	<div class='item_des_content'>	
 	             			<pre style='margin:0;padding:0'>
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"description": "five information requirements for users",
-	"title": "cpt templet",
-	"type": "object",
-	"properties": {
-		"id": {
-			"type": "string",
-			"description": "user weId"
-		},
-		"age": {
-			"description": "the age of certificate owner",
-			"type": "integer"
-		},
-		"gender": {
-			"description": "the gender of certificate owner",
-			"enum": [
-				"F",
-				"M"
-			],
-			"type": "string"
-		},
-		"name": {
-			"description": "the name of certificate owner",
-			"type": "string"
-		}
-	},
-	"required": [
-		"name",
-		"age"
-	]
-}
-             			</pre>
+  "description": "this is a one-level CPT",
+  "title": "one level template",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "user weId"
+    },
+    "age": {
+      "description": "the age of certificate owner",
+      "type": "integer"
+    },
+    "gender": {
+      "description": "the gender of certificate owner",
+      "enum": [
+        "F",
+        "M"
+      ],
+      "type": "string"
+    },
+    "name": {
+      "description": "the name of certificate owner",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "age"
+  ]
+}</pre>
              			</div>
              		</div>
              	</div>
@@ -210,52 +208,53 @@
              			<div class='item_des_content'>	
              				<pre style='margin:0;padding:0'>
 {
- 	"properties": {
-		"id": {
-			"type": "string",
-			"description": "the WeID of the owner"
-		},
-		"name": {
-			"type": "string",
-			"description": "the name of object"
-		},
-		"meta": {
-			"type": "object",
-			"properties": {
-				"id": {
-					"type": "string",
-					"description": "code"
-				},
-				"context": {
-					"type": "string",
-					"description": "error"
-				},
-				"date": {
-					"type": "string",
-					"description": "info"
-				}
-			}
-		},
-		"data": {
-			"type": "object",
-		  	"properties": {
-		    	"id": {
-				  	"type": "string",
-				  	"description": "info"
-				},
-				"address": {
-					"type": "string",
-				  	"description": "sipTellAddress"
-				},
-				"userlevel": {
-					"type": "integer",
-					"description": "userlevel"
-				}
-		  	}
-		}
-  	}
-}
-             				</pre>
+  "description": "this is a multi-level CPT",
+  "title": "multi level template",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "the WeID of the owner"
+    },
+    "name": {
+      "type": "string",
+      "description": "the name of object"
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "code"
+        },
+        "context": {
+          "type": "string",
+          "description": "error"
+        },
+        "date": {
+          "type": "string",
+          "description": "info"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id"
+        },
+        "address": {
+          "type": "string",
+          "description": "sipTellAddress"
+        },
+        "userlevel": {
+          "type": "integer",
+          "description": "userlevel"
+        }
+      }
+    }
+  }
+}</pre>
              			</div>
              		</div>
              	</div>

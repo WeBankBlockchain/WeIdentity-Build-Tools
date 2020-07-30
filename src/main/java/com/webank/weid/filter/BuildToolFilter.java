@@ -20,6 +20,8 @@
 package com.webank.weid.filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -38,6 +40,12 @@ import com.webank.weid.service.DeployService;
 @WebFilter(urlPatterns = {"/*"})
 public class BuildToolFilter implements Filter {
     
+    private static List<String> filterUrl = new ArrayList<String>();
+    static {
+        filterUrl.add("modal.html");
+        filterUrl.add("foot.html");
+        filterUrl.add("log.html");
+    }
     @Autowired
     DeployService deployService;
 
@@ -47,7 +55,11 @@ public class BuildToolFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest)request;
         HttpServletResponse res = (HttpServletResponse)response;
         String uri = req.getRequestURI();
-        if (uri.endsWith(".html") && !uri.endsWith("foot.html") && !uri.endsWith("log.html")) {
+        String requestFile = uri.substring(uri.lastIndexOf("/") + 1);
+        if (filterUrl.contains(requestFile)) {
+            chain.doFilter(request, response);
+            return;
+        }else if (uri.endsWith(".html")) {
             String guideResult = deployService.getGuideStatus();
             if (uri.endsWith("guide.html") && StringUtils.isNotBlank(guideResult)) {
                 res.sendRedirect("index.html");

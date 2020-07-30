@@ -12,7 +12,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         var weId = $.trim($("#registerIssuerWeId").val());
         if (weId.length == 0) {
-            $("#messageBody").html("<p>请输入weId。</p>");
+            $("#messageBody").html("<p>请输入WeID。</p>");
             $("#modal-message").modal();
             return;
         }

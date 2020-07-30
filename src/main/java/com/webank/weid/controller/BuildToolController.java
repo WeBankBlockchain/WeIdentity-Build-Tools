@@ -100,6 +100,8 @@ public class BuildToolController {
     private static boolean nodeCheck = false;
     
     private static boolean dbCheck = false;
+    
+    private static String preMainHash;
 
     @Autowired
     BuildToolService buildToolService;
@@ -283,6 +285,13 @@ public class BuildToolController {
         LinkedList<CnsInfo> cnsInfoList = deployService.getDeployList();
         for (CnsInfo cnsInfo : cnsInfoList) {
             cnsInfo.setGroupId("group-" + fiscoConfig.getGroupId());
+            if (cnsInfo.isEnable()) { // 如果是启用状态
+                //如果上一个地址不为空，并且新hash地址跟上一个地址不相同则reloadAddress
+                if (StringUtils.isNotBlank(preMainHash) && !preMainHash.equals(cnsInfo.getHash())) {
+                    reloadAddress();
+                }
+                preMainHash = cnsInfo.getHash();
+            }
         }
         return cnsInfoList;
     }

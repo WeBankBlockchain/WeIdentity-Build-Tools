@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
@@ -49,7 +49,7 @@
         <a href="index.html" class="nav-link">主页</a>
       </li> -->
       <li class="nav-item d-none d-sm-inline-block">
-        <a id="openLog" href="#" class="nav-link">后台日志</a>
+        <a id="openLog" href="#" class="nav-link">查看后台日志</a>
       </li>
     </ul>
       
@@ -91,17 +91,12 @@ $(document).ready(function(){
           win.focus();
       }
     })
-    let role = ''
-    $.get("getRole",function(value,status){
-		if (value) {
-			role = value
-			if (value == 1) {
-				$("#role_select_part").find("option[value='1']").prop("selected",true);
-			} else if (value == 2) {
-				$("#role_select_part").find("option[value='2']").prop("selected",true);
-			}
-		}
-	})
+    var role = getRole();
+    if (role == 1) {
+        $("#role_select_part").find("option[value='1']").prop("selected",true);
+    } else if (role == 2) {
+        $("#role_select_part").find("option[value='2']").prop("selected",true);
+    }
     $('#role_select_part').change(function(){
     	let val = $(this).find('option:selected').val()
     	if (val != role) {
@@ -110,6 +105,7 @@ $(document).ready(function(){
 			formData.roleType = val;
 			$.post("setRole", formData, function(value,status){
 				if (value) {
+					sessionStorage.setItem('guide_role', val);
 					window.location.reload();
 				}
 			})	

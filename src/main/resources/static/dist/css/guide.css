@@ -233,7 +233,7 @@ html,body{
 }
 .warning_box .sql_warning{
 	position: absolute;
-	right:-260px;
+	right:-300px;
 	top: 0;
 }
 

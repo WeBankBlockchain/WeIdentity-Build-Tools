@@ -1,31 +1,26 @@
 var deployed = false;
+var mainDeployBtnName;
+let sessionRole;
 $(document).ready(function(){
-	$.get("getRole",function(value,status){
-		console.log(value)
-		if (value === '2') {
-			$('#depolyBtn').hide()
-		}
-	})
-    $("#depolyBtn").click(function(){
-        var $this = this;
-        $.get("isReady",function(data,status){
-            if(data) {
-            	$("#modal-deploy").modal();
-            } else {
-                $("#messageBody").html("<p>配置未准备完成，不可部署</p>");
-                $("#modal-message").modal();
-            }
-        });
+	sessionRole = getRole();
+	if (sessionRole === '1') {
+		$('#depolyBtn').show()
+	}
+	$("#depolyBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#modal-deploy").modal();
+        }
     });
     var url = window.location.pathname;
     url = url.substring(1);
-    if (url == "deploy.html") {
+    if (url == "index.html") {
     	if (!isReady) {
         	return;
         }
         loadData();
     }
-    
     var isClose = true;
     $("#mainDeploy").click(function(){
     	var chainId = $("#chainId").val();
@@ -41,7 +36,8 @@ $(document).ready(function(){
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         $($this).addClass("disabled");
-        $($this).html("合约部署中,  请稍等...");
+        mainDeployBtnName = $($this).html();
+        $($this).html("部署中...");
         $("#confirmMessage1Body").html("<p>合约部署中，请稍等...</p>");
         $("#confirmMessage1Btn").addClass("disabled");
         $("#modal-confirm-message1").modal();
@@ -60,18 +56,24 @@ $(document).ready(function(){
     	if (isClose) {
     		$("#modal-deploy").modal("hide");
     	}
-    	if (url != "deploy.html" && deployed) {
-			window.location.href="deploy.html";
+    	if (url != "index.html" && deployed) {
+    		sessionStorage.removeItem('guide_step')
+    		toIndex();
     	}
 	})
 	$("#confirmMessage1Btn").click(function(){
 		var disabled = $(this).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
-		if (url != "deploy.html") {
-			window.location.href="deploy.html";
-    	}
 		$("#modal-confirm-message1").modal("hide");
 	})
+	
+	function toIndex() {
+		var formData = {};
+		formData.step = "5";
+		$.post("setGuideStatus", formData, function(value,status){
+			window.location.href="index.html";
+		})	
+	}
 });
 
 var template = $("#data-tbody").html();
@@ -82,51 +84,49 @@ function loadData() {
     if (url == "guide.html") {
        return;
     }
-    $.get("getRole",function(value,status){
-    	var message = "您还没有部署主合约，请先部署主合约";
-    	if (value == "2") {
-    		message = "当前主群组管理员还没有部署主合约，请联系主群组管理员部署主合约";
-    	}
-    	$.get("getDeployList",function(data,status){
-       		if(table != null) {
-      			table.destroy();
-      		}
-      		$("#data-tbody").renderData(template,data);
-      		table = $('#example2').DataTable({
-      	      "paging": true,
-      	      "lengthChange": false,
-      	      "searching": true,
-      	      "ordering": true,
-      	      "info": false,
-      	      "autoWidth": false,
-      	      "order": [[ 3, "desc" ], [ 4, "desc" ]],
-    	  	  "aoColumnDefs": [
-    	          { "sType": "operation-column", "aTargets": [6] },    //指定列号使用自定义排序
-    	      ],
-    	      "oLanguage": {
-    	    	  "sZeroRecords": message,
-      	    	  "oPaginate": {
-    	            "sFirst":    "第一页",
-    	            "sPrevious": " 上一页 ",
-    	            "sNext":     " 下一页 ",
-    	            "sLast":     " 最后一页 "
-    	          }
-    	      }
-      		});
-      		processCnsBtn();
-      		table.on('draw', function () {
-      			processCnsBtn();
-      		}); 
-       		
-       		$.get("isDownFile",function(data,status){
-    			if(data) {
-    				$("button[downFile='file']").each(function(){
-    					$(this).css("display","inline-block");
-    		  		})
-    			}
-    		})
-       })
-	})
+	var message = "您还没有部署主合约，请先部署主合约";
+	if (sessionRole == "2") {
+		message = "当前主群组管理员还没有部署主合约，请联系主群组管理员部署主合约";
+	}
+	$.get("getDeployList",function(data,status){
+   		if(table != null) {
+  			table.destroy();
+  		}
+  		$("#data-tbody").renderData(template,data);
+  		table = $('#example2').DataTable({
+  	      "paging": true,
+  	      "lengthChange": false,
+  	      "searching": true,
+  	      "ordering": true,
+  	      "info": false,
+  	      "autoWidth": false,
+  	      "order": [[ 3, "desc" ], [ 4, "desc" ]],
+	  	  "aoColumnDefs": [
+	          { "sType": "operation-column", "aTargets": [6] },    //指定列号使用自定义排序
+	      ],
+	      "oLanguage": {
+	    	  "sZeroRecords": message,
+  	    	  "oPaginate": {
+	            "sFirst":    "第一页",
+	            "sPrevious": " 上一页 ",
+	            "sNext":     " 下一页 ",
+	            "sLast":     " 最后一页 "
+	          }
+	      }
+  		});
+  		processCnsBtn();
+  		table.on('draw', function () {
+  			processCnsBtn();
+  		}); 
+   		
+   		$.get("isDownFile", function(data,status){
+			if(data) {
+				$("button[downFile='file']").each(function(){
+					$(this).css("display","inline-block");
+		  		})
+			}
+		})
+   })
 }
 
 function processCnsBtn() {
@@ -264,11 +264,11 @@ function deployCpt(hash, obj) {
 
 function showBtn(btnObj) {
 	if (btnObj != null) {
-		$(btnObj).html("主群组部署合约");
+		$(btnObj).html(mainDeployBtnName);
 	    $(btnObj).removeClass("disabled");
 	    $("#modal-confirm-message1").modal();
 	}
-	 $("#confirmMessage1Btn").removeClass("disabled");
+	$("#confirmMessage1Btn").removeClass("disabled");
 }
 
 function showEnableBtn(btnObj) {

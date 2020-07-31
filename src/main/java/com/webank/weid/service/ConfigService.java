@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.service;
 
 import java.io.File;
@@ -115,13 +134,32 @@ public class ConfigService {
                 buffer.append(string).append("\n");
                 continue;
             }
-            if (string.startsWith("chainId")) {
+            if (string.startsWith("chain_id")) {
                 buffer.append("chain_id=").append(chainId).append("\n");
             } else {
                 buffer.append(string).append("\n");
             }
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+    }
+    
+    public boolean setMasterGroupId(String groupId) {
+        List<String> listStr = FileUtils.readFileToList("run.config");
+        StringBuffer buffer = new StringBuffer();
+        for (String string : listStr) {
+            if (string.startsWith("#") || string.indexOf("=") == -1) {
+                buffer.append(string).append("\n");
+                continue;
+            }
+            if (string.startsWith("group_id")) {
+                buffer.append("group_id=").append(groupId).append("\n");
+            } else {
+                buffer.append(string).append("\n");
+            }
+        }
+        FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        //根据模板生成配置文件
+        return generateProperties();
     }
     
     public boolean processDbConfig(String address, String database, String username, String password) {
@@ -157,6 +195,9 @@ public class ConfigService {
         String userName = PropertyUtils.getProperty(userNameKey);
         String passWordKey = "datasource1." + DataDriverConstant.JDBC_USER_PASSWORD;
         String passWord = PropertyUtils.getProperty(passWordKey);
+        if (StringUtils.isBlank(dbUrl) || StringUtils.isBlank(userName) || StringUtils.isBlank(passWord)) {
+            return false;
+        }
         Connection connection = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

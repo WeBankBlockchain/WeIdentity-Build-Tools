@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeIdentity 部署工具</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="plugins/swiper/swiper.min.css">
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="dist/css/guide.css">
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
+  <script src="dist/js/include.js"></script>
+  <script src="plugins/swiper/swiper.min.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <ul class="navbar-nav">
+    <li class="nav-item col-md-6 offset-md-3">
+            <span>WeIdentity 部署工具</span>
+            <span id="openLog">查看后台日志</span>
+    </li>
+  </ul>
+  <div class="swiper-container swiper-no-swiping">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide">
+                    <div class="content-wrapper">
+                        <section class="content">
+                            <div class='container-fluid guild-step'>
+                                <div class="col-md-6 offset-md-3">
+                                    <div id="AccountDiv" class="card card-primary">
+                                        <div class="card-header">
+                                            <h6>请选择您的角色</h6>
+                                            <span class='guide_notice'>
+                                                <img src="./dist/img/icon-question.svg" alt="">
+                                                什么是"联盟链委员会管理员"
+                                            </span>
+                                        </div>
+                                        <div class="card-body role_body">
+                                            <div class='role_part role_active' type='1'>
+                                                <span>
+                                                    <img class='role_icon' src='./dist/img/icon1-member.svg'>
+                                                    我是"联盟链委员会管理员"
+                                                </span>
+                                                <img class='selected_icon' src="./dist/img/icon-select.svg" alt="">
+                                            </div>
+                                            <div class='role_part' type='2'>
+                                                <span>
+                                                    <img class='role_icon' src="./dist/img/icon1-not.svg" alt="">
+                                                    我不是"联盟链委员会管理员"
+                                                </span>
+                                                <img class='selected_icon' src="./dist/img/icon-select.svg" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="card-footer" id="role-next">
+                                            <button type="button" class="btn btn-block btn-primary btn-flat">下一步</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+            </div>
+        <div class="swiper-slide">
+          <div class="content-wrapper">
+                <section class="content">                 
+                <div class='guide_step_part col-md-6 offset-md-3'>
+                    <div class='bottom_line'></div>
+                    <div class='guide_step_item guide_step_active'>
+                        <span>1</span>
+                        <img src="./dist/img/icon-hook.svg" alt="">
+                        <p>区块链节点配置</p>
+                    </div>
+                    <div class='guide_step_item'>
+                        <span>2</span>
+                         <img src="./dist/img/icon-hook.svg" alt="">
+                         <p>设置主群组</p>
+                        </div>
+                    <div class='guide_step_item'>
+                        <span>3</span>
+                        <img src="./dist/img/icon-hook.svg" alt="">
+                        <p>数据库配置(可选)</p>
+                    </div>
+                    <div class='guide_step_item'>
+                        <span>4</span>
+                        <img src="./dist/img/icon-hook.svg" alt="">
+                        <p>创建管理员WeID</p>
+                    </div>
+                    <div class='guide_step_item'>
+                        <span>5</span>
+                        <img src="./dist/img/icon-hook.svg" alt="">
+                        <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
+                    </div>
+                </div>
+                <div class="container-fluid">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card card-primary warning_box">
+                          <form id="nodeForm" role="form">
+                            <div class="card-body">
+                              <div class="form-group">
+                                <label for="orgId">机构名称</label>
+                              	<a href="#" target="blank_" style='display:block'>
+	                                <img src="./dist/img/icon-question.svg" alt="">
+	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                                    	如何设置机构名称？
+	                                </span>
+                                </a>
+                                <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
+                              </div>
+                              <div class="form-group">
+                                <label for="amopId">通讯ID</label>
+                                <a href="#" target="blank_" style='display:block'>
+	                                <img src="./dist/img/icon-question.svg" alt="">
+	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                                    	如何设置通讯ID
+	                                </span>
+                                </a>
+                                <span style="color: gray;">此ID用于链上AMOP通讯</span>
+                                <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
+                              </div>
+                              <div class="form-group display-none">
+                                    <label>部署环境</label>
+                                    <select  id="cnsProFileActive" name="cnsProFileActive" class="form-control">
+                                      <option value="prd">生产环境</option>
+                                      <option value="stg">测试环境</option>
+                                      <option value="dev" selected="selected">开发环境</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                    <label for="version">节点版本</label> <span style="color: gray;">目前只支持2.X的FISCO-BCOS版本</span>
+                                    <select  id="version" name="version" class="form-control">
+                                      <option value="2">FISCO-BCOS 2.X</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="ipPort">区块链节点 IP 和 Channel 端口</label>
+                                <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
+                                <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
+                                <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
+                              </div>
+                              <!-- <div class="form-group">
+                                <label for="ipPort">主群组ID (Main group ID)</label>
+                                <input type="text" class="form-control" id="groupId" name="groupId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter groupId">
+                              </div> -->
+                              <div class="form-group">
+                                    <label for="caCrtFile">ca.crt证书</label>
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="caCrtFile" name="caCrtFile">
+                                        <label class="custom-file-label"  for="caCrtFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="caCrtSpan"></span>
+                                  </div>
+                              <div id="caV2">
+                                   <div class="form-group">
+                                    <label for="nodeCrtFile">node.crt证书</label> 
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="nodeCrtFile" name="nodeCrt">
+                                        <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="nodeCrtSpan"></span>
+                                  </div>
+                                   <div class="form-group">
+                                    <label for="nodeKeyFile">node.key证书</label> 
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="nodeKeyFile" name="nodeKeyFile">
+                                        <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="nodeKeySpan"></span>
+                                  </div>
+                              </div>
+                              <div id="caV1" style="display: none">
+                                   <div class="form-group">
+                                    <label for="clientKeyStoreFile">client.keystore证书</label>
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="clientKeyStoreFile" name="clientKeyStoreFile">
+                                        <label class="custom-file-label" for="clientKeyStoreFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="cllientKeyStoreSpan"></span>
+                                  </div>
+                              </div>
+                              <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_">
+                                <img src="./dist/img/icon-question.svg" alt="">
+                                <span style="color:#017CFF;font-size:12px;">
+                                    	如何获取证书?
+                                </span>
+                                </a>
+                            </div>
+                            </form>
+                            <div class='sql_warning' style='right:-160px'>
+                               <a href="#" target="blank_" style='display:block'>
+                                <img src="./dist/img/icon-question.svg" alt="">
+                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+                                                                            点击查看配置配置教程
+                                </span>
+                               </a>
+                            </div>
+                            <div class="node_part">
+                              <button type="button" class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                              <button type="button" id="postNodeBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </section>
+            </div>
+        </div>
+        <div class="swiper-slide">
+            <div class="content-wrapper">
+                <section class="content">
+                   	<div class='guide_step_part col-md-6 offset-md-3'>
+                      	<div class='bottom_line'></div>
+                        <div class='guide_step_item guide_step_complated'>
+                             <span>1</span>
+                             <img src="./dist/img/icon-hook.svg" alt="">
+                             <p>区块链节点配置</p>
+                       	</div>
+                       	<div class='guide_step_item guide_step_active'>
+                            <span>2</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>设置主群组</p>
+                        </div>
+                        <div class='guide_step_item'>
+                            <span>3</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>数据库配置(可选)</p>
+                        </div>
+                        <div class='guide_step_item'>
+                             <span>4</span>
+                             <img src="./dist/img/icon-hook.svg" alt="">
+                             <p>创建管理员WeID</p>
+                        </div>
+                        <div class='guide_step_item '>
+                             <span>5</span>
+                             <img src="./dist/img/icon-hook.svg" alt="">
+                             <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
+                        </div>
+                      </div>
+                      <div class='container-fluid guild-step'>
+                            <div class="col-md-6 offset-md-3">
+                                <div id="AccountDiv" class="card card-primary">
+                                    <div class="card-header">
+                                        <h6>选择一个FISCO-BCOS的群组，作为 WeIdentity 的主群组（即部署 WeIdentity 智能合约的群组）</h6>
+                                    </div>
+                                    <div class="card-header" style='padding-top:0'>
+                                    	<a href="#" target="blank_" style='display:block'>
+			                           <img src="./dist/img/icon-question.svg" alt="">
+			                           <span style="color:#017CFF;font-size:12px;display:inline-block">
+			                                    	什么是群组？
+			                                </span>
+		                                </a>
+		                            </div>
+                                    <div class="card-body role_body" style='padding:0 1.25rem;'>
+                                    	<div class="form-group" style='width:100%;'>
+		                                    <select  id="guide_groupID" name="version" class="form-control"></select>
+                                     	</div>
+                                    </div>
+                                    <div class="db-part">
+                                      <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                                      <button type="button"  id="setGroupId" class="btn btn-block btn-primary btn-flat">下一步</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                   </section>
+             </div>
+        </div>
+        <div class="swiper-slide">
+            <div class='content-wrapper'>
+              <section class="content">
+                  <div class='guide_step_part col-md-6 offset-md-3'>
+                        <div class='bottom_line'></div>
+                        <div class='guide_step_item guide_step_complated'>
+                            <span>1</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>区块链节点配置</p>
+                        </div>
+                        <div class='guide_step_item guide_step_complated'>
+                            <span>2</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>设置主群组</p>
+                        </div>
+                        <div class='guide_step_item guide_step_active'>
+                            <span>3</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>数据库配置(可选)</p>
+                        </div>
+                        <div class='guide_step_item'>
+                            <span>4</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>创建管理员WeID</p>
+                        </div>
+                        <div class='guide_step_item'>
+                            <span>5</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
+                        </div>
+                    </div>
+                  <div class="container-fluid">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card card-primary warning_box">
+                          <form role="form" id="dbForm">
+                            <div id="dbFormDiv" class="card-body">
+                            <div class="form-group">
+                                    <label for="sql_version">数据库类型</label> <span style="color: gray;">目前暂只支持MySql数据库</span>
+                                    <select  id="sql_version" name="sql_version" class="form-control">
+                                      <option value="mysql">MYSQL</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="mysql_address">数据库IP:PORT</label>
+                                <input type="text" class="form-control" id="mysql_address" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" placeholder="IP:PORT">
+                              </div>
+                              <div class="form-group">
+                                <label for="mysql_database">数据库名称</label>
+                                <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">* 数据库需要提前自己搭建好，并建立好数据库，数据库名称(DataBase Name)可以自行决定</div>
+                                <input type="text" class="form-control" id="mysql_database" placeholder="Enter DataBase Name">
+                              </div>
+                              <div class="form-group">
+                                <label for="mysql_username">数据库用户名</label>
+                                <input type="text" class="form-control" id="mysql_username" placeholder="Enter username">
+                              </div>
+                              <div class="form-group">
+                                <label for="mysql_password">数据库密码</label>
+                                <input type="password" class="form-control" id="mysql_password" placeholder="Enter password">
+                              </div>
+                            </div>
+                            <div class="db-part">
+                              <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                              <button type="button"  id="dbPassBtn" class="btn btn-block btn-primary btn-flat">跳过</button>
+                              <button type="button"  id="postDbBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
+                            </div>
+                          </form>
+            			  <div class='sql_warning'>
+                            <div class='warning_title'>温馨提示</div>
+                            <p>如果您需要使用到下列功能，则需要配置数据库</p>
+                            <p>1.Transportation相关组件功能</p>
+                            <p>2.Evidence异步存证功能</p>
+                            <p>3.Persistence数据存储功能(例如：存储Credential)</p>
+                           	<p>
+                           		<a href="#" target="blank_" style='display:block'>
+			                           <img src="./dist/img/icon-question.svg" alt="">
+			                           <span style="color:#017CFF;font-size:12px;display:inline-block">
+			                                    	配置教程
+			                                </span>
+		                                </a>
+                           	</p>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </section>
+             </div>
+         </div>
+        <div class="swiper-slide">
+             <div class="content-wrapper">
+              <section class="content">
+                  <div class='guide_step_part col-md-6 offset-md-3'>
+                        <div class='bottom_line'></div>
+                        <div class='guide_step_item guide_step_complated'>
+                            <span>1</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>区块链节点配置</p>
+                        </div>
+                        <div class='guide_step_item guide_step_complated'>
+                            <span>2</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>设置主群组</p>
+                        </div>
+                        <div class='guide_step_item guide_step_complated'>
+                            <span>3</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>数据库配置(可选)</p>
+                        </div>
+                        <div class='guide_step_item guide_step_active'>
+                            <span>4</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p>创建管理员WeID</p>
+                        </div>
+                        <div class='guide_step_item'>
+                            <span>5</span>
+                            <img src="./dist/img/icon-hook.svg" alt="">
+                            <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
+                        </div>
+                    </div>
+                  <div class="container-fluid">
+                    <!-- Small boxes (Stat box) -->
+                    <div class="col-md-6 offset-md-3">
+                        <!-- general form elements -->
+                        <div id="AccountDiv" class="card card-primary">
+                          <div class="card-header">
+                            <h3 class="card-title">创建管理员WeID</h3>
+                          </div>
+                          <div class="card-header" style='padding-top:0;padding-bottom:0'>
+                            <a href="#" target="blank_" style='display:block'>
+				                <img src="./dist/img/icon-question.svg" alt="">
+				                <span style="color:#017CFF;font-size:12px;display:inline-block">
+				                     	什么是管理员？
+				                 </span>
+		                     </a>
+		                  </div>
+                          <!-- /.card-header -->
+                          <!-- form start -->
+                          <form role="form" id="AccountForm">
+                            <div class="card-body" >
+                              <div class="form-group" id="createDiv" margin-top: 15px"> 
+                                <!-- <button type="button"  id="createBySysBtn" class="btn btn-inline btn-primary btn-flat" style="width: 45%;">系统自动创建公私钥 </button>
+                                <span style="width: 8%;display: inline-block;text-align: center;float:none;color:#000">或</span>
+                                <button type="button" data-toggle="modal" data-target="#modal-create-pri" id="createByPri" class="btn btn-inline btn-primary btn-flat" style="width: 45%;">自行上传私钥</button> -->
+                                <div class='key_item active_key' type='1'>
+                                    <span class='item_out_role'>
+                                        <span></span>
+                                    </span>
+                                    <p>系统自动创建公私钥
+                                    </p>
+                                </div>
+                                <div class='key_item' type='2'>
+                                    <span class='item_out_role'>
+                                        <span></span>
+                                    </span>
+                                    <p>自行上传私钥</p>
+                                </div>
+                              </div>
+                              <div class="form-group" id="accountDiv" style='display:none'>
+                                <!-- <label for="account">账户：</label> -->
+                                <input type="text" class="form-control" id="account" readonly="readonly">
+                              </div>
+                            <div class="card-footer" id="nextDiv" style="display: none">
+                              <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                              <button type="button"  id="nextBtn" class="btn btn-block btn-primary btn-flat disabled">下一步</button>
+                            </div>
+                            <div class="db-part" id='key-part' style='width:100%'>
+                                <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                                <button type="button" id='caretKeyBtn' class="btn btn-block btn-primary btn-flat">下一步</button>
+                            </div>
+                          </form>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                  </div><!-- /.container-fluid -->
+                </section>
+             </div>
+            </div>
+        <div class="swiper-slide">
+                <div class="content-wrapper">
+                    <section class="content">
+                        <div class='guide_step_part col-md-6 offset-md-3'>
+                            <div class='bottom_line'></div>
+                            <div class='guide_step_item guide_step_complated'>
+                                <span>1</span>
+                                <img src="./dist/img/icon-hook.svg" alt="">
+                                <p>区块链节点配置</p>
+                            </div>
+                            <div class='guide_step_item guide_step_complated'>
+	                            <span>2</span>
+	                            <img src="./dist/img/icon-hook.svg" alt="">
+	                            <p>设置主群组</p>
+	                        </div>
+                            <div class='guide_step_item guide_step_complated'>
+                                <span>3</span>
+                                <img src="./dist/img/icon-hook.svg" alt="">
+                                <p>数据库配置(可选)</p>
+                            </div>
+                            <div class='guide_step_item guide_step_complated'>
+                                <span>4</span>
+                                <img src="./dist/img/icon-hook.svg" alt="">
+                                <p>创建管理员WeID</p>
+                            </div>
+                            <div class='guide_step_item guide_step_active'>
+                                <span>5</span>
+                                <img src="./dist/img/icon-hook.svg" alt="">
+                                <p style='width:200px;left:-89px'>部署WeIdentity智能合约</p>
+                            </div>
+                        </div>
+                        <div class='container-fluid guild-step'>
+                            <div class="col-md-6 offset-md-3">
+                                <div id="AccountDiv" class="card card-primary">
+                                    <div class="card-header">
+                                        <h6>为WeIdentity DID 设置链ID （chain-id）</h6>
+                                    </div>
+                                    <div class="card-body role_body" style='padding:0 1.25rem;'>
+                                    <div class="form-group" style='width:100%;'><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="color: #017CFF;">
+                                        <img src="./dist/img/icon-question.svg" alt="">
+                                        什么是chain id?</span></a>
+                                       <input type="text"  class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
+                                     </div>
+                                    </div>
+                                    <div class="db-part">
+                                      <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
+                                      <button type="button"  id="mainDeploy" class="btn btn-block btn-primary btn-flat">下一步</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        <div style='display:none' class="swiper-button-next"></div>
+        <div style='display:none' class="swiper-button-prev"></div>
+    </div>
+  </div>
+  <div class="modal fade" id="modal-create-pri">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title">自行上传私钥</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">备注：支持椭圆曲线的公私钥，并且为十进制私钥数据。
+          	<a href="#" target="blank_"><img src="./dist/img/icon-question.svg" alt=""><span style="color:#017CFF;font-size:12px;display:inline-block">如何生成私钥？</span></a>
+		  </p>
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          <form id="KeyForm" role="form">
+            <div class="form-group row">
+               <div class="col-sm-12">
+                   <div class="input-group">
+                     <div class="custom-file">
+                       <input type="file" class="custom-file-input" id="privateKeyFile"   name="privateKeyFile">
+                       <label class="custom-file-label" for="privateKeyFile">选择私钥文件...</label>
+                     </div>
+                   </div>
+               </div>
+             </div>
+             </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="craeteByPrivBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+  </div>
+</div>
+<!-- ./wrapper -->
+<!-- Bootstrap 4 -->
+<script src="dist/js/demo.js"></script>
+<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<script src="js/guide.js"></script>
+<script src="js/deploy.js"></script>
+</body>
+<script>
+$(document).ready(function(){
+    $("#openLog").click(function(){
+      var win = window.open("","logWin","width=800,height=500,top=300,left=500");
+      if (win.location.href === "about:blank") {
+          //窗口不存在
+          win = window.open("log.html", "logWin","width=800,height=500,top=300,left=500");
+      } else {
+          //窗口以已经存在了
+          win.focus();
+      }
+    })
+})
+</script>
+</html>

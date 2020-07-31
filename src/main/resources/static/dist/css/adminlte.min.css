@@ -12,4 +12,5 @@
 .success-span{color: green;}
 .fail-span{color:red}
 .show-new-line{width: 100%;height: auto;word-wrap:break-word;word-break:break-all;overflow: hidden;}
+.content-wrapper{ min-height: 89vh !important;}
 /*# sourceMappingURL=adminlte.min.css.map */

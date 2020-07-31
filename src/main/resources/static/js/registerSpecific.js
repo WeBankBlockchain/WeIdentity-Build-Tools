@@ -1,5 +1,12 @@
 $(document).ready(function(){
-	
+	$("#registerIssuerTypeBtn").click(function(){
+		if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#addIssuerType").val("");
+        	$("#modal-register-issue-type").modal();
+        }
+    });
     if (!isReady) {
     	return;
     }
@@ -42,17 +49,14 @@ $(document).ready(function(){
         })
     });
     
-    $("#registerIssuerTypeBtn").click(function(){
-    	$("#addIssuerType").val("");
-    	$("#modal-register-issue-type").modal();
-    });
+    
     $("#addToIssuerType").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         var weId = $.trim($("#addIssuerWeId").val());
         if (weId.length == 0) {
-       	    $("#messageBody").html("<p>请输入weId。</p>");
+       	    $("#messageBody").html("<p>请输入WeID。</p>");
        	    $("#modal-message").modal();
             return;
         }

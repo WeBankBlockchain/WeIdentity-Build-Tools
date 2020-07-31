@@ -1003,18 +1003,6 @@ public class BuildToolService {
         return null;
     }
     
-    // 判断是否存在机构配置
-    public boolean checkOrgId(String orgId) {
-        //从机构配置中获取当前机构的hash
-        HashContract hashFromOrgIdCns = getHashFromOrgCns(orgId);
-        // 如果不存在机构配置，则返回前端进行私钥配置
-        if (hashFromOrgIdCns == null) {
-            logger.info("[checkOrgId] the orgId does not exist in orgConfig cns.");
-            return false;//不存在
-        }
-        return true;
-    }
-    
     // 判断当前机构配置跟当前私钥是否匹配
     public boolean isMatchThePrivateKey() {
         HashContract hashFromOrgIdCns = getHashFromOrgCns(ConfigUtils.getCurrentOrgId());

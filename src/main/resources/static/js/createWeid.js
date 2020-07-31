@@ -1,18 +1,26 @@
+var role = "3";
 $(document).ready(function(){
+	$("#showCreateBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#modal-show-create-weid").modal();
+        }
+    });
 	if (!isReady) {
     	return;
     }
     loadData();
     // 初始化控件
     bsCustomFileInput.init();
-    
+    role = getRole();
     $("#createBtn").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("weId创建中,  请稍等...");
+        $($this).html("WeID创建中,  请稍等...");
         $.get("createWeId",function(value,status){
             if (value == "success") {
                 $("#confirmMessageBody").html("<p>WeID创建<span class='success-span'>成功</span>。</p>");
@@ -35,7 +43,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("weId创建中,  请稍等...");
+        $($this).html("WeID创建中,  请稍等...");
         var formData = new FormData();
         formData.append("privateKey", $("#privateKey")[0].files[0]);
 		$.ajax({
@@ -67,7 +75,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("weId创建中,  请稍等...");
+        $($this).html("WeID创建中,  请稍等...");
         var formData = new FormData();
         formData.append("publicKey", $("#publicKey")[0].files[0]);
 		$.ajax({
@@ -191,9 +199,9 @@ $(document).ready(function(){
     	
 	})
 	
-	$.get("getWeIdPath",function(value,status){
-       $("#weidDir").html("当前WeID存放路径: " + value);
-    })
+//	$.get("getWeIdPath",function(value,status){
+//       $("#weidDir").html("当前WeID存放路径: " + value);
+//    })
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -240,10 +248,18 @@ function loadData() {
 
 function processIssuerBtn() {
 	$("button[name='registerIssueBtn']").each(function(){
-		var index = $(this).attr("class").indexOf("true");
-		if(index > 0) {
-			$(this).attr("disabled",true);
-			$(this).html("已成为权威凭证发行者");
+		if (role == "1") {
+			$(this).show();
+			var index = $(this).attr("class").indexOf("true");
+			if(index > 0) {
+				$(this).attr("disabled",true);
+				$(this).html("已成为权威凭证发行者");
+			}
+		}
+	});
+	$("button[name='addToIssuerTypeBtn']").each(function(){
+		if (role == "1") {
+			$(this).show();
 		}
 	});
 	$.get("isDownFile",function(data,status){
@@ -265,6 +281,7 @@ function downEcdsaPubKey(address) {
 
 function registerIssue(weId) {
 	$("#registerIssuerWeId").val(weId);
+	$("#registerIssuerName").val("");
     $("#modal-register-issue").modal();
 }
 

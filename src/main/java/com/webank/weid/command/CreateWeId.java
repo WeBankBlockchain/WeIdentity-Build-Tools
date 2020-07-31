@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.service.BuildToolService;
+import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdUtils;
 
 /**
@@ -53,6 +54,7 @@ public class CreateWeId extends StaticConfig {
         }
         File weIdFile = buildToolService.getWeidDir(WeIdUtils.convertWeIdToAddress(result));
         if (weIdFile.exists()) {
+            FileUtils.writeToFile(result, "weid");
             System.out.println("New weid has been created ---->" + result);
             System.out.println("The related private key and public key can be found at " 
                 + weIdFile.getAbsolutePath());

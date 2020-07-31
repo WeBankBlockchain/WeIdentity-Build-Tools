@@ -2,6 +2,7 @@
 
 repo=cn
 version=latest.integration
+installZipDir=weid-build-tools/common/script/install
 
 set -- `getopt v:t: "$@"`
 while [ -n "$1" ]
@@ -17,8 +18,17 @@ do
     shift 
 done
 
+if [ ! -d ${installZipDir} ];then
+    mkdir -p ${installZipDir}
+fi
+
 # 1. down weid-install-tools.zip
 if [ ! -d "weid-install-tools" ];then
+
+    # check the install zip is exists in ${installZipDir}
+    if [ -f "${installZipDir}/weid-install-tools.zip" ]; then
+        cp ${installZipDir}/weid-install-tools.zip ./
+    fi
 	if [ ! -f "weid-install-tools.zip" ]; then
 		echo "begin download the weid-install-tools.zip..."
 		if [[ ${repo} == "cn" ]];then
@@ -29,7 +39,11 @@ if [ ! -d "weid-install-tools" ];then
 	fi
 	# unzip weid-install-tools.zip
 	unzip weid-install-tools.zip
-	# delete weid-install-tools.zip 
+	# delete weid-install-tools.zip
+	if [ ! -f "${installZipDir}/weid-install-tools.zip" ]; then
+        cp weid-install-tools.zip ${installZipDir}/
+    fi
+    rm -rf weid-install-tools.zip
 	if [ ! -d "weid-install-tools" ];then
 		echo "unzip weid-install-tools.zip fail."
 		exit 1
@@ -45,7 +59,7 @@ sed -i "/^buildToolVersion/cbuildToolVersion=$version" gradle.properties
 
 # 3. grant to gradlew and build
 chmod u+x gradlew
-./gradlew clean build
+./gradlew clean build -Dorg.gradle.internal.http.socketTimeout=6000000 -Dorg.gradle.internal.http.connectionTimeout=6000000
 
 if [ -d "dist/lib" ];then
 	echo "begin complete the package..."
@@ -89,4 +103,8 @@ if [ ! $? -eq 0 ]; then
     echo "Err: the weid-build-tools install fail."
     exit $?
 fi
-echo "the weid-build-tools install successfully, please go to weid-build-tools and start server. example: cd weid-build-tools && ./start.sh"
+
+echo "--------------------------------------------------------------------------"
+echo "weid-build-tools is installed successfully, please go to the weid-build-tools directory and start the server."
+echo "Example: cd weid-build-tools && ./start.sh"
+echo "--------------------------------------------------------------------------"

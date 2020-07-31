@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bcos.web3j.crypto.Keys;
+import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
 import org.jsonschema2pojo.DefaultGenerationConfig;
 import org.jsonschema2pojo.GenerationConfig;
 import org.jsonschema2pojo.NoopAnnotator;
@@ -52,6 +54,7 @@ import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
+import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.dto.CptInfo;
 import com.webank.weid.dto.Issuer;
@@ -171,7 +174,7 @@ public class BuildToolService {
     public String createWeIdByPublicKey(String publicKey, DataFrom from) {
         // 判断当前使用的cns是否为当前admin部署的
         // 获取当前配置的hash值
-        String hash = ConfigUtils.getCurrentHash();
+        String hash = getMainHash();
         // 获取所有的主合约cns值，从而获取当前cns的部署者
         List<HashContract> result = getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
         // 当前hash的所有者
@@ -264,12 +267,12 @@ public class BuildToolService {
 
     public File getWeidDir(String address) {
         address = FileUtils.getSecurityFileName(address);
-        File targetDir = new File(WEID_PATH + "/" + ConfigUtils.getCurrentHash() + "/" + address);
+        File targetDir = new File(WEID_PATH + "/" + getMainHash() + "/" + address);
         return targetDir;
     }
     
     public String getWeidDir() {
-        return new File(WEID_PATH + "/" + ConfigUtils.getCurrentHash()).getAbsolutePath();
+        return new File(WEID_PATH + "/" + getMainHash()).getAbsolutePath();
     }
     
     private String getWeIdAddress(String weId) {
@@ -308,7 +311,7 @@ public class BuildToolService {
         info.setEcdsaKey(privateKey);
         info.setEcdsaPubKey(publicKey);
         info.setWeId(weId);
-        info.setHash(ConfigUtils.getCurrentHash());
+        info.setHash(getMainHash());
         info.setFrom(from.name());
         info.setAdmin(isAdmin);
         return DataToolUtils.serialize(info);
@@ -316,7 +319,7 @@ public class BuildToolService {
     
     public List<WeIdInfo> getWeIdList() {
         List<WeIdInfo> list = new ArrayList<WeIdInfo>();
-        String currentHash = ConfigUtils.getCurrentHash();
+        String currentHash = getMainHash();
         if (StringUtils.isBlank(currentHash)) {
             return list;
         }
@@ -359,7 +362,7 @@ public class BuildToolService {
         authorityIssuer.setAccValue("1");
         authorityIssuer.setCreated(System.currentTimeMillis());
         registerAuthorityIssuerArgs.setAuthorityIssuer(authorityIssuer);
-        String hash = ConfigUtils.getCurrentHash();
+        String hash = getMainHash();
         registerAuthorityIssuerArgs.setWeIdPrivateKey(DeployService.getWeIdPrivateKey(hash));
         ResponseData<Boolean> response = getAuthorityIssuerService().
             registerAuthorityIssuer(registerAuthorityIssuerArgs);
@@ -398,7 +401,7 @@ public class BuildToolService {
     }
     
     public List<Issuer> getIssuerList() {
-        String currentHash = ConfigUtils.getCurrentHash();
+        String currentHash = getMainHash();
         List<Issuer> list = new ArrayList<Issuer>();
         if (StringUtils.isBlank(currentHash)) {
             return list;
@@ -422,7 +425,7 @@ public class BuildToolService {
         logger.info("[removeIssuer] begin remove authority issuer={} ...", weId);
         RemoveAuthorityIssuerArgs removeAuthorityIssuerArgs = new RemoveAuthorityIssuerArgs();
         removeAuthorityIssuerArgs.setWeId(weId);
-        String hash = ConfigUtils.getCurrentHash();
+        String hash = getMainHash();
         removeAuthorityIssuerArgs.setWeIdPrivateKey(DeployService.getWeIdPrivateKey(hash));
 
         ResponseData<Boolean> response = getAuthorityIssuerService()
@@ -465,7 +468,7 @@ public class BuildToolService {
             );
             String id = DataToolUtils.getUuId32();
             //文件落地处理,每注册一个issuerType 记录一个文件
-            File issuerTypeFile = new File(ISSUER_TYPE_PATH + "/" + ConfigUtils.getCurrentHash(), id);
+            File issuerTypeFile = new File(ISSUER_TYPE_PATH + "/" + getMainHash(), id);
             IssuerType info = buildIssuerType(type, from);
             String data = DataToolUtils.serialize(info);
             FileUtils.writeToFile(data, issuerTypeFile.getAbsolutePath(), FileOperator.OVERWRITE);
@@ -474,7 +477,7 @@ public class BuildToolService {
     }
     
     private WeIdAuthentication getCurrentWeIdAuth() {
-        String hash = ConfigUtils.getCurrentHash();
+        String hash = getMainHash();
         WeIdPrivateKey weIdPrivateKey = DeployService.getWeIdPrivateKey(hash);
         WeIdAuthentication callerAuth = new WeIdAuthentication();
         callerAuth.setWeIdPrivateKey(weIdPrivateKey);
@@ -483,19 +486,9 @@ public class BuildToolService {
         return callerAuth;
     }
     
-    private WeIdAuthentication getCurrentWeIdAuth(String weId) {
-        WeIdInfo weIdInfo = this.getWeIdInfo(getWeIdAddress(weId));
-        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
-        weIdPrivateKey.setPrivateKey(weIdInfo.getEcdsaKey());
-        WeIdAuthentication callerAuth = new WeIdAuthentication();
-        callerAuth.setWeIdPrivateKey(weIdPrivateKey);
-        callerAuth.setWeId(weId);
-        return callerAuth;
-    }
-    
     private IssuerType buildIssuerType(String type, DataFrom from) {
         IssuerType info = new IssuerType();
-        info.setHash(ConfigUtils.getCurrentHash());
+        info.setHash(getMainHash());
         long time = System.currentTimeMillis();
         info.setTime(time);
         info.setType(type);
@@ -504,7 +497,7 @@ public class BuildToolService {
     }
     
     public List<IssuerType> getIssuerTypeList() {
-        String currentHash = ConfigUtils.getCurrentHash();
+        String currentHash = getMainHash();
         List<IssuerType> list = new ArrayList<IssuerType>();
         if (StringUtils.isBlank(currentHash)) {
             return list;
@@ -653,7 +646,7 @@ public class BuildToolService {
         
         logger.info("[registerCpt] begin save register info.");
         //开始保存CPT数据
-        File cptDir = new File(CPT_PATH + "/" + ConfigUtils.getCurrentHash() + "/" + resultCptId);
+        File cptDir = new File(CPT_PATH + "/" + getMainHash() + "/" + resultCptId);
         cptDir.mkdirs();
         //复制CPT文件
         FileUtils.copy(cptFile, new File(cptDir.getAbsolutePath(), cptFile.getName()));       
@@ -673,7 +666,7 @@ public class BuildToolService {
     
     private CptInfo buildCptInfo(String weId, Integer cptId, String cptJsonName, DataFrom from) {
         CptInfo info = new CptInfo();
-        info.setHash(ConfigUtils.getCurrentHash());
+        info.setHash(getMainHash());
         long time = System.currentTimeMillis();
         info.setTime(time);
         info.setCptId(cptId);
@@ -685,7 +678,7 @@ public class BuildToolService {
     
     public List<CptInfo> getCptInfoList() {
         List<CptInfo> list = new ArrayList<CptInfo>();
-        String currentHash = ConfigUtils.getCurrentHash();
+        String currentHash = getMainHash();
         if (StringUtils.isBlank(currentHash)) {
             return list;
         }
@@ -799,7 +792,7 @@ public class BuildToolService {
     }
     
     public File getCptFile(Integer cptId) {
-        return new File(CPT_PATH + "/" + ConfigUtils.getCurrentHash() + "/" + cptId,
+        return new File(CPT_PATH + "/" + getMainHash() + "/" + cptId,
             getCptFileName(cptId));
     }
     
@@ -810,7 +803,7 @@ public class BuildToolService {
     private PojoInfo buildPojoInfo(String id, Integer[] cptIds, String fromType, DataFrom from) {
         PojoInfo info = new PojoInfo();
         info.setCptIds(cptIds);
-        info.setHash(ConfigUtils.getCurrentHash());
+        info.setHash(getMainHash());
         info.setId(id);
         info.setTime(System.currentTimeMillis());
         info.setFrom(from.name());
@@ -820,7 +813,7 @@ public class BuildToolService {
     
     public List<PojoInfo> getPojoList() {
         List<PojoInfo> list = new ArrayList<PojoInfo>();
-        String currentHash = ConfigUtils.getCurrentHash();
+        String currentHash = getMainHash();
         if (StringUtils.isBlank(currentHash)) {
             return list;
         }
@@ -869,7 +862,7 @@ public class BuildToolService {
     }
     
     private File getPojoDir() {
-        return new File(POJO_PATH + "/" + ConfigUtils.getCurrentHash());
+        return new File(POJO_PATH + "/" + getMainHash());
     }
 
     /**
@@ -971,13 +964,16 @@ public class BuildToolService {
         }
     }
     
-    public String getIssuerByWeId(String weId) {
-        if (StringUtils.isBlank(ConfigUtils.getCurrentHash())) {
+    public String getIssuerByWeId(String weIdAddress) {
+        String mainHash = getMainHash();
+        if (StringUtils.isBlank(mainHash)) {
             return StringUtils.EMPTY;
         }
+        AuthorityIssuerService service = this.getAuthorityIssuerService();
+        String weId = WeIdUtils.convertAddressToWeId(weIdAddress);
+        
         logger.info("[getIssuerByWeId] begin query issuer. weid = {}", weId);
-        ResponseData<AuthorityIssuer> response = this.getAuthorityIssuerService()
-            .queryAuthorityIssuerInfo(weId);
+        ResponseData<AuthorityIssuer> response = service.queryAuthorityIssuerInfo(weId);
         if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
             logger.warn("[getIssuerByWeId] query issuer fail. ErrorCode is:{}, msg :{}",
                 response.getErrorCode(),
@@ -986,5 +982,64 @@ public class BuildToolService {
         } else {
             return response.getResult().getName();
         }
+    }
+    
+    /**
+     * 根据orgId获取org_config里面的hash数据.
+     * @param orgId 机构编码
+     * @return 返回hash对象信息
+     */
+    public HashContract getHashFromOrgCns(String orgId) {
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return null;
+        }
+        List<HashContract> allHash = getDataBucket(CnsType.ORG_CONFING).getAllHash().getResult();
+        for (HashContract hashContract : allHash) {
+            if (hashContract.getHash().equals(orgId)) {
+                return hashContract;
+            }
+        }
+        return null;
+    }
+    
+    // 判断当前机构配置跟当前私钥是否匹配
+    public boolean isMatchThePrivateKey() {
+        HashContract hashFromOrgIdCns = getHashFromOrgCns(ConfigUtils.getCurrentOrgId());
+        // 如果不存在机构配置，则可以匹配
+        if (hashFromOrgIdCns == null) {
+            logger.info("[isMatchThePrivateKey] the orgId does not exist in orgConfig cns, default match.");
+            return true;//不存在
+        }
+        WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+        String publicKey = DataToolUtils.publicKeyFromPrivate(
+            new BigInteger(currentPrivateKey.getPrivateKey())).toString();
+        String address = "0x" + Keys.getAddress(new BigInteger(publicKey));
+        if (address.equals(hashFromOrgIdCns.getOwner())) {
+            logger.info("[isMatchThePrivateKey] the orgId is exist in orgConfig cns, match the private key.");
+            return true;//存在orgId并且为当前机构所有
+        }
+        logger.info("[isMatchThePrivateKey] the orgId is exist, but misMatch the private key.");
+        return false; //存在机构id不为当前机构所有，私钥不匹配
+    }
+    
+    
+    public String getMainHash() {
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return StringUtils.EMPTY;
+        }
+        return getDataBucket(CnsType.ORG_CONFING).get(
+            WeIdConstant.CNS_GLOBAL_KEY, WeIdConstant.CNS_MAIN_HASH).getResult();
+    }
+    
+    public String getEvidenceHash(String groupId) {
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return StringUtils.EMPTY;
+        }
+        String orgId = ConfigUtils.getCurrentOrgId();
+        return getDataBucket(CnsType.ORG_CONFING).get(
+            orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
     }
 }

@@ -1,19 +1,21 @@
 $(document).ready(function(){
-	var dbReady = false;
 	//获取配置
     $.get("loadConfig",function(data,status){
         $("#dbForm  #mysql_address").val(data.mysql_address);
         $("#dbForm  #mysql_database").val(data.mysql_database);
         $("#dbForm  #mysql_username").val(data.mysql_username);
         $("#dbForm  #mysql_password").val(data.mysql_password);
+//        $.get("dbCheckState",function(data,status){
+//            if(data) {//检查成功
+//                disabledInput();
+//            } else {
+//            	$("#postBtnDiv").show();
+//            }
+//         });
     });
     
     //提交配置
     $("#postBtn").click(function(){
-    	if (dbReady) {
-    		goConfig(this);
-    		return;
-    	}
     	var disabled = $(this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         var message = checkInput();
@@ -27,9 +29,9 @@ $(document).ready(function(){
 	    formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
 	    formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
 	    formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
-	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
-	    $("#modal-default").modal();
-	    $("#configBtn").addClass("disabled");
+	    $("#confirmMessage1Body").html("<p>配置提交中,请稍后...</p>");
+	    $("#confirmMessage1Btn").addClass("disabled");
+	    $("#modal-confirm-message1").modal();
 	    $.ajax({
 	        url:'submitDbConfig', /*接口域名地址*/
 	        type:'post',
@@ -40,13 +42,16 @@ $(document).ready(function(){
 	            console.log(res);
 	            if (res=="success") {
 	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+	            	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
 	            	setTimeout(checkForTimeout,2000);
 	            } else if (res=="fail") {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+	            	 $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+	            	 $("#confirmMessage1Btn").removeClass("disabled");
 	            } else {
+	            	$("#confirmMessage1Btn").removeClass("disabled");
 	                console.log(res);
 	            }
+	            $("#modal-confirm-message1").modal();
 	        }
 	    })
     });
@@ -70,85 +75,39 @@ $(document).ready(function(){
     	return null;
     }
     function checkForTimeout() {
-    	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
     	setTimeout(checkdb,2000);
     }
     
     function  checkdb() {
     	$.get("checkDb",function(data,status){
            if(data) {//检查成功
-        	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+   			   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p><span class='success-span'>目前暂不支持动态修改，如修改配置请重启服务生效。</span></p>");
         	   $("#configBtn").removeClass("disabled");
-        	   disabledInput();
-        	   step2();
+        	   //disabledInput();
+        	   $("#i-db").removeClass("fa-circle");
+               $("#i-db").addClass("fa-check-circle");
            } else {//检查失败
-        	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
+           $("#modal-confirm-message1").modal();
+           $("#confirmMessage1Btn").removeClass("disabled");
         });
     }
-    $.get("dbCheckState",function(data,status){
-        if(data) {//检查成功
-            $("#checkBody").html("<p>当前配置正常，无需再次配置。</p>");
-            $("#modal-default").modal();
-            disabledInput();
-            setTimeout(step2,150);
-        } else {
-        	step1();
-        }
-     });
+    
     
     function disabledInput() {
+    	$("#dbForm  #version").attr("disabled",true);
     	$("#dbForm  #mysql_address").attr("disabled", true);
         $("#dbForm  #mysql_database").attr("disabled", true);
         $("#dbForm  #mysql_username").attr("disabled", true);
         $("#dbForm  #mysql_password").attr("disabled", true);
-        $("#configBtn").removeClass("disabled");
-        $("#i-db").removeClass("fa-circle");
-        $("#i-db").addClass("fa-check-circle");
-        dbReady = true;
     }
-    
-    function step1() {
-    	if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({
-			onSkip:function(){
-				$.cookie("skip",true);
-			}
-		});
-		var enjoyhint_script_steps = [{
-		    'next #dbFormDiv': "请完成配置，并点击' 下一步'",
-		    'showSkip': false,
-		    'nextButton': {
-		        text: "确定"
-		    }
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
-	}
-    
-    function step2() {
-    	if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({
-			onSkip:function(){
-				$.cookie("skip",true);
-			}
-		});
-		var enjoyhint_script_steps = [{
-		    'click #configBtn': '下一步，前往合约部署。',
-		    'showSkip': false
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
-	}
+
+    $("#confirmMessage1Btn").click(function(){
+		var disabled = $(this).attr("class").indexOf("disabled");
+	    if(disabled > 0) return;
+		$("#modal-confirm-message1").modal("hide");
+	})
 });
-function goConfig(thiObj) {
-	$.get("dbCheckState",function(data,status){
-        if(data) {//检查成功
-     	   goTo(thiObj, "deploy.html");
-        }
-     });
-}

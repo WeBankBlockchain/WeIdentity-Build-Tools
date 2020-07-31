@@ -86,8 +86,7 @@ function compile()
     export GROUP_ID=${group_id}
     export CNS_PROFILE_ACTIVE=${cns_profile_active}
     export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
-    export CNS_CONTRACT_FOLLOW=${cns_contract_follow}
-    FISCOVAS='${GROUP_ID}:${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_CONTRACT_FOLLOW}:${CNS_PROFILE_ACTIVE}'
+    FISCOVAS='${GROUP_ID}:${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_PROFILE_ACTIVE}'
     envsubst ${FISCOVAS}} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}
@@ -97,11 +96,12 @@ function compile()
     
     #modify weidentity properties
     export ORG_ID=${org_id}
+    export AMOP_ID=${amop_id}
     export MYSQL_ADDRESS=${mysql_address}
     export MYSQL_DATABASE=${mysql_database}
     export MYSQL_USERNAME=${mysql_username}
     export MYSQL_PASSWORD=${mysql_password}
-    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
+    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${AMOP_ID}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
     envsubst ${VARS} < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
 
     if [ -f build.gradle ]; then
@@ -147,6 +147,10 @@ function check_parameter()
         echo "org id is empty, please check the config."
         exit 1
     fi
+    if [ -z ${amop_id} ];then
+        echo "amop id is empty, please check the config."
+        exit 1
+    fi
     if [ -z ${chain_id} ];then
         echo "chain id is empty, please check the config."
         exit 1
@@ -155,25 +159,25 @@ function check_parameter()
         echo "group id is empty, please check the config."
         exit 1
     fi
-    if [ -z ${mysql_address} ];then
-        echo "mysql_address is empty, please check the config."
-        exit 1
-    fi
-    if [ -z ${mysql_database} ];then
-        echo "mysql_database is empty, please check the config."
-        exit 1
-    fi
-    if [ -z ${mysql_username} ];then
-        echo "mysql_username is empty, please check the config."
-        exit 1
-    fi
-    if [ -z ${mysql_password} ];then
-        echo "mysql_password is empty, please check the config."
-        exit 1
-    fi
+    # if [ -z ${mysql_address} ];then
+    #    echo "mysql_address is empty, please check the config."
+    #    exit 1
+    # fi
+    # if [ -z ${mysql_database} ];then
+    #    echo "mysql_database is empty, please check the config."
+    #    exit 1
+    # fi
+    # if [ -z ${mysql_username} ];then
+    #    echo "mysql_username is empty, please check the config."
+    #    exit 1
+    # fi
+    # if [ -z ${mysql_password} ];then
+    #    echo "mysql_password is empty, please check the config."
+    #    exit 1
+    # fi
     if [ -z ${cns_profile_active} ];then
-        echo "cns_profile_active is empty, please check the config."
-        exit 1
+       echo "cns_profile_active is empty, please check the config."
+       exit 1
     fi
     if [ "${cns_profile_active}" != "prd" ] &&  [ "${cns_profile_active}" != "stg" ] && [ "${cns_profile_active}" != "dev" ];then
         echo "the value of cns_profile_active error, please input: prd, stg, dev"

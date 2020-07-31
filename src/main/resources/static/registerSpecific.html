@@ -3,14 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -32,7 +40,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">功能管理</a></li>
+              <li class="breadcrumb-item active">功能管理</li>
               <li class="breadcrumb-item active">特定类型的发行者</li>
             </ol>
           </div><!-- /.col -->
@@ -119,8 +127,8 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
-              <label for="addIssuerWeId">weId</label>
-              <input type="text" class="form-control" id="addIssuerWeId" onkeyup="this.value=this.value.replace(/[^\w：:]/g,'');this.value=this.value.replace(/：/g,':');"  placeholder="Enter weId">
+              <label for="addIssuerWeId">WeID</label>
+              <input type="text" class="form-control" id="addIssuerWeId" onkeyup="this.value=this.value.replace(/[^\w：:]/g,'');this.value=this.value.replace(/：/g,':');"  placeholder="Enter WeID">
             </div>
             <div class="form-group">
               <label for="registerIssuerName">特定类型</label>
@@ -139,23 +147,6 @@
   <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
-  $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/checkConfig.js"></script>
 <script src="js/registerSpecific.js"></script>

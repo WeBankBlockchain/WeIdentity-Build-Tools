@@ -64,8 +64,9 @@ public final class ConfigUtils {
     public static <T extends Map> T objToMap(Object obj, Class<T> cls) throws IOException {
         return (T)OBJECT_MAPPER.readValue(serialize(obj), cls);
     }
-    
-    public static String getCurrentHash() {
-        return PropertyUtils.getProperty("cns.contract.follow");
+
+    public static String getCurrentOrgId() {
+        return PropertyUtils.getProperty("blockchain.orgid");
     }
+
 }

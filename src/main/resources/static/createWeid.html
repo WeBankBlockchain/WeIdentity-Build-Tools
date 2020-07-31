@@ -3,13 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <style>
+  .select_part input{
+     width: 100%;
+    border: 0;
+    outline: none;
+  }
+  .select_part textarea{
+     width: 100%;
+    border: 0;
+    outline: none;
+    resize:none;
+    height:130px;
+  }
+  .log_part{
+  	   position: fixed;
+	    width: 100%;
+	    top: 20vh;
+	    z-index: 999999;
+  }
+   .log_part p{
+   		margin: auto;
+	    width: 200px;
+	    height: 50px;
+	    line-height: 50px;
+	    background: rgba(0,0,0,0.6);
+	    color: #fff;
+	    text-align: center;
+	    border-radius: 25px;
+   }
+  </style>
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -31,7 +70,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">功能管理</a></li>
+              <li class="breadcrumb-item active">功能管理</li>
               <li class="breadcrumb-item active">WeID管理</li>
             </ol>
           </div><!-- /.col -->
@@ -43,7 +82,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="showCreateBtn" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-show-create-weid" class="btn btn-inline btn-primary btn-flat">创建WeID</button>
+        <button type="button" id="showCreateBtn" title="创建WeIdentity DID" class="btn btn-inline btn-primary btn-flat">创建WeID</button>
         <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">什么是WeID?</a>
       </div>
       <div class="row">
@@ -54,7 +93,7 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th title="WeIdentity DID">weId</th>
+                  <th title="WeIdentity DID">WeID</th>
                   <th>Admin</th>
                   <th>数据来源</th>
                   <th>CNS</th>
@@ -64,7 +103,7 @@
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
 	            <tr class="display-none">
-	                <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
+	                <td><a href="javascript:showDId('${weId}')"> ${weIdShow} </a></td>
 	                <td>${showAdmin}</td>
 	                <td>${from}</td>
 	                <td>${hashShow}</td>
@@ -72,8 +111,8 @@
 	                <td>
 	                      <button type="button" onclick="downEcdsaPubKey('${id}')" class="btn btn-inline btn-primary btn-flat display-none" style="display: none" downFile="file">下载公钥文件</button>
 	                      <button type="button" onclick="downEcdsaKey('${id}')" class="btn btn-inline btn-primary btn-flat" style="display: none" downFile="file">下载私钥文件</button>
-	                      <button type="button" name="registerIssueBtn" onclick="registerIssue('${weId}')" title="注册为Authority Issuer" class="btn btn-inline btn-primary btn-flat ${issuer}" >注册为权威凭证发行者</button>
-	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" >注册为特定类型的发行者</button>
+	                      <button type="button" name="registerIssueBtn" onclick="registerIssue('${weId}')" title="注册为Authority Issuer" class="btn btn-inline btn-primary btn-flat ${issuer}" style="display: none" >注册为权威凭证发行者</button>
+	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" style="display: none" >注册为特定类型的发行者</button>
 	                </td>
 	              </tr>
                 </tbody>
@@ -89,7 +128,6 @@
     </section>
     <!-- /.content -->
   </div>
-  
   <div class="modal fade" id="modal-register-issue">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -102,8 +140,8 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
-              <label for="registerIssuerWeId">weId</label>
-              <input type="text" class="form-control" id="registerIssuerWeId" readonly="readonly" placeholder="Enter weid">
+              <label for="registerIssuerWeId">WeID</label>
+              <input type="text" class="form-control" id="registerIssuerWeId" readonly="readonly" placeholder="Enter WeID">
             </div>
             <div class="form-group">
               <label for="registerIssuerName">权威机构名称</label>
@@ -132,8 +170,8 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
-              <label for="addIssuerWeId">weId</label>
-              <input type="text" class="form-control" id="addIssuerWeId" readonly="readonly" placeholder="Enter weid">
+              <label for="addIssuerWeId">WeID</label>
+              <input type="text" class="form-control" id="addIssuerWeId" readonly="readonly" placeholder="Enter WeID">
             </div>
             <div class="form-group">
               <label for="registerIssuerName">特定类型 &nbsp;&nbsp;<a id="registerSpecific_A" href="registerSpecific.html" style="font-size: 12px;display: none;">前往注册特定类型</a></label>
@@ -155,25 +193,28 @@
   <div class="modal fade" id="modal-show-create-weid">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header" style='position: relative;'>
           <h4 class="modal-title">创建WeID</h4>
+          <a href="#" target="blank_" style='position: absolute;right:40px;top:16px;'>
+			 <img src="./dist/img/icon-question.svg" alt="">
+			 <span style="color:#017CFF;font-size:12px;display:inline-block">
+			       如何选择密钥
+			 </span>
+		  </a>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+	          <div class="form-group">
+	              <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-block btn-primary btn-flat">系统自动创建公私钥来创建WeID</button>
+	          </div>
             <div class="form-group">
 	          <button type="button" id="createBtn1" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-create-by-privateKey" class="btn btn-block btn-primary btn-flat">传入私钥创建WeID</button>
 	        </div>
 	        <div class="form-group">
-              <button type="button" id="createBtn2" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-create-by-publicKey"  class="btn btn-block btn-primary btn-flat">传入公钥创建来代理模式创建WeID</button>
-            </div>
-            <div class="form-group">
-              <button type="button" id="createBtn" title="创建WeIdentity DID" class="btn btn-block btn-primary btn-flat">系统自动创建公私钥来创建WeID</button>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-10"><span style="font-size: 13px;color: gray">* 只有是群组的admin，才能作为代理创建WeID。</span></div>
+              <button type="button" id="createBtn2" title="创建WeIdentity DID" data-toggle="modal" data-target="#modal-create-by-publicKey"  class="btn btn-block btn-primary btn-flat">传入公钥，使用代理模式创建WeID</button>
             </div>
           </div>
         </div>
@@ -238,6 +279,9 @@
                        <label id="publicKey-label" class="custom-file-label" for="publicKey">选择公钥文件...</label>
                      </div>
                    </div>
+                   <div class="form-group">
+	                 <div class="col-sm-10" style="font-size: 13px;color: gray;max-width: 100%;margin-top:0.5rem"><span>* 只有联盟链委员会的管理员，才能作为代理，为其他机构创建WeID。</span></div>
+	              </div>
                </div>
              </div>
              </form>
@@ -251,28 +295,11 @@
     </div>
     <!-- /.modal-dialog -->
   </div>
-  <!-- /foot -->
+    <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
-  $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-<script src="plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
+<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="js/checkConfig.js"></script>
 <script src="js/createWeid.js"></script>
 </body>

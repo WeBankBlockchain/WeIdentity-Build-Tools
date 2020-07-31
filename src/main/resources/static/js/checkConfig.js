@@ -1,59 +1,66 @@
 var isReady = false;
+var enEableMasterCns = true;
 $(document).ready(function(){
-	var times = 6;
-	$.ajaxSettings.async = false;
-    $.get("isReady",function(data,status){
-    	if(!data) {
-    		$('#modal-message').on('hide.bs.modal', function () {
-    			goToIndex();
-	    	})
-    		showTime();
-    		setInterval(showTime,1000);
-            setTimeout(goToIndex,5000);
-    	} else {
-    		var url = window.location.pathname;
-    		url = url.substring(1);
-    		if (url == "deploy.html") {
-    			isReady = true;
-    		} else {
-    			isEnableMasterCns();
-    		}
-    	}
-    });
-    $.ajaxSettings.async = true;
-    function showTime() {
-    	times--;
-    	$("#messageBody").html("<p>配置未准备完成，" + times + "秒后自动进入配置页面。</p>");
-    	$("#modal-message").modal();
-    }
-    function goToIndex() {
-        window.location.href="index.html";
-    }
-    
-    function showCns() {
-    	times--;
-    	$("#messageBody").html("<p>您未启用主合约，" + times + "秒后自动进入主合约部署页面，请进行启用。</p>");
-    	$("#modal-message").modal();
-    }
-    function goToDeploy() {
-        window.location.href="deploy.html";
-    }
-    
+	
+	if(!getNodeCheckState()) {
+		showMessageForNodeException();
+	} else {
+		var url = window.location.pathname;
+		url = url.substring(1);
+		if (url == "index.html") {
+			isReady = true;
+		} else {
+			isEnableMasterCns();
+		}
+	}
+	
     function isEnableMasterCns() {
-    	$.get("isEnableMasterCns",function(data,status){
-    	    if(!data) {
-    	    	$('#modal-message').on('hide.bs.modal', function () {
-    	    		goToDeploy();
-    	    	})
-    	    	times = 6;
-    	    	showCns();
-    	    	setInterval(showCns,1000);
-    	        setTimeout(goToDeploy,5000);
-    	    } else {
-    	    	isReady = true;
-    	    }
-    	});
+    	if(!getEnableState()) {
+	    	enEableMasterCns = false;
+	    	showMessageForNodeException();
+	    } else {
+	    	isReady = true;
+	    }
+    }
+    
+    function getNodeCheckState() {
+    	var nodeCheckState = sessionStorage.getItem('nodeCheckState');
+    	if (!nodeCheckState) {
+    		$.ajaxSettings.async = false;
+    		$.get("nodeCheckState",function(value,status){
+    			if (value) {
+    				nodeCheckState = value;
+    				sessionStorage.setItem("nodeCheckState", nodeCheckState);
+    			}
+    		})
+    		$.ajaxSettings.async = true;
+    	}
+    	return nodeCheckState;
+    }
+    
+    function getEnableState() {
+    	var isEnable = sessionStorage.getItem('isEnableMasterCns');
+    	if (!isEnable) {
+    		$.ajaxSettings.async = false;
+    		$.get("isEnableMasterCns",function(value,status){
+    			if (!value) {
+    				isEnable = true;
+    				sessionStorage.setItem("isEnableMasterCns", isEnable);
+    			}
+    		})
+    		$.ajaxSettings.async = true;
+    	}
+    	return isEnable;
     }
 });
 
-
+function showMessageForNodeException() {
+	if (enEableMasterCns) {
+		$("#configType").val("2");
+		$("#configBody").html("<p>您区块链节点异常，请配置正确的区块链节点。</p>");
+	} else {
+		$("#configType").val("3");
+		$("#configBody").html("<p>您未启用主合约，请前往启用主合约。</p>");
+	}
+	$("#modal-config").modal();
+}

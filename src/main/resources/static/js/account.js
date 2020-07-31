@@ -20,10 +20,6 @@ $(document).ready(function(){
 	    })
     });
 	
-	$("#nextBtn").click(function(){
-		goTo(this, "nodeConfig.html");
-    });
-	
 	function createAdmin(obj) {
 		$(obj).addClass("disabled");
 	    var formData = new FormData();
@@ -46,7 +42,6 @@ $(document).ready(function(){
 	            	first = false;
 	            	load();
 	            	$("#configBtn").removeClass("disabled");
-	            	step2();
 	            }
 	        }
 	    })
@@ -57,73 +52,20 @@ $(document).ready(function(){
 		$("#createDiv").hide();
 		$.get("checkAdmin",function(data,status){
 			if (data != "") {
-				$(".card-title").html("当前admin账户");
+				$(".card-title").html("当前管理员的 WeID 已经存在（目前不支持修改）");
 				$("#accountDiv").show();
-				$("#nextDiv").show();
 				$("#account").val(data);
 				$("#i-account").removeClass("fa-circle");
 	            $("#i-account").addClass("fa-check-circle");
 				hasAccount = true;
 				$("#nextBtn").removeClass("disabled");
-				if (first) {
-					step2_1();
-				}
 			} else {
 				$(".card-title").html("创建管理员账户的WeId");
 				$("#createDiv").show();
 				hasAccount = false;
 				$("#nextBtn").removeClass("disabled");
-				step1();
 			}
 	    });
-	}
-	function step1() {
-		if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({
-			onSkip:function(){
-				$.cookie("skip",true);
-			}
-		});
-		var enjoyhint_script_steps = [{
-		    'click #createDiv': "请点击【系统自动创建公私钥】或 【自行上传公私钥1】"
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
-	}
-	
-	function step2() {
-		if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({});
-		var enjoyhint_script_steps = [{
-		    'click #configBtn': '下一步，配置节点。',
-		    'showSkip': false
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
-	}
-	
-	function step2_1() {
-		if($.cookie("skip")){
-			return;
-		}
-		var enjoyhint_instance = new EnjoyHint({
-			onSkip:function(){
-				$.cookie("skip",true);
-			}
-		});
-		var enjoyhint_script_steps = [{
-		    'next #nextBtn': '下一步，配置节点。',
-		    'nextButton': {
-		        text: "确定"
-		    },
-		    'showSkip': true
-		}];
-		enjoyhint_instance.set(enjoyhint_script_steps);
-		enjoyhint_instance.run();
 	}
 });
 

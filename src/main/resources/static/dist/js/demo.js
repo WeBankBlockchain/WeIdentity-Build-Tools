@@ -483,7 +483,32 @@ function showWeId(weId) {
 	$("#modal-message").modal();
 }
 
-function showMessage(thisObj, message) {
+function showDId(weId) {
+	$.get("getWeIdPath",function(value,status){
+		$("#messageBody").html("<p class='select_part'><label>WeID:</label>" +"<input readonly onClick='select_copy(this,event)' value='"+ weId +"' /></p>");
+	    var data = value + "/" + weId.split(":")[3];
+	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeID公钥存放路径:</label><textarea onClick='select_copy(this,event)' readonly>" + data + "</textarea></p>");
+	    $("#modal-message").modal();
+	})
+}
+
+function select_copy (e, event){
+	$(e).select();
+	document.execCommand("Copy");
+	var div = document.createElement('div')
+	$(div).addClass('log_part')
+	$(div).html('<p>内容已复制</p>')
+	$(document.body).append(div)
+	setTimeout(function(){
+		$(div).remove()
+	}, 1000)
+//	var showbox = showMessage(e,"已复制", event);
+//	setTimeout(function(){
+//		$(showbox).remove();
+//	}, 1000)
+}
+
+function showMessage(thisObj, message, event) {
 	var posX = 0, posY = 0;
 	var event = event || window.event;
 	if (event.pageX || event.pageY) {
@@ -507,8 +532,34 @@ function showMessage(thisObj, message) {
                   background: '#fff',
                 }).addClass("showbox");
     showbox.insertAfter(thisObj);
+    return showbox;
 }
 
 function hideMessage() {
 	$(".showbox").remove();
+}
+
+loadModal();
+function loadModal() {
+	var body = $('body');
+	var modalDiv = $("<div></div>").appendTo(body);
+	$.ajaxSettings.async = false;
+	$.get("../../common/modal.html",function(value,status){
+		modalDiv.html(value);
+	})
+	$.ajaxSettings.async = true;
+}
+function getRole() {
+	var role = sessionStorage.getItem('guide_role');
+	if (!role) {
+		$.ajaxSettings.async = false;
+		$.get("getRole",function(value,status){
+			if (value) {
+				role = value;
+				sessionStorage.setItem("guide_role", role);
+			}
+		})
+		$.ajaxSettings.async = true;
+	}
+	return role;
 }

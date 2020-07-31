@@ -3,14 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -32,7 +40,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">功能管理</a></li>
+              <li class="breadcrumb-item active">功能管理</li>
               <li class="breadcrumb-item active">权威凭证发行者</li>
             </ol>
           </div><!-- /.col -->
@@ -55,7 +63,7 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th title="WeIdentity DID">weId</th>
+                  <th title="WeIdentity DID">WeID</th>
                   <th>权威机构名称</th>
                   <th>数据来源</th>
                   <th>CNS</th>
@@ -96,13 +104,15 @@
         </div>
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          	<p style='font-size:13px;color:gray'>说明：由各机构提供其“WeID”和“权威机构名称”，给到联盟链委员会的成员，由成员完成“权威凭证发行者”的注册。</p>	
             <div class="form-group">
-              <label for="registerIssuerWeId">weId</label>
-              <input type="text" class="form-control" id="registerIssuerWeId" onkeyup="this.value=this.value.replace(/[^\w：:]/g,'');this.value=this.value.replace(/：/g,':');" placeholder="Enter weid">
+              <label for="registerIssuerWeId">机构的WeID</label>
+              <input type="text" class="form-control" id="registerIssuerWeId" onkeyup="this.value=this.value.replace(/[^\w：:]/g,'');this.value=this.value.replace(/：/g,':');" placeholder="填入这个机构WeID">
             </div>
             <div class="form-group">
               <label for="registerIssuerName">权威机构名称</label>
-              <input type="text" class="form-control" id="registerIssuerName" onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'')" placeholder="Enter issuer name">
+              <p style="font-size: 12px;margin-bottom:0.5rem;color: gray;">输入权威机构的名称（建议由英文或者数字组成，不建议包含类似空格字符的特殊符号，也不支持中文），作为类似权威机构 ID 的方式使用，例如如果机构是微众银行，则可以输入类似“webank”作为其权威机构名称。</p>
+              <input type="text" class="form-control" id="registerIssuerName" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" placeholder="Enter issuer name">
             </div>
           </div>
         </div>
@@ -119,22 +129,6 @@
   <include src="common/foot.html"></include>
 </div>
 <!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
-  $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <script src="js/checkConfig.js"></script>
 <script src="js/registerIssuer.js"></script>

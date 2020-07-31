@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.command;
 
 import java.math.BigInteger;
@@ -78,7 +97,7 @@ public class RegisterEvidenceByGroup {
             Credentials credentials = GenCredential.create(new BigInteger(privatekey).toString(16));
             // 加载DataBucket
             DataBucket dataBucket = DataBucket.load(
-                weServer.getBucketAddress(CnsType.DEFAULT), 
+                weServer.getBucketByCns(CnsType.DEFAULT).getAddress(), 
                 (Web3j)weServer.getWeb3j(), 
                 credentials, 
                 new StaticGasProvider(WeIdConstant.GAS_PRICE, WeIdConstant.GAS_LIMIT)
@@ -96,7 +115,7 @@ public class RegisterEvidenceByGroup {
             // 将地址注册到cns中
             CnsType cnsType = CnsType.SHARE;
             // 注册SHARE CNS 默认主群组
-            RegisterAddressV2.registerBucketToCns(cnsType);
+            RegisterAddressV2.registerBucketToCns(cnsType, currentPrivateKey);
             // 根据群组和evidence Address获取hash
             String hash = AddressProcess.getHashForShare(groupId, evidenceAddress);
             // 将evidence地址注册到cns中 默认主群组

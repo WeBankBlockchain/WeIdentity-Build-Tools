@@ -563,3 +563,8 @@ function getRole() {
 	}
 	return role;
 }
+
+function getLocalTime(nS) {
+	var  date = new Date(parseInt(nS) + 8 * 3600 * 1000);
+    return date.toJSON().substr(0, 19).replace('T', ' ');
+}

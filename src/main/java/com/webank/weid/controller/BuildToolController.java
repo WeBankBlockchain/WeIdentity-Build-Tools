@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.controller;
 
 import java.io.File;
@@ -66,9 +85,9 @@ import com.webank.weid.service.DeployService;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
-import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.PropertyUtils;
 import com.webank.weid.util.WeIdUtils;
 
 @RestController
@@ -81,6 +100,8 @@ public class BuildToolController {
     private static boolean nodeCheck = false;
     
     private static boolean dbCheck = false;
+    
+    private static String preMainHash;
 
     @Autowired
     BuildToolService buildToolService;
@@ -102,22 +123,41 @@ public class BuildToolController {
     
     @GetMapping("/nodeCheckState")
     public boolean nodeCheckState() {
-        return nodeCheck;
+        if (!nodeCheck) {
+            String result = checkNode();
+            return BuildToolsConstant.SUCCESS.equals(result);
+        }
+        return true;
     }
     
     @GetMapping("/dbCheckState")
     public boolean dbCheckState() {
-        return dbCheck;
+        if (!dbCheck) {
+            return checkDb();
+        }
+        return true;
     }
+    
+    @GetMapping("/groupCheckState")
+    public boolean groupCheckState() {
+        String groupId = configService.loadConfig().get("group_id");
+        return deployService.getAllGroup(false).contains(groupId);
+    }
+    
+    @GetMapping("/checkState")
+    public Map<String, Boolean> checkState() {
+        Map<String, Boolean> result = new HashMap<String, Boolean>();
+        result.put("adminState", StringUtils.isNotBlank(checkAdmin()));
+        result.put("nodeState", nodeCheckState());
+        result.put("dbState", dbCheckState());
+        result.put("groupState", groupCheckState());
+        return result;
+    }
+    
     
     @GetMapping("/isDownFile")
     public boolean isDownFile() {
         return isDownFile.equals("true");
-    }
-    
-    @GetMapping("/isReady")
-    public boolean isReady() {
-        return nodeCheck;
     }
     
     @Description("是否启用主hash")
@@ -245,6 +285,13 @@ public class BuildToolController {
         LinkedList<CnsInfo> cnsInfoList = deployService.getDeployList();
         for (CnsInfo cnsInfo : cnsInfoList) {
             cnsInfo.setGroupId("group-" + fiscoConfig.getGroupId());
+            if (cnsInfo.isEnable()) { // 如果是启用状态
+                //如果上一个地址不为空，并且新hash地址跟上一个地址不相同则reloadAddress
+                if (StringUtils.isNotBlank(preMainHash) && !preMainHash.equals(cnsInfo.getHash())) {
+                    reloadAddress();
+                }
+                preMainHash = cnsInfo.getHash();
+            }
         }
         return cnsInfoList;
     }
@@ -372,7 +419,10 @@ public class BuildToolController {
         String amopId = request.getParameter("amopId");
         String version = request.getParameter("version");
         String ipPort = request.getParameter("ipPort");
-        String groupId = request.getParameter("groupId");
+        String groupId = configService.loadConfig().get("group_id");
+        if (StringUtils.isBlank(groupId)) {
+            groupId = "0";
+        }
         String profileActive = request.getParameter("cnsProFileActive");
         String privName = request.getParameter("privName");
         if (profileActive.equals("priv")) {
@@ -407,6 +457,7 @@ public class BuildToolController {
             if (checkNode != null && checkNode.check(fiscoConfig)) {
                 logger.info("[checkNode] the node check successfull.");
                 nodeCheck = true;
+                //configService.reloadAddress();
                 return BuildToolsConstant.SUCCESS;
             }
             logger.error("[checkNode] checkNode with fail.");
@@ -418,6 +469,15 @@ public class BuildToolController {
             logger.error("[checkNode] checkNode with unkonw exception.", e);
             return BuildToolsConstant.FAIL;
         }
+    }
+    
+    @Description("提交群组Id")
+    @PostMapping("/setGroupId")
+    public boolean setMasterGroupId(@RequestParam("groupId") String groupId) {
+        logger.info("[setMasterGroupId] begin set the groupId = {}.", groupId);
+        boolean result = configService.setMasterGroupId(groupId);
+        PropertyUtils.reload();
+        return result;
     }
     
     @Description("数据库配置提交")
@@ -529,14 +589,14 @@ public class BuildToolController {
         logger.info("[registerCpt] begin save the cpt json file...");
         String cptJson = request.getParameter("cptJson");
         cptJson = StringEscapeUtils.unescapeHtml(cptJson);
-        String fileName = request.getParameter("fileName");
-        fileName = fileName.substring(0, fileName.lastIndexOf("."));
-        fileName = FileUtils.getSecurityFileName(fileName);
+        String fileName = DataToolUtils.getUuId32();
         File targetFIle = new File("output/", fileName + ".json");
         FileUtils.writeToFile(cptJson, targetFIle.getAbsolutePath(), FileOperator.OVERWRITE);
         logger.info("[registerCpt] begin register cpt...");
         String cptId = request.getParameter("cptId");
         try {
+            //判断当前账户是否注册成weid，如果没有则创建weid
+            deployService.createWeIdForCurrentUser(DataFrom.WEB);
             return buildToolService.registerCpt(targetFIle, cptId, DataFrom.WEB);
         } catch (Exception e) {
             logger.error("[registerCpt] register cpt has error.", e);
@@ -693,9 +753,11 @@ public class BuildToolController {
     }
     
     @Description("获取群组列表")
-    @GetMapping("/getAllGroup")
-    public List<Map<String,String>> getAllGroup() {
-        List<String> allGroup = deployService.getAllGroup();
+    @GetMapping("/getAllGroup/{filterMaster}")
+    public List<Map<String,String>> getAllGroup(
+        @PathVariable(value = "filterMaster") boolean filterMaster
+    ) {
+        List<String> allGroup = deployService.getAllGroup(filterMaster);
         List<Map<String,String>> result = new ArrayList<Map<String,String>>();
         if (allGroup != null) {
             for (String string : allGroup) {
@@ -773,18 +835,39 @@ public class BuildToolController {
         return deployService.getRoleType();
     }
     
-    @Description("判断当前机构是否存在机构配置，如果存在则不需要配置机构私钥，系统默认配置机构私钥")
+    @Description("判断当前机构是否存在机构配置，如果存在则不需要配置机构私钥，系统默认配置机构私钥。"
+            + "返回： 1：存在，0：不存在，2：异常。")
     @PostMapping("/checkOrgId")
-    public boolean checkOrgId() {
-        // 判断是否存在机构配置
-        boolean isExist= buildToolService.checkOrgId(ConfigUtils.getCurrentOrgId());
-        // 如果存在
-        if (isExist) {
-            String address = deployService.checkAdmin();
-            if (StringUtils.isBlank(address)) {
-                deployService.createAdmin(null);
+    public int checkOrgId() {
+        try {
+            logger.info("[checkOrgId] begin check the orgId.");
+            // 判断是否存在机构配置
+            FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+            CheckNodeFace checkNode = new CheckNodeServiceV2();
+            boolean isExist = checkNode.checkOrgId(fiscoConfig);
+            // 如果存在
+            if (isExist) {
+                String address = deployService.checkAdmin();
+                if (StringUtils.isBlank(address)) {
+                    deployService.createAdmin(null);
+                }
             }
+            return isExist ? 1 : 0;
+        } catch (Exception e) {
+            logger.error("[checkOrgId] check orgId is exist has error.", e);
+            return 2;
         }
-        return isExist;
+    }
+    
+    @Description("设置引导完成状态")
+    @PostMapping("/setGuideStatus")
+    public boolean setGuideStatus(@RequestParam(value = "step") String step) {
+        return deployService.setGuideStatus(step);
+    }
+    
+    @Description("获取引导状态")
+    @GetMapping("/getGuideStatus")
+    public String getGuideStatus() {
+        return deployService.getGuideStatus();
     }
 }

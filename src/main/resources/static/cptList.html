@@ -3,15 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome -->
+  <link rel="stylesheet" href="plugins/json-editor/jsoneditor.css"/>
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="plugins/json-editor/jsoneditor.css"/>
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <style>
+  	.template_part{
+  		margin-bottom:0.5rem;
+  	}
+  	.template_part_item{
+  		position: relative;
+  		display:inline-block;
+  		
+  	}
+  	.template_part_item .item_des{
+  	    position: absolute;
+    	background:#FFF;
+   		z-index:-10;
+   		padding-top:10px;
+   		opacity:none;
+  	}
+  	.template_part_item .item_des .item_des_content{
+  		width:600px;
+  		border:1px solid #ddd;
+    	border-radius:4px;
+    	padding:20px 10px;
+    	max-height:500px;
+    	overflow:auto;
+    	position: relative;
+    	display: none;
+    	
+  	}
+
+  </style>
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -33,7 +70,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">功能管理</a></li>
+              <li class="breadcrumb-item active">功能管理</li>
               <li class="breadcrumb-item active">凭证类型(CPT)管理</li>
             </ol>
           </div><!-- /.col -->
@@ -130,6 +167,107 @@
                    </div>
                </div>
              </div>
+             <div class='template_part'>
+             	<div class='template_part_item' >
+             	<button type="button" class='btn btn-block btn-primary btn-flat template_btn' title='模板1为 Claim 只有一级数据结构的模板' type='1'>
+             		模板1
+             	</button>
+             		<div class='item_des'>
+             		 	<div class='item_des_content'>	
+	             			<pre style='margin:0;padding:0'>
+{
+  "description": "this is a one-level CPT",
+  "title": "one level template",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "user weId"
+    },
+    "age": {
+      "description": "the age of certificate owner",
+      "type": "integer"
+    },
+    "gender": {
+      "description": "the gender of certificate owner",
+      "enum": [
+        "F",
+        "M"
+      ],
+      "type": "string"
+    },
+    "name": {
+      "description": "the name of certificate owner",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "age"
+  ]
+}</pre>
+             			</div>
+             		</div>
+             	</div>
+             	<div class='template_part_item'>
+					<button type="button" class='btn btn-block btn-primary btn-flat template_btn' title='模板2为 Claim 是两级数据结构的模板'  type='2'>
+             			模板2
+             		</button>
+             		<div class='item_des'>
+             			<div class='item_des_content'>	
+             				<pre style='margin:0;padding:0'>
+{
+  "description": "this is a multi-level CPT",
+  "title": "multi level template",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "the WeID of the owner"
+    },
+    "name": {
+      "type": "string",
+      "description": "the name of object"
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "code"
+        },
+        "context": {
+          "type": "string",
+          "description": "error"
+        },
+        "date": {
+          "type": "string",
+          "description": "info"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id"
+        },
+        "address": {
+          "type": "string",
+          "description": "sipTellAddress"
+        },
+        "userlevel": {
+          "type": "integer",
+          "description": "userlevel"
+        }
+      }
+    }
+  }
+}</pre>
+             			</div>
+             		</div>
+             	</div>
+             </div>
+             <p style='font-size:13px;color:gry'>说明: 点击模板按钮可以自动填充相应内容到下列代码输入框中</p>
              <div id="jsonContent" style="height: 350px"></div>
              </form>
           </div>
@@ -167,26 +305,9 @@
   <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
-  $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="dist/js/demo.js"></script>
 <script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="plugins/json-editor/jsoneditor.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="dist/js/demo.js"></script>
 <script src="js/checkConfig.js"></script>
 <script src="js/cpt.js"></script>
 </body>

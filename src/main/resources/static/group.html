@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeIdentity 部署工具</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
+  <script src="dist/js/include.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <!-- menu-->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <include src="common/menu.html?open=1&level=1"></include>
+  </aside>
+  <include src="common/nav.html"></include>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">主群组配置</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active">配置管理</li>
+              <li class="breadcrumb-item active">配置主群组</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="col-md-6 offset-md-3">
+          <div id="AccountDiv" class="card card-primary">
+              <div class="card-header">
+                  <h6>配置主群组</h6>
+              </div>
+              <div class="card-body role_body" style='padding:1rem 1.25rem;'>
+                  <div class="form-group" style='width:100%;'>
+                      <label for=""groupId"">选择一个FISCO-BCOS的群组，作为 WeIdentity 的主群组（即部署 WeIdentity 智能合约的群组）</label>
+                      <a href="#" target="blank_" >
+	                       <img src="./dist/img/icon-question.svg" alt="">
+	                       <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                           	什么是群组？
+	                       </span>
+                       </a>
+                      <select  id="guide_groupID" name="groupId" class="form-control" style='margin-top:0.5rem'></select>
+                  </div>
+              </div>
+              <div class="db-part">
+                  <button type="button"  id="setGroupId" class="btn btn-block btn-primary btn-flat">完成</button>
+              </div>
+          </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /foot -->
+  <include src="common/foot.html"></include>
+</div>
+<script src="dist/js/demo.js"></script>
+<script src="js/group.js"></script>
+</body>
+</html>

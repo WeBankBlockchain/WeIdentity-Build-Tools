@@ -70,6 +70,7 @@ public class GeneratePolicy {
                 .generate(cptStr, policyType, policyId, "cpt");
             FileUtils.writeToFile(policy, "presentation_policy.json",
                 FileOperator.OVERWRITE);
+            System.exit(0);
         } catch (Exception e) {
             logger.error("[GeneratePolicy] generate policy has error.", e);
             System.out.println("generate policy fail, please check the log.");

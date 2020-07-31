@@ -7,10 +7,10 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index.html" class="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-           style="opacity: .8">
-      <span class="brand-text font-weight-light">weid-build-tool</span>
+    <a href="index.html" class="brand-link" style='width:100%;display: flex;align-items: center;justify-content: center;'>
+      <img src="dist/img/logo.svg" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+           style="opacity: .8;border-radius:0;width:110px;margin:0 5px">
+      <span class="brand-text font-weight-light" style='font-size: 1.2rem;'>部署工具</span>
     </a>
 
     <!-- Sidebar -->
@@ -18,24 +18,37 @@
       <!-- Sidebar Menu -->
       <nav id="menuNav" class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-         <li class="nav-item  menu-open">
+         <li class="nav-item has-treeview config menu-open">
+         	<a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+               	 配置管理
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="index.html" class="nav-link">
-                  <i id = "i-account" class="far fa-circle nav-icon"></i>
-                  <p>配置admin账户</p>
-                </a>
-              </li>
               <li class="nav-item" >
                 <a href="nodeConfig.html" class="nav-link" >
                   <i id = "i-node" class="far fa-circle nav-icon"></i>
                   <p>配置区块链节点</p>
                 </a>
               </li>
+              <li class="nav-item" >
+                <a href="group.html" class="nav-link" >
+                  <i id = "i-group" class="far fa-circle nav-icon"></i>
+                  <p>配置主群组</p>
+                </a>
+              </li>
               <li class="nav-item">
                 <a href="dbConfig.html" class="nav-link">
                   <i id = "i-db" class="far fa-circle nav-icon"></i>
                   <p>配置数据库</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="account.html" class="nav-link">
+                  <i id = "i-account" class="far fa-circle nav-icon"></i>
+                  <p>配置WeID账户</p>
                 </a>
               </li>
             </ul>
@@ -51,15 +64,15 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="deploy.html" title="Deploy WeIdentity Contract"  class="nav-link">
+                <a href="index.html" title="Deploy WeIdentity Contract"  class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>主群组部署合约</p>
+                  <p>部署 WeIdentity 智能合约</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="deployEvidence.html" title="Deploy Evidence Contract"  class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>部署Evidence合约</p>
+                  <p>部署 Evidence 智能合约</p>
                 </a>
               </li>
 <!--               <li class="nav-item">
@@ -74,13 +87,13 @@
                   <p>WeID管理</p>
                 </a>
               </li>
-              <li class="nav-item">
+              <li id="authorityLi" class="nav-item" style="display: none">
                 <a href="registerIssuer.html" title="Authority Issuer" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>权威凭证发行者</p>
                 </a>
               </li>
-              <li class="nav-item">
+              <li id="specificLi" class="nav-item" style="display: none">
                 <a href="registerSpecific.html" title="Specific Issuer" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>特定类型的发行者</p>
@@ -100,7 +113,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item has-treeview menu-open async-menu">
+          <li class="nav-item has-treeview async-menu menu-open">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
@@ -112,7 +125,7 @@
              <li class="nav-item">
                 <a href="async.html" class="nav-link async-form">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>异步任务列表</p>
+                  <p>Evidence异步上链管理</p>
                 </a>
               </li>
             </ul>
@@ -136,6 +149,19 @@ $(document).ready(function(){
 			$(this).addClass("active");
 		}
 	});
+
+	/*
+	$("#menuNav > ul > li[class*=has-treeview] > a").click(function(){
+		$("#menuNav > ul > li[class*=has-treeview]").each(function(){
+	        $(this).removeClass("menu-open");
+	    })
+		$(this).parent().addClass("menu-open");
+		var config = $(this).parent().attr("class").indexOf("config");
+        if(config > 0) {
+        	checkState();
+        }
+	})
+	
 	$("#menuNav > ul > li[class*=has-treeview]").each(function(){
 		var navA = $(this).find("a");
 		if(navA.length > 1) {
@@ -149,41 +175,40 @@ $(document).ready(function(){
 	        });
 		}
 	});
+	 if (url == 'account.html' || url == 'dbConfig.html' || url == 'group.html' ||url == 'nodeConfig.html'){
+    
+     }
+	*/
 	
 	if (url == 'asyncDetail.html') {
 		$(".async-form").addClass("active")
 		$(".async-menu").addClass("menu-open")
 	}
-
-	checkAdmin();
+	if (getRole() === '1') {
+        $('#authorityLi').show()
+        $('#specificLi').show()
+    }
+    checkState();
 	//加载状态
-	function checkAdmin() {
-		$.get("checkAdmin",function(data,status){
-	        if (data != "") {
+	function checkState() {
+		$.get("checkState",function(data,status){
+	        if (data.adminState) {
 	            $("#i-account").removeClass("fa-circle");
 	            $("#i-account").addClass("fa-check-circle");
 	        }
-	        checkNode();
-	    });
-	}
-	
-	function checkNode() {
-		$.get("nodeCheckState",function(data,status){
-            if(data) {//检查成功
-                $("#i-node").removeClass("fa-circle");
+	        if (data.nodeState) {
+	        	$("#i-node").removeClass("fa-circle");
                 $("#i-node").addClass("fa-check-circle");
             }
-            checkDb();
-        })
-	}
-	
-	function checkDb() {
-		$.get("dbCheckState",function(data,status){
-            if(data) {//检查成功
-                $("#i-db").removeClass("fa-circle");
+	        if (data.dbState) {
+	        	$("#i-db").removeClass("fa-circle");
                 $("#i-db").addClass("fa-check-circle");
             }
-         });
+	        if (data.groupState) {
+	        	$("#i-group").removeClass("fa-circle");
+                $("#i-group").addClass("fa-check-circle");
+            }
+	    });
 	}
 })
 

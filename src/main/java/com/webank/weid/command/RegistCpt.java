@@ -90,6 +90,9 @@ public class RegistCpt extends StaticConfig {
             String temp = "tools/" + privateKeyFile;
             privateKeyFile = temp;
         }
+        // 替换cnshash
+        String mainHash = buildToolService.getMainHash();
+        privateKeyFile = privateKeyFile.replace("{cns_contract_follow}", mainHash);
         String privateKey = FileUtils.readFile(privateKeyFile);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         weIdPrivateKey.setPrivateKey(privateKey);

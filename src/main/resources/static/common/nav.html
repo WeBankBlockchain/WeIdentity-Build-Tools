@@ -3,9 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    .role_select{
+        position: absolute;
+    	right: 30px;
+    	display: flex;
+    	align-items: center;
+    	font-size:14px;
+    }
+    .role_select label{
+        margin-bottom:0;
+    }
+    .role_select label img{
+        width:20px;
+    }
+    .role_select select{
+    	padding: 4px;
+	    border: 0;
+	    outline: none;
+    }
+    #openLog{
+        border: 1px solid #017CFF;
+        border-radius: 2px;
+        padding:0.2rem 0.6rem;
+        color:#017CFF;
+        font-size:14px;
+        cursor: pointer;
+        height:auto;
+    }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -13,14 +42,14 @@
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="index.html" class="nav-link">主页</a>
-      </li>
+      </li> -->
       <li class="nav-item d-none d-sm-inline-block">
-        <a id="openLog" href="#" class="nav-link">后台日志</a>
+        <a id="openLog" href="#" class="nav-link">查看后台日志</a>
       </li>
     </ul>
       
@@ -37,6 +66,15 @@
         </div>
       </li>
     </ul>
+    <div class='role_select'>
+      <label>
+      	<img class='role_icon' src="./dist/img/icon1-not.svg" alt="">
+      </label>
+      <select id='role_select_part'>
+        <option value='1'>联盟链委员会管理员</option>
+        <option value='2'>非联盟链委员会管理员</option>
+      </select>
+    </div>
   </nav>
   <!-- /.navbar -->
 </div>
@@ -52,6 +90,26 @@ $(document).ready(function(){
           //窗口以已经存在了
           win.focus();
       }
+    })
+    var role = getRole();
+    if (role == 1) {
+        $("#role_select_part").find("option[value='1']").prop("selected",true);
+    } else if (role == 2) {
+        $("#role_select_part").find("option[value='2']").prop("selected",true);
+    }
+    $('#role_select_part').change(function(){
+    	let val = $(this).find('option:selected').val()
+    	if (val != role) {
+    		//切换角色并刷新
+    		var formData = {};
+			formData.roleType = val;
+			$.post("setRole", formData, function(value,status){
+				if (value) {
+					sessionStorage.setItem('guide_role', val);
+					window.location.reload();
+				}
+			})	
+    	}
     })
 })
 </script>

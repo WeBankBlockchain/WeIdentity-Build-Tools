@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>WeIdentity 部署工具</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
+  <script src="dist/js/include.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+  <!-- menu-->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <include src="common/menu.html?open=1&level=1"></include>
+  </aside>
+  <include src="common/nav.html"></include>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">配置管理员WeID</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active">配置管理</li>
+              <li class="breadcrumb-item active">配置WeID账户</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="col-md-6 offset-md-3">
+            <!-- general form elements -->
+            <div id="AccountDiv" class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title"> </h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form role="form" id="AccountForm">
+                <div class="card-body" >
+                  <div class="form-group" id="createDiv" style="display:none;margin-top: 15px"> 
+                    <button type="button"  id="createBySysBtn" class="btn btn-inline btn-primary btn-flat" style="width: 45%;">系统自动创建公私钥 </button>
+                    <span style="width: 8%;display: inline-block;text-align: center;">或</span>
+                    <button type="button" data-toggle="modal" data-target="#modal-create-pri" id="createByPri" class="btn btn-inline btn-primary btn-flat" style="width: 45%;">自行上传私钥</button>
+                  </div>
+                  <div class="form-group" id="accountDiv" style="display:none">
+                    <label for="account">账户：</label>
+                    <input type="text" class="form-control" id="account" readonly="readonly">
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- /.card -->
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  
+  <div class="modal fade" id="modal-create-pri">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">自行上传私钥</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          <form id="KeyForm" role="form">
+            <div class="form-group row">
+               <div class="col-sm-12">
+                   <div class="input-group">
+                     <div class="custom-file">
+                       <input type="file" class="custom-file-input" id="privateKeyFile"   name="privateKeyFile">
+                       <label class="custom-file-label" for="privateKeyFile">选择私钥文件...</label>
+                     </div>
+                   </div>
+               </div>
+             </div>
+             </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="craeteByPrivBtn" class="btn btn-block btn-primary btn-flat">确定 </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  
+  <div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">温馨提示</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="checkBody" class="modal-body">
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭Close</button>
+          <button type="button" id="configBtn" onclick="goTo(this, 'nodeConfig.html')"  class="btn btn-primary disabled">下一步</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /foot -->
+  <include src="common/foot.html"></include>
+</div>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<script src="js/account.js"></script>
+</body>
+</html>

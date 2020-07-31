@@ -24,7 +24,11 @@ apply plugin: 'idea'
 apply plugin: 'signing'
 group = 'com.webank'
 
-version = "1.0.12"
+version = "0.0.0"
+def versionFile = file("VERSION")
+versionFile.eachLine { line ->
+    version = line
+}
 def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios
@@ -220,7 +224,7 @@ jar {
     into('file') {
        from fileTree(file("./")){
             //自定义过滤规则
-            includes = ["*.sh"]
+            includes = ["*.sh", "VERSION"]
             excludes = ["build.sh"]
         }
         from 'common/script/tpl/run.config.tpl'

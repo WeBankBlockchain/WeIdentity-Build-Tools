@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.service;
 
 import java.io.File;
@@ -72,7 +91,13 @@ public class ConfigService {
     }
     
     public boolean processNodeConfig(
-        String address, String version, String orgId, String chainId, String groupId, String profileActive) {
+        String address, 
+        String version, 
+        String orgId, 
+        String amopId, 
+        String groupId,
+        String profileActive
+    ) {
         List<String> listStr = FileUtils.readFileToList("run.config");
         StringBuffer buffer = new StringBuffer();
         for (String string : listStr) {
@@ -86,12 +111,48 @@ public class ConfigService {
                 buffer.append("blockchain_fiscobcos_version=").append(version).append("\n");
             } else  if (string.startsWith("org_id")) {
                 buffer.append("org_id=").append(orgId).append("\n");
-            } else if (string.startsWith("chain_id")) {
-                buffer.append("chain_id=").append(chainId).append("\n");
+            } else  if (string.startsWith("amop_id")) {
+                buffer.append("amop_id=").append(amopId).append("\n");
             }  else if (string.startsWith("group_id")) {
                 buffer.append("group_id=").append(groupId).append("\n");
             } else if (string.startsWith("cns_profile_active")) {
                 buffer.append("cns_profile_active=").append(profileActive).append("\n");
+            } else {
+                buffer.append(string).append("\n");
+            }
+        }
+        FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        //根据模板生成配置文件
+        return generateProperties();
+    }
+    
+    public void updateChainId(String chainId) {
+        List<String> listStr = FileUtils.readFileToList("run.config");
+        StringBuffer buffer = new StringBuffer();
+        for (String string : listStr) {
+            if (string.startsWith("#") || string.indexOf("=") == -1) {
+                buffer.append(string).append("\n");
+                continue;
+            }
+            if (string.startsWith("chain_id")) {
+                buffer.append("chain_id=").append(chainId).append("\n");
+            } else {
+                buffer.append(string).append("\n");
+            }
+        }
+        FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+    }
+    
+    public boolean setMasterGroupId(String groupId) {
+        List<String> listStr = FileUtils.readFileToList("run.config");
+        StringBuffer buffer = new StringBuffer();
+        for (String string : listStr) {
+            if (string.startsWith("#") || string.indexOf("=") == -1) {
+                buffer.append(string).append("\n");
+                continue;
+            }
+            if (string.startsWith("group_id")) {
+                buffer.append("group_id=").append(groupId).append("\n");
             } else {
                 buffer.append(string).append("\n");
             }
@@ -134,6 +195,9 @@ public class ConfigService {
         String userName = PropertyUtils.getProperty(userNameKey);
         String passWordKey = "datasource1." + DataDriverConstant.JDBC_USER_PASSWORD;
         String passWord = PropertyUtils.getProperty(passWordKey);
+        if (StringUtils.isBlank(dbUrl) || StringUtils.isBlank(userName) || StringUtils.isBlank(passWord)) {
+            return false;
+        }
         Connection connection = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -192,7 +256,6 @@ public class ConfigService {
         fileStr = fileStr.replace("${ISSUER_ADDRESS}", "");
         fileStr = fileStr.replace("${EVIDENCE_ADDRESS}", "");
         fileStr = fileStr.replace("${SPECIFICISSUER_ADDRESS}", "");
-        fileStr = fileStr.replace("${CNS_CONTRACT_FOLLOW}", loadConfig.get("cns_contract_follow"));
         fileStr = fileStr.replace("${CNS_PROFILE_ACTIVE}", loadConfig.get("cns_profile_active"));
         //将文件写入resource目录
         FileUtils.writeToFile(fileStr, "resources/fisco.properties", FileOperator.OVERWRITE);
@@ -202,8 +265,8 @@ public class ConfigService {
         logger.info("[generateWeidentityProperties] begin generate weidentity.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/weidentity.properties.tpl");
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
+        fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
-        
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));
         fileStr = fileStr.replace("${MYSQL_DATABASE}", loadConfig.get("mysql_database"));
         fileStr = fileStr.replace("${MYSQL_USERNAME}", loadConfig.get("mysql_username"));
@@ -236,6 +299,7 @@ public class ConfigService {
      * 启用CNS.
      * @param hash 需要启用的cns值
      */
+    @Deprecated
     public void enableHash(String hash) {
         //更新cns配置
         List<String> listStr = FileUtils.readFileToList("run.config");
@@ -282,6 +346,8 @@ public class ConfigService {
         //重新加载地址
         reloadAddress();
     }
+    
+   
     
     public void reloadAddress() {
         PropertyUtils.reload();

@@ -3,22 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeId-Web-Tool</title>
+  <title>WeIdentity 部署工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-  <link href="plugins/enjoyhint/enjoyhint.css" rel="stylesheet">
+  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <style>
     .form-group span{
 	    font-size:12px;
 	    color:red;
 	    display: none;
-	    float: right;
+	    font-size: 12px;
+	    margin-bottom:0.5rem
     }
   </style>
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <script src="plugins/jquery/jquery.min.js"></script>
+  <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+  <script src="plugins/jquery/jquery.cookie.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="plugins/datatables/dataTables.sort.plungin.js"></script>
+  <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -36,12 +45,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">配置管理</h1>
+            <h1 class="m-0 text-dark">区块链节点配置</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="index.html">主页</a></li>
-              <li class="breadcrumb-item active">基础配置</li>
+              <li class="breadcrumb-item active">配置管理</li>
+              <li class="breadcrumb-item active">配置区块链节点</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -62,87 +71,98 @@
               <!-- /.card-header -->
               <!-- form start -->
               <form id="nodeForm" role="form">
-                <div class="card-body">
-                  <div class="form-group">
-                    <label for="orgId">机构名称</label>
-                    <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
-                  </div>
-                  <div class="form-group">
-                        <label>部署环境</label>
-                        <select  id="cnsProFileActive" name="cnsProFileActive" class="form-control">
-                          <option value="prd">生产环境</option>
-                          <option value="stg">测试环境</option>
-                          <option value="dev" selected="selected">开发环境</option>
-                        </select>
-                  </div>
-                  <div class="form-group">
-                        <label for="version">节点版本</label> <span style="display: inline;color: gray;">目前只支持2.0的FISCO-BCOS版本</span>
-                        <select  id="version" id="version" name="version" class="form-control">
-                          <option value="2">FISCO-BCOS 2.X</option>
-                          <!-- <option value="1">FISCO-BCOS 1.X</option> -->
-                        </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="ipPort">区块链节点 IP 和 Channel 端口</label>
-                    <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
-                    <div style="display:block; font-size: 13px;color: gray;">例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
-                    <div style="display:block; font-size: 13px;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
-                  
-                  </div>
-                  <div class="form-group">
-                    <label for="ipPort">链ID(chain_id)</label><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="display: inline;color: blue;">什么是chain id?</span></a>
-                    <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
-                  </div>
-                  <div class="form-group">
-                    <label for="ipPort">主群组ID (Main group ID)</label>
-                    <input type="text" class="form-control" id="groupId" name="groupId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter groupId">
-                  </div>
-                  <div class="form-group">
-                        <label for="caCrtFile">ca.crt证书</label> <span id="caCrtSpan"></span>
-                        <div class="input-group">
-                          <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="caCrtFile" name="caCrtFile">
-                            <label class="custom-file-label"  for="caCrtFile">选择文件...</label>
-                          </div>
-                        </div>
-                      </div>
-                  <div id="caV2">
-	                   <div class="form-group">
-	                    <label for="nodeCrtFile">node.crt证书</label> <span id="nodeCrtSpan"></span>
-	                    <div class="input-group">
-	                      <div class="custom-file">
-	                        <input type="file" class="custom-file-input" id="nodeCrtFile" name="nodeCrt">
-	                        <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
-	                      </div>
-	                    </div>
-	                  </div>
-	                   <div class="form-group">
-	                    <label for="nodeKeyFile">node.key证书</label> <span id="nodeKeySpan"></span>
-	                    <div class="input-group">
-	                      <div class="custom-file">
-	                        <input type="file" class="custom-file-input" id="nodeKeyFile" name="nodeKeyFile">
-	                        <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
-	                      </div>
-	                    </div>
-	                  </div>
-                  </div>
-                  <div id="caV1" style="display: none">
-                       <div class="form-group">
-                        <label for="clientKeyStoreFile">client.keystore证书</label> <span id="cllientKeyStoreSpan"></span>
-                        <div class="input-group">
-                          <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="clientKeyStoreFile" name="clientKeyStoreFile">
-                            <label class="custom-file-label" for="clientKeyStoreFile">选择文件...</label>
-                          </div>
-                        </div>
-                      </div>
-                  </div>
-                  <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk.html#fisco-bcos" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
-                </div>
-                </form>
+                            <div class="card-body">
+                              <div class="form-group">
+                                <label for="orgId">机构名称</label>
+                                <a href="#" target="blank_" style='display:block'>
+	                                <img src="./dist/img/icon-question.svg" alt="">
+	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                                    	如何设置机构名称？
+	                                </span>
+                                </a>
+                                <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
+                              </div>
+                              <div class="form-group">
+                                <label for="amopId">通讯ID</label> 
+                                <a href="#" target="blank_" style='display:block'>
+	                                <img src="./dist/img/icon-question.svg" alt="">
+	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+	                                    	如何设置通讯ID
+	                                </span>
+                                </a>
+                                <span style="display: block;color: gray;">此ID用于链上AMOP通讯</span>
+                                <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
+                              </div>
+                              <div class="form-group display-none">
+                                    <label>部署环境</label>
+                                    <select  id="cnsProFileActive" name="cnsProFileActive" class="form-control">
+                                      <option value="prd">生产环境</option>
+                                      <option value="stg">测试环境</option>
+                                      <option value="dev" selected="selected">开发环境</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                    <label for="version">节点版本</label> <span style="display:block;color: gray;">目前只支持2.X的FISCO-BCOS版本</span>
+                                    <select  id="version" id="version" name="version" class="form-control">
+                                      <option value="2">FISCO-BCOS 2.X</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                <label for="ipPort">区块链节点 IP 和 Channel 端口</label>
+                                <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
+                                <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
+                                <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
+                              </div>
+                              <div class="form-group">
+                                    <label for="caCrtFile">ca.crt证书</label> 
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="caCrtFile" name="caCrtFile">
+                                        <label class="custom-file-label"  for="caCrtFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span id="caCrtSpan"></span>
+                                  </div>
+                              <div id="caV2">
+                                   <div class="form-group">
+                                    <label for="nodeCrtFile">node.crt证书</label> 
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="nodeCrtFile" name="nodeCrt">
+                                        <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span id="nodeCrtSpan"></span>
+                                  </div>
+                                   <div class="form-group">
+                                    <label for="nodeKeyFile">node.key证书</label> 
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="nodeKeyFile" name="nodeKeyFile">
+                                        <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span id="nodeKeySpan"></span>
+                                  </div>
+                              </div>
+                              <div id="caV1" style="display: none">
+                                   <div class="form-group">
+                                    <label for="clientKeyStoreFile">client.keystore证书</label> 
+                                    <div class="input-group">
+                                      <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="clientKeyStoreFile" name="clientKeyStoreFile">
+                                        <label class="custom-file-label" for="clientKeyStoreFile">选择文件...</label>
+                                      </div>
+                                    </div>
+                                    <span id="cllientKeyStoreSpan"></span>
+                                  </div>
+                              </div>
+                              <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
+                            </div>
+                            </form>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="button" id="postBtn" class="btn btn-block btn-primary btn-flat">下一步</button>
+                  <button type="button" id="postBtn" class="btn btn-block btn-primary btn-flat">完成</button>
                 </div>
             </div>
             <!-- /.card -->
@@ -151,49 +171,11 @@
     </section>
     <!-- /.content -->
   </div>
-  <div class="modal fade" id="modal-default">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">温馨提示</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div id="checkBody" class="modal-body">
-          <p>配置检查中..&hellip;</p>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">关闭Close</button>
-          <button type="button" id="configBtn" onclick="goConfig(this)" class="btn btn-primary disabled">下一步</button>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-  </div>
   <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
-<script src="plugins/jquery/jquery.cookie.js"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
-  $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-<script src="plugins/enjoyhint/enjoyhint.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
+<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="js/nodeConfig.js"></script>
 </body>
 </html>

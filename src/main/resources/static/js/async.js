@@ -10,7 +10,7 @@ $(document).ready(function(){
 			forceParse: 0,
 			format:"yyyy-mm-dd"
 	});
-	if (!isReady) {
+	if (!isReady || !isReadyForDb) {
 		return;
     }
 	query();
@@ -18,6 +18,14 @@ $(document).ready(function(){
 });
 
 function query() {
+	if (!isReadyForDb) {
+		showConfigMessage();
+		return;
+    }
+	if (!isReady) {
+		showMessageForNodeException();
+		return;
+    }
 	//加载部署数据
 	$('#example2').DataTable({
       "paging": true,

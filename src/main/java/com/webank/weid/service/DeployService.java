@@ -1,7 +1,25 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcos.web3j.crypto.Keys;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
-import org.fisco.bcos.web3j.protocol.Web3j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,9 +76,11 @@ public class DeployService {
     private static final String ECDSA_KEY = "ecdsa_key";
     private static final String ECDSA_PUB_KEY = "ecdsa_key.pub";
     private static final String ROLE_FILE = "role";
+    private static final String GUIDE_FILE = "guide";
     private static final String ADMIN_PATH = "output/admin";
     public static final String DEPLOY_PATH = "output/deploy";
     public static final String SHARE_PATH = "output/share";
+    private static final String OTHER_PATH = "output/other";
     
     private static final String AUTH_ADDRESS_FILE_NAME = "authorityIssuer.address";
     private static final String CPT_ADDRESS_FILE_NAME = "cptController.address";
@@ -434,14 +453,17 @@ public class DeployService {
 
     /**
      * 获取群组列表
+     * @param filterMaster 是否过滤主群组
      * @return 返回群组列表
      */
-    public List<String> getAllGroup() {
+    public List<String> getAllGroup(boolean filterMaster) {
         List<String> list = WeServerUtils.getGroupList();
-        return list.stream()
-            .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
-            .collect(Collectors.toList());
-
+        if (filterMaster) {
+            return list.stream()
+                    .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
+                    .collect(Collectors.toList());
+        }
+       return list;
     }
     
     /**
@@ -463,7 +485,7 @@ public class DeployService {
         boolean isMatch =  buildToolService.isMatchThePrivateKey();
         Map<String, String> cache = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(list)) {
-            List<String> allGroup = getAllGroup();
+            List<String> allGroup = getAllGroup(true);
             for (HashContract hashContract : list) {
                 ShareInfo share = new ShareInfo();
                 share.setTime(hashContract.getTime());
@@ -597,7 +619,7 @@ public class DeployService {
     public String enableShareCns(String hash) {
         logger.info("[enableShareCns] begin enable new hash...");
         try {
-            List<String> allGroup = getAllGroup();
+            List<String> allGroup = getAllGroup(true);
             // 查询hash对应的群组
             String groupId = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
             String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
@@ -630,13 +652,30 @@ public class DeployService {
     
     
     public boolean setRoleType(String roleType) {
-        File roleFile = new File(ADMIN_PATH, ROLE_FILE);
+        File roleFile = new File(OTHER_PATH, ROLE_FILE);
         FileUtils.writeToFile(roleType, roleFile.getAbsolutePath(), FileOperator.OVERWRITE);
         return true;
     }
     
     public String getRoleType() {
-        File roleFile = new File(ADMIN_PATH, ROLE_FILE);;
+        File roleFile = new File(OTHER_PATH, ROLE_FILE);
+        if (!roleFile.exists()) {
+            return StringUtils.EMPTY;
+        }
         return FileUtils.readFile(roleFile.getAbsolutePath());
+    }
+    
+    public boolean setGuideStatus(String step) {
+        File guideFile = new File(OTHER_PATH, GUIDE_FILE);
+        FileUtils.writeToFile(step, guideFile.getAbsolutePath(), FileOperator.OVERWRITE);
+        return true;
+    }
+    
+    public String getGuideStatus() {
+        File guideFile = new File(OTHER_PATH, GUIDE_FILE);
+        if (!guideFile.exists()) {
+            return StringUtils.EMPTY;
+        }
+        return FileUtils.readFile(guideFile.getAbsolutePath());
     }
 }

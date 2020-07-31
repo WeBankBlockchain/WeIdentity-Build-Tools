@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcos.web3j.crypto.Keys;
 import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
@@ -59,6 +60,7 @@ import com.webank.weid.dto.CptFile;
 import com.webank.weid.dto.CptInfo;
 import com.webank.weid.dto.Issuer;
 import com.webank.weid.dto.IssuerType;
+import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.protocol.base.AuthorityIssuer;
@@ -104,7 +106,6 @@ public class BuildToolService {
     private static final String ECDSA_KEY = "ecdsa_key";
     private static final String ECDSA_PUB_KEY = "ecdsa_key.pub";
     private static final String WEID_PATH = "output/create_weid";
-    private static final String ISSUER_PATH = "output/issuer";
     private static final String ISSUER_TYPE_PATH = "output/issuer_type";
     private static final String CPT_PATH = "output/cpt";
     private static final String CPT_RESULT_PATH = "output/regist_cpt";
@@ -331,8 +332,8 @@ public class BuildToolService {
             File weidFile = new File(file.getAbsoluteFile(),"info");
             String jsonData = FileUtils.readFile(weidFile.getAbsolutePath());
             WeIdInfo info = DataToolUtils.deserialize(jsonData, WeIdInfo.class);
-            File issuerFile = new File(ISSUER_PATH + "/" + currentHash, info.getId());
-            info.setIssuer(issuerFile.exists());
+            AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(info.getWeId()).getResult();
+            info.setIssuer(issuer != null);
             list.add(info);
         }
         Collections.sort(list);
@@ -379,46 +380,84 @@ public class BuildToolService {
                 "[registerIssuer] register authority issuer {} success.",
                 weId
             );
-            //保存issuer
-            File weIdFile = new File(ISSUER_PATH + "/" + hash, getWeIdAddress(weId));
-            Issuer issuer = buildIssuer(weId, name, hash, from);
-            String data = DataToolUtils.serialize(issuer);
-            FileUtils.writeToFile(data, weIdFile.getAbsolutePath(), FileOperator.OVERWRITE);
             return BuildToolsConstant.SUCCESS;
         }
     }
     
-    private Issuer buildIssuer(String weId, String name, String hash, DataFrom from) {
-        Issuer issuer = new Issuer();
-        issuer.setHash(hash);
-        issuer.setId(getWeIdAddress(weId));
-        issuer.setWeId(weId);
-        issuer.setName(name);
-        long time = System.currentTimeMillis();
-        issuer.setTime(time);
-        issuer.setFrom(from.name());
-        return issuer;
+    /**
+     * 认证issuer.
+     * @param weId 需要认证的weId
+     * @return 返回认证结果
+     */
+    public String recognizeAuthorityIssuer(String weId) {
+        WeIdPrivateKey weIdPrivateKey = DeployService.getWeIdPrivateKey(getMainHash());
+        ResponseData<Boolean> response = getAuthorityIssuerService().recognizeAuthorityIssuer(weId, weIdPrivateKey);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error(
+                "[recognizeAuthorityIssuer] recognize authority issuer {} failed. error code : {}, error msg :{}",
+                weId,
+                response.getErrorCode(),
+                response.getErrorMessage()
+            );
+            return response.getErrorCode() + "-" + response.getErrorMessage();
+        } else {
+            logger.info("[recognizeAuthorityIssuer] recognize authority issuer {} success.", weId);
+            return BuildToolsConstant.SUCCESS;
+        }
     }
     
-    public List<Issuer> getIssuerList() {
-        String currentHash = getMainHash();
+    /**
+     * 撤销认证issuer.
+     * @param weId 需要认证的weId
+     * @return 返回认证结果
+     */
+    public String deRecognizeAuthorityIssuer(String weId) {
+        WeIdPrivateKey weIdPrivateKey = DeployService.getWeIdPrivateKey(getMainHash());
+        ResponseData<Boolean> response = getAuthorityIssuerService().deRecognizeAuthorityIssuer(weId, weIdPrivateKey);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error(
+                "[deRecognizeAuthorityIssuer] deRecognize authority issuer {} failed. error code : {}, error msg :{}",
+                weId,
+                response.getErrorCode(),
+                response.getErrorMessage()
+            );
+            return response.getErrorCode() + "-" + response.getErrorMessage();
+        } else {
+            logger.info("[deRecognizeAuthorityIssuer] deRecognize authority issuer {} success.", weId);
+            return BuildToolsConstant.SUCCESS;
+        }
+    }
+    
+    public PageDto<Issuer> getIssuerList(PageDto<Issuer> pageDto) {
+        String hash = getMainHash();
+        ResponseData<List<AuthorityIssuer>> response = 
+            this.getAuthorityIssuerService().getAllAuthorityIssuerList(pageDto.getStartIndex(), pageDto.getPageSize());
         List<Issuer> list = new ArrayList<Issuer>();
-        if (StringUtils.isBlank(currentHash)) {
-            return list;
+        if (response.getErrorCode().intValue() == ErrorCode.SUCCESS.getCode()) {
+            List<AuthorityIssuer> result = response.getResult();
+            if (CollectionUtils.isNotEmpty(result)) {
+                for (AuthorityIssuer authorityIssuer : result) {
+                    Issuer issuer = new Issuer();
+                    issuer.setWeId(authorityIssuer.getWeId());
+                    issuer.setName(authorityIssuer.getName());
+                    issuer.setCreateTime(String.valueOf(authorityIssuer.getCreated()));
+                    issuer.setHash(hash);
+                    issuer.setRecognized(authorityIssuer.isRecognized());
+                    list.add(issuer);
+                }
+            }
+        } else {
+            logger.warn("[getIssuerList] query issuerList from chain fail: {} - {}.", response.getErrorCode(), response.getErrorMessage());
         }
-        File targetDir = new File(ISSUER_PATH + "/" + currentHash);
-        if (!targetDir.exists()) {
-            return list;
+        if (list.size() == 0) {//说明没有数据了
+            pageDto.setAllCount(pageDto.getStartIndex());
+        } else if (list.size() < pageDto.getPageSize()) { //说明最后一页了
+            pageDto.setAllCount(pageDto.getStartIndex() + list.size());
+        } else { //还可以继续分页
+            pageDto.setAllCount(pageDto.getStartIndex() + pageDto.getPageSize() + 1);
         }
-        for (File file : targetDir.listFiles()) {
-            //根据weid判断本地是否存在
-            String jsonData = FileUtils.readFile(file.getAbsolutePath());
-            Issuer info = DataToolUtils.deserialize(jsonData, Issuer.class);
-            info.setCanDo(true);
-            list.add(info);
-        }
-        Collections.sort(list);
-        return list;
+        pageDto.setDataList(list);
+        return pageDto;
     }
     
     public String removeIssuer(String weId) {
@@ -443,8 +482,6 @@ public class BuildToolService {
                 "[removeIssuer] remove authority issuer {} success.",
                 weId
             );
-            File issuerFile = new File(ISSUER_PATH + "/" + hash, getWeIdAddress(weId));
-            FileUtils.delete(issuerFile);
             return BuildToolsConstant.SUCCESS;
         }
     }
@@ -964,10 +1001,10 @@ public class BuildToolService {
         }
     }
     
-    public String getIssuerByWeId(String weIdAddress) {
+    public AuthorityIssuer getIssuerByWeId(String weIdAddress) {
         String mainHash = getMainHash();
         if (StringUtils.isBlank(mainHash)) {
-            return StringUtils.EMPTY;
+            return null;
         }
         AuthorityIssuerService service = this.getAuthorityIssuerService();
         String weId = WeIdUtils.convertAddressToWeId(weIdAddress);
@@ -978,9 +1015,9 @@ public class BuildToolService {
             logger.warn("[getIssuerByWeId] query issuer fail. ErrorCode is:{}, msg :{}",
                 response.getErrorCode(),
                 response.getErrorMessage());
-            return StringUtils.EMPTY;
+            return null;
         } else {
-            return response.getResult().getName();
+            return response.getResult();
         }
     }
     

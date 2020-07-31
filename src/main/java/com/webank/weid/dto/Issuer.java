@@ -30,6 +30,7 @@ public class Issuer extends BaseDto {
     private String name;
     private boolean canDo;
     private String weIdShow;
+    private boolean recognized;
     public void setWeId(String weId) {
         this.weId = weId;
         this.weIdShow = super.getHideValue(weId, 20, 6);

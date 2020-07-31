@@ -526,9 +526,35 @@ public class BuildToolController {
         }
     }
     
+    @Description("认证issuer")
+    @PostMapping("/recognizeAuthorityIssuer")
+    public String recognizeAuthorityIssuer(@RequestParam("weId") String weId) {
+        try {
+            return buildToolService.recognizeAuthorityIssuer(weId);
+        } catch (Exception e) {
+            logger.error("[recognizeAuthorityIssuer] recognize issuer has error.", e);
+            return BuildToolsConstant.FAIL;
+        }
+    }
+    
+    @Description("撤销认证issuer")
+    @PostMapping("/deRecognizeAuthorityIssuer")
+    public String deRecognizeAuthorityIssuer(@RequestParam("weId") String weId) {
+        try {
+            return buildToolService.deRecognizeAuthorityIssuer(weId);
+        } catch (Exception e) {
+            logger.error("[deRecognizeAuthorityIssuer] deRecognize issuer has error.", e);
+            return BuildToolsConstant.FAIL;
+        }
+    }
+    
     @GetMapping("/getIssuerList")
-    public List<Issuer> getIssuerList() {
-        return buildToolService.getIssuerList();
+    public PageDto<Issuer> getIssuerList(
+        @RequestParam(value = "iDisplayStart") int iDisplayStart,
+        @RequestParam(value = "iDisplayLength") int iDisplayLength
+    ) {
+        PageDto<Issuer> pageDto = new PageDto<Issuer>(iDisplayStart, iDisplayLength);
+        return buildToolService.getIssuerList(pageDto);
     }
     
     @Description("移除issuer")
@@ -869,5 +895,13 @@ public class BuildToolController {
     @GetMapping("/getGuideStatus")
     public String getGuideStatus() {
         return deployService.getGuideStatus();
+    }
+    
+    @Description("将指定cptId转policy")
+    @GetMapping("/cptToPolicy")
+    public boolean cptToPolicy(@RequestParam(value = "cptId") Integer cptId) {
+        //
+       System.out.println("这里只想cpt转policy");
+       return true;
     }
 }

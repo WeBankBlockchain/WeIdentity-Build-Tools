@@ -45,7 +45,7 @@
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1 class="m-0 text-dark">主群组部署 WeIdentity 智能合约
-            	<a href="#" target="blank_" style="color:#017CFF;font-size:12px;display:inline-block">
+            	<a href="https://weid-doc-xml.readthedocs.io/zh/test/docs/weidentity-quick-tools-web.html#id2" target="blank_" style="color:#017CFF;font-size:12px;display:inline-block">
 			    <img src="./dist/img/icon-question.svg" alt="">
 			    <span style="color:#017CFF;font-size:12px;display:inline-block">
 			          	多次部署合约
@@ -82,26 +82,12 @@
                   <th>部署账户</th>
                   <th>权威机构名称</th>
                   <th>群组</th>
-                  <th style="display: none">状态</th>
                   <th>创建时间</th>
-                  <th width="400px">操作</th>
+                  <th width="300px">操作</th>
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
-                <tr class="display-none">
-                    <td><a href="javascript:showDeploy('${hash}', '${weId}')"> ${hashShow} </a></td>
-                    <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
-                    <td> ${issuer} </td>
-                    <td> ${groupId} </td>
-                    <th style="display: none">${enable}</th>
-                    <td>${createTime}</td>
-                    <td>
-                          <div style="display: none">${enable}</div>
-                          <button type="button" name="cnsEnableBtn" onclick="enable('${hash}' , ${needDeployCpt}, this)"   class="btn btn-inline btn-primary btn-flat ${enable}">启用</button>
-                          <button type="button" name="cnsRemoveBtn" onclick="removeHash('${hash}', this)"   class="btn btn-inline btn-primary btn-flat ${enable}">删除</button>
-                          <button type="button" name="cnsDeploSystemCptBtn"  onclick="deployCpt('${hash}', this)"   class="btn btn-inline btn-primary btn-flat ${showDeployCptBtn}" style="display: none"> 部署系统CPT</button>
-                    </td>
-                  </tr>
+                
                 </tbody>
               </table>
             </div>
@@ -207,8 +193,13 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
-               <label for="ipPort">链ID(chain_id)</label><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="display: inline;color: blue;">什么是chain id?</span></a>
+               <label for="ipPort">链ID(chain_id)</label>
+               <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html?highlight=chain-id#id4" target="blank_" style="display: block;">
+               <span style="display: block;color: #017CFF;float: left;padding-bottom: 10px;"><img src="./dist/img/icon-question.svg" alt="">什么是chain id?</span>
+               </a>
+               <div >
                <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
+               </div>
              </div>
           </div>
         </div>

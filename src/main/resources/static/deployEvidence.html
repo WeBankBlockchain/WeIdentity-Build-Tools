@@ -67,25 +67,11 @@
                   <th>部署账户</th>
                   <th>权威机构名称</th>
                   <th>群组</th>
-                  <th style="display: none">状态</th>
                   <th>创建时间</th>
-                  <th width="130px">操作</th>
+                  <th width="300px">操作</th>
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
-                <tr class="display-none">
-                    <td><a href="javascript:showDeploy('${hash}', '${owner}')"> ${hashShow} </a></td>
-                    <td><a href="javascript:showWeId('${owner}')"> ${ownerShow} </a></td>
-                    <td>${issuer} </td>
-                    <td>${showGroupId} </td>
-                    <td style="display: none">${enable}</td>
-                    <td>${createTime}</td>
-                    <td>
-                          <div style="display: none">${enable}</div>
-                          <button type="button" name="cnsEnableBtn" onclick="enableHash('${hash}' , ${groupId})"   class="btn btn-inline btn-primary btn-flat ${enable}">启用</button>
-                          <button type="button" name="cnsRemoveBtn" onclick="removeHash('${hash}', this)"   class="btn btn-inline btn-primary btn-flat ${enable}">删除</button>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>

@@ -52,6 +52,7 @@ import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.ShareInfo;
+import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.CptBaseInfo;
 import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.protocol.base.WeIdAuthentication;
@@ -202,7 +203,7 @@ public class DeployService {
         String currentHash = buildToolService.getMainHash();
         List<HashContract> result = buildToolService.getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
         String roleType = this.getRoleType();
-        Map<String, String> cache = new HashMap<String, String>();
+        Map<String, AuthorityIssuer> cache = new HashMap<String, AuthorityIssuer>();
         for (HashContract hashContract : result) {
             CnsInfo cns = new CnsInfo();
             cns.setHash(hashContract.getHash());
@@ -226,7 +227,7 @@ public class DeployService {
             if(cache.containsKey(cns.getWeId())) {
                 cns.setIssuer(cache.get(cns.getWeId()));
             } else {
-                String issuer = buildToolService.getIssuerByWeId(cns.getWeId());
+                AuthorityIssuer issuer = buildToolService.getIssuerByWeId(cns.getWeId());
                 cns.setIssuer(issuer);
                 cache.put(cns.getWeId(), issuer);
             }
@@ -483,7 +484,7 @@ public class DeployService {
         List<HashContract> list = dataBucket.getAllHash().getResult();
         // 判断机构配置私钥是否匹配所有者，如果不匹配页面可以不用显示按钮
         boolean isMatch =  buildToolService.isMatchThePrivateKey();
-        Map<String, String> cache = new HashMap<String, String>();
+        Map<String, AuthorityIssuer> cache = new HashMap<String, AuthorityIssuer>();
         if (CollectionUtils.isNotEmpty(list)) {
             List<String> allGroup = getAllGroup(true);
             for (HashContract hashContract : list) {
@@ -503,7 +504,7 @@ public class DeployService {
                     if(cache.containsKey(share.getOwner())) {
                         share.setIssuer(cache.get(share.getOwner()));
                     } else {
-                        String issuer = buildToolService.getIssuerByWeId(share.getOwner());
+                        AuthorityIssuer issuer = buildToolService.getIssuerByWeId(share.getOwner());
                         share.setIssuer(issuer);
                         cache.put(share.getOwner(), issuer);
                     }

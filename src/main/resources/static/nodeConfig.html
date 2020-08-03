@@ -18,6 +18,33 @@
 	    margin-bottom:0.5rem
     }
   </style>
+  <style>
+    .warning_box{
+        position: relative;
+        border:1px solid #ddd;
+    }
+    .warning_box .sql_warning{
+        position: absolute;
+        right: -320px;
+        top: 50px;
+        padding: 10px;
+    }
+    
+    .sql_warning .warning_title{
+        font-family: PingFangSC-Medium;
+        font-size: 14px;
+        color: #333333;
+        line-height: 22px;
+        margin-bottom:10px;
+    }
+    
+    .sql_warning p{
+        font-size: 12px;
+        color: #666666;
+        line-height: 20px;
+        margin-bottom:5px;
+    }
+  </style>
   <script src="plugins/jquery/jquery.min.js"></script>
   <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
   <script src="plugins/jquery/jquery.cookie.js"></script>
@@ -64,7 +91,7 @@
         <!-- Small boxes (Stat box) -->
         <div class="col-md-6 offset-md-3">
             <!-- general form elements -->
-            <div class="card card-primary">
+            <div class="card card-primary warning_box">
               <div class="card-header">
                 <h3 class="card-title">节点配置</h3>
               </div>
@@ -74,24 +101,12 @@
                             <div class="card-body">
                               <div class="form-group">
                                 <label for="orgId">机构名称</label>
-                                <a href="#" target="blank_" style='display:block'>
-	                                <img src="./dist/img/icon-question.svg" alt="">
-	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
-	                                    	如何设置机构名称？
-	                                </span>
-                                </a>
-                                <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
+                                <input type="text" class="form-control" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" id="orgId" name="orgId" placeholder="Enter orgId">
                               </div>
                               <div class="form-group">
                                 <label for="amopId">通讯ID</label> 
-                                <a href="#" target="blank_" style='display:block'>
-	                                <img src="./dist/img/icon-question.svg" alt="">
-	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
-	                                    	如何设置通讯ID
-	                                </span>
-                                </a>
                                 <span style="display: block;color: gray;">此ID用于链上AMOP通讯</span>
-                                <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
+                                <input type="text" class="form-control" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" id="amopId" name="amopId" placeholder="Enter amopId">
                               </div>
                               <div class="form-group display-none">
                                     <label>部署环境</label>
@@ -157,9 +172,22 @@
                                     <span id="cllientKeyStoreSpan"></span>
                                   </div>
                               </div>
-                              <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_"><span style="display: inline;color: blue;">如何获取证书?</span></a>
+                               <a href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/enterprise_tools/operation.html#get-sdk-file" target="blank_">
+                                <img src="./dist/img/icon-question.svg" alt="">
+                                <span style="color:#017CFF;font-size:12px;">
+                                        如何获取证书?
+                                </span>
+                                </a>
                             </div>
-                            </form>
+                          </form>
+                          <div class='sql_warning' style='right:-160px'>
+                             <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id4" target="blank_" style='display:block'>
+                              <img src="./dist/img/icon-question.svg" alt="">
+                              <span style="color:#017CFF;font-size:12px;display:inline-block">
+                                                                          点击查看配置配置教程
+                              </span>
+                             </a>
+                          </div>  
                 <!-- /.card-body -->
                 <div class="card-footer">
                   <button type="button" id="postBtn" class="btn btn-block btn-primary btn-flat">完成</button>

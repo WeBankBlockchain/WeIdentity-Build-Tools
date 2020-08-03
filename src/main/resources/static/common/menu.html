@@ -87,7 +87,7 @@
                   <p>WeID管理</p>
                 </a>
               </li>
-              <li id="authorityLi" class="nav-item" style="display: none">
+              <li id="authorityLi" class="nav-item">
                 <a href="registerIssuer.html" title="Authority Issuer" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>权威凭证发行者</p>
@@ -96,7 +96,7 @@
               <li id="specificLi" class="nav-item" style="display: none">
                 <a href="registerSpecific.html" title="Specific Issuer" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>特定类型的发行者</p>
+                  <p>白名单功能管理</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -105,7 +105,7 @@
                   <p>凭证类型(CPT)管理</p>
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" style="display: none">
                 <a href="cptToPojoList.html" title="CPT TO POJO" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>CPT转JAVA Jar包</p>
@@ -185,7 +185,7 @@ $(document).ready(function(){
 		$(".async-menu").addClass("menu-open")
 	}
 	if (getRole() === '1') {
-        $('#authorityLi').show()
+        //$('#authorityLi').show()
         $('#specificLi').show()
     }
     checkState();

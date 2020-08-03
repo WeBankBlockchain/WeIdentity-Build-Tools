@@ -25,7 +25,7 @@ $(document).ready(function(){
     
     function getNodeCheckState() {
     	var nodeCheckState = sessionStorage.getItem('nodeCheckState');
-    	if (!nodeCheckState) {
+    	//if (!nodeCheckState) {
     		$.ajaxSettings.async = false;
     		$.get("nodeCheckState",function(value,status){
     			if (value) {
@@ -34,13 +34,13 @@ $(document).ready(function(){
     			}
     		})
     		$.ajaxSettings.async = true;
-    	}
+    	//}
     	return nodeCheckState;
     }
     
     function getEnableState() {
     	var isEnable = sessionStorage.getItem('isEnableMasterCns');
-    	if (!isEnable) {
+    	//if (!isEnable) {
     		$.ajaxSettings.async = false;
     		$.get("isEnableMasterCns",function(value,status){
     			if (!value) {
@@ -49,7 +49,7 @@ $(document).ready(function(){
     			}
     		})
     		$.ajaxSettings.async = true;
-    	}
+    	//}
     	return isEnable;
     }
 });

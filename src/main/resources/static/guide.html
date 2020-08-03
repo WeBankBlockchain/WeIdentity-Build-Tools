@@ -32,13 +32,15 @@
                         <section class="content">
                             <div class='container-fluid guild-step'>
                                 <div class="col-md-6 offset-md-3">
-                                    <div id="AccountDiv" class="card card-primary">
+                                    <div id="AccountDiv" class="card card-primary warning_box">
                                         <div class="card-header">
                                             <h6>请选择您的角色</h6>
+                                            <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id3" target="_blank">
                                             <span class='guide_notice'>
                                                 <img src="./dist/img/icon-question.svg" alt="">
-                                                什么是"联盟链委员会管理员"
+                                              什么是"联盟链委员会管理员" 
                                             </span>
+                                            </a> 
                                         </div>
                                         <div class="card-body role_body">
                                             <div class='role_part role_active' type='1'>
@@ -59,6 +61,14 @@
                                         <div class="card-footer" id="role-next">
                                             <button type="button" class="btn btn-block btn-primary btn-flat">下一步</button>
                                         </div>
+                                        <div class='sql_warning' style='right:-160px'>
+			                               <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id3" target="blank_" style='display:block'>
+			                                <img src="./dist/img/icon-question.svg" alt="">
+			                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+			                                                                            点击查看配置配置教程
+			                                </span>
+			                               </a>
+			                            </div>
                                     </div>
                                 </div>
                             </div>
@@ -103,24 +113,12 @@
                             <div class="card-body">
                               <div class="form-group">
                                 <label for="orgId">机构名称</label>
-                              	<a href="#" target="blank_" style='display:block'>
-	                                <img src="./dist/img/icon-question.svg" alt="">
-	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
-	                                    	如何设置机构名称？
-	                                </span>
-                                </a>
-                                <input type="text" class="form-control" id="orgId" name="orgId" placeholder="Enter orgId">
+                                <input type="text" class="form-control" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" id="orgId" name="orgId" placeholder="Enter orgId">
                               </div>
                               <div class="form-group">
                                 <label for="amopId">通讯ID</label>
-                                <a href="#" target="blank_" style='display:block'>
-	                                <img src="./dist/img/icon-question.svg" alt="">
-	                                <span style="color:#017CFF;font-size:12px;display:inline-block">
-	                                    	如何设置通讯ID
-	                                </span>
-                                </a>
                                 <span style="color: gray;">此ID用于链上AMOP通讯</span>
-                                <input type="text" class="form-control" id="amopId" name="amopId" placeholder="Enter amopId">
+                                <input type="text" class="form-control" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" id="amopId" name="amopId" placeholder="Enter amopId">
                               </div>
                               <div class="form-group display-none">
                                     <label>部署环境</label>
@@ -199,7 +197,7 @@
                             </div>
                             </form>
                             <div class='sql_warning' style='right:-160px'>
-                               <a href="#" target="blank_" style='display:block'>
+                               <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id4" target="blank_" style='display:block'>
                                 <img src="./dist/img/icon-question.svg" alt="">
                                 <span style="color:#017CFF;font-size:12px;display:inline-block">
                                                                             点击查看配置配置教程
@@ -249,16 +247,14 @@
                       </div>
                       <div class='container-fluid guild-step'>
                             <div class="col-md-6 offset-md-3">
-                                <div id="AccountDiv" class="card card-primary">
+                                <div id="AccountDiv" class="card card-primary warning_box">
                                     <div class="card-header">
                                         <h6>选择一个FISCO-BCOS的群组，作为 WeIdentity 的主群组（即部署 WeIdentity 智能合约的群组）</h6>
                                     </div>
                                     <div class="card-header" style='padding-top:0'>
-                                    	<a href="#" target="blank_" style='display:block'>
+                                    	<a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id6" target="blank_" style='display:block'>
 			                           <img src="./dist/img/icon-question.svg" alt="">
-			                           <span style="color:#017CFF;font-size:12px;display:inline-block">
-			                                    	什么是群组？
-			                                </span>
+			                           <span style="color:#017CFF;font-size:12px;display:inline-block"> 什么是群组？</span>
 		                                </a>
 		                            </div>
                                     <div class="card-body role_body" style='padding:0 1.25rem;'>
@@ -270,7 +266,16 @@
                                       <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
                                       <button type="button"  id="setGroupId" class="btn btn-block btn-primary btn-flat">下一步</button>
                                     </div>
+                                    <div class='sql_warning' style='right:-160px'>
+		                               <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id6" target="blank_" style='display:block'>
+		                                <img src="./dist/img/icon-question.svg" alt="">
+		                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+		                                                                            点击查看配置配置教程
+		                                </span>
+		                               </a>
+		                            </div>
                                 </div>
+                               
                             </div>
                         </div>
                    </section>
@@ -349,7 +354,7 @@
                             <p>2.Evidence异步存证功能</p>
                             <p>3.Persistence数据存储功能(例如：存储Credential)</p>
                            	<p>
-                           		<a href="#" target="blank_" style='display:block'>
+                           		<a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id8" target="blank_" style='display:block'>
 			                           <img src="./dist/img/icon-question.svg" alt="">
 			                           <span style="color:#017CFF;font-size:12px;display:inline-block">
 			                                    	配置教程
@@ -398,12 +403,12 @@
                     <!-- Small boxes (Stat box) -->
                     <div class="col-md-6 offset-md-3">
                         <!-- general form elements -->
-                        <div id="AccountDiv" class="card card-primary">
+                        <div id="AccountDiv" class="card card-primary warning_box">
                           <div class="card-header">
                             <h3 class="card-title">创建管理员WeID</h3>
                           </div>
                           <div class="card-header" style='padding-top:0;padding-bottom:0'>
-                            <a href="#" target="blank_" style='display:block'>
+                            <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#weid" target="blank_" style='display:block'>
 				                <img src="./dist/img/icon-question.svg" alt="">
 				                <span style="color:#017CFF;font-size:12px;display:inline-block">
 				                     	什么是管理员？
@@ -445,6 +450,14 @@
                                 <button type="button" id='caretKeyBtn' class="btn btn-block btn-primary btn-flat">下一步</button>
                             </div>
                           </form>
+                          <div class='sql_warning' style='right:-160px'>
+                               <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#weid" target="blank_" style='display:block'>
+                                <img src="./dist/img/icon-question.svg" alt="">
+                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+                                                                            点击查看配置配置教程
+                                </span>
+                               </a>
+                            </div>
                         </div>
                         <!-- /.card -->
                     </div>
@@ -485,12 +498,12 @@
                         </div>
                         <div class='container-fluid guild-step'>
                             <div class="col-md-6 offset-md-3">
-                                <div id="AccountDiv" class="card card-primary">
+                                <div id="AccountDiv" class="card card-primary warning_box">
                                     <div class="card-header">
                                         <h6>为WeIdentity DID 设置链ID （chain-id）</h6>
                                     </div>
                                     <div class="card-body role_body" style='padding:0 1.25rem;'>
-                                    <div class="form-group" style='width:100%;'><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html#id4" target="blank_"><span style="color: #017CFF;">
+                                    <div class="form-group" style='width:100%;'><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html?highlight=chain-id#id4" target="blank_"><span style="color: #017CFF;">
                                         <img src="./dist/img/icon-question.svg" alt="">
                                         什么是chain id?</span></a>
                                        <input type="text"  class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
@@ -500,7 +513,16 @@
                                       <button type="button"  class="prevBtn btn btn-block btn-primary btn-flat">上一步</button>
                                       <button type="button"  id="mainDeploy" class="btn btn-block btn-primary btn-flat">下一步</button>
                                     </div>
+                                    <div class='sql_warning' style='right:-160px'>
+		                               <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id9" target="blank_" style='display:block'>
+		                                <img src="./dist/img/icon-question.svg" alt="">
+		                                <span style="color:#017CFF;font-size:12px;display:inline-block">
+		                                                                            点击查看配置配置教程
+		                                </span>
+		                               </a>
+		                            </div>
                                 </div>
+                                
                             </div>
                         </div>
                     </section>
@@ -521,7 +543,7 @@
         </div>
         <div  class="modal-body">
           <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">备注：支持椭圆曲线的公私钥，并且为十进制私钥数据。
-          	<a href="#" target="blank_"><img src="./dist/img/icon-question.svg" alt=""><span style="color:#017CFF;font-size:12px;display:inline-block">如何生成私钥？</span></a>
+          	<a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#weid" target="blank_"><img src="./dist/img/icon-question.svg" alt=""><span style="color:#017CFF;font-size:12px;display:inline-block">如何生成私钥？</span></a>
 		  </p>
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
           <form id="KeyForm" role="form">

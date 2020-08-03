@@ -143,7 +143,7 @@ $(document).ready(function(){
             window.location.href="index.html";
         }
     })
-    var buildToolsVersion = sessionStorage.getItem('buildToolsVersion')
+    var buildToolsVersion = null;//sessionStorage.getItem('buildToolsVersion')
     if (buildToolsVersion != null) {
     	$("#buildToolsVersion").html(buildToolsVersion);
     } else {

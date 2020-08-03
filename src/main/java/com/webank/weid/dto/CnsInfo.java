@@ -19,6 +19,8 @@
 
 package com.webank.weid.dto;
 
+import com.webank.weid.protocol.base.AuthorityIssuer;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,7 +33,7 @@ public class CnsInfo extends BaseDto {
     private boolean enable;
     private boolean showDeployCptBtn;
     private boolean needDeployCpt;
-    private String issuer;
+    private AuthorityIssuer issuer;
     private String groupId;
     private String roleType;
 

@@ -36,12 +36,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">特定类型的发行者</h1>
+            <h1 class="m-0 text-dark">白名单管理</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item active">功能管理</li>
-              <li class="breadcrumb-item active">特定类型的发行者</li>
+              <li class="breadcrumb-item active">白名单管理</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -52,8 +52,8 @@
     <!-- Main content -->
     <section class="content">
       <div class="card-footer">
-        <button type="button" id="registerIssuerTypeBtn" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat">注册特定类型的发行者</button>
-        <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">什么是特定类型的发行者?</a>
+        <button type="button" id="registerIssuerTypeBtn" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat">新增白名单</button>
+        <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">白名单使用教程</a>
       </div>
       <br />
       <div id="data-div">
@@ -65,11 +65,11 @@
                      <div class="card-header">
                        <div  style="float: left;width: 400px">
                          <h3 class="card-title" style="line-height: 30px;">
-                           ${index}#&nbsp;&nbsp;&nbsp;&nbsp;特定类型的发行者: ${type}
+                           ${index}#&nbsp;&nbsp;&nbsp;&nbsp;白名单名称: ${type}
                          </h3>
                       </div>
                       <div>
-                        <button type="button" id="addIssuerTypeBtn" onclick="addIssuerTypeBtn('${type}')" title="add weId to this Specific type" class="btn btn-inline btn-primary btn-flat btn-sm" style="float: left">将WeID注册为这个特定类型的发行者</button>
+                        <button type="button" id="addIssuerTypeBtn" onclick="addIssuerTypeBtn('${type}')" title="add weId to this Specific type" class="btn btn-inline btn-primary btn-flat btn-sm" style="float: left">添加WeID到这个白名单</button>
                       </div>
                        <div class="card-tools">
                          <button type="button" id="btn${index}" value="${type}" onclick="collapse(this, '${type}' , 'div${index}')" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -93,7 +93,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">注册特定类型的发行者</h4>
+          <h4 class="modal-title">新增白名单</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -101,13 +101,13 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
             <div class="form-group">
-              <label for="addIssuerType">特定类型</label>
-              <input type="text" class="form-control"  onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'')" id="addIssuerType" placeholder="Enter issuer type">
+              <label for="addIssuerType">新增白名单名称</label>
+              <input type="text" class="form-control"  onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" id="addIssuerType" placeholder="Enter new whitelist name">
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" id="registerBtn" class="btn btn-block btn-primary btn-flat">注册</button>
+          <button type="button" id="registerBtn" class="btn btn-block btn-primary btn-flat">新增</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -119,7 +119,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">将WeID注册为这个特定类型的发行者</h4>
+          <h4 class="modal-title">将WeID添加到这个白名单</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -131,13 +131,13 @@
               <input type="text" class="form-control" id="addIssuerWeId" onkeyup="this.value=this.value.replace(/[^\w：:]/g,'');this.value=this.value.replace(/：/g,':');"  placeholder="Enter WeID">
             </div>
             <div class="form-group">
-              <label for="registerIssuerName">特定类型</label>
+              <label for="registerIssuerName">白名单名称</label>
               <input type="text" class="form-control" id="issuerType" readonly="readonly">
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" id="addToIssuerType" class="btn btn-block btn-primary btn-flat">注册</button>
+          <button type="button" id="addToIssuerType" class="btn btn-block btn-primary btn-flat">添加</button>
         </div>
       </div>
       <!-- /.modal-content -->

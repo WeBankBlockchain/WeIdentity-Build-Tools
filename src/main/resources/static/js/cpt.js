@@ -280,3 +280,7 @@ function getCptIds() {
 	return cptIds;
 }
 
+function showCptToPolicy(cptId) {
+	$("#fromCptId").val(cptId)
+	$("#modal-cpt-to-policy").modal();
+}

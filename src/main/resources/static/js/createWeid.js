@@ -154,22 +154,23 @@ $(document).ready(function(){
         var weId = $("#addIssuerWeId").val();
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
-        $($this).html("注册中,  请稍等...");
+        var btnValue = $($this).html();
+        $($this).html("添加中,  请稍等...");
         isClose = false;
         var formData = {};
 	    formData.weId = weId;
 	    formData.issuerType = type;
         $.post("addIssuerIntoIssuerType", formData, function(value,status){
             if (value == "success") {
-                $("#confirmMessageBody").html("<p>特定类型的发行者注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>添加白名单<span class='success-span'>成功</span>。</p>");
                 loadData();
                 isClose = true;
             }  else if (value == "fail") {
-            	$("#confirmMessageBody").html("<p>特定类型的发行者注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	$("#confirmMessageBody").html("<p>添加白名单<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
             	$("#confirmMessageBody").html("<p>"+value+"</p>");
             }
-            $($this).html("注册");
+            $($this).html(btnValue);
             $($this).removeClass("disabled");
             $("#modal-confirm-message").modal();
         })

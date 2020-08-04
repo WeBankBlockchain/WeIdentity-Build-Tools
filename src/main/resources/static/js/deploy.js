@@ -88,45 +88,82 @@ function loadData() {
 	if (sessionRole == "2") {
 		message = "当前主群组管理员还没有部署主合约，请联系主群组管理员部署主合约";
 	}
-	$.get("getDeployList",function(data,status){
-   		if(table != null) {
-  			table.destroy();
-  		}
-  		$("#data-tbody").renderData(template,data);
-  		table = $('#example2').DataTable({
-  	      "paging": true,
-  	      "lengthChange": false,
-  	      "searching": true,
-  	      "ordering": true,
-  	      "info": false,
-  	      "autoWidth": false,
-  	      "order": [[ 3, "desc" ], [ 4, "desc" ]],
-	  	  "aoColumnDefs": [
-	          { "sType": "operation-column", "aTargets": [6] },    //指定列号使用自定义排序
-	      ],
+	$('#example2').DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": true,
+	      "serverSide": false,
+	      "ordering": true,
+	      "info": false,
+	      "destroy": true,
+	      "autoWidth": false,
+	      "iDisplayLength": 7,
+	      "order": [[ 5, "desc" ], [ 4, "desc" ]],
 	      "oLanguage": {
 	    	  "sZeroRecords": message,
-  	    	  "oPaginate": {
+	    	  "oPaginate": {
 	            "sFirst":    "第一页",
 	            "sPrevious": " 上一页 ",
 	            "sNext":     " 下一页 ",
 	            "sLast":     " 最后一页 "
-	          }
-	      }
-  		});
-  		processCnsBtn();
-  		table.on('draw', function () {
-  			processCnsBtn();
-  		}); 
-   		
-   		$.get("isDownFile", function(data,status){
-			if(data) {
-				$("button[downFile='file']").each(function(){
-					$(this).css("display","inline-block");
-		  		})
-			}
-		})
-   })
+	          } 
+	      },
+	      "sAjaxSource":"getDeployList",
+	      "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+	    	oSettings.jqXHR = $.ajax({
+	    		  "dataType": 'json',
+	    		  "type": "GET",
+	    		  "url": sSource,
+	    		  "data": aoData,
+	    		  "success": function(data) {
+	    			  var ndata = {};//返回的数据需要固定格式，否则datatables无法解析，所以需要重新组装
+	    			  ndata.data = data;
+	    			  ndata.recordsTotal = data.lenght;
+	    			  ndata.recordsFiltered = ndata.lenght;
+	    			  fnCallback(ndata);
+	    		  }
+	         });
+	      },
+	      columns:[
+	          {"render": function ( data, type, full, meta) {
+	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.weId + "\")'>" + full.hashShow + "</a>"
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return "<a href='javascript:showWeId(\"" + full.weId + "\")'>" + full.weIdShow + "</a>"
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  if (full.issuer != null) {
+	        		  var name = full.issuer.name;
+	        		  if (full.issuer.recognized) {
+	        			  name += "&nbsp;<image src='dist/img/recognize.svg' widht='50' height='50'/>"
+	        		  } else {
+	        			  name += "&nbsp;<image src='dist/img/deRecognize.svg' widht='50' height='50'/>" 
+	        		  }
+	        		  return name
+	        	  }
+	        	  return ""
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return full.groupId
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return full.createTime
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  var btnHtml = "";
+	        	  if (full.enable) {
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn'  class='btn btn-inline btn-primary btn-flat ' disabled>已启用</button>&nbsp;&nbsp;";
+	        	  } else {
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enable(\"" + full.hash + "\" , \"" + full.needDeployCpt + "\", this)'   class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
+	        	  }
+	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
+	        	  if (full.showDeployCptBtn) {
+	        		  btnHtml += "<button type='button' name='cnsDeploSystemCptBtn'  onclick='deployCpt(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>部署系统CPT</button>&nbsp;&nbsp;";
+	        	  }
+	        	  return btnHtml
+	          }}
+	        ]
+	    });
 }
 
 function processCnsBtn() {

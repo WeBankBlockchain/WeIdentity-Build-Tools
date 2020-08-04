@@ -83,7 +83,7 @@
     <section class="content">
       <div class="card-footer">
         <button type="button" id="showCreateBtn" title="创建WeIdentity DID" class="btn btn-inline btn-primary btn-flat">创建WeID</button>
-        <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html">什么是WeID?</a>
+        <a style="font-size: 13px;padding-left: 10px" target="blank" href="https://weidentity.readthedocs.io/zh_CN/latest/docs/terminologies.html?highlight=简称WeID">什么是WeID?</a>
       </div>
       <div class="row">
         <div class="col-12">
@@ -98,7 +98,7 @@
                   <th>数据来源</th>
                   <th>CNS</th>
                   <th>创建时间</th>
-                  <th width="400px">操作</th>
+                  <th width="330px">操作</th>
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
@@ -112,7 +112,7 @@
 	                      <button type="button" onclick="downEcdsaPubKey('${id}')" class="btn btn-inline btn-primary btn-flat display-none" style="display: none" downFile="file">下载公钥文件</button>
 	                      <button type="button" onclick="downEcdsaKey('${id}')" class="btn btn-inline btn-primary btn-flat" style="display: none" downFile="file">下载私钥文件</button>
 	                      <button type="button" name="registerIssueBtn" onclick="registerIssue('${weId}')" title="注册为Authority Issuer" class="btn btn-inline btn-primary btn-flat ${issuer}" style="display: none" >注册为权威凭证发行者</button>
-	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" style="display: none" >注册为特定类型的发行者</button>
+	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" style="display: none" >添加到白名单</button>
 	                </td>
 	              </tr>
                 </tbody>
@@ -145,7 +145,7 @@
             </div>
             <div class="form-group">
               <label for="registerIssuerName">权威机构名称</label>
-              <input type="text" class="form-control" id="registerIssuerName"  onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'')" placeholder="Enter issuer name">
+              <input type="text" class="form-control" id="registerIssuerName"  onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" placeholder="Enter issuer name">
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">注册为特定类型的发行者</h4>
+          <h4 class="modal-title">添加到白名单</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -174,14 +174,14 @@
               <input type="text" class="form-control" id="addIssuerWeId" readonly="readonly" placeholder="Enter WeID">
             </div>
             <div class="form-group">
-              <label for="registerIssuerName">特定类型 &nbsp;&nbsp;<a id="registerSpecific_A" href="registerSpecific.html" style="font-size: 12px;display: none;">前往注册特定类型</a></label>
+              <label for="registerIssuerName">选择待加入的白名单 &nbsp;&nbsp;<a id="registerSpecific_A" href="registerSpecific.html" style="font-size: 12px;display: none;">前往新增白名单</a></label>
               <select class="custom-select" id="issuerType">
               </select>
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" id="addToIssuerType" class="btn btn-block btn-primary btn-flat">注册</button>
+          <button type="button" id="addToIssuerType" class="btn btn-block btn-primary btn-flat">添加</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -195,7 +195,7 @@
       <div class="modal-content">
         <div class="modal-header" style='position: relative;'>
           <h4 class="modal-title">创建WeID</h4>
-          <a href="#" target="blank_" style='position: absolute;right:40px;top:16px;'>
+          <a href="https://weid-doc-xml.readthedocs.io/zh/test/docs/weidentity-quick-tools-web.html#weid" target="blank_" style='position: absolute;right:40px;top:16px;'>
 			 <img src="./dist/img/icon-question.svg" alt="">
 			 <span style="color:#017CFF;font-size:12px;display:inline-block">
 			       如何选择密钥

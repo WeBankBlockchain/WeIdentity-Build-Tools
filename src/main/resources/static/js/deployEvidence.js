@@ -70,38 +70,79 @@ var template = $("#data-tbody").html();
 var  table;
 function loadData() {
 	 //加载部署数据
-	$.get("getShareList",function(data,status){
-  		if(table != null) {
- 			table.destroy();
- 		}
- 		$("#data-tbody").renderData(template,data);
- 		table = $('#example2').DataTable({
- 	      "paging": true,
- 	      "iDisplayLength": 10,
- 	      "lengthChange": false,
- 	      "searching": true,
- 	      "ordering": true,
- 	      "info": false,
- 	      "autoWidth": false,
- 	      "order": [[ 2, "desc" ], [ 3, "desc" ]],
-	  	  "aoColumnDefs": [
-	          { "sType": "operation-column", "aTargets": [4] },    //指定列号使用自定义排序
-	      ],
+	$('#example2').DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": true,
+	      "serverSide": false,
+	      "ordering": true,
+	      "info": false,
+	      "destroy": true,
+	      "autoWidth": false,
+	      "iDisplayLength": 7,
+	      "order": [[ 5, "desc" ], [ 4, "desc" ]],
 	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
- 	    	  "oPaginate": {
+	    	  "oPaginate": {
 	            "sFirst":    "第一页",
 	            "sPrevious": " 上一页 ",
 	            "sNext":     " 下一页 ",
 	            "sLast":     " 最后一页 "
-	          }
-	      }
- 		});
- 		processCnsBtn();
- 		table.on('draw', function () {
- 			processCnsBtn();
- 		}); 
-  })
+	          } 
+	      },
+	      "sAjaxSource":"getShareList",
+	      "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+	    	oSettings.jqXHR = $.ajax({
+	    		  "dataType": 'json',
+	    		  "type": "GET",
+	    		  "url": sSource,
+	    		  "data": aoData,
+	    		  "success": function(data) {
+	    			  var ndata = {};//返回的数据需要固定格式，否则datatables无法解析，所以需要重新组装
+	    			  ndata.data = data;
+	    			  ndata.recordsTotal = data.lenght;
+	    			  ndata.recordsFiltered = ndata.lenght;
+	    			  fnCallback(ndata);
+	    		  }
+	         });
+	      },
+	      columns:[
+	          {"render": function ( data, type, full, meta) {
+	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.owner + "\")'>" + full.hashShow + "</a>"
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return "<a href='javascript:showWeId(\"" + full.owner + "\")'>" + full.ownerShow + "</a>"
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  if (full.issuer != null) {
+	        		  var name = full.issuer.name;
+	        		  if (full.issuer.recognized) {
+	        			  name += "&nbsp;<image src='dist/img/recognize.svg' widht='50' height='50'/>"
+	        		  } else {
+	        			  name += "&nbsp;<image src='dist/img/deRecognize.svg' widht='50' height='50'/>" 
+	        		  }
+	        		  return name
+	        	  }
+	        	  return ""
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return full.showGroupId
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return full.createTime
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  var btnHtml = "";
+	        	  if (full.enable) {
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn'  class='btn btn-inline btn-primary btn-flat ' disabled>已启用</button>&nbsp;&nbsp;";
+	        	  } else {
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enableHash(\"" + full.hash + "\" , \"" + full.groupId + "\")' class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
+	        	  }
+	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
+	        	  return btnHtml
+	          }}
+	        ]
+	    });
 }
 
 function checkFirstDeploy(hash, groupId) {

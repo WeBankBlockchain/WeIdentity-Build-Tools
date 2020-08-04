@@ -19,6 +19,8 @@
 
 package com.webank.weid.dto;
 
+import com.webank.weid.protocol.base.AuthorityIssuer;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,7 +34,7 @@ public class ShareInfo extends DeployBase {
     private String showGroupId;
     private String evidenceAddress;
     private boolean enable; 
-    private String issuer;
+    private AuthorityIssuer issuer;
     private boolean showBtn;
     
     public void setGroupId(Integer groupId) {

@@ -47,6 +47,8 @@ public class ConfigService {
     
     private static final Logger logger = LoggerFactory.getLogger(ConfigService.class);
     
+    private static final String RUN_CONFIG_BAK = "output/.run.config";
+    
     public FiscoConfig loadNewFiscoConfig() {
         logger.info("[loadNewFiscoConfig] reload the properties...");
         PropertyUtils.reload();
@@ -70,6 +72,23 @@ public class ConfigService {
         logger.info("[loadConfig] begin load the run.config");
         //读取基本配置
         List<String> listStr = FileUtils.readFileToList("run.config");
+        Map<String, String> map = processConfig(listStr);
+        //判断如果节点配置为空，则重载备份配置
+        if (StringUtils.isBlank(map.get("blockchain_address"))) {
+            listStr = FileUtils.readFileToList(RUN_CONFIG_BAK);
+            if (listStr.size() > 0) {
+                map = processConfig(listStr);
+            }
+        }
+        //判断证书配置是否存在
+        map.put("ca.crt", String.valueOf(FileUtils.exists("resources/ca.crt")));
+        map.put("client.keystore", String.valueOf(FileUtils.exists("resources/client.keystore")));
+        map.put("node.crt", String.valueOf(FileUtils.exists("resources/node.crt")));
+        map.put("node.key", String.valueOf(FileUtils.exists("resources/node.key")));
+        return map;
+    }
+    
+    private Map<String, String> processConfig(List<String> listStr) {
         Map<String, String> map = new HashMap<String, String>();
         for (String string : listStr) {
             if (string.startsWith("#") || string.indexOf("=") == -1) {
@@ -82,11 +101,6 @@ public class ConfigService {
                 map.put(values[0], StringUtils.EMPTY);
             }
         }
-        //判断证书配置是否存在
-        map.put("ca.crt", String.valueOf(FileUtils.exists("resources/ca.crt")));
-        map.put("client.keystore", String.valueOf(FileUtils.exists("resources/client.keystore")));
-        map.put("node.crt", String.valueOf(FileUtils.exists("resources/node.crt")));
-        map.put("node.key", String.valueOf(FileUtils.exists("resources/node.key")));
         return map;
     }
     
@@ -122,8 +136,13 @@ public class ConfigService {
             }
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        backRunConfig();
         //根据模板生成配置文件
         return generateProperties();
+    }
+    
+    private void backRunConfig() {
+        FileUtils.copy(new File("run.config"), new File(RUN_CONFIG_BAK));
     }
     
     public void updateChainId(String chainId) {
@@ -141,6 +160,7 @@ public class ConfigService {
             }
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        backRunConfig();
     }
     
     public boolean setMasterGroupId(String groupId) {
@@ -158,6 +178,7 @@ public class ConfigService {
             }
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        backRunConfig();
         //根据模板生成配置文件
         return generateProperties();
     }
@@ -183,6 +204,7 @@ public class ConfigService {
             }
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
+        backRunConfig();
         //根据模板生成配置文件
         return generateProperties();
     }

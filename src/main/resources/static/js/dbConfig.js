@@ -31,6 +31,7 @@ $(document).ready(function(){
 	    formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
 	    $("#confirmMessage1Body").html("<p>配置提交中,请稍后...</p>");
 	    $("#confirmMessage1Btn").addClass("disabled");
+	    $("#postBtn").addClass("disabled");
 	    $("#modal-confirm-message1").modal();
 	    $.ajax({
 	        url:'submitDbConfig', /*接口域名地址*/
@@ -47,8 +48,10 @@ $(document).ready(function(){
 	            } else if (res=="fail") {
 	            	 $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
 	            	 $("#confirmMessage1Btn").removeClass("disabled");
+	            	 $("#postBtn").removeClass("disabled");
 	            } else {
 	            	$("#confirmMessage1Btn").removeClass("disabled");
+	            	$("#postBtn").removeClass("disabled");
 	                console.log(res);
 	            }
 	            $("#modal-confirm-message1").modal();
@@ -76,6 +79,7 @@ $(document).ready(function(){
     }
     function checkForTimeout() {
     	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#modal-confirm-message1").modal();
     	setTimeout(checkdb,2000);
     }
     
@@ -92,6 +96,7 @@ $(document).ready(function(){
         	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
            $("#modal-confirm-message1").modal();
+           $("#postBtn").removeClass("disabled");
            $("#confirmMessage1Btn").removeClass("disabled");
         });
     }

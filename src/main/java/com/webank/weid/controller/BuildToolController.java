@@ -899,8 +899,12 @@ public class BuildToolController {
     
     @Description("将指定cptId转policy")
     @GetMapping("/cptToPolicy")
-    public boolean cptToPolicy(@RequestParam(value = "cptId") Integer cptId) {
-        //
+    public boolean cptToPolicy(
+        @RequestParam(value = "cptId") Integer cptId,
+        @RequestParam(value = "policyId") String policyId,
+        @RequestParam(value = "policyType") String policyType
+    ) {
+       //
        System.out.println("这里只想cpt转policy");
        return true;
     }

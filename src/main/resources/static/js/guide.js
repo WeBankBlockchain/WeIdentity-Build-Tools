@@ -195,6 +195,7 @@ $(document).ready(function(){
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#goNext").addClass("disabled");
+	    $('#postNodeBtn').addClass("disabled");
 	    $.ajax({
 	        url:'nodeConfigUpload', /*接口域名地址*/
 	        type:'post',
@@ -208,7 +209,9 @@ $(document).ready(function(){
 	            	setTimeout(checkNodeForTimeout,2000);
 	            } else {
 	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            } 
+	            	 $('#postNodeBtn').removeClass("disabled");
+	            }
+	            $("#modal-default").modal();
 	        }
 	    })	
 	});
@@ -258,6 +261,7 @@ $(document).ready(function(){
 	// 配置提交成功后进行节点检查
     function checkNodeForTimeout() {
     	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#modal-default").modal();
     	setTimeout(checkNode,2000);
     }
     
@@ -267,6 +271,7 @@ $(document).ready(function(){
             if(data == "success") {//检查成功
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
 				$("#goNext").removeClass("disabled");
+				$('#postNodeBtn').removeClass("disabled");
 				$("#goNext").addClass("nodeGoNext");
 				//disabledInput(); //禁止修改操作
          	    $("#goNext").click(function(){
@@ -285,6 +290,8 @@ $(document).ready(function(){
             } else {//检查失败
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
             }
+            $('#postNodeBtn').removeClass("disabled");
+            $("#modal-default").modal();
          });
     }
     // 获取群主ID
@@ -345,6 +352,7 @@ $(document).ready(function(){
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#goNext").addClass("disabled");
+	    $("#postDbBtn").addClass("disabled");
 	    $.ajax({
 	        url:'submitDbConfig', /*接口域名地址*/
 	        type:'post',
@@ -358,7 +366,9 @@ $(document).ready(function(){
 	            	setTimeout(checkDbForTimeout,2000);
 	            } else {
 	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+	            	 $('#postDbBtn').removeClass("disabled");
 	            }
+	            $("#modal-default").modal();
 	        }
 	    })
     });
@@ -385,6 +395,7 @@ $(document).ready(function(){
     
     function checkDbForTimeout() {
     	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#modal-default").modal();
     	setTimeout(checkdb,2000);
     }
     
@@ -393,6 +404,7 @@ $(document).ready(function(){
            if(data) {//检查成功
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
 			   $("#goNext").removeClass("disabled");
+			   $('#postDbBtn').removeClass("disabled");
 			   //disabledInput();
 			   $("#goNext").addClass("bdGoNext");
         	   $("#goNext").click(function(){
@@ -422,6 +434,8 @@ $(document).ready(function(){
            } else {//检查失败
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
+           $('#postDbBtn').removeClass("disabled");
+           $("#modal-default").modal();
         });
     }
     // 点击选择生成秘钥
@@ -445,7 +459,6 @@ $(document).ready(function(){
     		$('#modal-create-pri').modal()
     	}
     })
-    
     
     var hasAccount = false;
     // 转到账户配置

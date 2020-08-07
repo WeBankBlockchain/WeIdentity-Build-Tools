@@ -102,7 +102,7 @@
                   </th>
                   <th>cptId</th>
                   <th>数据来源</th>
-                  <th>owner</th>
+                  <th>注册账户</th>
                   <th>CNS</th>
                   <th>创建时间</th>
                   <th  width="300px">操作</th>
@@ -118,13 +118,13 @@
                   </td>
                   <td>${cptId}</td>
                   <td>${from}</td>
-                  <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a></td>
+                  <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a><div class='display-none'>${weId}</div></td>
                   <td>${hashShow}</td>
                   <td>${createTime}</td>
                   <td>
                       <button type="button" onclick="queryCptSchema('${cptId}')" class="btn btn-inline btn-primary btn-flat">预览CPT</button>
                       <button type="button" onclick="downCpt('${cptId}')" class="btn btn-inline btn-primary btn-flat">下载CPT</button>
-                      <!-- <button type="button" onclick="showCptToPolicy('${cptId}')" class="btn btn-inline btn-primary btn-flat">转Policy</button> -->
+                      <button type="button" onclick="showCptToPolicy('${cptId}')" class="btn btn-inline btn-primary btn-flat" style="display: none" >转Policy</button>
                   </td>
                 </tr>
                 </tbody>
@@ -318,7 +318,6 @@
               <label for="policyId">策略编号</label>
               <input type="text" class="form-control" id="policyId" onkeyup="this.value=this.value.replace(/\D/g,'')"  placeholder="Enter policyId">
               <input type="hidden" class="form-control" id="fromCptId" >
-              <input type="hidden" class="form-control" id="fromType" value="cpt" >
             </div>
             <div class="form-group">
               <label for="policyType">策略类型</label>

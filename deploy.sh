@@ -18,8 +18,8 @@ function show_address()
 {
     cd ${SOURCE_CODE_DIR}
     if [ ! -f weIdContract.address ];then
-    	echo "deploy contract failed."
-    	exit 1
+        echo "deploy contract failed."
+        exit 1
     fi
     echo "contract is deployed with success."
     echo "===========================================."
@@ -39,7 +39,7 @@ function show_address()
 
 function deploy_contract()
 {
-	echo " "
+    echo " "
     echo "begin to deploy contract, please wait....."
     cd ${SOURCE_CODE_DIR}
     #deploy contract to your blockchain nodes
@@ -57,16 +57,15 @@ function deploy_contract()
     #    rm -rf ${SOURCE_CODE_DIR}/output/admin
     #fi
     #mkdir -p ${SOURCE_CODE_DIR}/output/admin
-    
+
     #the copy action in deploy contract
     #mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
     #mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
-    
+
     rm -f ecdsa_key
     rm -f ecdsa_key.pub
     rm -f hash
     rm -f weid
-    
 }
 
 function deploy_system_cpt()

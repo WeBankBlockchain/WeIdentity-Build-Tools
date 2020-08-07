@@ -19,16 +19,18 @@
 
 package com.webank.weid.service;
 
+import com.webank.weid.suite.api.persistence.params.PersistenceType;
+import com.webank.weid.util.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.webank.weid.constant.DataDriverConstant;
 import com.webank.weid.constant.SqlConstant;
-import com.webank.weid.suite.api.persistence.Persistence;
-import com.webank.weid.suite.persistence.sql.ConnectionPool;
-import com.webank.weid.suite.persistence.sql.SqlExecutor;
-import com.webank.weid.suite.persistence.sql.driver.MysqlDriver;
+import com.webank.weid.suite.persistence.mysql.ConnectionPool;
+import com.webank.weid.suite.persistence.mysql.SqlExecutor;
+import com.webank.weid.suite.api.persistence.inf.Persistence;
+import com.webank.weid.suite.api.persistence.PersistenceFactory;
 
 @Service
 public class DataBaseService {
@@ -51,14 +53,21 @@ public class DataBaseService {
     
     private Persistence getPersistence() {
         if (persistence == null) {
-            persistence = new MysqlDriver();
+            String type = PropertyUtils.getProperty("persistence_type");
+            PersistenceType persistenceType = null;
+            if (type.equals("mysql")) {
+                persistenceType = PersistenceType.Mysql;
+            } else if (type.equals("redis")) {
+                persistenceType = PersistenceType.Redis;
+            }
+            persistence = PersistenceFactory.build(persistenceType);
         }
         return persistence;
     }
     
     private SqlExecutor getSqlExecutor() {
         if (sqlExecutor == null) {
-            sqlExecutor = new SqlExecutor(ConnectionPool.getFirstDataSourceName()); 
+            sqlExecutor = new SqlExecutor(ConnectionPool.getFirstDataSourceName());
         }
         return sqlExecutor;
     }

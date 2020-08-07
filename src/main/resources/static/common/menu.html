@@ -77,7 +77,7 @@
               </li>
             </ul>
           </li>
-          
+
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
@@ -142,6 +142,24 @@
               </li>
             </ul>
           </li>
+
+          <li class="nav-item has-treeview async-menu menu-open">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+                配置检查管理
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="check.html" class="nav-link async-form">
+                  <i id = "i-verifyDb" class="far fa-circle nav-icon"></i>
+                  <p>检查数据库配置</p>
+                </a>
+              </li>
+            </ul>
+          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -187,7 +205,7 @@ $(document).ready(function(){
 	        });
 		}
 	});
-	 if (url == 'account.html' || url == 'dbConfig.html' || url == 'group.html' ||url == 'nodeConfig.html'){
+	 if (url == 'account.html' || url == 'dbConfig.html' || url == 'group.html' || url == 'nodeConfig.html' || url == 'check.html'){
     
      }
 	*/
@@ -219,6 +237,10 @@ $(document).ready(function(){
 	        if (data.groupState) {
 	        	$("#i-group").removeClass("fa-circle");
                 $("#i-group").addClass("fa-check-circle");
+            }
+	        if (data.checkPersistenceState) {
+	        	$("#i-verifyDb").removeClass("fa-circle");
+                $("#i-verifyDb").addClass("fa-check-circle");
             }
 	    });
 	}

@@ -31,8 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.webank.weid.suite.persistence.sql.ConnectionPool;
-   
+import com.webank.weid.suite.persistence.mysql.ConnectionPool;
+
 /** 
  * 数据库访问帮助类 
  *  
@@ -41,7 +41,7 @@ import com.webank.weid.suite.persistence.sql.ConnectionPool;
  */  
 public class JdbcHelper {
     
-    private static final String dsName = ConnectionPool.getFirstDataSourceName(); 
+    private static final String dsName = ConnectionPool.getFirstDataSourceName();
     
     public static List<Map<String, Object>> queryList(String sql, Object... paramters)  
             throws SQLException {  

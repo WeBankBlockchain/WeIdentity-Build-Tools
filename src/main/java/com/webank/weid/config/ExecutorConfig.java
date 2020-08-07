@@ -35,11 +35,11 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "async.thread")
 public class ExecutorConfig {
     
-    private int corePoolSize;
-    private int maxPoolSize;
-    private int maxQueue;
-    private String namePrefix;
-    private int keepAlive;
+    private int corePoolSize = 5;
+    private int maxPoolSize = 20;
+    private int maxQueue = 1000;
+    private String namePrefix = "weid-async-thread-";
+    private int keepAlive = 10;
     
     @Bean
     public Executor asyncServiceExecutor() {

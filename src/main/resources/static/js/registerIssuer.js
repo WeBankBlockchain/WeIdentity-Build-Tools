@@ -127,10 +127,10 @@ function loadData() {
          });
       },
       columns:[
+          { data: 'name'},
           {"render": function ( data, type, full, meta) {
         	  return "<a href='javascript:showWeId(\""+ full.weId + "\")'>" + full.weIdShow + "</a>"
           }},
-          { data: 'name'},
           {"render": function ( data, type, full, meta) {
         	  if(full.recognized) {
         		  return "<image src='dist/img/recognize.svg' widht='50' height='50'/>";

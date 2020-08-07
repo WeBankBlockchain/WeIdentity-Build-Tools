@@ -147,10 +147,10 @@ function check_parameter()
         echo "org id is empty, please check the config."
         exit 1
     fi
-    if [ -z ${amop_id} ];then
-        echo "amop id is empty, please check the config."
-        exit 1
-    fi
+    #if [ -z ${amop_id} ];then
+    #    echo "amop id is empty, please check the config."
+    #    exit 1
+    #fi
     if [ -z ${chain_id} ];then
         echo "chain id is empty, please check the config."
         exit 1

@@ -249,13 +249,10 @@ function loadData() {
 
 function processIssuerBtn() {
 	$("button[name='registerIssueBtn']").each(function(){
-		if (role == "1") {
-			$(this).show();
-			var index = $(this).attr("class").indexOf("true");
-			if(index > 0) {
-				$(this).attr("disabled",true);
-				$(this).html("已成为权威凭证发行者");
-			}
+		var index = $(this).attr("class").indexOf("true");
+		if(index > 0) {
+			$(this).attr("disabled",true);
+			$(this).html("已成为权威凭证发行者");
 		}
 	});
 	$("button[name='addToIssuerTypeBtn']").each(function(){

@@ -21,6 +21,7 @@ package com.webank.weid.command;
 
 import java.math.BigInteger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
 import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
@@ -57,6 +58,10 @@ public class UpgradeDataBucket {
             System.out.println("begin upgrade DataBucket...");
             // 获取私钥
             WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+            if(StringUtils.isBlank(currentPrivateKey.getPrivateKey())) {
+                System.out.println("the DataBucket upgrade fail: can not found the private key.");
+                System.exit(1);
+            }
             // 根据私钥获取Credentials
             Credentials credentials = GenCredential.create(new BigInteger(currentPrivateKey.getPrivateKey()).toString(16));
             // 重新部署所有的DataBucket

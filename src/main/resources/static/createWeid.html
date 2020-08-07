@@ -54,7 +54,7 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
   <!-- menu-->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <aside class="main-sidebar sidebar-dark-primary elevation-4 menu-sidebar">
     <include src="common/menu.html?open=1&level=1"></include>
   </aside>
   <include src="common/nav.html"></include>
@@ -195,10 +195,10 @@
       <div class="modal-content">
         <div class="modal-header" style='position: relative;'>
           <h4 class="modal-title">创建WeID</h4>
-          <a href="https://weid-doc-xml.readthedocs.io/zh/test/docs/weidentity-quick-tools-web.html#weid" target="blank_" style='position: absolute;right:40px;top:16px;'>
+          <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=WeID 管理#weid" target="blank_" style='position: absolute;right:40px;top:16px;'>
 			 <img src="./dist/img/icon-question.svg" alt="">
 			 <span style="color:#017CFF;font-size:12px;display:inline-block">
-			       如何选择密钥
+			       使用教程
 			 </span>
 		  </a>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -239,6 +239,9 @@
           <form id="KeyForm" role="form">
             <div class="form-group row">
                <div class="col-sm-12">
+                  <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">备注：支持椭圆曲线的公私钥，并且为十进制私钥数据。
+                    <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=创建密钥#weid" target="blank_"><img src="./dist/img/icon-question.svg" alt=""><span style="color:#017CFF;font-size:12px;display:inline-block">如何生成私钥？</span></a>
+                  </p>
                    <div class="input-group">
                      <div class="custom-file">
                        <input type="file" class="custom-file-input" id="privateKey" name="privateKey">
@@ -273,15 +276,20 @@
           <form id="KeyForm" role="form">
             <div class="form-group row">
                <div class="col-sm-12">
+                 
+                  <div class="form-group">
+                   <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">* 只有联盟链委员会的管理员，才能作为代理，为其他机构创建WeID。</p>
+                   <p style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">* 支持椭圆曲线的公私钥，并且为十进制私钥数据。
+                    <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=创建密钥#weid" target="blank_"><img src="./dist/img/icon-question.svg" alt=""><span style="color:#017CFF;font-size:12px;display:inline-block">如何生成公钥？</span></a>
+                   </p>
+                  </div>
                    <div class="input-group">
                      <div class="custom-file">
                        <input type="file" class="custom-file-input" id="publicKey" name="publicKey">
                        <label id="publicKey-label" class="custom-file-label" for="publicKey">选择公钥文件...</label>
                      </div>
                    </div>
-                   <div class="form-group">
-	                 <div class="col-sm-10" style="font-size: 13px;color: gray;max-width: 100%;margin-top:0.5rem"><span>* 只有联盟链委员会的管理员，才能作为代理，为其他机构创建WeID。</span></div>
-	              </div>
+                   
                </div>
              </div>
              </form>

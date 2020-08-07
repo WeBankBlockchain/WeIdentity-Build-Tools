@@ -20,11 +20,38 @@
   <!-- AdminLTE App -->
   <script src="dist/js/adminlte.min.js"></script>
   <script src="dist/js/include.js"></script>
+  <style>
+    .warning_box{
+        position: relative;
+        border:1px solid #ddd;
+    }
+    .warning_box .sql_warning{
+        position: absolute;
+        right: -320px;
+        top: 50px;
+        padding: 10px;
+    }
+    
+    .sql_warning .warning_title{
+        font-family: PingFangSC-Medium;
+        font-size: 14px;
+        color: #333333;
+        line-height: 22px;
+        margin-bottom:10px;
+    }
+    
+    .sql_warning p{
+        font-size: 12px;
+        color: #666666;
+        line-height: 20px;
+        margin-bottom:5px;
+    }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
   <!-- menu-->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <aside class="main-sidebar sidebar-dark-primary elevation-4 menu-sidebar">
     <include src="common/menu.html?open=1&level=1"></include>
   </aside>
   <include src="common/nav.html"></include>
@@ -52,14 +79,14 @@
     <!-- Main content -->
     <section class="content">
       <div class="col-md-6 offset-md-3">
-          <div id="AccountDiv" class="card card-primary">
+          <div id="AccountDiv" class="card card-primary warning_box">
               <div class="card-header">
                   <h6>配置主群组</h6>
               </div>
               <div class="card-body role_body" style='padding:1rem 1.25rem;'>
                   <div class="form-group" style='width:100%;'>
                       <label for="groupId">选择一个FISCO-BCOS的群组，作为 WeIdentity 的主群组（即部署 WeIdentity 智能合约的群组）</label>
-                      <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id6" target="blank_" style="display: block" >
+                      <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html?highlight=主群组#group-selection" target="blank_" style="display: block" >
 	                       <img src="./dist/img/icon-question.svg" alt="">
 	                       <span style="color:#017CFF;font-size:12px;display:inline-block">
 	                           	什么是群组？
@@ -70,6 +97,14 @@
               </div>
               <div class="db-part">
                   <button type="button"  id="setGroupId" class="btn btn-block btn-primary btn-flat">完成</button>
+              </div>
+              <div class='sql_warning' style='right:-160px'>
+                 <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html?highlight=选择主群组#group-selection" target="blank_" style='display:block'>
+                  <img src="./dist/img/icon-question.svg" alt="">
+                  <span style="color:#017CFF;font-size:12px;display:inline-block">
+                                                              点击查看配置配置教程
+                  </span>
+                 </a>
               </div>
           </div>
       </div>

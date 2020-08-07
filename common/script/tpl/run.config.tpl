@@ -26,10 +26,13 @@ chain_id=1
 group_id=1
 
 #Configure your database information
+persistence_type=
 mysql_address=
 mysql_database=
 mysql_username=
 mysql_password=
+redis_address=
+redis_password=
 
 #This variable is used to distinguish the environment. You can use "dev" to set the development environment, 
 #"stg" to set the test environment, "prd" to set the production environment.

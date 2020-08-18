@@ -17,7 +17,6 @@ fi
 # make the file
 FISCOVAS='${CRONTAB_TIME}:${BUILD_TOOL_DIR}:${USER}'
 envsubst ${FISCOVAS}} < ${WEIDENTITY_CRON_JOB_TPL} >${WEIDENTITY_CRON_JOB}
-    
 
 # copy to /etc/cron.d/
 cp $WEIDENTITY_CRON_JOB /etc/cron.d/

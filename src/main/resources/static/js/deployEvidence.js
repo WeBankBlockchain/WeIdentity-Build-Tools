@@ -108,10 +108,10 @@ function loadData() {
 	      },
 	      columns:[
 	          {"render": function ( data, type, full, meta) {
-	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.owner + "\")'>" + full.hashShow + "</a>"
+	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.owner + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
 	          }},
 	          {"render": function ( data, type, full, meta) {
-	        	  return "<a href='javascript:showWeId(\"" + full.owner + "\")'>" + full.ownerShow + "</a>"
+	        	  return "<a href='javascript:showWeId(\"" + full.owner + "\")'>" + full.ownerShow + "</a><div class='display-none'>" + full.owner + "</div>"
 	          }},
 	          {"render": function ( data, type, full, meta) {
 	        	  if (full.issuer != null) {

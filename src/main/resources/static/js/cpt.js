@@ -40,18 +40,30 @@ $(document).ready(function(){
         })
     });
     
-    var registerCptResult = false;
+    var isClose = false;
     
     $('#modal-message').on('hide.bs.modal', function () {
     	$("#modal-message .modal-dialog").removeClass("modal-lg");
 	})
 	
 	$('#modal-confirm-message').on('hide.bs.modal', function () {
-		if (registerCptResult) {
-			$("#modal-register-cpt").modal("hide");
+		if (isClose) {
+			$("#modal-register-cpt").modal("hide");			
 		}
 	})
-
+	
+	$('#modal-confirm-message1').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-cpt-to-policy").modal("hide");			
+		}
+	})
+	
+	$("#confirmMessage1Btn").click(function(){
+		var disabled = $(this).attr("class").indexOf("disabled");
+	    if(disabled > 0) return;
+		$("#modal-confirm-message1").modal("hide");
+	})
+	
 	if (!isReady) {
     	return;
     }
@@ -101,10 +113,10 @@ $(document).ready(function(){
 	        processData: false,
 	        success:function(res) {
 	            console.log(res);
-	            registerCptResult = false;
+	            isClose = false;
 	            if (res=="success") {
 	            	$("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='success-span'>成功</span>。</p>");
-	            	registerCptResult = true;
+	            	isClose = true;
 	            	loadData();
 	            } else if (res=="fail") {
 	            	$("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='fail-span'>失败</span>，请查看服务端日志。</p>");
@@ -177,6 +189,40 @@ $(document).ready(function(){
 		});
     	fixSelectAll();
     });
+	
+	//cpt转policy
+    $("#cptToPolicy").click(function(){
+        var thisObj = this;
+        var disabled = $(thisObj).attr("class").indexOf("disabled");
+        if(disabled > 0) return;
+        var cptId = $("#fromCptId").val();
+        var policyId = $("#policyId").val();
+        var btnValue = $(thisObj).html();
+        $(thisObj).html("转换中，请稍后...");
+        $(thisObj).addClass("disabled");
+        $("#confirmMessage1Body").html("<p>转换中，请稍后...</p>");
+        $("#confirmMessage1Btn").addClass("disabled");
+        $("#modal-confirm-message1").modal();
+        var formData = {};
+        formData.cptId = cptId;
+        formData.policyId = policyId;
+        formData.policyType = $("#policyType").val();
+        $.post("cptToPolicy", formData, function(value,status){
+        	isClose = false;
+            if (value == "success") {
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='success-span'>成功</span>。</p>");
+                isClose = true;
+            } else if (value == "fail") {
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='fail-span'>失败</span>，请查看日志。</p>");
+            } else {
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='fail-span'>失败</span>: " + value + "</p>");
+            }
+            $(thisObj).html(btnValue);
+            $(thisObj).removeClass("disabled");
+            $("#confirmMessage1Btn").removeClass("disabled");
+            $("#modal-confirm-message1").modal();
+        })
+    })
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -282,5 +328,6 @@ function getCptIds() {
 
 function showCptToPolicy(cptId) {
 	$("#fromCptId").val(cptId)
+	$("#policyId").val("")
 	$("#modal-cpt-to-policy").modal();
 }

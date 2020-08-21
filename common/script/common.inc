@@ -42,4 +42,3 @@ function build_classpath()
             CLASSPATH=${CLASSPATH}:${jar_file}
         done
 }
-

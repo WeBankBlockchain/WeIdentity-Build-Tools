@@ -203,7 +203,6 @@ public class DeployService {
         String currentHash = buildToolService.getMainHash();
         List<HashContract> result = buildToolService.getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
         String roleType = this.getRoleType();
-        Map<String, AuthorityIssuer> cache = new HashMap<String, AuthorityIssuer>();
         for (HashContract hashContract : result) {
             CnsInfo cns = new CnsInfo();
             cns.setHash(hashContract.getHash());
@@ -224,12 +223,9 @@ public class DeployService {
                 cns.setShowDeployCptBtn(true);
             }
             // 查询此部署账户的权威机构名
-            if(cache.containsKey(cns.getWeId())) {
-                cns.setIssuer(cache.get(cns.getWeId()));
-            } else {
+            if (cns.isEnable()) {
                 AuthorityIssuer issuer = buildToolService.getIssuerByWeId(cns.getWeId());
                 cns.setIssuer(issuer);
-                cache.put(cns.getWeId(), issuer);
             }
             dataList.add(cns);
         }
@@ -291,8 +287,9 @@ public class DeployService {
             logger.error("[deploySystemCpt] can not found the admin ECDSA.");
             return false;
         }
-        //注册weid
+        // 注册weid
         createWeId(deployInfo, from, true);
+        
         logger.info("[deploySystemCpt] begin register systemCpt...");
         //部署系统CPT, 
         boolean result = registerSystemCpt(deployInfo);
@@ -353,6 +350,12 @@ public class DeployService {
         } else {
             logger.info("[createWeId] the weId is exist."); 
         }
+        // 默认将当前weid注册成为权威机构，并认证
+        String orgId = ConfigUtils.getCurrentOrgId();
+        // 注册权威机构
+        buildToolService.registerIssuer(weId, orgId, from);
+        // 认证权威机构
+        buildToolService.recognizeAuthorityIssuer(weId);
     }
     
     /**

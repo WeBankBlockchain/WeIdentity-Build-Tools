@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -82,7 +84,9 @@ import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.DataBaseService;
 import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.DeployService;
+import com.webank.weid.service.PolicyFactory;
 import com.webank.weid.service.TransactionService;
+import com.webank.weid.service.fisco.WeServerUtils;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
 import com.webank.weid.util.DataToolUtils;
@@ -289,6 +293,8 @@ public class BuildToolController {
                 //如果上一个地址不为空，并且新hash地址跟上一个地址不相同则reloadAddress
                 if (StringUtils.isNotBlank(preMainHash) && !preMainHash.equals(cnsInfo.getHash())) {
                     reloadAddress();
+                    //判断当前账户是否注册成weid，如果没有则创建weid
+                    deployService.createWeIdForCurrentUser(DataFrom.WEB);
                 }
                 preMainHash = cnsInfo.getHash();
             }
@@ -621,8 +627,6 @@ public class BuildToolController {
         logger.info("[registerCpt] begin register cpt...");
         String cptId = request.getParameter("cptId");
         try {
-            //判断当前账户是否注册成weid，如果没有则创建weid
-            deployService.createWeIdForCurrentUser(DataFrom.WEB);
             return buildToolService.registerCpt(targetFIle, cptId, DataFrom.WEB);
         } catch (Exception e) {
             logger.error("[registerCpt] register cpt has error.", e);
@@ -897,15 +901,57 @@ public class BuildToolController {
         return deployService.getGuideStatus();
     }
     
-    @Description("将指定cptId转policy")
-    @GetMapping("/cptToPolicy")
-    public boolean cptToPolicy(
-        @RequestParam(value = "cptId") Integer cptId,
-        @RequestParam(value = "policyId") String policyId,
-        @RequestParam(value = "policyType") String policyType
-    ) {
-       //
-       System.out.println("这里只想cpt转policy");
-       return true;
+//    @Description("将指定cptId转policy")
+//    @PostMapping("/cptToPolicy")
+//    public String cptToPolicy(
+//        @RequestParam(value = "cptId") Integer cptId,
+//        @RequestParam(value = "policyId") String policyId,
+//        @RequestParam(value = "policyType") String policyType
+//    ) {
+//       // 先根据cpt转pojo，然后根据pojo转policy
+//       // 生成pojoId
+//        String pojoId = DataToolUtils.getUuId32();
+//        try {
+//            logger.info("[cptToPolicy] begin cpt to pojo. cptId = {}.", cptId);
+//            // 获取cpt文件
+//            File cptFile = buildToolService.getCptFile(cptId);
+//            // 生成源码文件
+//            buildToolService.generateJavaCodeByCpt(cptFile, cptId, pojoId, "cpt");
+//            File sourceFile = buildToolService.getSourceFile(pojoId);
+//            // 转成jar文件
+//            Integer[] cptIds = {cptId};
+//            buildToolService.createJar(sourceFile, cptIds, "cpt", DataFrom.WEB);
+//            logger.info("[cptToPolicy] begin pojo to policy, cptId = {}, policyType = {}.", cptId, policyType);
+//            // 根据pojo转换policy
+//            String jarPath = buildToolService.getJarFile(pojoId).getAbsolutePath();
+//            String policy = PolicyFactory.loadJar(jarPath).generate(cptId);
+//            return buildToolService.registerClaimPolicy(cptId, policy);
+//        } catch (Exception e) {
+//            logger.error("[cptToPolicy] cpt to policy has error.", e);
+//            buildToolService.deletePojoInfo(pojoId);
+//            return BuildToolsConstant.FAIL;
+//        }
+//    }
+    
+    @Description("查询群组列表")
+    @GetMapping("/getGroupMapping")
+    public List<Map<String, String>> getGroupMapping() {
+        Map<String, List<String>> groupMapping = WeServerUtils.getGroupMapping();
+        Set<Entry<String, List<String>>> entrySet = groupMapping.entrySet();
+        List<Map<String, String>> list = new ArrayList<Map<String,String>>();
+        String masterGroupId = this.loadConfig().get("group_id");
+        for (Entry<String, List<String>> entry : entrySet) {
+            Map<String, String> info = new HashMap<String, String>();
+            info.put("groupId", entry.getKey());
+            info.put("nodes", entry.getValue().toString());
+            info.put("type", "子群组");
+            if (masterGroupId.equals(entry.getKey())) {
+                info.put("type", "主群组");
+                list.add(0, info);
+            } else {
+                list.add(info);
+            }
+        }
+        return list;
     }
 }

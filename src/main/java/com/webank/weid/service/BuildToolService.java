@@ -117,6 +117,14 @@ public class BuildToolService {
     private WeIdService weIdService;
     private AuthorityIssuerService authorityIssuerService;
     private CptService cptService;
+//    private PolicyService policyService;
+//    
+//    private PolicyService getPolicyService() {
+//        if (policyService == null) {
+//            policyService = new PolicyServiceImpl();
+//        }
+//        return policyService;
+//    }
     
     private WeIdService getWeIdService() {
         if (weIdService == null) {
@@ -520,6 +528,7 @@ public class BuildToolService {
         callerAuth.setWeIdPrivateKey(weIdPrivateKey);
         callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(
             DataToolUtils.publicKeyFromPrivate(new BigInteger(weIdPrivateKey.getPrivateKey())).toString()));
+        callerAuth.setWeIdPublicKeyId(callerAuth.getWeId());
         return callerAuth;
     }
     
@@ -1079,4 +1088,19 @@ public class BuildToolService {
         return getDataBucket(CnsType.ORG_CONFING).get(
             orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
     }
+    
+//    public String registerClaimPolicy(Integer cptId, String policyJson) {
+//        WeIdAuthentication currentWeIdAuth = this.getCurrentWeIdAuth();
+//        ResponseData<Integer> response = getPolicyService().registerClaimPolicy(cptId, policyJson, currentWeIdAuth);
+//        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+//            logger.error("[registerClaimPolicy] register ClaimPolicy fail. ErrorCode is:{}, msg :{}",
+//                response.getErrorCode(),
+//                response.getErrorMessage());
+//            return response.getErrorCode() + "-" + response.getErrorMessage();
+//        } else {
+//            logger.info(
+//                "[registerClaimPolicy] register ClaimPolicys success. cpt id = {}, policyId = {}", cptId, response.getResult());
+//            return BuildToolsConstant.SUCCESS;
+//        }
+//    }
 }

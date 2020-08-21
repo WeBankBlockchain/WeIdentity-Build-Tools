@@ -12,6 +12,7 @@ $(document).ready(function(){
 			if (value) {
 				$("#messageBody").html("<p>设置主群组ID<span class='success-span'>成功</span></p>");
 				$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>目前暂不支持动态修改，如修改配置请重启服务生效。</span></p>");
+				loadData();
 			} else {
 				$("#messageBody").html("<p>设置主群组ID<span class='fail-span'>失败</span></p>");
 			}
@@ -35,7 +36,52 @@ $(document).ready(function(){
     		}
 	    })
 	});
+	
+	loadData();
 });
 
-
+function loadData() {
+	//加载部署数据
+	$('#example2').DataTable({
+      "paging": false,
+      "lengthChange": false,
+      "searching": false,
+      "serverSide": false,
+      "ordering": false,
+      "info": false,
+      "destroy": true,
+      "autoWidth": false,
+      "pagingType":"simple",
+      "oLanguage": {
+    	  "sZeroRecords": "对不起，查询不到任何相关数据",
+    	  "oPaginate": {
+            "sFirst":    "第一页",
+            "sPrevious": " 上一页 ",
+            "sNext":     " 下一页 ",
+            "sLast":     " 最后一页 "
+          } 
+      },
+      "sAjaxSource":"getGroupMapping",
+      "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+    	oSettings.jqXHR = $.ajax({
+    		  "dataType": 'json',
+    		  "type": "GET",
+    		  "url": sSource,
+    		  "data": aoData,
+    		  "success": function(data) {
+    			  var ndata = {};//返回的数据需要固定格式，否则datatables无法解析，所以需要重新组装
+    			  ndata.data = data;
+    			  ndata.recordsTotal = data.length;
+    			  ndata.recordsFiltered = ndata.recordsTotal;
+    			  fnCallback(ndata);
+    		  }
+         });
+      },
+      columns:[
+          { data: 'groupId'},
+          { data: 'nodes'},
+          { data: 'type'}
+        ]
+    });
+}
 

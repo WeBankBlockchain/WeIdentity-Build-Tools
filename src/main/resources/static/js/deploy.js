@@ -126,10 +126,10 @@ function loadData() {
 	      },
 	      columns:[
 	          {"render": function ( data, type, full, meta) {
-	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.weId + "\")'>" + full.hashShow + "</a>"
+	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.weId + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
 	          }},
 	          {"render": function ( data, type, full, meta) {
-	        	  return "<a href='javascript:showWeId(\"" + full.weId + "\")'>" + full.weIdShow + "</a>"
+	        	  return "<a href='javascript:showWeId(\"" + full.weId + "\")'>" + full.weIdShow + "</a><div class='display-none'>" + full.weId + "</div>"
 	          }},
 	          {"render": function ( data, type, full, meta) {
 	        	  if (full.issuer != null) {
@@ -154,7 +154,7 @@ function loadData() {
 	        	  if (full.enable) {
 	        		  btnHtml += "<button type='button' name='cnsEnableBtn'  class='btn btn-inline btn-primary btn-flat ' disabled>已启用</button>&nbsp;&nbsp;";
 	        	  } else {
-	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enable(\"" + full.hash + "\" , \"" + full.needDeployCpt + "\", this)'   class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enable(\"" + full.hash + "\" , " + full.needDeployCpt + ", this)'   class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
 	        	  }
 	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
 	        	  if (full.showDeployCptBtn) {

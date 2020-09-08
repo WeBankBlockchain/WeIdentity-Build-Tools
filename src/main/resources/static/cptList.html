@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="plugins/json-editor/jsoneditor.css"/>
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="plugins/element-ui/index.css">
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <style>
   	.template_part{
@@ -138,6 +139,87 @@
     <!-- /.content -->
   </div>
   
+   <!-- 单级CPT注册 -->
+  <div class="modal fade" id="modal-register-cpt-one-level">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">注册新的凭证类型(CPT)</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+          <form id="oneLeveFrom" role="form">
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT ID (选填):</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="registerCptId" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId">
+                <div class="col-sm-10"><span style="font-size: 13px;color: gray">只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span></div>
+              </div>
+            </div>
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT标题 :</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt Title">
+              </div>
+            </div>
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT描述 :</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="cptDesc"  placeholder="Enter cpt description">
+              </div>
+            </div>
+            <div>
+              <strong>数据结构定义（claim结构定义）</strong>
+              <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=WeID 管理#weid" target="blank_" >
+               <img src="./dist/img/icon-question.svg" alt="">
+               <span style="color:#017CFF;font-size:12px;display:inline-block;">什么是claim</span>
+              </a>
+            </div>
+            <div>
+              <div id="app">
+                <el-table :data="tableData" border style="width: 100%;margin-top: 10px;" max-height="300">
+                  <el-table-column label="序号" width="70" align="center">
+                    <template slot-scope="scope">{{scope.$index + 1}}</template>
+                  </el-table-column>
+                  <el-table-column prop="name" label="字段名" width="180" align="center">
+                    <template slot-scope="scope"><el-input v-model="scope.row.name" /></template>
+                  </el-table-column>
+                  <el-table-column prop="type" label="字段类型" width="130" align="center">
+                    <template slot-scope="scope">
+                      <el-select v-model="scope.row.type" >
+                        <el-option label="string" value="string" selected></el-option>
+                        <el-option label="integer" value="integer"></el-option>
+                      </el-select>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="description" label="字段描述"  align="center">
+                    <template slot-scope="scope"><el-input  v-model="scope.row.description" /></template>
+                  </el-table-column>
+                  <el-table-column label="操作" align="center" width="100">
+                    <template slot-scope="scope"><el-button @click.native.prevent="deleteRow(scope.$index, tableData)">删除</el-button></template>
+                  </el-table-column>
+                </el-table>
+                <div style="margin-top: 10px">
+                  <el-button @click.prevent="addDomain()">新增</el-button>
+                </div>
+              </div>
+            </div>
+          </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="registerCptByOne" class="btn btn-block btn-primary btn-flat">注册</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  
+  <!-- 多级CPT注册 -->
   <div class="modal fade" id="modal-register-cpt">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -150,25 +232,33 @@
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
           <form id="nodeForm" role="form">
-            <div class="form-group row">
+            <div class="form-group row" style="padding-left: 10px">
               <label for="registerCptId" style="width: 15%;">CPT ID (选填):</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="registerCptId" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId">
                 <div class="col-sm-10"><span style="font-size: 13px;color: gray">只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span></div>
               </div>
             </div>
-            <div class="form-group row">
-               <label for="cptJsonFile" style="width: 15%;">CPT JSON文件: </label>
-               <div class="col-sm-10">
-                   <div class="input-group">
-                     <div class="custom-file">
-                       <input type="file" class="custom-file-input" id="cptJsonFile" accept=".json"  name="cptJsonFile">
-                       <label class="custom-file-label" for="cptJsonFile">选择文件...</label>
-                     </div>
-                   </div>
-               </div>
-             </div>
-             <div class='template_part'>
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT标题 :</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt Title">
+              </div>
+            </div>
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT描述 :</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="cptDesc"  placeholder="Enter cpt description">
+              </div>
+            </div>
+            <div>
+              <strong>数据结构定义（claim结构定义）</strong>
+              <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=WeID 管理#weid" target="blank_" >
+               <img src="./dist/img/icon-question.svg" alt="">
+               <span style="color:#017CFF;font-size:12px;display:inline-block">什么是claim</span>
+              </a>
+            </div>
+             <div class='template_part' style="margin-top: 10px;display: none;">
              	<div class='template_part_item' >
              	<button type="button" class='btn btn-block btn-primary btn-flat template_btn' title='模板1为 Claim 只有一级数据结构的模板' type='1'>
              		模板1
@@ -177,34 +267,26 @@
              		 	<div class='item_des_content'>	
 	             			<pre style='margin:0;padding:0'>
 {
-  "description": "this is a one-level CPT",
-  "title": "one level template",
-  "properties": {
-    "id": {
-      "type": "string",
-      "description": "user weId"
-    },
-    "age": {
-      "description": "the age of certificate owner",
-      "type": "integer"
-    },
-    "gender": {
-      "description": "the gender of certificate owner",
-      "enum": [
-        "F",
-        "M"
-      ],
-      "type": "string"
-    },
-    "name": {
-      "description": "the name of certificate owner",
-      "type": "string"
-    }
+  "id": {
+    "type": "string",
+    "description": "user weId"
   },
-  "required": [
-    "name",
-    "age"
-  ]
+  "age": {
+    "description": "the age of certificate owner",
+    "type": "integer"
+  },
+  "gender": {
+    "description": "the gender of certificate owner",
+    "enum": [
+      "F",
+      "M"
+    ],
+    "type": "string"
+  },
+  "name": {
+    "description": "the name of certificate owner",
+    "type": "string"
+  }
 }</pre>
              			</div>
              		</div>
@@ -217,49 +299,45 @@
              			<div class='item_des_content'>	
              				<pre style='margin:0;padding:0'>
 {
-  "description": "this is a multi-level CPT",
-  "title": "multi level template",
-  "properties": {
-    "id": {
-      "type": "string",
-      "description": "the WeID of the owner"
-    },
-    "name": {
-      "type": "string",
-      "description": "the name of object"
-    },
-    "meta": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "code"
-        },
-        "context": {
-          "type": "string",
-          "description": "error"
-        },
-        "date": {
-          "type": "string",
-          "description": "info"
-        }
+  "id": {
+    "type": "string",
+    "description": "the WeID of the owner"
+  },
+  "name": {
+    "type": "string",
+    "description": "the name of object"
+  },
+  "meta": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "code"
+      },
+      "context": {
+        "type": "string",
+        "description": "error"
+      },
+      "date": {
+        "type": "string",
+        "description": "info"
       }
-    },
-    "data": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "id"
-        },
-        "address": {
-          "type": "string",
-          "description": "sipTellAddress"
-        },
-        "userlevel": {
-          "type": "integer",
-          "description": "userlevel"
-        }
+    }
+  },
+  "data": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "id"
+      },
+      "address": {
+        "type": "string",
+        "description": "sipTellAddress"
+      },
+      "userlevel": {
+        "type": "integer",
+        "description": "userlevel"
       }
     }
   }
@@ -267,14 +345,50 @@
              			</div>
              		</div>
              	</div>
+             	<p style='font-size:13px;color:gry'>说明: 点击模板按钮可以自动填充相应内容到下列代码输入框中</p>
              </div>
-             <p style='font-size:13px;color:gry'>说明: 点击模板按钮可以自动填充相应内容到下列代码输入框中</p>
-             <div id="jsonContent" style="height: 350px"></div>
+             <div id="jsonContent" style="height: 350px;margin-top: 10px"></div>
              </form>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" id="registerCpt" class="btn btn-block btn-primary btn-flat">注册</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  
+  <!-- 文件上传CPT注册 第一步 -->
+  <div class="modal fade" id="modal-register-cpt-step1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">注册新的凭证类型(CPT)</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+            <form id="nodeForm" role="form">
+             <div class="form-group row">
+               <label for="cptJsonFile" style="width: 15%;">CPT JSON文件: </label>
+               <div class="col-sm-10">
+                   <div class="input-group">
+                     <div class="custom-file">
+                       <input type="file" class="custom-file-input" id="cptJsonFile" accept=".json"  name="cptJsonFile">
+                       <label class="custom-file-label" for="cptJsonFile">选择文件...</label>
+                     </div>
+                   </div>
+               </div>
+             </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="toStep2" class="btn btn-block btn-primary btn-flat">下一步</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -336,13 +450,67 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+
+  <!-- 显示创建CPT相关按钮 -->
+  <div class="modal fade" id="modal-show-register-cpt">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style='position: relative;'>
+          <h4 class="modal-title">创建凭证类型(CPT)</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+              <div class="form-group">
+                  <button type="button" id="createBtn" class="btn btn-block btn-primary btn-flat">创建只有一级数据结构的凭证类型</button>
+              </div>
+            <div class="form-group">
+              <button type="button" id="createBtn1" class="btn btn-block btn-primary btn-flat">创建多级数据结构的凭证类型</button>
+            </div>
+            <div class="form-group">
+              <button type="button" id="createBtn2" class="btn btn-block btn-primary btn-flat">上传CPT模板文件创建凭证类型</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
   <!-- /foot -->
   <include src="common/foot.html"></include>
 </div>
 <script src="dist/js/demo.js"></script>
 <script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="plugins/json-editor/jsoneditor.js"></script>
+<script src="plugins/vue/vue.min.js"></script>
+<script src="plugins/element-ui/index.js"></script>
 <script src="js/checkConfig.js"></script>
+<script type="text/javascript">
+var itemVue = new Vue({
+  el: '#app',
+  data() {
+    return {
+      tableData: []
+    };
+  },
+  methods: {
+    addDomain() {
+      this.tableData.push({
+        name: '',
+        type: 'string',
+        descript: ''
+      });
+    },
+    deleteRow(index, rows) {
+      rows.splice(index, 1);
+    }
+  }
+})
+</script>
 <script src="js/cpt.js"></script>
+
 </body>
 </html>

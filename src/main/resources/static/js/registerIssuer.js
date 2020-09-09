@@ -55,38 +55,6 @@ $(document).ready(function(){
 		}
 	})
 });
-var template = $("#data-tbody").html();
-var  table;
-function loadData1() {
-	 //加载部署数据
-  $.get("getIssuerList",function(data,status){
-		if(table != null) {
-			table.destroy();
-		}
-		$("#data-tbody").renderData(template,data);
-		table = $('#example2').DataTable({
-	      "paging": true,
-	      "lengthChange": false,
-	      "searching": true,
-	      "ordering": true,
-	      "info": false,
-	      "autoWidth": false,
-	      "oLanguage": {
-	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
-  	    	  "oPaginate": {
-	            "sFirst":    "第一页",
-	            "sPrevious": " 上一页 ",
-	            "sNext":     " 下一页 ",
-	            "sLast":     " 最后一页 "
-	          }
-	      }
-	    });
-		$("button[name='removeAuthBtn']").each(function(){
-			var index = $(this).attr("class").indexOf("true");
-			if(index < 0) $(this).attr("disabled",true);
-		})
-  })
-}
 
 function loadData() {
 	//加载部署数据

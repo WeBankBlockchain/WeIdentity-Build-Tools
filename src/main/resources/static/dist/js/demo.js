@@ -483,11 +483,15 @@ function showWeId(weId) {
 	$("#modal-message").modal();
 }
 
-function showDId(weId) {
+function showDId(weId, id) {
 	$.get("getWeIdPath",function(value,status){
 		$("#messageBody").html("<p class='select_part'><label>WeID:</label>" +"<input readonly onClick='select_copy(this,event)' value='"+ weId +"' /></p>");
 	    var data = value + "/" + weId.split(":")[3];
-	    $("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeID公钥存放路径:</label><textarea onClick='select_copy(this,event)' readonly>" + data + "</textarea></p>");
+	    if (id != "null") {
+	    	$("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeID公钥存放路径:</label><textarea onClick='select_copy(this,event)' readonly>" + data + "</textarea></p>");
+	    } else {
+	    	$("#messageBody").html($("#messageBody").html() + "<p class='select_part'><label>该WeID公钥存放路径:</label></p><p class='select_part'>该WeID非当前系统产生</p>");
+	    }
 	    $("#modal-message").modal();
 	})
 }

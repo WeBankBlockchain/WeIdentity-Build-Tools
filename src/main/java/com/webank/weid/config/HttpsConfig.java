@@ -29,9 +29,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * implement http
+ * implement http.
  * 
- * @author 
+ * @author yanggang
  */
 @Configuration
 @ConditionalOnProperty(value = "server.ssl.enabled", havingValue = "true")

@@ -77,8 +77,10 @@ import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.exception.WeIdBaseException;
+import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.BaseService;
 import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
@@ -396,8 +398,23 @@ public class BuildToolController {
     }
 
     @GetMapping("/getWeIdList")
-    public List<WeIdInfo> getWeIdList() {
-        return buildToolService.getWeIdList();
+    public PageDto<WeIdInfo> getWeIdList(
+        @RequestParam(value = "blockNumber") int blockNumber,
+        @RequestParam(value = "pageSize") int pageSize,
+        @RequestParam(value = "indexInBlock") int indexInBlock,
+        @RequestParam(value = "direction") boolean direction,
+        @RequestParam(value = "iDisplayStart") int iDisplayStart,
+        @RequestParam(value = "iDisplayLength") int iDisplayLength
+    ) {
+        if (blockNumber == 0) {
+            try {
+                blockNumber = BaseService.getBlockNumber();
+            } catch (IOException e) {
+                logger.error("[getWeIdList] get blockNumber fail.", e);
+            }
+        }
+        PageDto<WeIdInfo> pageDto = new PageDto<WeIdInfo>(iDisplayStart, iDisplayLength);
+        return buildToolService.getWeIdList(pageDto, blockNumber, pageSize, indexInBlock, direction);
     }
 
     @Description("加载run.config配置")
@@ -627,7 +644,7 @@ public class BuildToolController {
 
     @Description("查询issuer成员列表")
     @PostMapping("/getAllIssuerInType")
-    public List<String> getAllIssuerInType(@RequestParam("issuerType") String type) {
+    public List<AuthorityIssuer> getAllIssuerInType(@RequestParam("issuerType") String type) {
         return buildToolService.getAllSpecificTypeIssuerList(type);
     }
 

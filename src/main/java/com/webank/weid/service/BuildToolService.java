@@ -70,6 +70,7 @@ import com.webank.weid.protocol.base.CptBaseInfo;
 import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.protocol.base.PresentationPolicyE;
 import com.webank.weid.protocol.base.WeIdAuthentication;
+import com.webank.weid.protocol.base.WeIdPojo;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.base.WeIdPublicKey;
 import com.webank.weid.protocol.request.CptStringArgs;
@@ -326,7 +327,7 @@ public class BuildToolService {
         return DataToolUtils.serialize(info);
     }
     
-    public List<WeIdInfo> getWeIdList() {
+    public List<WeIdInfo> getWeIdList1() {
         List<WeIdInfo> list = new ArrayList<WeIdInfo>();
         String currentHash = getMainHash();
         if (StringUtils.isBlank(currentHash)) {
@@ -348,10 +349,53 @@ public class BuildToolService {
         return list;
     }
     
+    public PageDto<WeIdInfo> getWeIdList(
+        PageDto<WeIdInfo> pageDto,
+        Integer blockNumber,
+        Integer pageSize,
+        Integer indexInBlock,
+        boolean direction
+    ) {
+        ResponseData<List<WeIdPojo>> response = getWeIdService().getWeIdList(blockNumber, pageSize, indexInBlock, direction);
+        if (response.getErrorCode().intValue() != ErrorCode.SUCCESS.getCode()) {
+            logger.error("[getWeIdList] get weIdList has error, {} - {}", response.getErrorCode().intValue(), response.getErrorMessage());
+            return pageDto;
+        }
+        List<WeIdPojo> list = response.getResult();
+        if (list.size() == 0) {//说明没有数据了
+            pageDto.setAllCount(pageDto.getStartIndex());
+        } else if (list.size() < pageDto.getPageSize()) { //说明最后一页了
+            pageDto.setAllCount(pageDto.getStartIndex() + list.size());
+        } else { //还可以继续分页
+            pageDto.setAllCount(pageDto.getStartIndex() + pageDto.getPageSize() + 1);
+        }
+        List<WeIdInfo> rList = new ArrayList<WeIdInfo>();
+        if (list.size() > 0) {
+            String mainHash = getMainHash();
+            for (WeIdPojo weIdPojo : list) {
+                WeIdInfo weInfo = getWeIdInfo(this.getWeIdAddress(weIdPojo.getId()));
+                if(weInfo == null) {
+                    weInfo = new WeIdInfo();
+                }
+                weInfo.setWeIdPojo(weIdPojo);
+                weInfo.setWeId(weIdPojo.getId());
+                AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(weIdPojo.getId()).getResult();
+                weInfo.setIssuer(issuer != null);
+                weInfo.setHash(mainHash);
+                rList.add(weInfo);
+            }
+        }
+        pageDto.setDataList(rList);
+        return pageDto;
+    }
+    
     public WeIdInfo getWeIdInfo(String address) {
         File targetDir = getWeidDir(address);
         File weIdFile = new File(targetDir.getAbsoluteFile(), "info");
         String jsonData = FileUtils.readFile(weIdFile.getAbsolutePath());
+        if (StringUtils.isBlank(jsonData)) {
+            return null;
+        }
         return DataToolUtils.deserialize(jsonData, WeIdInfo.class);
     }
     
@@ -562,7 +606,7 @@ public class BuildToolService {
         return list;
     }
     
-    public List<String> getAllSpecificTypeIssuerList(String issuerType) {
+    public List<AuthorityIssuer> getAllSpecificTypeIssuerList(String issuerType) {
         List<String> list = new ArrayList<String>();
         int num = 10;
         int startIndex = 0;
@@ -579,7 +623,16 @@ public class BuildToolService {
                 break;
             }
         }
-        return list;
+        List<AuthorityIssuer> rList = new ArrayList<AuthorityIssuer>();
+        for (String weId : list) {
+            AuthorityIssuer issuer = this.getIssuerByWeId(this.getWeIdAddress(weId));
+            if (issuer == null) {
+                issuer = new AuthorityIssuer();
+                issuer.setWeId(weId);
+            }
+            rList.add(issuer);
+        }
+        return rList;
     }
     
     private List<String> convertToWeId(List<String> data) {

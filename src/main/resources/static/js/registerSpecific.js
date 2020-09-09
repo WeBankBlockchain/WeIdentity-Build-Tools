@@ -118,9 +118,20 @@ function collapse(thisObj, type, contain) {
 	    formData.issuerType = type;
 		$.post("getAllIssuerInType", formData ,function(data,status){
 			var html = "<table id='table" + contain + "' class='table table-bordered table-hover' style='line-height: 40px;'>";
-			html +="<thead><tr><th title='WeIdentity DID'>weId</th><th width='250px'>操作</th></tr></thead><tbody>";
+			html +="<thead><tr><th title='WeIdentity DID'>WeID</th><th width='200px'>权威机构名称</th><th width='250px'>操作</th></tr></thead><tbody>";
 			for(var i = 0; i < data.length; i++) {
-				html +="<tr><td>" + data[i] + "</td>";
+				html +="<tr><td>" + data[i].weId + "</td>";
+				if (data[i].name) {
+					html +="<td>" + data[i].name;
+					if (data[i].recognized) {
+						html += "&nbsp;<image src='dist/img/recognize.svg' widht='50' height='50'/>";
+	        		} else {
+	        			html += "&nbsp;<image src='dist/img/deRecognize.svg' widht='50' height='50'/>";
+	        		}
+					html +="</td>";
+				} else {
+					html +="<td> </td>";
+				}
 				html +="<td><button type='button' onclick='removeIssuerFromIssuerType(this,"+'"'+type+'"'+"," +'"'+ data[i] +'"'+ ")' class='btn btn-inline btn-primary btn-flat'>删除</button></td></tr>";
 			}
 			html += "</tbody></table>";

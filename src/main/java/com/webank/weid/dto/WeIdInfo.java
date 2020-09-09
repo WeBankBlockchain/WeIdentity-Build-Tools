@@ -19,6 +19,8 @@
 
 package com.webank.weid.dto;
 
+import com.webank.weid.protocol.base.WeIdPojo;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,6 +34,7 @@ public class WeIdInfo extends BaseDto {
     private boolean isIssuer;
     private String weIdShow;
     private boolean isAdmin;
+    private WeIdPojo weIdPojo;
     
     public void setWeId(String weId) {
         this.weId = weId;

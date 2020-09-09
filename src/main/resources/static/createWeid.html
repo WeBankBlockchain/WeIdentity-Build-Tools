@@ -94,7 +94,6 @@
                 <thead>
                 <tr>
                   <th title="WeIdentity DID">WeID</th>
-                  <th>管理员</th>
                   <th>数据来源</th>
                   <th>CNS</th>
                   <th>创建时间</th>
@@ -102,19 +101,7 @@
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
-	            <tr class="display-none">
-	                <td><a href="javascript:showDId('${weId}')"> ${weIdShow} </a><div class='display-none'>${weId}</div></td>
-	                <td>${showAdmin}</td>
-	                <td>${from}</td>
-	                <td>${hashShow}</td>
-	                <td>${createTime}</td>
-	                <td>
-	                      <button type="button" onclick="downEcdsaPubKey('${id}')" class="btn btn-inline btn-primary btn-flat display-none" style="display: none" downFile="file">下载公钥文件</button>
-	                      <button type="button" onclick="downEcdsaKey('${id}')" class="btn btn-inline btn-primary btn-flat" style="display: none" downFile="file">下载私钥文件</button>
-	                      <button type="button" name="registerIssueBtn" onclick="registerIssue('${weId}')" title="注册为Authority Issuer" class="btn btn-inline btn-primary btn-flat ${issuer}" >注册为权威凭证发行者</button>
-	                      <button type="button" name="addToIssuerTypeBtn" onclick="addToIssuerType('${weId}')" title="注册为Specific Issuer" class="btn btn-inline btn-primary btn-flat" style="display: none" >添加到白名单</button>
-	                </td>
-	              </tr>
+
                 </tbody>
               </table>
             </div>

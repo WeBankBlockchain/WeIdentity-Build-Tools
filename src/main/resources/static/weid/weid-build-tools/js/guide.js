@@ -317,7 +317,7 @@ $(document).ready(function(){
     })
 
     function toDbConfig() {
-        if (localStorage) {
+        if (localStorage.persistence_type) {
             /*
             * 读出localstorage中的值
             */

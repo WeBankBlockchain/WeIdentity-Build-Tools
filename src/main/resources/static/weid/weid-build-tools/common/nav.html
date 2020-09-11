@@ -25,7 +25,7 @@
 	    border: 0;
 	    outline: none;
     }
-    #openLog{
+    #openLog, #openWebase{
         border: 1px solid #017CFF;
         border-radius: 2px;
         padding:0.2rem 0.6rem;
@@ -33,6 +33,7 @@
         font-size:14px;
         cursor: pointer;
         height:auto;
+        margin-right: 5px;
     }
   </style>
 </head>
@@ -50,6 +51,9 @@
       </li> -->
       <li class="nav-item d-none d-sm-inline-block">
         <a id="openLog" href="#" class="nav-link">查看后台日志</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a id="openWebase" href="#" class="nav-link">区块链浏览器</a>
       </li>
     </ul>
       
@@ -89,6 +93,24 @@ $(document).ready(function(){
       } else {
           //窗口以已经存在了
           win.focus();
+      }
+    })
+    $("#openWebase").click(function(){
+      //判断是否启用webase如果启用则打开页面
+      $.ajaxSettings.async = false;
+      var isOpen = false;
+      $.get("checkWebase",function(data,status){
+          if (data) {
+              isOpen = true;
+          } else {
+              isOpen = false;
+              $("#messageBody").html("<p>您还没有配置安装启动webase服务!</p>");
+              $("#modal-message").modal();
+          }
+      });
+      $.ajaxSettings.async = false;
+      if (isOpen) {
+          window.open("webase-browser");
       }
     })
     var role = getRole();

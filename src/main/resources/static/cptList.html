@@ -140,7 +140,7 @@
   </div>
   
    <!-- 单级CPT注册 -->
-  <div class="modal fade" id="modal-register-cpt-one-level">
+  <div class="modal fade" id="modal-register-cpt-one-level" style="position: absolute">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -218,10 +218,10 @@
     </div>
     <!-- /.modal-dialog -->
   </div>
-  
+  <input type="hidden" id="cptClaim"/>
   <!-- 多级CPT注册 -->
-  <div class="modal fade" id="modal-register-cpt">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="modal-register-cpt" style="position: absolute">
+    <div class="modal-dialog modal-lg" >
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">注册新的凭证类型(CPT)</h4>
@@ -385,6 +385,7 @@
                </div>
              </div>
             </form>
+            
           </div>
         </div>
         <div class="modal-footer justify-content-between">

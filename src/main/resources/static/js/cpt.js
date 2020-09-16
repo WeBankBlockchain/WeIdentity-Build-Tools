@@ -98,6 +98,8 @@ $(document).ready(function(){
     		$("#modal-register-cpt-step1").modal("hide");
     		$(".template_part").hide();
     		$("#modal-register-cpt").modal();
+    		editor.set(JSON.parse($("#cptClaim").val()));
+    		editor.updataText();
     	}
 	})
 	
@@ -270,8 +272,7 @@ $(document).ready(function(){
               var data = JSON.parse(e.target.result);
               $("#nodeForm  #cptTitle").val(data.title)
               $("#nodeForm  #cptDesc").val(data.description)
-              editor.set(data.properties);
-              editor.updataText();
+              $("#cptClaim").val(JSON.stringify(data.properties))
             };
     	}
     })

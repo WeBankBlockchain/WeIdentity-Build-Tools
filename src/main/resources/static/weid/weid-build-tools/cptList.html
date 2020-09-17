@@ -101,8 +101,7 @@
                         <label for="selectAll" class="custom-control-label"></label>
                       </div>
                   </th>
-                  <th>cptId</th>
-                  <th>数据来源</th>
+                  <th>CPT ID</th>
                   <th>注册账户</th>
                   <th>CNS</th>
                   <th>创建时间</th>
@@ -118,7 +117,6 @@
 					  </div>
                   </td>
                   <td>${cptId}</td>
-                  <td>${from}</td>
                   <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a><div class='display-none'>${weId}</div></td>
                   <td>${hashShow}</td>
                   <td>${createTime}</td>
@@ -153,13 +151,6 @@
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
           <form id="oneLeveFrom" role="form">
             <div class="form-group row" style="padding-left: 10px">
-              <label for="registerCptId" style="width: 15%;">CPT ID (选填):</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="registerCptId" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId">
-                <div class="col-sm-10"><span style="font-size: 13px;color: gray">只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span></div>
-              </div>
-            </div>
-            <div class="form-group row" style="padding-left: 10px">
               <label for="registerCptId" style="width: 15%;">CPT标题 :</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt Title">
@@ -169,6 +160,13 @@
               <label for="registerCptId" style="width: 15%;">CPT描述 :</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="cptDesc"  placeholder="Enter cpt description">
+              </div>
+            </div>
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT ID (选填):</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="registerCptId" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId">
+                <div class="col-sm-10"><span style="font-size: 13px;color: gray">只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span></div>
               </div>
             </div>
             <div>
@@ -203,7 +201,7 @@
                   </el-table-column>
                 </el-table>
                 <div style="margin-top: 10px">
-                  <el-button @click.prevent="addDomain()">新增</el-button>
+                  <el-button @click.prevent="addDomain()">新增字段</el-button>
                 </div>
               </div>
             </div>
@@ -233,13 +231,6 @@
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
           <form id="nodeForm" role="form">
             <div class="form-group row" style="padding-left: 10px">
-              <label for="registerCptId" style="width: 15%;">CPT ID (选填):</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="registerCptId" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId">
-                <div class="col-sm-10"><span style="font-size: 13px;color: gray">只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span></div>
-              </div>
-            </div>
-            <div class="form-group row" style="padding-left: 10px">
               <label for="registerCptId" style="width: 15%;">CPT标题 :</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt Title">
@@ -249,6 +240,13 @@
               <label for="registerCptId" style="width: 15%;">CPT描述 :</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="cptDesc"  placeholder="Enter cpt description">
+              </div>
+            </div>
+            <div class="form-group row" style="padding-left: 10px">
+              <label for="registerCptId" style="width: 15%;">CPT ID (选填):</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="registerCptId" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId">
+                <div class="col-sm-10"><span style="font-size: 13px;color: gray">只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span></div>
               </div>
             </div>
             <div>

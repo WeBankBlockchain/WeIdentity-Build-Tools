@@ -97,6 +97,7 @@ import com.webank.weid.util.PropertyUtils;
 import com.webank.weid.util.WeIdUtils;
 
 @RestController
+@RequestMapping(value = "/weid/weid-build-tools/")
 public class BuildToolController {
     /**
      * log4j.
@@ -203,7 +204,7 @@ public class BuildToolController {
             }
             return deployService.createAdmin(inputPrivateKey);
         } catch (Exception e) {
-            logger.error("[createAdmin] create admin hash error.");
+            logger.error("[createAdmin] create admin hash error.", e);
             return BuildToolsConstant.FAIL;
         }
     }
@@ -1007,4 +1008,3 @@ public class BuildToolController {
         return list;
     }
 }
-

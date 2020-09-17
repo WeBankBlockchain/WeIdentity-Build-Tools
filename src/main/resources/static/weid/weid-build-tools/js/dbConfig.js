@@ -8,7 +8,7 @@ $(document).ready(function(){
         $("#dbForm  #mysql_password").val(data.mysql_password);
         $("#dbForm  #redis_address").val(data.redis_address);
         $("#dbForm  #redis_password").val(data.redis_password);
-        if (data.persistenceType == "mysql" || data.persistence_type == "redis") {
+        if (data.persistence_type == "mysql" || data.persistence_type == "redis") {
             dbDisplay(data.persistence_type);
         }
     });
@@ -29,7 +29,9 @@ $(document).ready(function(){
     $("#persistence_type").change(function(){
          var selected = $(this).children('option:selected').val();
 //         console.log(selected);
-         dbDisplay(selected);
+         if (selected) {
+             dbDisplay(selected); 
+         }
     })
     //提交配置
     $("#postBtn").click(function(){

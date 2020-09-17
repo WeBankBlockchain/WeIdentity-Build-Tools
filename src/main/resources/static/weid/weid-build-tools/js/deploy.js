@@ -15,7 +15,7 @@ $(document).ready(function(){
     });
     var url = window.location.pathname;
     url = url.substring(1);
-    if (url == "index.html") {
+    if (url.endWith("index.html")) {
     	if (!isReady) {
         	return;
         }
@@ -56,7 +56,7 @@ $(document).ready(function(){
     	if (isClose) {
     		$("#modal-deploy").modal("hide");
     	}
-    	if (url != "index.html" && deployed) {
+    	if (!url.endWith("index.html") && deployed) {
     		sessionStorage.removeItem('guide_step')
     		toIndex();
     	}
@@ -81,7 +81,7 @@ var  table;
 function loadData() {
 	var url = window.location.pathname;
     url = url.substring(1);
-    if (url == "guide.html") {
+    if (url.endWith("guide.html")) {
        return;
     }
 	var message = "您还没有部署主合约，请先部署主合约";

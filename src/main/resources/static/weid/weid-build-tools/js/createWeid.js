@@ -308,12 +308,12 @@ function loadData() {
             op += "<a href='javascript:showDId(\""+ full.weId + "\",\""+ full.id + "\")'>" + full.weIdShow + "</a>";
         	return op;
           }},
-          { "render": function (data, type, full, meta) {
+/*          { "render": function (data, type, full, meta) {
         	  if (!full.from) {
         		  return "--";
         	  }
         	  return full.from;
-          }},
+          }},*/
           { data: 'hashShow'},
           { "render": function (data, type, full, meta) {
         	  return getLocalTime(full.weIdPojo.created * 1000);

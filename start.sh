@@ -24,7 +24,11 @@ checkServer() {
 }
 
 #begin build classpath
-CLASSPATH=${SOURCE_CODE_DIR}/resources:${SOURCE_CODE_DIR}/dist/app/*:${SOURCE_CODE_DIR}/dist/lib/*
+if [ ! -d ${SOURCE_CODE_DIR}/dist/web ]; then
+    mkdir -p ${SOURCE_CODE_DIR}/dist/web
+fi
+
+CLASSPATH=${SOURCE_CODE_DIR}/resources:${SOURCE_CODE_DIR}/dist/app/*:${SOURCE_CODE_DIR}/dist/lib/*:${SOURCE_CODE_DIR}/dist/web
 
 #set the application.properties in to classpath
 CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/dist/conf/
@@ -84,7 +88,7 @@ fi
 if [ ${running} = true ];then
     echo "-----------------------------------------------"
     echo "The weid-build-tools web server started successfully."
-    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}"/index.html"
+    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}""
     echo "-----------------------------------------------"
 else 
     if [ $count == 30 ]; then

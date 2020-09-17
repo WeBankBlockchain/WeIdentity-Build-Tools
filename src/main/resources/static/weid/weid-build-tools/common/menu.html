@@ -175,7 +175,7 @@ $(document).ready(function(){
 	$("#menuNav ul li a").each(function(){
 		var navUrl = $(this).attr("href");
 		$(this).removeClass("active");
-		if (navUrl == url) {
+		if (url.endWith(navUrl)) {
 			$(this).addClass("active");
 		}
 	});

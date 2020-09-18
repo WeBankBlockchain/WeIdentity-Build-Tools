@@ -60,6 +60,23 @@ do
     echo -n "."
 done
 
+if [ ${running} = true ];then
+    echo "-----------------------------------------------"
+    echo "The weid-build-tools web server started successfully."
+    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}""
+    echo "-----------------------------------------------"
+else 
+    if [ $count == 30 ]; then
+        echo "-----------------------------------------------"
+        echo "The weid-build-tools web server started timeout, please check the log -> ./logs/error.log."
+        echo "-----------------------------------------------"
+        exit 1;
+    fi
+    echo "-----------------------------------------------"
+    echo "The weid-build-tools web server started error, please check the log -> ./logs/error.log."
+    echo "-----------------------------------------------"
+fi
+
 addEnv() {
     sed '/BUILD_TOOL_HOME/d' $1 > $1.tempforinforsuite
     cat $1.tempforinforsuite > $1
@@ -83,21 +100,4 @@ else
       touch .profile
     fi
     addEnv .profile
-fi
-
-if [ ${running} = true ];then
-    echo "-----------------------------------------------"
-    echo "The weid-build-tools web server started successfully."
-    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}""
-    echo "-----------------------------------------------"
-else 
-    if [ $count == 30 ]; then
-        echo "-----------------------------------------------"
-        echo "The weid-build-tools web server started timeout, please check the log -> ./logs/error.log."
-        echo "-----------------------------------------------"
-        exit 1;
-    fi
-    echo "-----------------------------------------------"
-    echo "The weid-build-tools web server started error, please check the log -> ./logs/error.log."
-    echo "-----------------------------------------------"
 fi

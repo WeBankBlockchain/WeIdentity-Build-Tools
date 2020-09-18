@@ -1,0 +1,291 @@
+html,body{
+		height:100% !important;
+		font-family: PingFangSC-Regular, sans-serif;
+}
+.wrapper{
+    position: relative;
+}
+.navbar-nav{
+    width:100%;
+    z-index:99;
+    background:#fff;
+}
+.nav-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height:64px;
+    flex:auto;
+}
+.nav-item span{
+	font-size:21px;
+	color:#333;
+}
+.nav-item #openLog{
+	border: 1px solid #017CFF;
+	border-radius: 2px;
+	padding:0.2rem 0.6rem;
+	color:#017CFF;
+	font-size:14px;
+	cursor: pointer;
+}
+.guide_step_part{
+	display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top:35px;
+    padding:0 25px;
+
+}
+.guide_step_part .bottom_line{
+	position: absolute;
+	left: 25px;
+	right: 25px;
+	border-color: #ddd;
+	border-width: 1px;
+	border-style: dashed;
+	z-index:0;
+}
+.guide_step_part .guide_step_item{
+	text-align:center;
+	position: relative;
+	width:30px;
+	height:30px;
+	line-height:28px;
+	border-radius: 15px;
+	border:1px solid #ddd;
+	background:#fff;
+	z-index:1;
+}
+
+.guide_step_part .guide_step_item img{
+	position: absolute;
+	top:7px;
+	left:7px;
+	display:none;
+}
+.guide_step_part .guide_step_item p{
+	text-align:center;
+	position: absolute;
+	bottom:-30px;
+	left:-39px;
+	font-size:12px;
+	width:108px;
+	text-align:center;
+	margin-bottom:0;
+	color:#333;
+}
+.guide_step_part .guide_step_complated span{
+	display:none;	
+}
+.guide_step_part .guide_step_complated img{
+	display:block;	
+}
+.guide_step_part .guide_step_active {
+	color:#fff;
+	background:#017CFF;
+	border-color: #017CFF;
+}
+.guide_step_part .guide_step_active p{
+	font-size:14px;
+	color:#017CFF;
+}
+.swiper-container{
+    position: absolute;
+    top:66px;
+    left:0;
+    right:0;
+    bottom:25px;
+}
+.swiper-slide{
+	overflow:auto;
+}
+.content-wrapper{
+    margin-left:0 !important;
+    display: flow-root;
+    min-height: auto !important;
+    background:#fff;
+    height: 100vh;
+}
+.navbar-nav{
+    border-bottom: 1px solid #dee2e6;
+}
+.container-fluid{
+	padding:0;
+	margin-top:56px;
+}
+.card-primary:not(.card-outline)>.card-header{
+    background-color: #fff;
+    border:0;
+    color:#333;
+}
+.card-header{
+	display:flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card-header::after{
+	display:none;
+}
+
+.card-header h6{
+	font-size:18px;
+	color:#333;
+}
+
+.card-header .guide_notice{
+	color:#017CFF;
+	font-size:12px;
+}
+
+.card-footer{
+	background:#fff;	
+	display:flex;
+	justify-content: center;
+}
+
+.card-footer .btn{
+	width:106px;
+	height:36px;
+	background: #017CFF;
+	border-radius: 4px;
+	color:#fff;
+	margin:0 10px;
+}
+
+.card{
+	padding:2rem 1.5rem;
+}
+.role_body{
+	display:flex;
+	justify-content: space-between;
+}
+.role_body::after{
+	display:none;
+}
+.role_body .role_part{
+	display:flex;
+	align-items: center;
+	justify-content: space-between;
+	width:47%;
+	text-align: center;
+	border:2px solid transparent;
+	border-radius:4px;
+	font-size: 14px;
+	padding:30px 24px;
+	cursor: pointer;
+	box-shadow: 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+.role_body .role_part .role_icon{
+	margin-right:15px;
+}
+
+.role_body .role_part .selected_icon{
+	opacity: 0;
+	width:22px;
+}
+
+.role_active{
+	border-color:#017CFF !important;
+}
+.role_active .selected_icon{
+	opacity: 1 !important;
+}
+.node_part,.db-part{
+	display: flex;
+	justify-content: center;
+	padding:1rem 2rem;
+}
+.node_part .btn-primary{
+	width:106px;
+	height:36px;
+	background: #017CFF;
+	border-radius: 4px;
+	color:#fff;
+	margin:0 10px;
+}
+.db-part .btn-primary{
+	width:106px;
+	height:36px;
+	background: #017CFF;
+	border-radius: 4px;
+	color:#fff;
+	margin:0 10px;
+}
+.btn-primary{
+	line-height: 22px;
+}
+
+.form-group span{
+    font-size:12px;
+    color:red;
+    display:block;
+    margin-bottom:0.5rem;
+}
+.form-group label{
+	font-size:15px;
+	margin-bottom:0.5rem;
+} 
+.warning_box{
+	position: relative;
+	border:1px solid #ddd;
+}
+.warning_box .sql_warning{
+	position: absolute;
+	right:-300px;
+	top: 0;
+}
+
+.sql_warning .warning_title{
+	font-family: PingFangSC-Medium;
+	font-size: 14px;
+	color: #333333;
+	line-height: 22px;
+	margin-bottom:10px;
+}
+
+.sql_warning p{
+	font-size: 12px;
+	color: #666666;
+	line-height: 20px;
+	margin-bottom:5px;
+}
+#createDiv{
+	display:flex;
+}
+#createDiv .key_item{
+	display:flex;
+	align-items:center;
+	margin-right:3.5rem;
+	cursor: pointer;
+}
+#createDiv .key_item p{
+	margin-bottom:0;
+}
+
+#createDiv .key_item .item_out_role{
+	width:16px;
+	height:16px;
+	border-radius: 8px;
+	border:1px solid #ddd;
+	display:flex;
+	align-items: center;
+	margin-bottom:0;
+	margin-right:0.5rem;
+}
+#createDiv .active_key .item_out_role{
+	border-color:#017CFF;
+}
+#createDiv .key_item .item_out_role span{
+	margin:auto;
+	width:10px;
+	height:10px;
+	border-radius: 5px;
+}
+#createDiv .active_key .item_out_role span{
+	background:#017CFF;
+}
+footer{
+	display:none;
+}

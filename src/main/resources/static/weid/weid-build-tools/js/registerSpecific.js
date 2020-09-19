@@ -132,7 +132,7 @@ function collapse(thisObj, type, contain) {
 				} else {
 					html +="<td> </td>";
 				}
-				html +="<td><button type='button' onclick='removeIssuerFromIssuerType(this,"+'"'+type+'"'+"," +'"'+ data[i] +'"'+ ")' class='btn btn-inline btn-primary btn-flat'>删除</button></td></tr>";
+				html +="<td><button type='button' onclick='removeIssuerFromIssuerType(this,"+'"'+type+'"'+"," +'"'+ data[i].weId +'"'+ ")' class='btn btn-inline btn-primary btn-flat'>删除</button></td></tr>";
 			}
 			html += "</tbody></table>";
 			$("#" + contain).html(html);

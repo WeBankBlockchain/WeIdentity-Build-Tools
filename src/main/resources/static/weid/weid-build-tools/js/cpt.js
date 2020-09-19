@@ -343,7 +343,7 @@ function loadData() {
   	      "ordering": true,
   	      "info": false,
   	      "autoWidth": false,
-  	      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 0 , 6] }],
+  	      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 0 , 5] }],
   	      "aaSorting": [[1, "asc"]],
   	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",

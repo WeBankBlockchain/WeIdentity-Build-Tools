@@ -86,7 +86,6 @@ addEnv() {
     source $1
 }
 
-echo
 echo "setting env variables..."
 BUILD_TOOL_HOME=`pwd`
 export BUILD_TOOL_HOME
@@ -101,3 +100,4 @@ else
     fi
     addEnv .profile
 fi
+echo "setting env successfully."

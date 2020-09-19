@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rootDir=../../../../
+rootDir=../../../
 installZipDir=weid-build-tools/common/script/install
 project=weid-build-tools
 
@@ -53,7 +53,7 @@ function installWebase() {
     fi
 
     cd ${fiscoBcosBrowserDir}
-    webTargetDir=${rootDir}/dist/web/static/weid/weid-build-tools/webase-browser/
+    webTargetDir=${rootDir}../dist/web/static/weid/weid-build-tools/webase-browser/
 
     # 2. check the install script.
     if [ ! -f "script/init.sh" ];then

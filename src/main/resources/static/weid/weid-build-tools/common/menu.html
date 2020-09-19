@@ -65,19 +65,19 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="index.html" title="Deploy WeIdentity Contract"  class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-fan nav-icon"></i>
                   <p>部署 WeIdentity 智能合约</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="deployEvidence.html" title="Deploy Evidence Contract"  class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-fan nav-icon"></i>
                   <p>部署存证智能合约</p>
                 </a>
               </li>
             </ul>
           </li>
-          
+
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
@@ -95,31 +95,31 @@
               </li> -->
               <li class="nav-item">
                 <a href="createWeid.html" title="WeIdentity DID" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-tree nav-icon"></i>
                   <p>WeID管理</p>
                 </a>
               </li>
               <li id="authorityLi" class="nav-item">
                 <a href="registerIssuer.html" title="Authority Issuer" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-tree nav-icon"></i>
                   <p>权威凭证发行者</p>
                 </a>
               </li>
               <li id="specificLi" class="nav-item" style="display: none">
                 <a href="registerSpecific.html" title="Specific Issuer" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-tree nav-icon"></i>
                   <p>白名单功能管理</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="cptList.html" title="CPT" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-tree nav-icon"></i>
                   <p>凭证类型(CPT)管理</p>
                 </a>
               </li>
               <li class="nav-item" style="display: none">
                 <a href="cptToPojoList.html" title="CPT TO POJO" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-tree nav-icon"></i>
                   <p>CPT转JAVA Jar包</p>
                 </a>
               </li>
@@ -136,8 +136,26 @@
             <ul class="nav nav-treeview">
              <li class="nav-item">
                 <a href="async.html" class="nav-link async-form">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="fas fa-book-open nav-icon"></i>
                   <p>存证异步上链管理</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview async-menu menu-open">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+                配置检查管理
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="check.html" class="nav-link async-form">
+                  <i id = "i-verifyDb" class="far fa-circle nav-icon"></i>
+                  <p>检查数据库配置</p>
                 </a>
               </li>
             </ul>
@@ -157,7 +175,7 @@ $(document).ready(function(){
 	$("#menuNav ul li a").each(function(){
 		var navUrl = $(this).attr("href");
 		$(this).removeClass("active");
-		if (navUrl == url) {
+		if (url.endWith(navUrl)) {
 			$(this).addClass("active");
 		}
 	});
@@ -187,7 +205,7 @@ $(document).ready(function(){
 	        });
 		}
 	});
-	 if (url == 'account.html' || url == 'dbConfig.html' || url == 'group.html' ||url == 'nodeConfig.html'){
+	 if (url == 'account.html' || url == 'dbConfig.html' || url == 'group.html' || url == 'nodeConfig.html' || url == 'check.html'){
     
      }
 	*/
@@ -219,6 +237,10 @@ $(document).ready(function(){
 	        if (data.groupState) {
 	        	$("#i-group").removeClass("fa-circle");
                 $("#i-group").addClass("fa-check-circle");
+            }
+	        if (data.checkPersistenceState) {
+	        	$("#i-verifyDb").removeClass("fa-circle");
+                $("#i-verifyDb").addClass("fa-check-circle");
             }
 	    });
 	}

@@ -199,74 +199,141 @@ $(document).ready(function(){
 		}
     	
 	})
-	
-//	$.get("getWeIdPath",function(value,status){
-//       $("#weidDir").html("当前WeID存放路径: " + value);
-//    })
-});
-var template = $("#data-tbody").html();
-var  table;
-function loadData() {
-	 //加载部署数据
-	$.get("getWeIdList",function(data,status){
-  		if(table != null) {
-  			table.destroy();
-  		}
-  		if (data.length > 0) {
-  			for(var i = 0; i < data.length; i++) {
-  				if (data[i].admin) {
-  					data[i]["showAdmin"] = "是";
-  				} else {
-  					data[i]["showAdmin"] = "否";
-  				}
-  			}
-  		}
-  		$("#data-tbody").renderData(template,data);
-  		table = $('#example2').DataTable({
-  	      "paging": true,
-  	      "iDisplayLength": 7,
-  	      "lengthChange": false,
-  	      "searching": true,
-  	      "ordering": true,
-  	      "info": false,
-  	      "autoWidth": false,
-  	      "oLanguage": {
-	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
-  	    	  "oPaginate": {
-	            "sFirst":    "第一页",
-	            "sPrevious": " 上一页 ",
-	            "sNext":     " 下一页 ",
-	            "sLast":     " 最后一页 "
-	          }
-	      }
-  	    });
-  		processIssuerBtn();
-  		table.on('draw', function () {
-  			processIssuerBtn();
-  		}); 
-	})
-}
 
-function processIssuerBtn() {
-	$("button[name='registerIssueBtn']").each(function(){
-		var index = $(this).attr("class").indexOf("true");
-		if(index > 0) {
-			$(this).attr("disabled",true);
-			$(this).html("已成为权威凭证发行者");
-		}
-	});
-	$("button[name='addToIssuerTypeBtn']").each(function(){
-		if (role == "1") {
-			$(this).show();
-		}
-	});
-	$.get("isDownFile",function(data,status){
-		if(data) {
-			$("button[downFile='file']").each(function(){
-				$(this).css("display","inline-block");
-	  		})
-		}
-	})
+});
+
+function loadData() {
+	var cData = {};//记录当前查询数据
+	var cStartIndex = 0;//记录当前开始位置
+	var pageBtnType = "first";
+	//加载部署数据
+	$('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "serverSide": true,
+      "ordering": false,
+      "info": false,
+      "destroy": true,
+      "autoWidth": false,
+      "iDisplayLength": 7,
+      "pagingType":"full",
+      "oLanguage": {
+    	  "sZeroRecords": "对不起，查询不到任何相关数据",
+    	  "oPaginate": {
+            "sFirst":    "第一页",
+            "sPrevious": " 上一页 ",
+            "sNext":     " 下一页 ",
+            "sLast":     " 最后一页 "
+          } 
+      },
+      "sAjaxSource":"getWeIdList",
+      "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+    	var iDisplayStart = oSettings["_iDisplayStart"];
+    	var pageSize = oSettings["_iDisplayLength"];
+    	var blockNumber;
+    	var indexInBlock;
+    	var direction;
+    	if (pageBtnType == "first") {
+    		blockNumber = 0;//0表示后台要取最新块高
+    		indexInBlock = 9999; //表示从块最末开始
+    		direction = true;
+    	} else if(pageBtnType == "previous") {
+    		blockNumber = cData.dataList[0].weIdPojo.currentBlockNum;
+    		indexInBlock = cData.dataList[0].weIdPojo.index + 1;
+    		direction = false;
+    	} else if(pageBtnType == "next") {
+    		blockNumber = cData.dataList[cData.dataList.length - 1].weIdPojo.currentBlockNum;
+    		indexInBlock = cData.dataList[cData.dataList.length - 1].weIdPojo.index - 1;
+    		direction = true;
+    	} else if(pageBtnType == "last") {
+    		blockNumber = -1
+    		indexInBlock = 0;
+    		direction = false;
+    		oSettings["_iDisplayStart"] = 99999999;
+    	}
+    	aoData.push({"name":"blockNumber","value":blockNumber});
+        aoData.push({"name":"pageSize","value":pageSize});
+        aoData.push({"name":"indexInBlock","value":indexInBlock});
+        aoData.push({"name":"direction","value":direction});
+        cStartIndex = oSettings["_iDisplayStart"];
+        console.log(cStartIndex)
+    	oSettings.jqXHR = $.ajax({
+    		  "dataType": 'json',
+    		  "type": "GET",
+    		  "url": sSource,
+    		  "data": aoData,
+    		  "success": function(data) {
+    			  var ndata = {};//返回的数据需要固定格式，否则datatables无法解析，所以需要重新组装
+    			  if (data.dataList.length > 0) {
+    				cData = data; 
+    			  } else {
+    				data = cData;
+    				if (pageBtnType == "previous") {
+  					  oSettings["_iDisplayStart"] = 0;
+  				    }
+    			  }
+    			  ndata.data = data.dataList;
+    			  if (data.dataList.length < pageSize) {
+    				  if (pageBtnType == "previous") {
+    					  oSettings["_iDisplayStart"] = 0;
+    				  }
+    				  if (pageBtnType == "next") {
+    					  oSettings["_iDisplayStart"] = oSettings["_iDisplayStart"] + pageSize;
+    				  }
+    			  }
+    			  ndata.recordsTotal = data.allCount;
+    			  ndata.recordsFiltered = ndata.recordsTotal;
+    			  fnCallback(ndata);
+    		  }
+         });
+      },
+      "fnDrawCallback":function(){
+    	 $(".pagination > .last > a").click(function(){
+			 pageBtnType = "last";
+		 })
+		 $(".pagination > .previous > a").click(function(){
+			 pageBtnType = "previous";
+		 })
+		 $(".pagination > .next > a").click(function(){
+			 pageBtnType = "next";
+		 })
+		 $(".pagination > .first > a").click(function(){
+			 pageBtnType = "first";
+		 })
+      },
+      columns:[
+          {"render": function ( data, type, full, meta) {
+        	var op = ""
+            op += "<a href='javascript:showDId(\""+ full.weId + "\",\""+ full.id + "\")'>" + full.weIdShow + "</a>";
+        	return op;
+          }},
+/*          { "render": function (data, type, full, meta) {
+        	  if (!full.from) {
+        		  return "--";
+        	  }
+        	  return full.from;
+          }},*/
+          { data: 'hashShow'},
+          { "render": function (data, type, full, meta) {
+        	  return getLocalTime(full.weIdPojo.created * 1000);
+          }},
+          {"render": function ( data, type, full, meta) {
+        	  var op = ""
+        	  //op += "<button type='button' onclick='downEcdsaPubKey(\"" + full.id + "\")' class='btn btn-inline btn-primary btn-flat'>下载公钥文件</button> &nbsp;";
+        	  //op += "<button type='button' onclick='downEcdsaKey(\"" + full.id + "\")' class='btn btn-inline btn-primary btn-flat'>下载私钥文件</button> &nbsp;";
+        	  var disable = "";
+        	  if (full.issuer) {//权威机构
+        		  disable = "disabled = 'true'"
+        	  }
+        	  op += "<button type='button' name='registerIssueBtn' onclick='registerIssue(\"" + full.weId + "\")' title='注册为Authority Issuer' class='btn btn-inline btn-primary btn-flat'" + disable + ">注册为权威凭证发行者</button> &nbsp;";
+        	  if (role == "1") {
+        		op += "<button type='button' name='addToIssuerTypeBtn' onclick='addToIssuerType(\"" + full.weId + "\")' title='注册为Specific Issuer' class='btn btn-inline btn-primary btn-flat' >添加到白名单</button>";
+      		  }
+        	  return op;
+          }}
+        ]
+    });
 }
 
 function downEcdsaKey(address) {

@@ -24,7 +24,11 @@ checkServer() {
 }
 
 #begin build classpath
-CLASSPATH=${SOURCE_CODE_DIR}/resources:${SOURCE_CODE_DIR}/dist/app/*:${SOURCE_CODE_DIR}/dist/lib/*
+if [ ! -d ${SOURCE_CODE_DIR}/dist/web ]; then
+    mkdir -p ${SOURCE_CODE_DIR}/dist/web
+fi
+
+CLASSPATH=${SOURCE_CODE_DIR}/resources:${SOURCE_CODE_DIR}/dist/app/*:${SOURCE_CODE_DIR}/dist/lib/*:${SOURCE_CODE_DIR}/dist/web
 
 #set the application.properties in to classpath
 CLASSPATH=${CLASSPATH}:${SOURCE_CODE_DIR}/dist/conf/
@@ -56,6 +60,23 @@ do
     echo -n "."
 done
 
+if [ ${running} = true ];then
+    echo "-----------------------------------------------"
+    echo "The weid-build-tools web server started successfully."
+    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}""
+    echo "-----------------------------------------------"
+else 
+    if [ $count == 30 ]; then
+        echo "-----------------------------------------------"
+        echo "The weid-build-tools web server started timeout, please check the log -> ./logs/error.log."
+        echo "-----------------------------------------------"
+        exit 1;
+    fi
+    echo "-----------------------------------------------"
+    echo "The weid-build-tools web server started error, please check the log -> ./logs/error.log."
+    echo "-----------------------------------------------"
+fi
+
 addEnv() {
     sed '/BUILD_TOOL_HOME/d' $1 > $1.tempforinforsuite
     cat $1.tempforinforsuite > $1
@@ -65,7 +86,6 @@ addEnv() {
     source $1
 }
 
-echo
 echo "setting env variables..."
 BUILD_TOOL_HOME=`pwd`
 export BUILD_TOOL_HOME
@@ -80,20 +100,4 @@ else
     fi
     addEnv .profile
 fi
-
-if [ ${running} = true ];then
-    echo "-----------------------------------------------"
-    echo "The weid-build-tools web server started successfully."
-    echo "The weid-build-tools web server url : http://127.0.0.1:"${port}"/index.html"
-    echo "-----------------------------------------------"
-else 
-    if [ $count == 30 ]; then
-        echo "-----------------------------------------------"
-        echo "The weid-build-tools web server started timeout, please check the log -> ./logs/error.log."
-        echo "-----------------------------------------------"
-        exit 1;
-    fi
-    echo "-----------------------------------------------"
-    echo "The weid-build-tools web server started error, please check the log -> ./logs/error.log."
-    echo "-----------------------------------------------"
-fi
+echo "setting env successfully."

@@ -10,18 +10,18 @@ $(document).ready(function(){
 	}
 	checkStep(step)
 	var mySwiper = new Swiper ('.swiper-container', {
-		  	initialSlide: step,
-			paginationClickable:true,
-			spaceBetween:30,
-			noSwiping: true,
-			navigation: {
-		        nextEl: '.swiper-button-next',
-		        prevEl: '.swiper-button-prev',
-			},
-			mousewheelEventsTarged : '.swiper-slide',
-			mousewheelControl: true,
-	        observer:true,
-			observeParents:true
+		initialSlide: step,
+		paginationClickable:true,
+		spaceBetween:30,
+		noSwiping: true,
+		navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		},
+		mousewheelEventsTarged : '.swiper-slide',
+		mousewheelControl: true,
+		observer:true,
+		observeParents:true
 	})
 	
 	// 上一步按钮
@@ -32,7 +32,7 @@ $(document).ready(function(){
 		sessionStorage.setItem('guide_step', s)
 		$('.swiper-button-prev').trigger('click');
 	})
-	
+
 	// 选择角色
 	$(".role_part").click(function(){
 		let r = sessionStorage.getItem('guide_role')
@@ -95,23 +95,23 @@ $(document).ready(function(){
 			nav();
 		}
 		switch (e) {
-		 	case 0:
-		 		break;
-		 	case 1:
-		 		toNodeConfig();
-		 		break;
-		 	case 2:
-		 		getIdList();
-		 		break;
-		 	case 3:
-		 		toDbConfig();
-		 		break;
-		 	case 4:
-		 		toAccount();;
-	 			break;		
+			case 0:
+				break;
+			case 1:
+				toNodeConfig();
+				break;
+			case 2:
+				getIdList();
+				break;
+			case 3:
+				toDbConfig();
+				break;
+			case 4:
+				toAccount();;
+				break;
 		}
 	}
-	
+
 	function nav() {
 		$(".guide_step_part > .guide_step_item > span").each(function(){
 			var $step = $(this).html();
@@ -122,7 +122,7 @@ $(document).ready(function(){
 			}
 		})
 	}
-	
+
 	// 转节点配置，初始化已有的相关数据
 	function toNodeConfig() {
 		//获取配置
@@ -195,7 +195,6 @@ $(document).ready(function(){
 	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
 	    $("#modal-default").modal();
 	    $("#goNext").addClass("disabled");
-	    $('#postNodeBtn').addClass("disabled");
 	    $.ajax({
 	        url:'nodeConfigUpload', /*接口域名地址*/
 	        type:'post',
@@ -209,9 +208,7 @@ $(document).ready(function(){
 	            	setTimeout(checkNodeForTimeout,2000);
 	            } else {
 	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            	 $('#postNodeBtn').removeClass("disabled");
-	            }
-	            $("#modal-default").modal();
+	            } 
 	        }
 	    })	
 	});
@@ -261,7 +258,6 @@ $(document).ready(function(){
 	// 配置提交成功后进行节点检查
     function checkNodeForTimeout() {
     	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
-    	$("#modal-default").modal();
     	setTimeout(checkNode,2000);
     }
     
@@ -271,7 +267,6 @@ $(document).ready(function(){
             if(data == "success") {//检查成功
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
 				$("#goNext").removeClass("disabled");
-				$('#postNodeBtn').removeClass("disabled");
 				$("#goNext").addClass("nodeGoNext");
 				//disabledInput(); //禁止修改操作
          	    $("#goNext").click(function(){
@@ -290,8 +285,6 @@ $(document).ready(function(){
             } else {//检查失败
          	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
             }
-            $('#postNodeBtn').removeClass("disabled");
-            $("#modal-default").modal();
          });
     }
     // 获取群主ID
@@ -322,18 +315,72 @@ $(document).ready(function(){
 		})
 
     })
-    
+
     function toDbConfig() {
-    	$.get("loadConfig",function(data,status){
-            $("#dbForm  #mysql_address").val(data.mysql_address);
-            $("#dbForm  #mysql_database").val(data.mysql_database);
-            $("#dbForm  #mysql_username").val(data.mysql_username);
-            $("#dbForm  #mysql_password").val(data.mysql_password);
-        });
-    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
-    	$("#modal-message").modal();
+        if (localStorage.persistence_type) {
+            /*
+            * 读出localstorage中的值
+            */
+            if (localStorage.persistence_type) {
+                $("#dbForm  #persistence_type").find("option[value=" + localStorage.persistence_type + "]").attr("selected", true);
+                dbDisplay(localStorage.persistence_type);
+            }
+            if (localStorage.mysql_address) {
+                $("#dbForm  #mysql_address").val(localStorage.mysql_address);
+            }
+            if (localStorage.mysql_database) {
+                $("#dbForm  #mysql_database").val(localStorage.mysql_database);
+            }
+            if (localStorage.mysql_username) {
+                $("#dbForm  #mysql_username").val(localStorage.mysql_username);
+            }
+            if (localStorage.mysql_password) {
+                $("#dbForm  #mysql_password").val(localStorage.mysql_password);
+            }
+            if (localStorage.redis_address) {
+                $("#dbForm  #redis_address").val(localStorage.redis_address);
+            }
+            if (localStorage.redis_password) {
+                $("#dbForm  #redis_password").val(localStorage.redis_password);
+            }
+            /*
+            * 当表单中的值改变时,localstorage的值也改变
+            */
+            $("input[type=text],select,textarea").change(function(){
+                $this = $(this);
+                localStorage[$this.attr("id")] = $this.val();
+                console.log(localStorage);
+            });
+        } else {
+            $.get("loadConfig",function(data,status){
+                $("#dbForm  #mysql_address").val(data.mysql_address);
+                $("#dbForm  #mysql_database").val(data.mysql_database);
+                $("#dbForm  #mysql_username").val(data.mysql_username);
+                $("#dbForm  #mysql_password").val(data.mysql_password);
+                $("#dbForm  #redis_address").val(data.redis_address);
+                $("#dbForm  #redis_password").val(data.redis_password);
+            });
+        }
+        $("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
+        $("#modal-message").modal();
     }
-    
+
+    function dbDisplay(v) {
+        if (v == "mysql") {
+            $("#mysqlForm").show();
+            $("#redisForm").hide();
+        } else {
+            $("#redisForm").show();
+            $("#mysqlForm").hide();
+        }
+    }
+
+    $("#dbForm  #persistence_type").change(function(){
+        var selected = $(this).children('option:selected').val();
+        console.log(selected);
+        dbDisplay(selected);
+    });
+
     // 提交数据库配置
     $("#postDbBtn").click(function(){
     	var disabled = $(this).attr("class").indexOf("disabled");
@@ -345,66 +392,83 @@ $(document).ready(function(){
     	    return ;
         }
 	    var formData = new FormData();
-	    formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
-	    formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
-	    formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
-	    formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
-	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
-	    $("#modal-default").modal();
-	    $("#goNext").addClass("disabled");
-	    $("#postDbBtn").addClass("disabled");
-	    $.ajax({
-	        url:'submitDbConfig', /*接口域名地址*/
-	        type:'post',
-	        data: formData,
-	        contentType: false,
-	        processData: false,
-	        success:function(res) {
-	            if (res=="success") {
-	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
-	            	setTimeout(checkDbForTimeout,2000);
-	            } else {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            	 $('#postDbBtn').removeClass("disabled");
-	            }
-	            $("#modal-default").modal();
-	        }
-	    })
+	    var dbVersion = $.trim($("#dbForm  #persistence_type").val());
+	    console.log(dbVersion);
+	    formData.append("persistence_type", dbVersion);
+	    console.log(formData.get("persistence_type"));
+	    if (dbVersion == "mysql") {
+            formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
+            formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
+            formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
+            formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
+        } else {
+            formData.append("redis_address", $.trim($("#dbForm  #redis_address").val()));
+            formData.append("redis_password", $.trim($("#dbForm  #redis_password").val()));
+        }
+        $("#checkBody").html("<p>配置提交中,请稍后...</p>");
+        $("#modal-default").modal();
+        $("#goNext").addClass("disabled");
+        $.ajax({
+            url:'submitDbConfig', /*接口域名地址*/
+            type:'post',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success:function(res) {
+                if (res=="success") {
+                    //检查节点是否正确
+                    $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+                    setTimeout(checkForTimeout,2000);
+                    localStorage.clear();
+                } else {
+                     $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+                }
+            }
+        })
     });
     
     function checkInputDB() {
-    	var address = $.trim($("#dbForm  #mysql_address").val());
-    	if (address.length == 0) {
-    		return "请输入您的数据库地址";
-    	}
-    	var database = $.trim($("#dbForm  #mysql_database").val());
-    	if (database.length == 0) {
-    		return "请输入您的数据库名称";
-    	}
-    	var username = $.trim($("#dbForm  #mysql_username").val());
-    	if (username.length == 0) {
-    		return "请输入您的数据库用户名";
-    	}
-    	var password = $.trim($("#dbForm  #mysql_password").val());
-    	if (password.length == 0) {
-    		return "请输入您的数据库密码";
+        var dbVersion = $.trim($("#dbForm  #persistence_type").val());
+        if (dbVersion == "mysql") {
+            var address = $.trim($("#dbForm  #mysql_address").val());
+            if (address.length == 0) {
+                return "请输入您的数据库地址";
+            }
+            var database = $.trim($("#dbForm  #mysql_database").val());
+            if (database.length == 0) {
+                return "请输入您的数据库名称";
+            }
+            var username = $.trim($("#dbForm  #mysql_username").val());
+            if (username.length == 0) {
+                return "请输入您的数据库用户名";
+            }
+            var password = $.trim($("#dbForm  #mysql_password").val());
+            if (password.length == 0) {
+                return "请输入您的数据库密码";
+            }
+    	} else {
+            var redisAddress = $.trim($("#dbForm  #redis_address").val());
+            if (redisAddress.length == 0) {
+                return "请输入您的服务器地址";
+            }
     	}
     	return null;
     }
     
-    function checkDbForTimeout() {
+    function checkForTimeout() {
     	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
-    	$("#modal-default").modal();
-    	setTimeout(checkdb,2000);
+    	setTimeout(checkpersistence,2000);
     }
+//   function redisCheckForTimeout() {
+//        $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
+//        setTimeout(checkredis,2000);
+//    }
     
-    function checkdb() {
-    	$.get("checkDb",function(data,status){
+    function checkpersistence() {
+    	$.get("checkPersistence",function(data,status){
            if(data) {//检查成功
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
 			   $("#goNext").removeClass("disabled");
-			   $('#postDbBtn').removeClass("disabled");
 			   //disabledInput();
 			   $("#goNext").addClass("bdGoNext");
         	   $("#goNext").click(function(){
@@ -434,10 +498,10 @@ $(document).ready(function(){
            } else {//检查失败
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
-           $('#postDbBtn').removeClass("disabled");
-           $("#modal-default").modal();
         });
     }
+
+
     // 点击选择生成秘钥
     $('.key_item').click(function(){
     	$('.key_item').removeClass('active_key')
@@ -459,6 +523,7 @@ $(document).ready(function(){
     		$('#modal-create-pri').modal()
     	}
     })
+    
     
     var hasAccount = false;
     // 转到账户配置

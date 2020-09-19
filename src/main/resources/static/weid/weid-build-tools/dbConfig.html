@@ -100,33 +100,57 @@
               <form role="form" id="dbForm">
                 <div id="dbFormDiv" class="card-body">
                 <div class="form-group">
-                        <label for="version">数据库类型</label> <span style="display: block;float:none;margin-bottom:0.5rem;color: gray;">目前暂只支持MySql数据库</span>
-                        <select  id="version" id="version" name="version" class="form-control">
+                        <label for="persistence_type">数据库类型</label> <span
+                        style="display: block;float:none;margin-bottom:0.5rem;color: gray;">
+                  目前暂只支持MySql与Redis数据库</span>
+                        <select id="persistence_type" name="persistence_type" class="form-control">
+                          <option value="">请选择数据库类型</option>
                           <option value="mysql">MYSQL</option>
-                          <!-- <option value="1">FISCO-BCOS 1.X</option> -->
+                          <option value="redis">REDIS</option>
                         </select>
+                </div>
+                  <!--mysql  -->
+                  <div id="mysqlForm" >
+                    <div class="form-group">
+                      <label for="mysql_address">数据库IP:PORT</label>
+                      <input type="text" class="form-control" id="mysql_address" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" placeholder="IP:PORT">
+                    </div>
+                    <div class="form-group">
+                      <label for="mysql_database">数据库名称</label>
+                      <input type="text" class="form-control" id="mysql_database" placeholder="Enter DataBase Name">
+                      <div style="display:block; font-size: 13px;color: gray;margin-top: 10px;">* 数据库需要提前自己搭建好，并建立好数据库，数据库名称(DataBase Name)可以自行决定</div>
+                    </div>
+                    <div class="form-group">
+                      <label for="mysql_username">数据库用户名</label>
+                      <input type="text" class="form-control" id="mysql_username" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                      <label for="mysql_password">数据库密码</label>
+                      <input type="password" class="form-control" id="mysql_password" placeholder="Enter password">
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label for="mysql_address">数据库IP:PORT</label>
-                    <input type="text" class="form-control" id="mysql_address" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" placeholder="IP:PORT">
-                  </div>
-                  <div class="form-group">
-                    <label for="mysql_database">数据库名称</label>
-                    <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;margin-top: 10px;">* 数据库需要提前自己搭建好，并建立好数据库，数据库名称(DataBase Name)可以自行决定</div>
-                    <input type="text" class="form-control" id="mysql_database" placeholder="Enter DataBase Name">
-                  </div>
-                  <div class="form-group">
-                    <label for="mysql_username">数据库用户名</label>
-                    <input type="text" class="form-control" id="mysql_username" placeholder="Enter username">
-                  </div>
-                  <div class="form-group">
-                    <label for="mysql_password">数据库密码</label>
-                    <input type="password" class="form-control" id="mysql_password" placeholder="Enter password">
+                  <!-- redis -->
+                  <div id="redisForm" style="display: none">
+                    <div class="form-group">
+                      <label for="redis_address">服务器IP:PORT</label>
+                      <div style="display:block; font-size: 13px;color:gray;">如：127.0.0.1:6379
+                        ；如果多个节点，则请用半角逗号","分割：127.0.0.1:7100,127.0.0.1:7101</div>
+                      <input type="text" class="form-control" id="redis_address"
+                             onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" placeholder="IP:PORT">
+                    </div>
+                    <div class="form-group">
+                      <label for="redis_password">服务器密码</label>
+                      <div style="display:block; font-size: 13px;color:gray;">如未设置密码可不填写
+                      </div>
+                      <input type="password" class="form-control" id="redis_password"
+                             placeholder="Enter password">
+                    </div>
                   </div>
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">完成</button>
+                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">
+                    确认</button>
                 </div>
              </form>
              <div class='sql_warning'>
@@ -143,6 +167,15 @@
 			               </span>
 		               </a>
                     </p>
+                    <p>
+                        <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/how-to-use-persisitence.html" target="blank_" style='display:block'>
+                           <img src="./dist/img/icon-question.svg" alt="">
+                           <span style="color:#017CFF;font-size:12px;display:inline-block">
+                                      使用教程
+                           </span>
+                        </a>
+                    </p>
+
                  </div>	
              </div>
             <!-- /.card -->

@@ -21,14 +21,10 @@ package com.webank.weid.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.webank.weid.service.DeployService;
-import com.webank.weid.util.FileUtils;
 
 /**
  * 主页控制器.
@@ -44,16 +40,29 @@ public class IndexController {
     public String index(){
        String value = deployService.getGuideStatus(); 
         if (StringUtils.isBlank(value)) {
+            return "redirect:weid/weid-build-tools/guide.html";
+        } else {
+            return "redirect:weid/weid-build-tools/index.html";
+        }
+    }
+    
+    @RequestMapping(value = "/weid/weid-build-tools/")
+    public String index1(){
+       String value = deployService.getGuideStatus(); 
+        if (StringUtils.isBlank(value)) {
             return "redirect:guide.html";
         } else {
             return "redirect:index.html";
         }
     }
     
-    @Description("获取版本号")
-    @GetMapping("/getVersion")
-    @ResponseBody
-    public String getVersion() {
-        return FileUtils.readFile("VERSION");
+    @RequestMapping(value = "/weid/weid-build-tools")
+    public String index2(){
+       String value = deployService.getGuideStatus(); 
+        if (StringUtils.isBlank(value)) {
+            return "redirect:weid-build-tools/guide.html";
+        } else {
+            return "redirect:weid-build-tools/index.html";
+        }
     }
 }

@@ -88,6 +88,14 @@ List mysql_driver = [
         "mysql:mysql-connector-java:8.0.20"
 ]
 
+List http_proxy = [
+        "org.mitre.dsmiley.httpproxy:smiley-http-proxy-servlet:1.7"
+]
+
+List redis_driver = [
+        "org.redisson:redisson:3.13.1"
+]
+
 def spring_version = "5.2.2.RELEASE"
 List spring = [
         "org.springframework:spring-aop:$spring_version",
@@ -120,7 +128,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-websocket")
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
@@ -131,7 +139,7 @@ dependencies {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.18.12'
             annotationProcessor 'org.projectlombok:lombok:1.18.12'
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"

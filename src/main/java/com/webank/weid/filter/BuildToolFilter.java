@@ -59,14 +59,26 @@ public class BuildToolFilter implements Filter {
         if (filterUrl.contains(requestFile)) {
             chain.doFilter(request, response);
             return;
-        }else if (uri.endsWith(".html")) {
+        } else if (uri.endsWith(".html") || uri.contains("webase-browser")) {
             String guideResult = deployService.getGuideStatus();
             if (uri.endsWith("guide.html") && StringUtils.isNotBlank(guideResult)) {
                 res.sendRedirect("index.html");
                 return;
             }
             if (!uri.endsWith("guide.html") && StringUtils.isBlank(guideResult)) {
-                res.sendRedirect("guide.html");
+                String guideHtml = "guide.html";
+                if (uri.contains("/webase-browser/")) {
+                    guideHtml = "../" + guideHtml;
+                } 
+                res.sendRedirect(guideHtml);
+                return;
+            }
+            if (uri.endsWith("webase-browser")) {
+                res.sendRedirect("webase-browser/index.html");
+                return;
+            }
+            if (uri.endsWith("webase-browser/")) {
+                res.sendRedirect("index.html");
                 return;
             }
         }

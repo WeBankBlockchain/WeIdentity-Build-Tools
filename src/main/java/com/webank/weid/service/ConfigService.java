@@ -19,21 +19,6 @@
 
 package com.webank.weid.service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.DataDriverConstant;
 import com.webank.weid.constant.FileOperator;
@@ -41,6 +26,25 @@ import com.webank.weid.service.impl.AbstractService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.PropertyUtils;
 import com.webank.weid.util.ZipUtils;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.RedisException;
+import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ConfigService {
@@ -183,7 +187,10 @@ public class ConfigService {
         return generateProperties();
     }
     
-    public boolean processDbConfig(String address, String database, String username, String password) {
+    public boolean processDbConfig(String persistenceType, String mysqlAddress, String database,
+                                   String username,
+                                   String mysqlPassword, String redisAddress,
+                                   String redisPassword) {
         List<String> listStr = FileUtils.readFileToList("run.config");
         StringBuffer buffer = new StringBuffer();
         for (String string : listStr) {
@@ -191,14 +198,21 @@ public class ConfigService {
                 buffer.append(string).append("\n");
                 continue;
             }
-            if (string.startsWith("mysql_address")) {
-                buffer.append("mysql_address=").append(address).append("\n");
+
+            if (string.startsWith("persistence_type")){
+                buffer.append("persistence_type=").append(replaceNull(persistenceType)).append("\n");
+            }else if (string.startsWith("mysql_address")) {
+                buffer.append("mysql_address=").append(replaceNull(mysqlAddress)).append("\n");
             } else if (string.startsWith("mysql_database")) {
-                buffer.append("mysql_database=").append(database).append("\n");
+                buffer.append("mysql_database=").append(replaceNull(database)).append("\n");
             } else  if (string.startsWith("mysql_username")) {
-                buffer.append("mysql_username=").append(username).append("\n");
+                buffer.append("mysql_username=").append(replaceNull(username)).append("\n");
             } else if (string.startsWith("mysql_password")) {
-                buffer.append("mysql_password=").append(password).append("\n");
+                buffer.append("mysql_password=").append(replaceNull(mysqlPassword)).append("\n");
+            } else if (string.startsWith("redis_address")) {
+                buffer.append("redis_address=").append(replaceNull(redisAddress)).append("\n");
+            } else if (string.startsWith("redis_password")) {
+                buffer.append("redis_password=").append(replaceNull(redisPassword)).append("\n");
             } else {
                 buffer.append(string).append("\n");
             }
@@ -207,6 +221,14 @@ public class ConfigService {
         backRunConfig();
         //根据模板生成配置文件
         return generateProperties();
+    }
+
+    //将空值转换成空字符串
+    public String replaceNull(String v) {
+        if (v == null) {
+            return "";
+        }
+        return v;
     }
     
     public boolean checkDb() {
@@ -238,6 +260,57 @@ public class ConfigService {
                     connection.close();
                 } catch (SQLException e) {
                     logger.error("[checkDb] the connection close error.", e);
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkRedis() {
+        logger.info("[checkRedis] begin reload the properties...");
+        PropertyUtils.reload();
+        Config config = new Config();
+        RedissonClient client = null;
+        String redisUrl = PropertyUtils.getProperty(DataDriverConstant.REDIS_URL);
+        if (StringUtils.isBlank(redisUrl)) {
+            return false;
+        }
+        String redisPassword = PropertyUtils.getProperty(DataDriverConstant.PASSWORD);
+        String passWord = null;
+        if (StringUtils.isNoneBlank(redisPassword)) {
+            passWord = redisPassword;
+        }
+        List<String> redisNodes = Arrays.asList(redisUrl.split(","));
+        if (redisNodes.size() > 1) {
+            List<String> clusterNodes = new ArrayList<>();
+            for (int i = 0; i < redisNodes.size(); i++) {
+                clusterNodes.add("redis://" + redisNodes.get(i));
+            }
+            config.useClusterServers().addNodeAddress(clusterNodes.toArray(
+                    new String[clusterNodes.size()]))
+                    .setPassword(passWord);
+        } else {
+            config.useSingleServer().setAddress("redis://" + redisUrl)
+                    .setPassword(passWord);
+        }
+
+        try {
+            client = Redisson.create(config);
+
+            if(client != null) {
+                logger.info("[checkRedis] the redis check successfully.");
+                return true;
+            } else {
+                logger.error("[checkRedis] the redis check fail...");
+            }
+        } catch (RedisException e) {
+            logger.error("[checkRedis] the redis check has error.", e);
+        } finally {
+            if (client != null) {
+                try {
+                    client.shutdown();
+                } catch (RedisException e) {
+                    logger.error("[checkRedis] the redis connection close error.", e);
                 }
             }
         }
@@ -289,10 +362,13 @@ public class ConfigService {
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
+        fileStr = fileStr.replace("${PERSISTENCE_TYPE}", loadConfig.get("persistence_type"));
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));
         fileStr = fileStr.replace("${MYSQL_DATABASE}", loadConfig.get("mysql_database"));
         fileStr = fileStr.replace("${MYSQL_USERNAME}", loadConfig.get("mysql_username"));
         fileStr = fileStr.replace("${MYSQL_PASSWORD}", loadConfig.get("mysql_password"));
+        fileStr = fileStr.replace("${REDIS_ADDRESS}", loadConfig.get("redis_address"));
+        fileStr = fileStr.replace("${REDIS_PASSWORD}", loadConfig.get("redis_password"));
         //将文件写入resource目录
         FileUtils.writeToFile(fileStr, "resources/weidentity.properties", FileOperator.OVERWRITE);
     }

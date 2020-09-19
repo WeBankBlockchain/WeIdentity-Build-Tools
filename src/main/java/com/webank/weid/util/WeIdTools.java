@@ -16,28 +16,26 @@
  *       You should have received a copy of the GNU Lesser General Public License
  *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
  */
+package com.webank.weid.util;
 
-package com.webank.weid.dto;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
-import com.webank.weid.protocol.base.WeIdPojo;
+public class WeIdTools {
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class WeIdInfo extends BaseDto {
-
-    private String weId;
-    private String ecdsaKey;
-    private String ecdsaPubKey;
-    private boolean isIssuer;
-    private String weIdShow;
-    private boolean isAdmin;
-    private WeIdPojo weIdPojo;
-    
-    public void setWeId(String weId) {
-        this.weId = weId;
-        this.weIdShow = super.getHideValue(weId, 20, 6);
+    public static boolean isHostConnectable(String host, int port) {
+        Socket socket = new Socket();
+        try {
+            socket.connect(new InetSocketAddress(host, port));
+        } catch (IOException e) {
+            return false;
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+            }
+        }
+        return true;
     }
 }

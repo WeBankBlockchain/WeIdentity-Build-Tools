@@ -11,5 +11,6 @@ WeIdentity JAVA SDK安装部署工具
 
 | weid-build-tools 版本 | weid-java-sdk 版本 |
 | :---- | :---- |
+| v1.0.19 | v1.6.6 |
 | v1.0.18 | v1.6.5 |
 | v1.0.12 | v1.6.4 |

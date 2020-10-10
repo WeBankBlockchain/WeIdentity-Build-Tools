@@ -36,6 +36,7 @@ public class CnsInfo extends BaseDto {
     private AuthorityIssuer issuer;
     private String groupId;
     private String roleType;
+    private String applyName;
 
     public void setWeId(String weId) {
         this.weId = weId;

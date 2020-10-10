@@ -24,7 +24,7 @@ $(document).ready(function(){
 		$(obj).addClass("disabled");
 	    var formData = new FormData();
 	    formData.append("ecdsa", $("#privateKeyFile")[0].files[0]);
-	    $("#checkBody").html("<p>账户创建中,请稍后...</p>");
+	    $("#checkBody").html("<p>> 账户创建中...</p>");
 	    $("#configBtn").addClass("disabled");
 	    $("#modal-default").modal();
 	    $.ajax({
@@ -35,10 +35,10 @@ $(document).ready(function(){
 	        processData: false,
 	        success:function(res) {
 	            if (res=="fail") {
-	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+	            	$("#checkBody").html($("#checkBody").html() + "<p>> 账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
 	            	$("#postBtn").removeClass("disabled");
 	            } else {
-	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
+	            	$("#checkBody").html($("#checkBody").html() + "<p>> 账户创建<span class='success-span'>成功</span>。</p>");
 	            	first = false;
 	            	load();
 	            	$("#configBtn").removeClass("disabled");

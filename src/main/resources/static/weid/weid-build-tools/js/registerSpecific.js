@@ -30,7 +30,7 @@ $(document).ready(function(){
         }
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("新增中,  请稍等...");
+        $($this).html("新增中...");
         isClose = false;
         var formData = {};
 	    formData.issuerType = type;
@@ -63,7 +63,7 @@ $(document).ready(function(){
         }
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
-        $($this).html("添加中,  请稍等...");
+        $($this).html("添加中...");
         isClose = false;
         var formData = {};
 	    formData.issuerType = type;
@@ -163,7 +163,7 @@ function  removeIssuerFromIssuerType(thisObj, type, weId) {
 	    var disabled = $($this).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
 	    $($this).addClass("disabled");
-	    $($this).html("删除中,  请稍等...");
+	    $($this).html("删除中...");
 	    var formData = {};
 	    formData.issuerType = type;
 	    formData.weId = weId;

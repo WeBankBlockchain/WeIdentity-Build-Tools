@@ -36,6 +36,7 @@ public class ShareInfo extends DeployBase {
     private boolean enable; 
     private AuthorityIssuer issuer;
     private boolean showBtn;
+    private String evidenceName;
     
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;

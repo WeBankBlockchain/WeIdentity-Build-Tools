@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeIdentity 部署工具</title>
+  <title>WeIdentity 网页管理工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
@@ -78,10 +78,11 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>智能合约信息</th>
+                  <th style="width: 200px">应用名字</th>
+                  <th>智能合约部署ID</th>
                   <th>部署账户</th>
                   <th>部署机构的名称</th>
-                  <th>部署的群组</th>
+                  <th>所在群组</th>
                   <th>创建时间</th>
                   <th width="300px">操作</th>
                 </tr>
@@ -112,7 +113,7 @@
             <table  class="table table-hover">
               <tbody>
                 <tr>
-                  <td>CNS编码</td>
+                  <td>智能合约部署ID</td>
                   <td colspan="3">${hash}</td>
                 </tr>
                 <tr>
@@ -199,6 +200,13 @@
                </a>
                <div >
                <input type="text" class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
+               </div>
+             </div>
+             <div class="form-group">
+               <label for="ipPort">应用名字</label>
+               <span style="display: block;color: gray;float: left;padding-bottom: 10px;">给自己的WeIdentity区块链应用起一个名字吧，用于在同一条链上区别不同的 WeIdentity 应用，例如“学历证书应用”，“区块链证件应用”。</span>
+               <div >
+               <input type="text" class="form-control" id="applyName" name="applyName" placeholder="Enter applyName">
                </div>
              </div>
           </div>

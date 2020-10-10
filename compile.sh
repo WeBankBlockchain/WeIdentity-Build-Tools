@@ -97,11 +97,12 @@ function compile()
     #modify weidentity properties
     export ORG_ID=${org_id}
     export AMOP_ID=${amop_id}
+    export PERSISTENCE_TYPE=${persistence_type}
     export MYSQL_ADDRESS=${mysql_address}
     export MYSQL_DATABASE=${mysql_database}
     export MYSQL_USERNAME=${mysql_username}
     export MYSQL_PASSWORD=${mysql_password}
-    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${AMOP_ID}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
+    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${AMOP_ID}:${PERSISTENCE_TYPE}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
     envsubst ${VARS} < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
 
     if [ -f build.gradle ]; then
@@ -179,10 +180,10 @@ function check_parameter()
        echo "cns_profile_active is empty, please check the config."
        exit 1
     fi
-    if [ "${cns_profile_active}" != "prd" ] &&  [ "${cns_profile_active}" != "stg" ] && [ "${cns_profile_active}" != "dev" ];then
-        echo "the value of cns_profile_active error, please input: prd, stg, dev"
-        exit 1
-    fi
+    # if [ "${cns_profile_active}" != "prd" ] &&  [ "${cns_profile_active}" != "stg" ] && [ "${cns_profile_active}" != "dev" ];then
+    #    echo "the value of cns_profile_active error, please input: prd, stg, dev"
+    #    exit 1
+    # fi
 }
 
 function check_font()

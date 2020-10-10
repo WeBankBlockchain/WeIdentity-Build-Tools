@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeIdentity 部署工具</title>
+  <title>WeIdentity 网页管理工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
@@ -44,12 +44,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">凭证类型(CPT)转JAVA Jar包</h1>
+            <h1 class="m-0 text-dark">凭证模板(CPT)转JAVA Jar包</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item active">功能管理</li>
-              <li class="breadcrumb-item active">凭证类型(CPT)转JAVA Jar包</li>
+              <li class="breadcrumb-item active">凭证模板(CPT)转JAVA Jar包</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -73,7 +73,6 @@
                   <th>cptId集合</th>
                   <th>转换来源</th>
                   <th>数据来源</th>
-                  <th>CNS</th>
                   <th>创建时间</th>
                   <th  width="250px">操作</th>
                 </tr>
@@ -83,7 +82,6 @@
                   <td><a href="javascript:showWeId('${cptIds}')"> ${showCptIds} </a></td>
                   <td>${fromType}</td>
                   <td>${from}</td>
-                  <td>${hashShow}</td>
                   <td>${createTime}</td>
                   <td>
                     <button type="button" onclick="downPolicy('${id}', '${cptIds}', '${fromType}')" class="btn btn-inline btn-primary btn-flat">下载披露策略文件</button>

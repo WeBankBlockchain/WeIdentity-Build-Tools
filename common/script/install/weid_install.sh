@@ -4,8 +4,9 @@ repo=cn
 version=latest.release
 installZipDir=weid-build-tools/common/script/install
 project=weid-build-tools
+port=default
 
-set -- `getopt v:t:n: "$@"`
+set -- `getopt v:t:n:p: "$@"`
 while [ -n "$1" ]
 do
     case "$1" in 
@@ -18,6 +19,14 @@ do
      -n) 
         project=$2
         shift ;;
+     -p) 
+        port=$2
+        expr ${port} "+" 10 &> /dev/null
+        if [ ! $? -eq 0 ];then
+           echo "Err: input port: $port invalid."
+           exit 1
+        fi
+        shift ;;
     esac
     shift 
 done
@@ -27,7 +36,6 @@ mysql_address=
 mysql_database=
 mysql_username=
 mysql_password=
-webase_port=5101
 analysisDataBase() {
     mysql_address=$(grep "mysql_address" ${1} | cut -d'=' -f2 | sed 's/\r//')
     mysql_database=$(grep "mysql_database" ${1} | cut -d'=' -f2 | sed 's/\r//')
@@ -37,6 +45,13 @@ analysisDataBase() {
 
 # install webase
 function installWebase() {
+
+    if [ ${port} == "default" ];then
+        port=5101
+    else
+        sed -i "/^proxy\.target\.url/cproxy\.target\.url=127.0.0.1:$port" weid-build-tools/dist/conf/application.properties 
+    fi
+
     # check
     # 1. check the weid-build-tools/run.config
     if [ ! -f "./weid-build-tools/run.config" ]; then
@@ -85,7 +100,7 @@ function installWebase() {
     chmod u+x init.sh
     
     # 4. installing
-    ./init.sh -P ${webase_port} -l "jdbc:mysql://${mysql_address}/${mysql_database}?useUnicode=true&characterEncoding=utf8" -u ${mysql_username} -p ${mysql_password}
+    ./init.sh -P ${port} -l "jdbc:mysql://${mysql_address}/${mysql_database}?useUnicode=true&characterEncoding=utf8" -u ${mysql_username} -p ${mysql_password}
     if [ ! -d "./server/" ] || [ ! -d "./web/" ];then
         echo "Err: the fisco-bcos-browser install fail."
         exit 1
@@ -105,11 +120,19 @@ function installWebase() {
     echo "--------------------------------------------------------------------------"
     echo "fisco-bcos-browser is installed successfully, please go to the fisco-bcos-browser/server directory and start the server."
     echo "Example: cd fisco-bcos-browser/server && ./start.sh"
+    if [ ! ${port} -eq 5101 ];then
+        echo "note: please restart the weid-build-tools server."
+    fi
     echo "--------------------------------------------------------------------------"
 }
 
 # install weid-build-tools
 function installBuildTools() {
+
+    if [ ${port} == "default" ];then
+        port=6021
+    fi
+
     if [ ! -d ${installZipDir} ];then
         mkdir -p ${installZipDir}
     fi
@@ -194,7 +217,11 @@ function installBuildTools() {
         echo "Err: the weid-build-tools install fail."
         exit $?
     fi
-
+    
+    # 6.modify port
+    if [ ! ${port} -eq 6021 ];then
+        sed -i "/^server\.port/cserver\.port=$port" dist/conf/application.properties
+    fi
     echo "--------------------------------------------------------------------------"
     echo "weid-build-tools is installed successfully, please go to the weid-build-tools directory and start the server."
     echo "Example: cd weid-build-tools && ./start.sh"

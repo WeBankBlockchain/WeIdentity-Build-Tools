@@ -20,7 +20,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("WeID创建中,  请稍等...");
+        $($this).html("WeID创建中...");
         $.get("createWeId",function(value,status){
             if (value == "success") {
                 $("#confirmMessageBody").html("<p>WeID创建<span class='success-span'>成功</span>。</p>");
@@ -43,7 +43,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("WeID创建中,  请稍等...");
+        $($this).html("WeID创建中...");
         var formData = new FormData();
         formData.append("privateKey", $("#privateKey")[0].files[0]);
 		$.ajax({
@@ -75,7 +75,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("WeID创建中,  请稍等...");
+        $($this).html("WeID创建中...");
         var formData = new FormData();
         formData.append("publicKey", $("#publicKey")[0].files[0]);
 		$.ajax({
@@ -108,6 +108,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         var weId = $("#registerIssuerWeId").val();
         var name = $.trim($("#registerIssuerName").val());
+        var description = $.trim($("#issuerDesc").val());
         if (name.length == 0) {
         	 $("#messageBody").html("<p>请输入权威机构名称。</p>");
         	 $("#modal-message").modal();
@@ -119,10 +120,11 @@ $(document).ready(function(){
 	   		return;
         }
         $($this).addClass("disabled");
-        $($this).html("注册中,  请稍等...");
+        $($this).html("注册中...");
         var formData = {};
 	    formData.weId = weId;
 	    formData.name = name;
+	    formData.description = description;
 	    isClose = false;
         $.post("registerIssuer", formData, function(value,status){
             if (value == "success") {
@@ -155,7 +157,7 @@ $(document).ready(function(){
         var type= $("#issuerType").val();
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("添加中,  请稍等...");
+        $($this).html("添加中...");
         isClose = false;
         var formData = {};
 	    formData.weId = weId;
@@ -250,7 +252,6 @@ function loadData() {
     		blockNumber = -1
     		indexInBlock = 0;
     		direction = false;
-    		oSettings["_iDisplayStart"] = 99999999;
     	}
     	aoData.push({"name":"blockNumber","value":blockNumber});
         aoData.push({"name":"pageSize","value":pageSize});
@@ -269,19 +270,8 @@ function loadData() {
     				cData = data; 
     			  } else {
     				data = cData;
-    				if (pageBtnType == "previous") {
-  					  oSettings["_iDisplayStart"] = 0;
-  				    }
     			  }
     			  ndata.data = data.dataList;
-    			  if (data.dataList.length < pageSize) {
-    				  if (pageBtnType == "previous") {
-    					  oSettings["_iDisplayStart"] = 0;
-    				  }
-    				  if (pageBtnType == "next") {
-    					  oSettings["_iDisplayStart"] = oSettings["_iDisplayStart"] + pageSize;
-    				  }
-    			  }
     			  ndata.recordsTotal = data.allCount;
     			  ndata.recordsFiltered = ndata.recordsTotal;
     			  fnCallback(ndata);
@@ -308,13 +298,6 @@ function loadData() {
             op += "<a href='javascript:showDId(\""+ full.weId + "\",\""+ full.id + "\")'>" + full.weIdShow + "</a>";
         	return op;
           }},
-/*          { "render": function (data, type, full, meta) {
-        	  if (!full.from) {
-        		  return "--";
-        	  }
-        	  return full.from;
-          }},*/
-          { data: 'hashShow'},
           { "render": function (data, type, full, meta) {
         	  return getLocalTime(full.weIdPojo.created * 1000);
           }},

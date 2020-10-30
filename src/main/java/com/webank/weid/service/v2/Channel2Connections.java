@@ -198,7 +198,7 @@ public class Channel2Connections extends ChannelConnections {
                             .keyManager(
                                     keystorecaResource.getInputStream(),
                                     keystorekeyResource.getInputStream())
-                            .sslProvider(SslProvider.JDK)
+                            .sslProvider(SslProvider.OPENSSL)
                             .build();
         } catch (Exception e) {
             logger.error(

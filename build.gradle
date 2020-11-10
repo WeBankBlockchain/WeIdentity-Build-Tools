@@ -96,7 +96,7 @@ List redis_driver = [
         "org.redisson:redisson:3.13.1"
 ]
 
-def spring_version = "5.2.2.RELEASE"
+def spring_version = "5.2.8.RELEASE"
 List spring = [
         "org.springframework:spring-aop:$spring_version",
         "org.springframework:spring-beans:$spring_version",

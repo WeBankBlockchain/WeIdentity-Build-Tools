@@ -9,8 +9,9 @@ WeIdentity JAVA SDK安装部署工具
 版本说明
 --------
 
-| weid-build-tools 版本 | weid-java-sdk 版本 |
-| :---- | :---- |
-| v1.0.19 | v1.6.6 |
-| v1.0.18 | v1.6.5 |
-| v1.0.12 | v1.6.4 |
+| weid-build-tools 版本 | weid-java-sdk 版本 | weid-contract-java 版本 |
+| :---- | :---- | :---- |
+| v1.0.20 | v1.6.7 | v1.2.26 |
+| v1.0.19 | v1.6.6 | v1.2.24 |
+| v1.0.18 | v1.6.5 | v1.2.23 |
+| v1.0.12 | v1.6.4 | v1.2.21 |

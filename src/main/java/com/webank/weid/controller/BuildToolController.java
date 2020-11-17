@@ -317,9 +317,9 @@ public class BuildToolController {
                 //如果上一个地址不为空，并且新hash地址跟上一个地址不相同则reloadAddress
                 if (StringUtils.isNotBlank(preMainHash) && !preMainHash.equals(cnsInfo.getHash())) {
                     reloadAddress();
-                    //判断当前账户是否注册成weid，如果没有则创建weid
-                    deployService.createWeIdForCurrentUser(DataFrom.WEB);
                 }
+                //当前账户创建weId，（内部有判断如果已创建则不会调用区块链创建）
+                deployService.createWeIdForCurrentUser(DataFrom.WEB);
                 preMainHash = cnsInfo.getHash();
             }
         }

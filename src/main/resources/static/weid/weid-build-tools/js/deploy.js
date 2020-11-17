@@ -10,6 +10,7 @@ $(document).ready(function(){
     	if (!isReady) {
     		showMessageForNodeException();
         } else {
+        	$("#applyName").val("");
         	$("#modal-deploy").modal();
         }
     });
@@ -23,10 +24,17 @@ $(document).ready(function(){
     }
     var isClose = true;
     $("#mainDeploy").click(function(){
-    	var chainId = $("#chainId").val();
+    	var chainId = $.trim($("#chainId").val());
     	if (chainId == "") {
     		isClose = false;
     		$("#messageBody").html("<p>请输入chainId!</p>");
+            $("#modal-message").modal();
+            return;
+    	}
+    	var applyName = $.trim($("#applyName").val());
+    	if (applyName == "") {
+    		isClose = false;
+    		$("#messageBody").html("<p>请输入您的应用名!</p>");
             $("#modal-message").modal();
             return;
     	}
@@ -38,19 +46,23 @@ $(document).ready(function(){
         $($this).addClass("disabled");
         mainDeployBtnName = $($this).html();
         $($this).html("部署中...");
-        $("#confirmMessage1Body").html("<p>合约部署中，请稍等...</p>");
+        $("#confirmMessage1Body").html("<p>> 合约部署中...</p>");
         $("#confirmMessage1Btn").addClass("disabled");
         $("#modal-confirm-message1").modal();
-        $.get("deploy/" + chainId,function(value,status){
+        
+        var formData = {};
+        formData.chainId = chainId;
+        formData.applyName = applyName;
+        $.post("deploy", formData, function(value,status){
             if (value == "fail") {
-            	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>合约部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
-            	showBtn($this);
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 合约部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+                showBtn($this);
             } else {
-            	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>合约部署<span class='success-span'>成功</span>。</p>");
-            	checkFirstDeploy(value, $this);
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 合约部署<span class='success-span'>成功</span>。</p>");
+                checkFirstDeploy(value, $this);
             }
             $("#modal-confirm-message1").modal();
-        })
+		})
     });
     $('#modal-confirm-message1').on('hide.bs.modal', function () {
     	if (isClose) {
@@ -98,7 +110,7 @@ function loadData() {
 	      "destroy": true,
 	      "autoWidth": false,
 	      "iDisplayLength": 7,
-	      "order": [[ 5, "desc" ], [ 4, "desc" ]],
+	      "order": [[ 6, "desc" ], [ 5, "desc" ]],
 	      "oLanguage": {
 	    	  "sZeroRecords": message,
 	    	  "oPaginate": {
@@ -125,8 +137,11 @@ function loadData() {
 	         });
 	      },
 	      columns:[
+	    	  {"render": function ( data, type, full, meta) {
+	        	  return "<div title='" + full.applyName +"' class='text_overflow'>" + full.applyName + "</div>"
+	          }},
 	          {"render": function ( data, type, full, meta) {
-	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.weId + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
+	        	  return "<a href='javascript:showWeId(\"" + full.hash +"\", \"" + full.hashShow + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
 	          }},
 	          {"render": function ( data, type, full, meta) {
 	        	  return "<a href='javascript:showWeId(\"" + full.weId + "\")'>" + full.weIdShow + "</a><div class='display-none'>" + full.weId + "</div>"
@@ -156,10 +171,11 @@ function loadData() {
 	        	  } else {
 	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enable(\"" + full.hash + "\" , " + full.needDeployCpt + ", this)'   class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
 	        	  }
-	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
+	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)' class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
 	        	  if (full.showDeployCptBtn) {
-	        		  btnHtml += "<button type='button' name='cnsDeploSystemCptBtn'  onclick='deployCpt(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>部署系统CPT</button>&nbsp;&nbsp;";
+	        		  btnHtml += "<button type='button' name='cnsDeploSystemCptBtn'  onclick='deployCpt(\"" + full.hash + "\", this)' class='btn btn-inline btn-primary btn-flat'>部署系统CPT</button>&nbsp;&nbsp;";
 	        	  }
+	        	  btnHtml += "<button type='button' name='showDetail' onclick='showDeploy(\"" + full.hash +"\", \"" + full.weId + "\")' class='btn btn-inline btn-primary btn-flat'>详细信息</button>&nbsp;&nbsp;";
 	        	  return btnHtml
 	          }}
 	        ]
@@ -194,10 +210,10 @@ function downEcdsaKey(id) {
 }
 
 function enableHash(hash, btnObj, deployCpt, enableBtn) {
-	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用中，请稍等...</p>");
+	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用中...</p>");
 	$.get("enableHash/" + hash,function(value,status){
 		if (value == "success") {
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用<span class='success-span'>成功</span>。</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用<span class='success-span'>成功</span>。</p>");
 			if (deployCpt) {
 				deploySystemCpt(hash, btnObj, enableBtn);
 			} else {
@@ -206,9 +222,9 @@ function enableHash(hash, btnObj, deployCpt, enableBtn) {
 			}
 		} else {
 			if (value == "fail") {
-				$("#confirmMessage1Body").html($("confirmMessage1Body").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
+				$("#confirmMessage1Body").html($("confirmMessage1Body").html() + "<p>> 启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
 			} else {
-				$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用<span class='fail-span'>失败</span>，原因:" + value + "。</p>");
+				$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用<span class='fail-span'>失败</span>，原因:" + value + "。</p>");
 			}
 			showBtn(btnObj);
 			showEnableBtn(enableBtn);
@@ -232,24 +248,24 @@ function checkFirstDeploy(value, obj) {
 }
 
 function removeHash(hash, obj) {
-	$.confirm("是否确定删除该CNS数据?",function(){
+	$.confirm("是否确定删除?",function(){
 		var disabled = $(obj).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
 	    $(obj).addClass("disabled");
 	    $(obj).html("删除中...");
 	    $("#confirmMessage1Btn").addClass("disabled");
-		$("#confirmMessage1Body").html("<p>CNS删除中，请稍等...</p>");
+		$("#confirmMessage1Body").html("<p>> 删除中...</p>");
 		$("#modal-confirm-message1").modal();
 		$.get("removeHash/" + hash + "/1", function(value,status){ 
 			if (value == "success") {
-				$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS删除<span class='success-span'>成功</span>。</p>");
+				$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 删除<span class='success-span'>成功</span>。</p>");
 				loadData();
 			} else if (value == "fail") {
-	        	 $("#confirmMessage1Body").html("<p>CNS删除<span class='fail-span'>失败</span>，请联系管理员。</p>");
+	        	 $("#confirmMessage1Body").html("<p>> 删除<span class='fail-span'>失败</span>，请联系管理员。</p>");
 	        	 $(obj).removeClass("disabled");
 	     	     $(obj).html("删除");
 	        } else {
-	        	 $("#confirmMessage1Body").html("<p>"+value+"</p>");
+	        	 $("#confirmMessage1Body").html("<p>> "+value+"</p>");
 	        	 $(obj).removeClass("disabled");
 	     	     $(obj).html("删除");
 	        }
@@ -273,15 +289,15 @@ function enable(hash, deployCpt, obj) {
 }
 
 function deploySystemCpt(hash, deployBtn, enableBtn) {
-	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>系统CPT部署中，请稍等...</p>");
+	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 系统CPT部署中...</p>");
 	$.get("deploySystemCpt/" + hash,function(value,status){
 		if (value) {
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>系统CPT部署<span class='success-span'>成功</span>。</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 系统CPT部署<span class='success-span'>成功</span>。</p>");
 			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p><span class='success-span'>合约部署成功,请继续操作。</span></p>");
 			deployed = true;
 			loadData();
 		} else {
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>系统CPT部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 系统CPT部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
 			showEnableBtn(enableBtn);
 		}
 		$("#confirmMessage1Btn").removeClass("disabled");

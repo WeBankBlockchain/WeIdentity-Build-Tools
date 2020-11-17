@@ -28,6 +28,8 @@ public class CptInfo extends BaseDto {
     
     private String weId;
     private Integer cptId;
+    private String cptTitle;
+    private String cptDesc;
     private String cptJsonName;
     private String weIdShow;
     public void setWeId(String weId) {

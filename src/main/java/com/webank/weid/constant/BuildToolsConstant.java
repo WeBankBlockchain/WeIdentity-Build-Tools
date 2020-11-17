@@ -53,5 +53,9 @@ public final class BuildToolsConstant {
     public static final String SUCCESS = "success";
     
     public static final String FAIL = "fail";
+    
+    public static final String APPLY_NAME = "applyName";
+    
+    public static final String EVIDENCE_NAME = "evidenceName";
 
 }

@@ -358,7 +358,7 @@ public class DeployService {
      * 给当前账户创建WeId.
      * @param from 创建来源
      */
-    public void createWeIdForCurrentUser(DataFrom from) {
+    public String createWeIdForCurrentUser(DataFrom from) {
         //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId
         CreateWeIdArgs arg = new CreateWeIdArgs();
         arg.setWeIdPrivateKey(getCurrentPrivateKey());
@@ -370,8 +370,10 @@ public class DeployService {
             logger.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
             String result = buildToolService.createWeId(arg, from, true);
             logger.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
+            return result;
         } else {
-            logger.info("[createWeIdForCurrentUser] the current weId is exist."); 
+            logger.info("[createWeIdForCurrentUser] the current weId is exist.");
+            return weId;
         }
     }
     

@@ -17,7 +17,7 @@ $(document).ready(function(){
     	$.post("verifyPersistence", {persistenceType : val}, function(value,status){
 			if (value) {
 				$("#messageBody").html($("#messageBody").html() + "<p>> 检查数据库配置<span class='success-span'>成功</span></p>");
-				$("#messageBody").html($("#messageBody").html() + "<p>> <span class='success-span'>目前暂不支持动态修改，如修改配置请重启服务生效。</span></p>");
+				$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>目前暂不支持动态修改，如修改配置请重启服务生效。</span></p>");
 			    $("#i-verifyDb").removeClass("fa-circle");
                 $("#i-verifyDb").addClass("fa-check-circle");
 			} else {

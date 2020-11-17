@@ -87,4 +87,7 @@ public class CommandArgs {
     
     @Parameter(names = "--cns", description = "cns")
     private String cns;
+    
+    @Parameter(names = "--desc", description = "desc")
+    private String desc;
 }

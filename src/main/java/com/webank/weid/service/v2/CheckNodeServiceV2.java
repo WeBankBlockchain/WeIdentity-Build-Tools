@@ -205,7 +205,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
             while (true) {
                 BigInteger offset = BigInteger.valueOf(startIndex);
                 Tuple4<List<String>, List<String>, List<BigInteger>, BigInteger> data = 
-                    dataBucket.getAllHash(offset, num).send();
+                    dataBucket.getAllBucket(offset, num).send();
                 List<String> hashList = data.getValue1();
                 List<String> ownerList = data.getValue2();
                 List<BigInteger> timesList = data.getValue3();

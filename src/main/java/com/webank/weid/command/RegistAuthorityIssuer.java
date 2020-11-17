@@ -73,7 +73,8 @@ public class RegistAuthorityIssuer extends StaticConfig {
         String result = null;
         if (StringUtils.isNotEmpty(weid)) {
             System.out.println("registering authorityissuer ---> " + weid + ", name is :"+ orgId);
-            result = buildToolService.registerIssuer(weid, orgId, DataFrom.COMMAND);
+            String description = commandArgs.getDesc();
+            result = buildToolService.registerIssuer(weid, orgId, description, DataFrom.COMMAND);
             if (!BuildToolsConstant.SUCCESS.equals(result)) {
                 System.out.println("register authority issuer " + weid + " failed :" + result);
                 logger.error("register authority issuer " + weid + " failed :" + result);

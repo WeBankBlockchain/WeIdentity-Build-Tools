@@ -10,11 +10,11 @@ $(document).ready(function(){
     	formData.groupId = val
     	$.post("setGroupId", formData, function(value,status){
 			if (value) {
-				$("#messageBody").html("<p>设置主群组ID<span class='success-span'>成功</span></p>");
-				$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>目前暂不支持动态修改，如修改配置请重启服务生效。</span></p>");
+				$("#messageBody").html("<p>> 设置主群组ID<span class='success-span'>成功</span></p>");
+				$("#messageBody").html($("#messageBody").html() + "<p><span class='success-span'>提示：目前暂不支持修改配置动态实时生效，修改配置需重启服务才能生效。</span></p>");
 				loadData();
 			} else {
-				$("#messageBody").html("<p>设置主群组ID<span class='fail-span'>失败</span></p>");
+				$("#messageBody").html("<p>> 设置主群组ID<span class='fail-span'>失败</span></p>");
 			}
 			$("#modal-message").modal();
 			$($this).removeClass("disabled");

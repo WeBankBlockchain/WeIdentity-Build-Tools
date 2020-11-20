@@ -70,7 +70,7 @@ $(document).ready(function(){
     		var formData = new FormData();
 		    formData.append("policy", policy);
 		    var btnValue = $(thisObj).html();
-		    $(thisObj).html("转换中，请稍后...");
+		    $(thisObj).html("转换中...");
 		    isClose = false;
 		    $(thisObj).addClass("disabled");
     		$.ajax({

@@ -34,7 +34,7 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bcos.web3j.crypto.Keys;
+import org.fisco.bcos.web3j.crypto.Keys;
 import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
 import org.jsonschema2pojo.DefaultGenerationConfig;
 import org.jsonschema2pojo.GenerationConfig;
@@ -186,7 +186,7 @@ public class BuildToolService {
         // 获取当前配置的hash值
         String hash = getMainHash();
         // 获取所有的主合约cns值，从而获取当前cns的部署者
-        List<HashContract> result = getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
+        List<HashContract> result = getDataBucket(CnsType.DEFAULT).getAllBucket().getResult();
         // 当前hash的所有者
         String currentHashOwner =  null;
         for (HashContract hashContract : result) {
@@ -326,29 +326,7 @@ public class BuildToolService {
         info.setAdmin(isAdmin);
         return DataToolUtils.serialize(info);
     }
-    
-    public List<WeIdInfo> getWeIdList1() {
-        List<WeIdInfo> list = new ArrayList<WeIdInfo>();
-        String currentHash = getMainHash();
-        if (StringUtils.isBlank(currentHash)) {
-            return list;
-        }
-        File targetDir = new File(WEID_PATH + "/" + currentHash);
-        if (!targetDir.exists()) {
-            return list;
-        }
-        for (File file : targetDir.listFiles()) {
-            File weidFile = new File(file.getAbsoluteFile(),"info");
-            String jsonData = FileUtils.readFile(weidFile.getAbsolutePath());
-            WeIdInfo info = DataToolUtils.deserialize(jsonData, WeIdInfo.class);
-            AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(info.getWeId()).getResult();
-            info.setIssuer(issuer != null);
-            list.add(info);
-        }
-        Collections.sort(list);
-        return list;
-    }
-    
+
     public PageDto<WeIdInfo> getWeIdList(
         PageDto<WeIdInfo> pageDto,
         Integer blockNumber,
@@ -362,13 +340,7 @@ public class BuildToolService {
             return pageDto;
         }
         List<WeIdPojo> list = response.getResult();
-        if (list.size() == 0) {//说明没有数据了
-            pageDto.setAllCount(pageDto.getStartIndex());
-        } else if (list.size() < pageDto.getPageSize()) { //说明最后一页了
-            pageDto.setAllCount(pageDto.getStartIndex() + list.size());
-        } else { //还可以继续分页
-            pageDto.setAllCount(pageDto.getStartIndex() + pageDto.getPageSize() + 1);
-        }
+        pageDto.setAllCount(getWeIdService().getWeIdCount().getResult());
         List<WeIdInfo> rList = new ArrayList<WeIdInfo>();
         if (list.size() > 0) {
             String mainHash = getMainHash();
@@ -403,17 +375,19 @@ public class BuildToolService {
      * 注册issuer.
      * @param weId 被注册成issuer的WeId
      * @param name 注册issuer名
+     * @param description 注册issuer备注
      * @param from 数据来源
      * @return 返回注册结果，true表示成功，false表示失败
      */
-    public String registerIssuer(String weId, String name, DataFrom from) {
-        logger.info("[registerIssuer] begin register authority issuer..., weId={}, name={}", weId, name);
+    public String registerIssuer(String weId, String name, String description, DataFrom from) {
+        logger.info("[registerIssuer] begin register authority issuer..., weId={}, name={}, description={}", weId, name, description);
         RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
         AuthorityIssuer authorityIssuer = new AuthorityIssuer();
         authorityIssuer.setName(name);
         authorityIssuer.setWeId(weId);
         authorityIssuer.setAccValue("1");
         authorityIssuer.setCreated(System.currentTimeMillis());
+        authorityIssuer.setDescription(description);
         registerAuthorityIssuerArgs.setAuthorityIssuer(authorityIssuer);
         String hash = getMainHash();
         registerAuthorityIssuerArgs.setWeIdPrivateKey(DeployService.getWeIdPrivateKey(hash));
@@ -494,6 +468,7 @@ public class BuildToolService {
                     issuer.setName(authorityIssuer.getName());
                     issuer.setCreateTime(String.valueOf(authorityIssuer.getCreated()));
                     issuer.setHash(hash);
+                    issuer.setDescription(authorityIssuer.getDescription());
                     issuer.setRecognized(authorityIssuer.isRecognized());
                     list.add(issuer);
                 }
@@ -751,7 +726,7 @@ public class BuildToolService {
         FileUtils.copy(cptFile, new File(cptDir.getAbsolutePath(), cptFile.getName()));       
         //构建cpt数据文件
         String data = DataToolUtils.serialize(
-            buildCptInfo(callerAuth.getWeId(), resultCptId, fileName, from));
+            buildCptInfo(callerAuth.getWeId(), resultCptId, fileName, from, jsonNode));
         File cptInfoFile = new File(cptDir.getAbsoluteFile(), "info");
         FileUtils.writeToFile(data, cptInfoFile.getAbsolutePath(), FileOperator.OVERWRITE);
         //链上查询cpt写链上cpt文件
@@ -763,7 +738,7 @@ public class BuildToolService {
         return result;
     }
     
-    private CptInfo buildCptInfo(String weId, Integer cptId, String cptJsonName, DataFrom from) {
+    private CptInfo buildCptInfo(String weId, Integer cptId, String cptJsonName, DataFrom from, JsonNode jsonNode) {
         CptInfo info = new CptInfo();
         info.setHash(getMainHash());
         long time = System.currentTimeMillis();
@@ -772,6 +747,8 @@ public class BuildToolService {
         info.setWeId(weId);
         info.setCptJsonName(cptJsonName);
         info.setFrom(from.name());
+        info.setCptTitle(jsonNode.get("title").asText());
+        info.setCptDesc(jsonNode.get("description").asText());
         return info;
     }
     
@@ -1093,7 +1070,7 @@ public class BuildToolService {
         if (cnsInfo == null) {
             return null;
         }
-        List<HashContract> allHash = getDataBucket(CnsType.ORG_CONFING).getAllHash().getResult();
+        List<HashContract> allHash = getDataBucket(CnsType.ORG_CONFING).getAllBucket().getResult();
         for (HashContract hashContract : allHash) {
             if (hashContract.getHash().equals(orgId)) {
                 return hashContract;
@@ -1131,7 +1108,7 @@ public class BuildToolService {
         return getDataBucket(CnsType.ORG_CONFING).get(
             WeIdConstant.CNS_GLOBAL_KEY, WeIdConstant.CNS_MAIN_HASH).getResult();
     }
-    
+
     public String getEvidenceHash(String groupId) {
         CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
@@ -1141,7 +1118,21 @@ public class BuildToolService {
         return getDataBucket(CnsType.ORG_CONFING).get(
             orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
     }
-    
+
+    public List<AuthorityIssuer> getUserListByHash(String hash) {
+        List<String> list = getDataBucket(CnsType.SHARE).getActivatedUserList(hash).getResult();
+        List<AuthorityIssuer> rList = new ArrayList<AuthorityIssuer>();
+        for (String weIdAddress : list) {
+            AuthorityIssuer issuer = this.getIssuerByWeId(weIdAddress);
+            if (issuer == null) {
+                issuer = new AuthorityIssuer();
+                issuer.setWeId(WeIdUtils.convertAddressToWeId(weIdAddress));
+            }
+            rList.add(issuer);
+        }
+        return rList;
+    }
+
 //    public String registerClaimPolicy(Integer cptId, String policyJson) {
 //        WeIdAuthentication currentWeIdAuth = this.getCurrentWeIdAuth();
 //        ResponseData<Integer> response = getPolicyService().registerClaimPolicy(cptId, policyJson, currentWeIdAuth);

@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="dist/css/tools.css">
 </head>
 <body>
   <!-- Main Sidebar Container -->
@@ -10,19 +11,18 @@
     <a href="index.html" class="brand-link" style='width:100%;display: flex;align-items: center;justify-content: center;'>
       <img src="dist/img/logo.svg" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
            style="opacity: .8;border-radius:0;width:110px;margin:0 5px">
-      <span class="brand-text font-weight-light" style='font-size: 1.2rem;'>部署工具</span>
+      <span class="brand-text font-weight-light" style='font-size: 1.2rem;'>网页管理工具</span>
     </a>
-
     <!-- Sidebar -->
     <div >
       <!-- Sidebar Menu -->
       <nav id="menuNav" class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-         <li class="nav-item has-treeview config menu-open">
+         <li class="nav-item has-treeview config">
          	<a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
-              <p>
-               	 配置管理
+              <p >
+               	<span class="nav_title">配置管理</span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -54,11 +54,11 @@
             </ul>
           </li>
           
-          <li class="nav-item has-treeview config menu-open">
+          <li class="nav-item has-treeview config">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
-                 智能合约管理
+                <span class="nav_title">智能合约管理</span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -78,21 +78,15 @@
             </ul>
           </li>
 
-          <li class="nav-item has-treeview menu-open">
+          <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
-                功能管理
+                <span class="nav_title">功能管理</span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-<!--               <li class="nav-item">
-                <a href="cns.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>CNS</p>
-                </a>
-              </li> -->
               <li class="nav-item">
                 <a href="createWeid.html" title="WeIdentity DID" class="nav-link">
                   <i class="fas fa-tree nav-icon"></i>
@@ -114,7 +108,7 @@
               <li class="nav-item">
                 <a href="cptList.html" title="CPT" class="nav-link">
                   <i class="fas fa-tree nav-icon"></i>
-                  <p>凭证类型(CPT)管理</p>
+                  <p>凭证模板(CPT)管理</p>
                 </a>
               </li>
               <li class="nav-item" style="display: none">
@@ -125,11 +119,11 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item has-treeview async-menu menu-open">
+          <li class="nav-item has-treeview async-menu">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
-                异步上链管理
+                <span class="nav_title">异步上链管理</span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -143,11 +137,11 @@
             </ul>
           </li>
 
-          <li class="nav-item has-treeview async-menu menu-open">
+          <li class="nav-item has-treeview async-menu">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
-                配置检查管理
+                <span class="nav_title">配置检查管理</span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -179,8 +173,7 @@ $(document).ready(function(){
 			$(this).addClass("active");
 		}
 	});
-
-	/*
+	
 	$("#menuNav > ul > li[class*=has-treeview] > a").click(function(){
 		$("#menuNav > ul > li[class*=has-treeview]").each(function(){
 	        $(this).removeClass("menu-open");
@@ -199,17 +192,13 @@ $(document).ready(function(){
 			$(this).removeClass("menu-open");
 			navA.each(function(){
 	            var navUrl = $(this).attr("href");
-	            if (navUrl == url) {
+	            if (url.endWith(navUrl)) {
 	            	$($this).addClass("menu-open");
 	            }
 	        });
 		}
 	});
-	 if (url == 'account.html' || url == 'dbConfig.html' || url == 'group.html' || url == 'nodeConfig.html' || url == 'check.html'){
-    
-     }
-	*/
-	
+
 	if (url == 'asyncDetail.html') {
 		$(".async-form").addClass("active")
 		$(".async-menu").addClass("menu-open")

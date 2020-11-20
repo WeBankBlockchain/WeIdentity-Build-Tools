@@ -357,6 +357,7 @@ public class DeployService {
     /**
      * 给当前账户创建WeId.
      * @param from 创建来源
+     * @return 返回创建的weId
      */
     public String createWeIdForCurrentUser(DataFrom from) {
         //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId

@@ -375,6 +375,7 @@ public class BuildToolService {
      * 注册issuer.
      * @param weId 被注册成issuer的WeId
      * @param name 注册issuer名
+     * @param description 注册issuer备注
      * @param from 数据来源
      * @return 返回注册结果，true表示成功，false表示失败
      */

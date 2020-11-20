@@ -50,7 +50,6 @@ public class RegisterSpecificIssuer extends StaticConfig {
             logger.error("[RegisterIssuer] input parameters error, please check your input!");
             System.exit(1);
         }
-
         CommandArgs commandArgs = new CommandArgs();
         JCommander.newBuilder()
             .addObject(commandArgs)
@@ -79,7 +78,6 @@ public class RegisterSpecificIssuer extends StaticConfig {
             logger.error("[RegisterIssuer] issuer weid and removed issuer can not both exist. Abort.");
         	System.exit(1);
         } 
-
         // Register this issuer type anyway
         logger.info("[RegisterIssuer] Registering issuer type with best effort: " + type);
         String message = buildToolService.registerIssuerType(type, DataFrom.COMMAND);
@@ -96,6 +94,7 @@ public class RegisterSpecificIssuer extends StaticConfig {
                     logger.error("[RegisterIssuer] Add FAILED: " + message);
                     System.exit(1);
                 }
+                System.out.println("[RegisterIssuer] Specific issuers and types have been successfully registered on blockchain.");
             }
         }
         
@@ -103,14 +102,15 @@ public class RegisterSpecificIssuer extends StaticConfig {
             // Remove the DIDs from this type
             List<String> weIdList = Arrays.asList(removedIssuer.split(","));
             for (String weId : weIdList) {
-                System.out.println("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
-                logger.info("[RegisterIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
+                System.out.println("[RemoveIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
+                logger.info("[RemoveIssuer] Removing WeIdentity DID " + weId + " from type: " + type);
                 message = buildToolService.removeIssuerFromIssuerType(type, weId);
                 if (!BuildToolsConstant.SUCCESS.equals(message)) {
                     System.out.println("[RegisterIssuer] Remove FAILED: " + message);
-                    logger.error("[RegisterIssuer] Remove FAILED: " + message);
+                    logger.error("[RemoveIssuer] Remove FAILED: " + message);
                     System.exit(1);
                 }
+                System.out.println("[RemoveIssuer] Removing WeIdentity DID successfully.");
             }
         }
 

@@ -19,6 +19,7 @@
 
 package com.webank.weid.controller;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,8 @@ public class CommonController {
     private static final Logger logger = LoggerFactory.getLogger(BuildToolController.class);
     
     private static boolean callWebaseApi = false;
+    
+    private static final String WEBASE_URI = "static/weid/weid-build-tools/webase-browser/index.html";
 
     @Value("${proxy.target.url}")
     private String proxyTargetUrl;
@@ -86,6 +89,11 @@ public class CommonController {
                     callWebaseApi = true;
                 }
             }
+        }
+        //如果webase服务已启动，则再检查webase页面是否安装（有可能服务是独立启动的，而页面没有安装）
+        if (result) {
+            URL webaseUri = Thread.currentThread().getContextClassLoader().getResource(WEBASE_URI);
+            return webaseUri != null;
         }
         return result;
     }

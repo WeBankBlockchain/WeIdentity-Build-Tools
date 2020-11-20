@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeIdentity 部署工具</title>
+  <title>WeIdentity 网页管理工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
@@ -94,7 +94,6 @@
                 <thead>
                 <tr>
                   <th title="WeIdentity DID">WeID</th>
-                  <th>CNS</th>
                   <th>创建时间</th>
                   <th width="330px">操作</th>
                 </tr>
@@ -132,6 +131,10 @@
             <div class="form-group">
               <label for="registerIssuerName">权威机构名称</label>
               <input type="text" class="form-control" id="registerIssuerName"  onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" placeholder="Enter issuer name">
+            </div>
+            <div class="form-group">
+              <label for="issuerDesc">备注</label>
+              <input type="text" class="form-control" id="issuerDesc"  placeholder="Enter issuer description">
             </div>
           </div>
         </div>

@@ -57,7 +57,7 @@ $(document).ready(function(){
 	        formData.append("redis_address", $.trim($("#dbForm  #redis_address").val()));
             formData.append("redis_password", $.trim($("#dbForm  #redis_password").val()));
         }
-        $("#confirmMessage1Body").html("<p>配置提交中,请稍后...</p>");
+        $("#confirmMessage1Body").html("<p>> 配置提交中...</p>");
         $("#confirmMessage1Btn").addClass("disabled");
         $("#modal-confirm-message1").modal();
         $.ajax({
@@ -70,10 +70,10 @@ $(document).ready(function(){
                 console.log(res);
                 if (res=="success") {
                     //检查节点是否正确
-                    $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+                    $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 配置提交<span class='success-span'>成功</span>, 检查准备中...</p>");
                     setTimeout(checkForTimeout,2000);
                 } else if (res=="fail") {
-                     $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+                     $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
                      $("#confirmMessage1Btn").removeClass("disabled");
                 } else {
                     $("#confirmMessage1Btn").removeClass("disabled");
@@ -112,20 +112,20 @@ $(document).ready(function(){
     	return null;
     }
     function checkForTimeout() {
-    	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 配置检查中...</p>");
     	setTimeout(checkpersistence,2000);
     }
     function checkpersistence() {
     	$.get("checkPersistence",function(data,status){
            if(data) {//检查成功
-        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-   			   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p><span class='success-span'>目前暂不支持动态修改，如修改配置请重启服务生效。</span></p>");
+        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 配置检查<span class='success-span'>成功</span>。</p>");
+   			   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p><span class='success-span'>提示：目前暂不支持修改配置动态实时生效，修改配置需重启服务才能生效。</span></p>");
         	   $("#configBtn").removeClass("disabled");
         	   //disabledInput();
         	   $("#i-db").removeClass("fa-circle");
                $("#i-db").addClass("fa-check-circle");
            } else {//检查失败
-        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
            $("#modal-confirm-message1").modal();
            $("#confirmMessage1Btn").removeClass("disabled");

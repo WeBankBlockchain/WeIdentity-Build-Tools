@@ -27,21 +27,23 @@ $(document).ready(function(){
 	       	$("#modal-message").modal();
 	   		return;
         }
+        var description = $.trim($("#issuerDesc").val());
         $($this).addClass("disabled");
-        $($this).html("注册中,  请稍等...");
+        $($this).html("注册中...");
         isClose = false;
         var formData = {};
 	    formData.weId = weId;
 	    formData.name = name;
+	    formData.description = description;
         $.post("registerIssuer", formData ,function(value,status){
         	if (value == "success") {
-                $("#confirmMessageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>> 注册<span class='success-span'>成功</span>。</p>");
                 loadData();
                 isClose = true;
             }  else if (value == "fail") {
-            	 $("#confirmMessageBody").html("<p>注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>> 注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
-            	 $("#confirmMessageBody").html("<p>"+value+"</p>");
+            	 $("#confirmMessageBody").html("<p>> "+value+"</p>");
             }
             $($this).html("注册");
             $($this).removeClass("disabled");
@@ -105,7 +107,7 @@ function loadData() {
         	  }
         	  return "<image src='dist/img/deRecognize.svg' widht='50' height='50' />";
           }},
-          { data: 'hashShow'},
+          { data: 'description'},
           { "render": function (data, type, full, meta) {
         	  return getLocalTime(full.createTime * 1000);
           }},
@@ -139,7 +141,7 @@ function removeIssuer(obj, weId) {
 	    var disabled = $(obj).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
 	    $(obj).addClass("disabled");
-	    $(obj).html("删除中,  请稍等...");
+	    $(obj).html("删除中...");
 	    var formData = {};
 	    formData.weId = weId;
 		$.post("removeIssuer", formData, function(value,status){
@@ -164,7 +166,7 @@ function deRecognizeAuthorityIssuer(obj, weId) {
 	    if(disabled > 0) return;
 	    $(obj).addClass("disabled");
 	    var btnValue = $(obj).html();
-	    $(obj).html("认证撤销中,  请稍等...");
+	    $(obj).html("认证撤销中...");
 	    var formData = {};
 	    formData.weId = weId;
 		$.post("deRecognizeAuthorityIssuer", formData, function(value,status){
@@ -189,7 +191,7 @@ function  recognizeAuthorityIssuer(obj, weId) {
 	    if(disabled > 0) return;
 	    $(obj).addClass("disabled");
 	    var btnValue = $(obj).html();
-	    $(obj).html("认证中,  请稍等...");
+	    $(obj).html("认证中...");
 	    var formData = {};
 	    formData.weId = weId;
 		$.post("recognizeAuthorityIssuer", formData, function(value,status){

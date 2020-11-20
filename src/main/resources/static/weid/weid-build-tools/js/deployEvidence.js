@@ -6,6 +6,7 @@ $(document).ready(function(){
         } else {
         	//判断是否有子群组
         	if (hashChildGroup) {
+        		$("#evidenceName").val("");
         		$("#modal-evidence-deploy").modal();
         	} else {
         		$("#messageBody").html("<p>当前“WeIdentity 部署工具”连接的区块链节点只加入了一个区块链群组，且这个群组是主群组。我们不支持在主群组上额外部署 Evidence 智能合约。</p>");
@@ -29,23 +30,30 @@ $(document).ready(function(){
     	var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
+        var evidenceName = $.trim($("#evidenceName").val());
+    	if (evidenceName == "") {
+    		$("#messageBody").html("<p>请输入您的存证应用名!</p>");
+            $("#modal-message").modal();
+            return;
+    	}
         $($this).addClass("disabled");
         var btnValue = $($this).html();
-        $($this).html("部署中,  请稍等...");
+        $($this).html("部署中...");
         isClose = false;
     	var formData = {};
 	    formData.groupId = $("#groupId").val();
-	    $("#confirmMessage1Body").html("<p>存证部署中...</p>");
+	    formData.evidenceName = evidenceName;
+	    $("#confirmMessage1Body").html("<p>> 存证部署中...</p>");
 	    $("#confirmMessage1Btn").addClass("disabled");
 	    $("#modal-confirm-message1").modal();
     	$.post("deployEvidence", formData, function(value,status){
     		// 部署成功
            if (value != "") {
-        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>存证部署<span class='success-span'>成功</span>。</p>");
+        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 存证部署<span class='success-span'>成功</span>。</p>");
         	   checkFirstDeploy(value, formData.groupId);
         	   isClose = true;
            } else {
-        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>存证部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+        	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 存证部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
         	   $("#confirmMessage1Btn").removeClass("disabled");
            }
            $($this).html(btnValue);
@@ -80,7 +88,7 @@ function loadData() {
 	      "destroy": true,
 	      "autoWidth": false,
 	      "iDisplayLength": 7,
-	      "order": [[ 5, "desc" ], [ 4, "desc" ]],
+	      "order": [[ 6, "desc" ], [ 5, "desc" ]],
 	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
 	    	  "oPaginate": {
@@ -107,8 +115,11 @@ function loadData() {
 	         });
 	      },
 	      columns:[
+	    	  {"render": function ( data, type, full, meta) {
+	        	  return "<div title='" + full.evidenceName +"' class='text_overflow'>" + full.evidenceName + "</div>"
+	          }},
 	          {"render": function ( data, type, full, meta) {
-	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.owner + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
+	        	  return "<a href='javascript:showWeId(\"" + full.hash +"\", \"" + full.owner + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
 	          }},
 	          {"render": function ( data, type, full, meta) {
 	        	  return "<a href='javascript:showWeId(\"" + full.owner + "\")'>" + full.ownerShow + "</a><div class='display-none'>" + full.owner + "</div>"
@@ -139,6 +150,8 @@ function loadData() {
 	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enableHash(\"" + full.hash + "\" , \"" + full.groupId + "\")' class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
 	        	  }
 	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
+	        	  btnHtml += "<button type='button' name='showDetail' onclick='showDeploy(\"" + full.hash +"\", \"" + full.owner + "\")' class='btn btn-inline btn-primary btn-flat'>详细信息</button>&nbsp;&nbsp;";
+	        	  btnHtml += "<button type='button' name='showDetail' onclick='showUserList(\"" + full.hash +"\")' class='btn btn-inline btn-primary btn-flat'>启用的机构列表</button>&nbsp;&nbsp;";
 	        	  return btnHtml
 	          }}
 	        ]
@@ -148,7 +161,7 @@ function loadData() {
 function checkFirstDeploy(hash, groupId) {
 	$.get("isEnableEvidenceCns/" + groupId ,function(data,status){
 		if (data == true) {//说明为首次部署，则调用启用逻辑
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用中，请稍等...</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用中...</p>");
 			enableEvidenHash(hash, groupId);
 		} else {
 			loadData();
@@ -168,24 +181,24 @@ function processCnsBtn() {
 }
 
 function removeHash(hash, obj) {
-	$.confirm("是否确定删除该CNS数据?",function() {
+	$.confirm("是否确定删除?",function() {
 		var disabled = $(obj).attr("class").indexOf("disabled");
 	    if(disabled > 0) return;
 	    $(obj).addClass("disabled");
 	    $(obj).html("删除中...");
-		$("#confirmMessage1Body").html("<p>CNS删除中，请稍等...</p>");
+		$("#confirmMessage1Body").html("<p>> 删除中...</p>");
 		$("#confirmMessage1Btn").addClass("disabled");
 		$("#modal-confirm-message1").modal();
 		$.get("removeHash/" + hash + "/2", function(value,status){ 
 			if (value == "success") {
-				$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS删除<span class='success-span'>成功</span>。</p>");
+				$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 删除<span class='success-span'>成功</span>。</p>");
 				loadData();
 			} else if (value == "fail") {
-	        	 $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS删除<span class='fail-span'>失败</span>，请联系管理员。</p>");
+	        	 $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 删除<span class='fail-span'>失败</span>，请联系管理员。</p>");
 	        	 $(obj).removeClass("disabled");
 	     	     $(obj).html("删除");
 	        } else {
-	        	 $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>"+value+"</p>");
+	        	 $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> "+value+"</p>");
 	        	 $(obj).removeClass("disabled");
 	     	     $(obj).html("删除");
 	        }
@@ -203,7 +216,7 @@ function enableHash(hash, groupId) {
 			+"<br/>* 不同群组，可以启用不同的 Evidence 合约。";
 	$("#modal-confirm .modal-dialog").addClass("modal-lg");
 	$.confirm(message,function() {
-		$("#confirmMessage1Body").html("<p>CNS启用中，请稍等...</p>");
+		$("#confirmMessage1Body").html("<p>> 启用中...</p>");
 		$("#confirmMessage1Btn").addClass("disabled");
 		$("#modal-confirm-message1").modal();
 		enableEvidenHash(hash, groupId);
@@ -216,18 +229,17 @@ function enableEvidenHash(hash, groupId) {
     formData.groupId = groupId;
 	$.post("enableShareCns", formData, function(value,status){
 		if (value == "success") {
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用<span class='success-span'>成功</span>。</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用<span class='success-span'>成功</span>。</p>");
 			loadData();
 		} else if (value == "fail") {
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用<span class='fail-span'>失败</span>，请联系管理员。</p>");
 		} else {
-			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CNS启用<span class='fail-span'>失败</span>，原因：" + value + "</p>");
+			$("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>> 启用<span class='fail-span'>失败</span>，原因：" + value + "</p>");
 		}
 		$("#confirmMessage1Btn").removeClass("disabled");
 		$("#modal-confirm-message1").modal();
 	});
 }
-
 
 var deployDivTemplate = $("#deployDiv").html();
 function showDeploy(hash, weId) {
@@ -240,4 +252,47 @@ function showDeploy(hash, weId) {
 		 }
 		 $("#modal-show-deploy").modal();
 	 });
+}
+
+function showUserList(hash) {
+	$.get("getUserListByHash/" + hash, function(data,status){
+		var html = "<table id='table_user_list' class='table table-bordered table-hover' style='line-height: 40px;'>";
+		html +="<thead><tr><th width='200px'>权威机构名称</th><th title='WeIdentity DID'>WeID</th></tr></thead><tbody>";
+		for(var i = 0; i < data.length; i++) {
+			html +="<tr>";
+			if (data[i].name) {
+				html +="<td>" + data[i].name;
+				if (data[i].recognized) {
+					html += "&nbsp;<image src='dist/img/recognize.svg' widht='50' height='50'/>";
+        		} else {
+        			html += "&nbsp;<image src='dist/img/deRecognize.svg' widht='50' height='50'/>";
+        		}
+				html +="</td>";
+			} else {
+				html +="<td> </td>";
+			}
+			html += "<td>" + data[i].weId + "</td></tr>";
+		}
+		html += "</tbody></table>";
+		$("#modal-show-user .card-body").html(html);
+		$('#table_user_list').DataTable({
+  	      "paging": true,
+  	      "lengthChange": false,
+  	      "searching": true,
+  	      "ordering": false,
+  	      "iDisplayLength": 5,
+  	      "info": false,
+  	      "autoWidth": false,
+  	      "oLanguage": {
+  	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
+  	    	  "oPaginate": {
+	            "sFirst":    "第一页",
+	            "sPrevious": " 上一页 ",
+	            "sNext":     " 下一页 ",
+	            "sLast":     " 最后一页 "
+	          }
+  	      },
+  	    });
+		$("#modal-show-user").modal();
+    })
 }

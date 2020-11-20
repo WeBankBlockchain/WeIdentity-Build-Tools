@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bcos.web3j.crypto.Keys;
+import org.fisco.bcos.web3j.crypto.Keys;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
 import org.slf4j.Logger;
@@ -46,7 +46,6 @@ import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.deploy.DeployEvidence;
-import com.webank.weid.contract.deploy.v1.DeployContractV1;
 import com.webank.weid.contract.deploy.v2.DeployContractV2;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
@@ -103,12 +102,7 @@ public class DeployService {
         if (targetDir.exists()) {
             privateKey = FileUtils.readFile(targetDir.getAbsolutePath());
         }
-        if (fiscoConfig.getVersion().startsWith(WeIdConstant.FISCO_BCOS_1_X_VERSION_PREFIX)) {
-            DeployContractV1.deployContract(privateKey);
-        } else {
-            // false: 表示不即时注册hash到org_config CNS中
-            DeployContractV2.deployContract(privateKey, fiscoConfig, false);
-        }
+        DeployContractV2.deployContract(privateKey, fiscoConfig, false);
         logger.info("[deploy] the contract depoly finish.");
         //开始保存文件
         //将私钥移动到/output/admin中
@@ -201,7 +195,7 @@ public class DeployService {
             return dataList;
         }
         String currentHash = buildToolService.getMainHash();
-        List<HashContract> result = buildToolService.getDataBucket(CnsType.DEFAULT).getAllHash().getResult();
+        List<HashContract> result = buildToolService.getDataBucket(CnsType.DEFAULT).getAllBucket().getResult();
         String roleType = this.getRoleType();
         for (HashContract hashContract : result) {
             CnsInfo cns = new CnsInfo();
@@ -227,6 +221,8 @@ public class DeployService {
                 AuthorityIssuer issuer = buildToolService.getIssuerByWeId(cns.getWeId());
                 cns.setIssuer(issuer);
             }
+            String applyName = buildToolService.getDataBucket(CnsType.DEFAULT).get(cns.getHash(), BuildToolsConstant.APPLY_NAME).getResult();
+            cns.setApplyName(applyName);
             dataList.add(cns);
         }
         return dataList;
@@ -353,7 +349,7 @@ public class DeployService {
         // 默认将当前weid注册成为权威机构，并认证
         String orgId = ConfigUtils.getCurrentOrgId();
         // 注册权威机构
-        buildToolService.registerIssuer(weId, orgId, from);
+        buildToolService.registerIssuer(weId, orgId, null, from);
         // 认证权威机构
         buildToolService.recognizeAuthorityIssuer(weId);
     }
@@ -361,8 +357,9 @@ public class DeployService {
     /**
      * 给当前账户创建WeId.
      * @param from 创建来源
+     * @return 返回创建的weId
      */
-    public void createWeIdForCurrentUser(DataFrom from) {
+    public String createWeIdForCurrentUser(DataFrom from) {
         //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId
         CreateWeIdArgs arg = new CreateWeIdArgs();
         arg.setWeIdPrivateKey(getCurrentPrivateKey());
@@ -374,8 +371,10 @@ public class DeployService {
             logger.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
             String result = buildToolService.createWeId(arg, from, true);
             logger.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
+            return result;
         } else {
-            logger.info("[createWeIdForCurrentUser] the current weId is exist."); 
+            logger.info("[createWeIdForCurrentUser] the current weId is exist.");
+            return weId;
         }
     }
     
@@ -401,11 +400,11 @@ public class DeployService {
         logger.info("[enableHash] begin enable the hash: {}", hash);
         //启用新hash
         WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
-        ResponseData<Boolean> enableHash = buildToolService.getDataBucket(cnsType).enableHash(hash, privateKey);
+        ResponseData<Boolean> enableHash = buildToolService.getDataBucket(cnsType).enable(hash, privateKey);
         logger.info("[enableHash] enable the hash {} --> result: {}", hash, enableHash);
         //如果原hash不为空，则停用原hash
         if (StringUtils.isNotBlank(oldHash)) {
-            ResponseData<Boolean> disableHash = buildToolService.getDataBucket(cnsType).disableHash(oldHash, privateKey);
+            ResponseData<Boolean> disableHash = buildToolService.getDataBucket(cnsType).disable(oldHash, privateKey);
             logger.info("[enableHash] disable the old hash {} --> result: {}", oldHash, disableHash);
         } else {
             logger.info("[enableHash] no old hash to disable");
@@ -484,7 +483,7 @@ public class DeployService {
         }
         String orgId = ConfigUtils.getCurrentOrgId();
         DataBucketServiceEngine dataBucket = buildToolService.getDataBucket(CnsType.SHARE);
-        List<HashContract> list = dataBucket.getAllHash().getResult();
+        List<HashContract> list = dataBucket.getAllBucket().getResult();
         // 判断机构配置私钥是否匹配所有者，如果不匹配页面可以不用显示按钮
         boolean isMatch =  buildToolService.isMatchThePrivateKey();
         Map<String, AuthorityIssuer> cache = new HashMap<String, AuthorityIssuer>();
@@ -511,6 +510,8 @@ public class DeployService {
                         share.setIssuer(issuer);
                         cache.put(share.getOwner(), issuer);
                     }
+                    String evidenceName = dataBucket.get(share.getHash(), BuildToolsConstant.EVIDENCE_NAME).getResult();
+                    share.setEvidenceName(evidenceName);
                     result.add(share);
                 }
             }

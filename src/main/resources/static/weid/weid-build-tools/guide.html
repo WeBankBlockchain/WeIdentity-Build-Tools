@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeIdentity 部署工具</title>
+  <title>WeIdentity 网页管理工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="plugins/swiper/swiper.min.css">
@@ -21,7 +21,7 @@
 <div class="wrapper">
   <ul class="navbar-nav">
     <li class="nav-item col-md-6 offset-md-3">
-            <span>WeIdentity 部署工具</span>
+            <span>WeIdentity 网页管理工具</span>
             <span id="openLog">查看后台日志</span>
     </li>
   </ul>
@@ -539,9 +539,19 @@
                                     </div>
                                     <div class="card-body role_body" style='padding:0 1.25rem;'>
                                     <div class="form-group" style='width:100%;'><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html?highlight=chain-id#id4" target="blank_"><span style="color: #017CFF;">
-                                        <img src="./dist/img/icon-question.svg" alt="">
-                                        什么是chain id?</span></a>
+                                        <img src="./dist/img/icon-question.svg" alt="">什么是chain id?</span></a>
                                        <input type="text"  class="form-control" id="chainId" name="chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" placeholder="Enter chainId">
+                                     </div>
+                                    </div>
+                                    <div class="card-header">
+                                        <h6>为应用设置名字</h6>
+                                    </div>
+                                    <div class="card-body role_body" style='padding:0 1.25rem;'>
+                                     <div class="form-group" style='width:100%;'>
+                                       <span style="display: block;color: gray;float: left;padding-bottom: 10px;">给自己的WeIdentity区块链应用起一个名字吧，用于在同一条链上区别不同的 WeIdentity 应用，例如“学历证书应用”，“区块链证件应用”。</span>
+                                       <div>
+                                         <input type="text" class="form-control" id="applyName" name="applyName" placeholder="Enter applyName">
+                                       </div>
                                      </div>
                                     </div>
                                     <div class="db-part">

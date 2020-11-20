@@ -192,7 +192,7 @@ $(document).ready(function(){
 	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
 	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
 //	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
-	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
+	    $("#checkBody").html("<p>> 配置提交中...</p>");
 	    $("#modal-default").modal();
 	    $("#goNext").addClass("disabled");
 	    $.ajax({
@@ -204,10 +204,10 @@ $(document).ready(function(){
 	        success:function(res) {
 	            if (res=="success") {
 	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+	            	$("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='success-span'>成功</span>, 检查准备中...</p>");
 	            	setTimeout(checkNodeForTimeout,2000);
 	            } else {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+	            	 $("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
 	            } 
 	        }
 	    })	
@@ -257,7 +257,7 @@ $(document).ready(function(){
 	
 	// 配置提交成功后进行节点检查
     function checkNodeForTimeout() {
-    	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#checkBody").html($("#checkBody").html() + "<p>> 配置检查中...</p>");
     	setTimeout(checkNode,2000);
     }
     
@@ -265,7 +265,7 @@ $(document).ready(function(){
     function checkNode() {
     	$.get("checkNode",function(data,status){
             if(data == "success") {//检查成功
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+         	   $("#checkBody").html($("#checkBody").html() + "<p>> 配置检查<span class='success-span'>成功</span>。</p>");
 				$("#goNext").removeClass("disabled");
 				$("#goNext").addClass("nodeGoNext");
 				//disabledInput(); //禁止修改操作
@@ -281,9 +281,9 @@ $(document).ready(function(){
 					}
          	   })
             } else if (data == "fail"){//检查失败
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+         	   $("#checkBody").html($("#checkBody").html() + "<p>> 配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
             } else {//检查失败
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
+         	   $("#checkBody").html($("#checkBody").html() + "<p>> 配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
             }
          });
     }
@@ -405,7 +405,7 @@ $(document).ready(function(){
             formData.append("redis_address", $.trim($("#dbForm  #redis_address").val()));
             formData.append("redis_password", $.trim($("#dbForm  #redis_password").val()));
         }
-        $("#checkBody").html("<p>配置提交中,请稍后...</p>");
+        $("#checkBody").html("<p>> 配置提交中...</p>");
         $("#modal-default").modal();
         $("#goNext").addClass("disabled");
         $.ajax({
@@ -417,11 +417,11 @@ $(document).ready(function(){
             success:function(res) {
                 if (res=="success") {
                     //检查节点是否正确
-                    $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+                    $("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='success-span'>成功</span>, 检查准备中...</p>");
                     setTimeout(checkForTimeout,2000);
                     localStorage.clear();
                 } else {
-                     $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+                     $("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
                 }
             }
         })
@@ -456,18 +456,14 @@ $(document).ready(function(){
     }
     
     function checkForTimeout() {
-    	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+    	$("#checkBody").html($("#checkBody").html() + "<p>> 配置检查中...</p>");
     	setTimeout(checkpersistence,2000);
     }
-//   function redisCheckForTimeout() {
-//        $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
-//        setTimeout(checkredis,2000);
-//    }
     
     function checkpersistence() {
     	$.get("checkPersistence",function(data,status){
            if(data) {//检查成功
-        	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+        	   $("#checkBody").html($("#checkBody").html() + "<p>> 配置检查<span class='success-span'>成功</span>。</p>");
 			   $("#goNext").removeClass("disabled");
 			   //disabledInput();
 			   $("#goNext").addClass("bdGoNext");
@@ -496,7 +492,7 @@ $(document).ready(function(){
         		   }	
           	  })
            } else {//检查失败
-        	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+        	   $("#checkBody").html($("#checkBody").html() + "<p>> 配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
            }
         });
     }
@@ -570,7 +566,7 @@ $(document).ready(function(){
 		$(obj).addClass("disabled");
 	    var formData = new FormData();
 	    formData.append("ecdsa", $("#privateKeyFile")[0].files[0]);
-	    $("#checkBody").html("<p>账户创建中,请稍后...</p>");
+	    $("#checkBody").html("<p>> 账户创建中...</p>");
 	    $("#goNext").addClass("disabled");
 	    $("#modal-default").modal();
 	    $.ajax({
@@ -581,11 +577,11 @@ $(document).ready(function(){
 	        processData: false,
 	        success:function(res) {
 	            if (res=="fail") {
-	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+	            	$("#checkBody").html($("#checkBody").html() + "<p>> 账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
 //	            	$("#postBtn").removeClass("disabled");
 	            	$(obj).removeClass("disabled");
 	            } else {
-	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
+	            	$("#checkBody").html($("#checkBody").html() + "<p>> 账户创建<span class='success-span'>成功</span>。</p>");
 	            	// 新增的内容开始
 	            	$(".card-title").html("当前admin账户");
 	            	$("#createDiv").hide();

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>WeIdentity 部署工具</title>
+  <title>WeIdentity 网页管理工具</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
@@ -64,12 +64,13 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>智能合约信息</th>
+                  <th style="width: 200px">应用名字</th>
+                  <th>智能合约部署ID</th>
                   <th>部署账户</th>
                   <th>部署机构的名称</th>
-                  <th>部署的群组</th>
+                  <th>所在群组</th>
                   <th>创建时间</th>
-                  <th width="300px">操作</th>
+                  <th width="400px">操作</th>
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
@@ -103,6 +104,11 @@
               <div class="col-sm-12"><span style="font-size: 13px;color: gray">1. 找不到想找要的FISCO-BCOS群组ID？请确认下是否已经完成群组的部署。</span></div>
               <div class="col-sm-12"><span style="font-size: 13px;color: gray">2. 只能在“非主群组”上部署存证智能合约，主群组上的存证智能合约不能随意替换。</span></div>
             </div>
+            <div class="form-group">
+              <label for="evidenceName">存证应用名字</label>
+              <input type="text" class="form-control" id="evidenceName" name="evidenceName" placeholder="Enter evidenceName">
+              <span style="font-size: 13px;color: gray">给存证区块链应用起一个名字吧，用于不同的存证使用场景，例如“学历证书应用存证”。</span>
+            </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
@@ -128,7 +134,7 @@
             <table  class="table table-hover">
               <tbody>
                 <tr>
-                  <td>CNS编码</td>
+                  <td>智能合约部署ID</td>
                   <td colspan="3">${hash}</td>
                 </tr>
                 <tr>
@@ -169,6 +175,25 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <div class="modal fade" id="modal-show-user">
+    <div class="modal-dialog modal-lg">
+      <div id="deployDiv" class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">启用的机构列表</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div  class="modal-body">
+          <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
+           
           </div>
         </div>
       </div>

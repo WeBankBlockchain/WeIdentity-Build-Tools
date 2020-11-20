@@ -16,7 +16,7 @@ $(document).ready(function(){
     	var $this = this;
     	var cptIds = getCptIds();
         if (cptIds.length == 0) {
-        	$("#messageBody").html("<p>请选择需要转换的凭证类型(CPT)</p>");
+        	$("#messageBody").html("<p>请选择需要转换的凭证模板(CPT)</p>");
     		$("#modal-message").modal();
     		return;
         }
@@ -26,12 +26,12 @@ $(document).ready(function(){
             if(disabled > 0) return;
             $($this).addClass("disabled");
             var btnValue = $($this).html();
-            $($this).html("转换中,  请稍等...");
+            $($this).html("转换中...");
         	$.get("cptToPojo",{cptIds:cptIds},function(data,status){
         		if (data == "success") {
-        			$("#messageBody").html("<p>凭证类型(CPT)转Jar包<span class='success-span'>成功</span>。</p>");
+        			$("#messageBody").html("<p>凭证模板(CPT)转Jar包<span class='success-span'>成功</span>。</p>");
         		} else {
-        			$("#messageBody").html("<p>凭证类型(CPT)转Jar包<span class='fail-span'>失败</span>，请查看后台日志。</p>");
+        			$("#messageBody").html("<p>凭证模板(CPT)转Jar包<span class='fail-span'>失败</span>，请查看后台日志。</p>");
         		}
         		$("#modal-message").modal();
         		$($this).html(btnValue);
@@ -140,12 +140,12 @@ $(document).ready(function(){
         var cptTitle = $.trim($("#nodeForm  #cptTitle").val());
         var cptDesc = $.trim($("#nodeForm  #cptDesc").val());
         if (cptTitle.length == 0) {
-            $("#messageBody").html("<p>凭证类型(CPT)标题不能为空</p>");
+            $("#messageBody").html("<p>凭证模板(CPT)标题不能为空</p>");
             $("#modal-message").modal();
             return;
         }
         if (cptDesc.length == 0) {
-            $("#messageBody").html("<p>凭证类型(CPT)描述不能为空</p>");
+            $("#messageBody").html("<p>凭证模板(CPT)描述不能为空</p>");
             $("#modal-message").modal();
             return;
         }
@@ -161,7 +161,7 @@ $(document).ready(function(){
         formData.append("cptJson", JSON.stringify(cptJsonData));
         formData.append("cptId", cptId);
         var btnValue = $(thisObj).html();
-        $(thisObj).html("凭证类型(CPT)注册中，请稍后...");
+        $(thisObj).html("凭证模板(CPT)注册中...");
         $(thisObj).addClass("disabled");
         $.ajax({
             url:'registerCpt', /*接口域名地址*/
@@ -173,11 +173,11 @@ $(document).ready(function(){
                 console.log(res);
                 isClose = false;
                 if (res=="success") {
-                    $("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='success-span'>成功</span>。</p>");
+                    $("#confirmMessageBody").html("<p>凭证模板(CPT)注册<span class='success-span'>成功</span>。</p>");
                     isClose = true;
                     loadData();
                 } else if (res=="fail") {
-                    $("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='fail-span'>失败</span>，请查看服务端日志。</p>");
+                    $("#confirmMessageBody").html("<p>凭证模板(CPT)注册<span class='fail-span'>失败</span>，请查看服务端日志。</p>");
                 } else {
                     $("#confirmMessageBody").html("<p>"+res+"</p>");
                 }
@@ -195,12 +195,12 @@ $(document).ready(function(){
         var cptTitle = $.trim($("#oneLeveFrom  #cptTitle").val());
         var cptDesc = $.trim($("#oneLeveFrom  #cptDesc").val());
         if (cptTitle.length == 0) {
-            $("#messageBody").html("<p>凭证类型(CPT)标题不能为空</p>");
+            $("#messageBody").html("<p>凭证模板(CPT)标题不能为空</p>");
             $("#modal-message").modal();
             return;
         }
         if (cptDesc.length == 0) {
-            $("#messageBody").html("<p>凭证类型(CPT)描述不能为空</p>");
+            $("#messageBody").html("<p>凭证模板(CPT)描述不能为空</p>");
             $("#modal-message").modal();
             return;
         }
@@ -300,9 +300,9 @@ $(document).ready(function(){
         var cptId = $("#fromCptId").val();
         var policyId = $("#policyId").val();
         var btnValue = $(thisObj).html();
-        $(thisObj).html("转换中，请稍后...");
+        $(thisObj).html("转换中...");
         $(thisObj).addClass("disabled");
-        $("#confirmMessage1Body").html("<p>转换中，请稍后...</p>");
+        $("#confirmMessage1Body").html("<p>转换中...</p>");
         $("#confirmMessage1Btn").addClass("disabled");
         $("#modal-confirm-message1").modal();
         var formData = {};

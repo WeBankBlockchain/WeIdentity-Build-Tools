@@ -26,7 +26,7 @@ cd ${SOURCE_CODE_DIR}
 
 build_classpath
 
-echo "Begin to register specific issuers and types, please wait..."
+echo "Th program is running, please wait..."
 
 java ${JAVA_OPTS} -cp "$CLASSPATH" com.webank.weid.command.RegisterSpecificIssuer $@ 
 
@@ -34,5 +34,3 @@ if [ ! $? -eq 0 ]; then
     echo "Register specific issuers and types failed, please check error logs for details."
     exit $?
 fi
-
-echo "Specific issuers and types have been successfully registered on blockchain."

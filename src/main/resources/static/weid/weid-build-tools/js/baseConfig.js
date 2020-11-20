@@ -31,7 +31,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         var thisBtn = this;
         $(thisBtn).addClass("disabled");
-        $(thisBtn).html("测试中，请稍后...");
+        $(thisBtn).html("> 测试中...");
         $.get("checkNode",function(data,status){
            if(data) {//检查成功
                $("#checkBody").html("<p>配置检查成功。</p>");
@@ -49,7 +49,7 @@ $(document).ready(function(){
         if(disabled > 0) return;
         var thisBtn = this;
         $(thisBtn).addClass("disabled");
-        $(thisBtn).html("测试中，请稍后...");
+        $(thisBtn).html("测试中...");
         $.get("checkDb",function(data,status){
            if(data) {//检查成功
                $("#checkBody").html("<p>配置检查成功。</p>");

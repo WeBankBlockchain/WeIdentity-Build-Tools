@@ -213,9 +213,11 @@ public class BuildToolController {
     public String checkAdmin() {
         return deployService.checkAdmin();
     }
-
-    @GetMapping("/deploy/{chainId}")
-    public String deploy(@PathVariable("chainId") String chainId) {
+    @PostMapping("/deploy")
+    public String deploy(
+        @RequestParam("chainId")  String chainId,
+        @RequestParam(BuildToolsConstant.APPLY_NAME) String applyName
+    ) {
         logger.info("[deploy] begin load fiscoConfig...");
         try {
             FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
@@ -223,6 +225,12 @@ public class BuildToolController {
             String hash = deployService.deploy(fiscoConfig, DataFrom.WEB);
             //configService.updateChainId(chainId);
             logger.info("[deploy] the hash: {}", hash);
+            //将应用名写入配置中
+            applyName = StringEscapeUtils.unescapeHtml(applyName);
+            WeIdPrivateKey currentPrivateKey = DeployService.getWeIdPrivateKey(hash);
+            ResponseData<Boolean> response = buildToolService.getDataBucket(CnsType.DEFAULT)
+                .put(hash, BuildToolsConstant.APPLY_NAME, applyName, currentPrivateKey);
+            logger.info("[deploy] put applyName: {}", response);
             return hash;
         } catch (Exception e) {
             logger.error("[deploy] the contract depoly error.", e);
@@ -309,9 +317,9 @@ public class BuildToolController {
                 //如果上一个地址不为空，并且新hash地址跟上一个地址不相同则reloadAddress
                 if (StringUtils.isNotBlank(preMainHash) && !preMainHash.equals(cnsInfo.getHash())) {
                     reloadAddress();
-                    //判断当前账户是否注册成weid，如果没有则创建weid
-                    deployService.createWeIdForCurrentUser(DataFrom.WEB);
                 }
+                //当前账户创建weId，（内部有判断如果已创建则不会调用区块链创建）
+                deployService.createWeIdForCurrentUser(DataFrom.WEB);
                 preMainHash = cnsInfo.getHash();
             }
         }
@@ -460,11 +468,7 @@ public class BuildToolController {
         if (StringUtils.isBlank(groupId)) {
             groupId = "0";
         }
-        String profileActive = request.getParameter("cnsProFileActive");
-        String privName = request.getParameter("privName");
-        if (profileActive.equals("priv")) {
-            profileActive = privName;
-        }
+        String profileActive = configService.loadConfig().get("cns_profile_active");
         //根据模板生成配置文件
         if(configService.processNodeConfig(ipPort, version, orgId, amopId, groupId, profileActive)) {
             return BuildToolsConstant.SUCCESS;
@@ -571,12 +575,13 @@ public class BuildToolController {
     @Description("注册issuer")
     @PostMapping("/registerIssuer")
     public String registerIssuer(
-            @RequestParam("weId") String weId,
-            @RequestParam("name") String name
+        @RequestParam("weId") String weId,
+        @RequestParam("name") String name,
+        @RequestParam("description") String description
     ) {
-
+        description = StringEscapeUtils.unescapeHtml(description);
         try {
-            return buildToolService.registerIssuer(weId, name, DataFrom.WEB);
+            return buildToolService.registerIssuer(weId, name, description, DataFrom.WEB);
         } catch (Exception e) {
             logger.error("[registerIssuer] register issuer has error.", e);
             return BuildToolsConstant.FAIL;
@@ -865,9 +870,19 @@ public class BuildToolController {
 
     @Description("根据群组Id部署Evidence合约")
     @PostMapping("/deployEvidence")
-    public String deployEvidence(@RequestParam(value = "groupId") Integer groupId) {
+    public String deployEvidence(
+        @RequestParam(value = "groupId") Integer groupId,
+        @RequestParam(value = "evidenceName") String evidenceName
+    ) {
         FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-        return deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
+        String hash = deployService.deployEvidence(fiscoConfig, groupId, DataFrom.WEB);
+        //将应用名写入配置中
+        evidenceName = StringEscapeUtils.unescapeHtml(evidenceName);
+        WeIdPrivateKey currentPrivateKey = DeployService.getWeIdPrivateKey(hash);
+        ResponseData<Boolean> response = buildToolService.getDataBucket(CnsType.SHARE)
+            .put(hash, BuildToolsConstant.EVIDENCE_NAME, evidenceName, currentPrivateKey);
+        logger.info("[deployEvidence] put evidenceName: {}", response);
+        return hash;
     }
 
     @Description("启用新的shareHash,禁用老的shareHash")
@@ -1006,5 +1021,17 @@ public class BuildToolController {
             }
         }
         return list;
+    }
+    
+    @Description("根据hash查询所有的启用成员")
+    @GetMapping("/getUserListByHash/{hash}")
+    public List<AuthorityIssuer> getUserListByHash(@PathVariable("hash") String hash) {
+        try {
+            logger.info("[getUserListByHash] get user list by hash = {}.", hash);
+            return buildToolService.getUserListByHash(hash);
+        } catch (Exception e) {
+            logger.error("[getUserListByHash] get user list by hash = {} has error.", hash);
+            return new ArrayList<AuthorityIssuer>();
+        }
     }
 }

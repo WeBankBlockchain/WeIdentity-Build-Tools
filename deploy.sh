@@ -10,7 +10,7 @@ port=$(grep "server\.port" $applicationFile |awk -F "=" '{print $2}')
 function reloadAddressForWeb() {
     export WEB_PID=`ps aux|grep "BuildToolApplication" | grep -v grep|awk '{print $2}'|head -1`
     if [ -n "$WEB_PID" ];then
-        curl http://localhost:${port}/reloadAddress
+        curl http://localhost:${port}/weid/weid-build-tools/reloadAddress
     fi
 }
 

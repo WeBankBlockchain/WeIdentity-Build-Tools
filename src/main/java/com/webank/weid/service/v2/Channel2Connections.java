@@ -19,7 +19,6 @@
 
 package com.webank.weid.service.v2;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,10 +29,12 @@ import javax.net.ssl.SSLException;
 import org.fisco.bcos.channel.handler.ChannelConnections;
 import org.fisco.bcos.channel.handler.ChannelHandler;
 import org.fisco.bcos.channel.handler.ConnectionInfo;
+import org.fisco.bcos.web3j.crypto.EncryptType;
 import org.fisco.bcos.web3j.tuples.generated.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import io.netty.bootstrap.Bootstrap;
@@ -56,7 +57,11 @@ import io.netty.util.concurrent.Future;
 public class Channel2Connections extends ChannelConnections {
     
     private static Logger logger = LoggerFactory.getLogger(ChannelConnections.class);
-    
+    /** SSL connection default configuration */
+    private static final String CA_CERT = "classpath:ca.crt";
+
+    private static final String SSL_CERT = "classpath:node.crt";
+    private static final String SSL_KEY = "classpath:node.key";
     private long idleTimeout = (long) 10000;
     private long connectTimeout = (long) 10000;
     private long sslHandShakeTimeout = (long) 10000;
@@ -67,7 +72,7 @@ public class Channel2Connections extends ChannelConnections {
     
     private boolean running = false;
     
-    public void startConnect() throws SSLException {
+    public void startConnect() throws Exception {
         if (running) {
             logger.debug("running");
             return;
@@ -86,7 +91,10 @@ public class Channel2Connections extends ChannelConnections {
         final ChannelConnections selfService = this;
         final ThreadPoolTaskExecutor selfThreadPool = super.getThreadPool();
 
-        SslContext sslCtx = initSslContextForConnect();
+        SslContext sslContext =
+                (EncryptType.encryptType == EncryptType.ECDSA_TYPE)
+                        ? initSslContext()
+                        : initSMSslContext();
         logger.debug(" connect sslcontext init success");
 
         bootstrap.handler(
@@ -100,7 +108,7 @@ public class Channel2Connections extends ChannelConnections {
                         handler.setConnections(selfService);
                         handler.setThreadPool(selfThreadPool);
 
-                        SslHandler sslHandler = sslCtx.newHandler(ch.alloc());
+                        SslHandler sslHandler = sslContext.newHandler(ch.alloc());
                         /** set ssl handshake timeout */
                         sslHandler.setHandshakeTimeoutMillis(sslHandShakeTimeout);
 
@@ -184,27 +192,80 @@ public class Channel2Connections extends ChannelConnections {
         logger.debug(" start connect end. ");
     }
     
-    private SslContext initSslContextForConnect() throws SSLException {
+    private SslContext initSslContext() throws SSLException {
         SslContext sslCtx;
         try {
+
+            if (!isEnableOpenSSL()) {
+                System.setProperty("jdk.tls.namedGroups", "secp256k1");
+                logger.info("set jdk.tls.namedGroups option");
+            }
+
+            PathMatchingResourcePatternResolver resolver =
+                    new PathMatchingResourcePatternResolver();
+
+            // check ssl cert file
             Resource caResource = getCaCert();
-            InputStream caInputStream = caResource.getInputStream();
             Resource keystorecaResource = getSslCert();
             Resource keystorekeyResource = getSslKey();
 
+            // check if ca.crt exist
+            if (Objects.isNull(caResource) || !caResource.exists()) {
+                Resource resource = resolver.getResource(CA_CERT);
+                if (Objects.nonNull(resource) && resource.exists()) {
+                    caResource = resource;
+                } else {
+                    throw new RuntimeException(
+                            (Objects.nonNull(caResource) ? "ca.crt" : caResource.getFilename())
+                                    + " not exist ");
+                }
+            }
+
+            // check if sdk.crt exist, if not , check the default value node.crt
+            if (Objects.isNull(keystorecaResource) || !keystorecaResource.exists()) {
+                Resource resource = resolver.getResource(SSL_CERT);
+                if (Objects.nonNull(resource) && resource.exists()) {
+                    keystorecaResource = resource;
+                } else {
+                    throw new RuntimeException(
+                            (Objects.nonNull(keystorecaResource)
+                                            ? "sdk.crt"
+                                            : keystorecaResource.getFilename())
+                                    + " not exist ");
+                }
+            }
+
+            // check if sdk.key exist, if not, check the default value sdk.key
+            if (Objects.isNull(keystorekeyResource) || !keystorekeyResource.exists()) {
+                Resource resource = resolver.getResource(SSL_KEY);
+                if (Objects.nonNull(resource) && resource.exists()) {
+                    keystorekeyResource = resource;
+                } else {
+                    throw new RuntimeException(
+                            (Objects.nonNull(keystorekeyResource)
+                                            ? "sdk.key"
+                                            : keystorekeyResource.getFilename())
+                                    + " not exist ");
+                }
+            }
+
+            logger.info(
+                    " ca certificate: {}, sdk certificate: {}, sdk key: {}, enableOpenSsl: {}",
+                    caResource.getFilename(),
+                    keystorecaResource.getFilename(),
+                    keystorekeyResource.getFilename(),
+                    isEnableOpenSSL());
+
             sslCtx =
                     SslContextBuilder.forClient()
-                            .trustManager(caInputStream)
+                            .trustManager(caResource.getInputStream())
                             .keyManager(
                                     keystorecaResource.getInputStream(),
                                     keystorekeyResource.getInputStream())
-                            .sslProvider(SslProvider.OPENSSL)
+                            .sslProvider(isEnableOpenSSL() ? SslProvider.OPENSSL : SslProvider.JDK)
                             .build();
         } catch (Exception e) {
-            logger.error(
-                    " Failed to initialize the SSLContext, error mesage: {}, error: {} ",
-                    e.getMessage(),
-                    e.getCause());
+            logger.error(" Failed to initialize the SSLContext, e: {} ", e.getCause());
             throw new SSLException(" Failed to initialize the SSLContext: " + e.getMessage());
         }
         return sslCtx;

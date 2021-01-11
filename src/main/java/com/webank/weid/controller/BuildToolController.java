@@ -466,6 +466,7 @@ public class BuildToolController {
         String orgId = request.getParameter("orgId");
         String amopId = request.getParameter("amopId");
         String version = request.getParameter("version");
+        String encryptType = request.getParameter("encryptType");
         String ipPort = request.getParameter("ipPort");
         String groupId = configService.loadConfig().get("group_id");
         if (StringUtils.isBlank(groupId)) {
@@ -473,7 +474,7 @@ public class BuildToolController {
         }
         String profileActive = configService.loadConfig().get("cns_profile_active");
         //根据模板生成配置文件
-        if(configService.processNodeConfig(ipPort, version, orgId, amopId, groupId, profileActive)) {
+        if(configService.processNodeConfig(ipPort, version, encryptType, orgId, amopId, groupId, profileActive)) {
             return BuildToolsConstant.SUCCESS;
         }
         return BuildToolsConstant.FAIL;

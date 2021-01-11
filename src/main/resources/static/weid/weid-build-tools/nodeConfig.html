@@ -128,50 +128,74 @@
                                 <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
                                 <input type="text" class="form-control" id="ipPort" name="ipPort" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" placeholder="IP:PORT,IP:PORT">
                               </div>
-                              <div class="form-group">
-                                    <label for="caCrtFile">ca.crt证书</label> 
+                                <div id="ecdsa" class="form-group">
+                                    <label for="caCrtFile">ca.crt证书</label>
                                     <div class="input-group">
-                                      <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="caCrtFile" name="caCrtFile">
-                                        <label class="custom-file-label"  for="caCrtFile">选择文件...</label>
-                                      </div>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="caCrtFile" name="caCrtFile">
+                                            <label class="custom-file-label"  for="caCrtFile">选择文件...</label>
+                                        </div>
                                     </div>
-                                    <span id="caCrtSpan"></span>
-                                  </div>
-                              <div id="caV2">
-                                   <div class="form-group">
-                                    <label for="nodeCrtFile">node.crt证书</label> 
+                                    <span style='margin-top:0.5rem' id="caCrtSpan"></span>
+                                    <label for="nodeCrtFile">node.crt证书</label>
                                     <div class="input-group">
-                                      <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="nodeCrtFile" name="nodeCrt">
-                                        <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
-                                      </div>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="nodeCrtFile" name="nodeCrt">
+                                            <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
+                                        </div>
                                     </div>
-                                    <span id="nodeCrtSpan"></span>
-                                  </div>
-                                   <div class="form-group">
-                                    <label for="nodeKeyFile">node.key证书</label> 
+                                    <span style='margin-top:0.5rem' id="nodeCrtSpan"></span>
+                                    <label for="nodeKeyFile">node.key证书</label>
                                     <div class="input-group">
-                                      <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="nodeKeyFile" name="nodeKeyFile">
-                                        <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
-                                      </div>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="nodeKeyFile" name="nodeKeyFile">
+                                            <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
+                                        </div>
                                     </div>
-                                    <span id="nodeKeySpan"></span>
-                                  </div>
-                              </div>
-                              <div id="caV1" style="display: none">
-                                   <div class="form-group">
-                                    <label for="clientKeyStoreFile">client.keystore证书</label> 
+                                    <span style='margin-top:0.5rem' id="nodeKeySpan"></span>
+                                </div>
+                                <div id="sm2" class="form-group">
+                                    <label for="caCrtFile">gmca.crt证书</label>
                                     <div class="input-group">
-                                      <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="clientKeyStoreFile" name="clientKeyStoreFile">
-                                        <label class="custom-file-label" for="clientKeyStoreFile">选择文件...</label>
-                                      </div>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="gmCaCrtFile" name="gmCaCrtFile">
+                                            <label class="custom-file-label"  for="caCrtFile">选择文件...</label>
+                                        </div>
                                     </div>
-                                    <span id="cllientKeyStoreSpan"></span>
-                                  </div>
-                              </div>
+                                    <span style='margin-top:0.5rem' id="gmCaCrtSpan"></span>
+                                    <label for="gmSdkCrtFile">gmsdk.crt证书</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="gmSdkCrtFile" name="gmSdkCrtFile">
+                                            <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
+                                        </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="gmSdkCrtSpan"></span>
+                                    <label for="nodeKeyFile">gmsdk.key证书</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="gmSdkKeyFile" name="gmSdkKeyFile">
+                                            <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
+                                        </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="gmSdkKeySpan"></span>
+                                    <label for="nodeCrtFile">gmensdk.crt证书</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="gmenSdkCrtFile" name="gmenSdkCrtFile">
+                                            <label class="custom-file-label" for="nodeCrtFile">选择文件...</label>
+                                        </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="gmenSdkCrtSpan"></span>
+                                    <label for="nodeKeyFile">gmensdk.key证书</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="gmenSdkKeyFile" name="gmenSdkKeyFile">
+                                            <label class="custom-file-label" for="nodeKeyFile">选择文件...</label>
+                                        </div>
+                                    </div>
+                                    <span style='margin-top:0.5rem' id="gmenSdkKeySpan"></span>
+                                </div>
                                <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html?highlight=配置SDK证书#certificate-create" target="blank_">
                                 <img src="./dist/img/icon-question.svg" alt="">
                                 <span style="color:#017CFF;font-size:12px;">

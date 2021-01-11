@@ -70,7 +70,6 @@ function loadData() {
       "destroy": true,
       "autoWidth": false,
       "iDisplayLength": 7,
-      "pagingType":"simple",
       "oLanguage": {
     	  "sZeroRecords": "对不起，查询不到任何相关数据",
     	  "oPaginate": {

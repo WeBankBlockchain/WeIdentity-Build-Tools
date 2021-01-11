@@ -20,6 +20,8 @@
 package com.webank.weid.constant;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The Class WeIdConstant.
@@ -57,5 +59,6 @@ public final class BuildToolsConstant {
     public static final String APPLY_NAME = "applyName";
     
     public static final String EVIDENCE_NAME = "evidenceName";
-
+    
+    public static final List<Integer> CPTID_LIST = Arrays.asList(101, 102, 103, 106, 107, 110, 111);
 }

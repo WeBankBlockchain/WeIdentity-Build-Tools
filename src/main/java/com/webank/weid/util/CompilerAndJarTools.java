@@ -178,8 +178,9 @@ public class CompilerAndJarTools {
         fos.close();
         // 生成目标路径
         File targetJarFile = new File(targetPath + File.separator + jarFileName);
-        if (targetJarFile.exists() && targetJarFile.isFile())
+        if (targetJarFile.exists() && targetJarFile.isFile()) {
             targetJarFile.delete();
+        }
         FileUtils.moveFile(jarFile, targetJarFile);
     }
 

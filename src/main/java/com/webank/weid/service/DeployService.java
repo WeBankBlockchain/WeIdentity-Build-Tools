@@ -312,9 +312,8 @@ public class DeployService {
         weIdAuthentication.setWeId(weId);
         cptStringArgs.setWeIdAuthentication(weIdAuthentication);
 
-        List<Integer> cptIdList = Arrays.asList(101, 102, 103, 106, 107, 110, 111);
         CptServiceImpl cptService = new CptServiceImpl();
-        for (Integer cptId : cptIdList) {
+        for (Integer cptId : BuildToolsConstant.CPTID_LIST) {
             String cptJsonSchema = DataToolUtils.generateDefaultCptJsonSchema(cptId);
             if (cptJsonSchema.isEmpty()) {
                 logger.info("[registerSystemCpt] Cannot generate CPT json schema with ID: " + cptId);

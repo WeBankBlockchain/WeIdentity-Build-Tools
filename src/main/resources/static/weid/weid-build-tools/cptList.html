@@ -64,42 +64,27 @@
           <div class="card">
             <!-- /.card-header -->
             <div class="card-body">
+              <div class="form-group">
+               <label>凭证模板(CPT)类型:&nbsp;&nbsp; </label>
+               <select  id="cptType" name="cptType" class="form-control" style="display: inline;width: auto;">
+                 <option value="">全部</option>
+                 <option value="sys">系统CPT</option>
+                 <option value="user">用户CPT</option>
+               </select>
+              </div>
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th width="100px" style="display: none;">选择
-                      <div class="custom-control custom-checkbox" style="float: right;padding-right: 36px">
-                        <input class="custom-control-input" type="checkbox" id="selectAll" onclick="" name="selectAll" value="0">
-                        <label for="selectAll" class="custom-control-label"></label>
-                      </div>
-                  </th>
-                  <th>凭证模板ID（CPT ID）</th>
+                  <th  width="165px">凭证模板ID（CPT ID）</th>
                   <th>凭证模板名称（CPT Name）</th>
-                  <th>发布者WeID</th>
+                  <th width="165px">发布者WeID</th>
                   <th>描述</th>
                   <th>创建时间</th>
                   <th  width="300px">操作</th>
                 </tr>
                 </thead>
                 <tbody id="data-tbody" style="line-height: 40px">
-                <tr class="display-none">
-                  <td align="center" valign="middle" style="display: none;">
-                      <div class="custom-control custom-checkbox" style="margin-top: 9px">
-					    <input class="custom-control-input" type="checkbox" id="${cptId}" onclick="clickCptId(this, true)" name="cptId" value="${cptId}">
-					    <label for="${cptId}" class="custom-control-label"></label>
-					  </div>
-                  </td>
-                  <td>${cptId}</td>
-                  <td><div title="${cptTitle}" class="text_overflow"> ${cptTitle} </div></td>
-                  <td><a href="javascript:showWeId('${weId}')"> ${weIdShow} </a><div class='display-none'>${weId}</div></td>
-                  <td><div title="${cptDesc}" class="text_overflow"> ${cptDesc} </div></td>
-                  <td>${createTime}</td>
-                  <td>
-                      <button type="button" onclick="queryCptSchema('${cptId}')" class="btn btn-inline btn-primary btn-flat">预览模板</button>
-                      <button type="button" onclick="downCpt('${cptId}')" class="btn btn-inline btn-primary btn-flat">下载模板</button>
-                      <button type="button" onclick="showCptToPolicy('${cptId}')" class="btn btn-inline btn-primary btn-flat" style="display: none" >转Policy</button>
-                  </td>
-                </tr>
+                
                 </tbody>
               </table>
             </div>
@@ -127,7 +112,7 @@
             <div class="form-group row" style="padding-left: 10px">
               <label for="registerCptId" style="width: 15%;">CPT标题 :</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt Title">
+                <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt title">
               </div>
             </div>
             <div class="form-group row" style="padding-left: 10px">
@@ -145,7 +130,7 @@
             </div>
             <div>
               <strong>数据结构定义（claim结构定义）</strong>
-              <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=WeID 管理#weid" target="blank_" >
+              <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html?highlight=claim#claim-protocol-type-cpt" target="blank_" >
                <img src="./dist/img/icon-question.svg" alt="">
                <span style="color:#017CFF;font-size:12px;display:inline-block;">什么是claim</span>
               </a>
@@ -207,7 +192,7 @@
             <div class="form-group row" style="padding-left: 10px">
               <label for="registerCptId" style="width: 15%;">CPT标题 :</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt Title">
+                <input type="text" class="form-control" id="cptTitle"  placeholder="Enter cpt title">
               </div>
             </div>
             <div class="form-group row" style="padding-left: 10px">
@@ -225,7 +210,7 @@
             </div>
             <div>
               <strong>数据结构定义（claim结构定义）</strong>
-              <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-quick-tools-web.html?highlight=WeID 管理#weid" target="blank_" >
+              <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html?highlight=claim#claim-protocol-type-cpt" target="blank_" >
                <img src="./dist/img/icon-question.svg" alt="">
                <span style="color:#017CFF;font-size:12px;display:inline-block">什么是claim</span>
               </a>
@@ -394,29 +379,25 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">CPT转Policy</h4>
+          <h4 class="modal-title">注册Policy</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div  class="modal-body">
           <div class="card-body" style="margin-top: -1rem;margin-bottom: -1rem;">
-            <div class="form-group">
-              <label for="policyId">策略编号</label>
-              <input type="text" class="form-control" id="policyId" onkeyup="this.value=this.value.replace(/\D/g,'')"  placeholder="Enter policyId">
-              <input type="hidden" class="form-control" id="fromCptId" >
+          <div>
+              <strong>Policy结构如下</strong>
+              <p>
+              <span style="font-size:12px;display:inline-block">0: 表示不披露，1: 表示披露</span>
+              </p>
             </div>
-            <div class="form-group">
-              <label for="policyType">策略类型</label>
-              <select class="custom-select" id="policyType">
-                <option value="original">original</option>
-                <option value="zkp">zkp</option>
-              </select>
-            </div>
+            <input id="fromCptId" name="fromCptId" type="hidden">
+            <div id="policyContent" style="height: 350px;margin-top: 10px"></div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" id="cptToPolicy" class="btn btn-block btn-primary btn-flat">转换</button>
+          <button type="button" id="registerPolicy" class="btn btn-block btn-primary btn-flat">注册</button>
         </div>
       </div>
       <!-- /.modal-content -->

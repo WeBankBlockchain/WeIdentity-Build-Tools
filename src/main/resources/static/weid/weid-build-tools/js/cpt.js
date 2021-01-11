@@ -1,3 +1,12 @@
+//json编辑器
+var options = {
+	mode: 'code',
+	modes: ['code', 'tree'], // allowed modes
+	onError: function (err) {
+		alert(err.toString());
+	}
+};
+var policyEditor = new JSONEditor(jQuery("#policyContent").get(0), options);
 $(document).ready(function(){
 	bsCustomFileInput.init();
     $("#openRegisterCpt").click(function(){
@@ -107,15 +116,6 @@ $(document).ready(function(){
     	return;
     }
     loadData();
-
-	//json编辑器
-    var options = {
-		mode: 'code',
-		modes: ['code', 'tree'], // allowed modes
-		onError: function (err) {
-			alert(err.toString());
-		}
-	};
     var editor = new JSONEditor(jQuery("#jsonContent").get(0), options);
     editor.setText("");
     //多级注册CPT
@@ -252,8 +252,7 @@ $(document).ready(function(){
 	    }
 		
 	})
-    
-    
+
     function vaildFileName(fileName) {
     	var v = fileName.substring(fileName.lastIndexOf("."));
     	if (v != ".json" && v != ".JSON") {
@@ -276,7 +275,7 @@ $(document).ready(function(){
             };
     	}
     })
-    
+
     $('#modal-register-cpt').on('hide.bs.modal', function () {
     	editor.setText("");
     	$("#cptJsonFile").val("");
@@ -293,31 +292,42 @@ $(document).ready(function(){
     });
 	
 	//cpt转policy
-    $("#cptToPolicy").click(function(){
+    $("#registerPolicy").click(function(){
         var thisObj = this;
         var disabled = $(thisObj).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         var cptId = $("#fromCptId").val();
-        var policyId = $("#policyId").val();
         var btnValue = $(thisObj).html();
-        $(thisObj).html("转换中...");
+        $(thisObj).html("注册中...");
         $(thisObj).addClass("disabled");
-        $("#confirmMessage1Body").html("<p>转换中...</p>");
+        $("#confirmMessage1Body").html("<p>注册中...</p>");
         $("#confirmMessage1Btn").addClass("disabled");
         $("#modal-confirm-message1").modal();
+        var policyData = null;
+        try {
+            if ($.trim(policyEditor.getText()).length == 0) {
+                $("#messageBody").html("<p>Policy结构不能为空</p>");
+                $("#modal-message").modal();
+                return;
+            }
+            policyData = policyEditor.get();
+        } catch (e) {
+            $("#messageBody").html("<pre>Error：" + e.message + "</pre>");
+            $("#modal-message").modal();
+            return;
+        }
         var formData = {};
         formData.cptId = cptId;
-        formData.policyId = policyId;
-        formData.policyType = $("#policyType").val();
-        $.post("cptToPolicy", formData, function(value,status){
+        formData.policy = JSON.stringify(policyData);
+        $.post("registerClaimPolicy", formData, function(value,status){
         	isClose = false;
             if (value == "success") {
-                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>Policy注册<span class='success-span'>成功</span>。</p>");
                 isClose = true;
             } else if (value == "fail") {
-                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='fail-span'>失败</span>，请查看日志。</p>");
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>Policy注册<span class='fail-span'>失败</span>，请查看日志。</p>");
             } else {
-                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='fail-span'>失败</span>: " + value + "</p>");
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>Policy注册<span class='fail-span'>失败</span>: " + value + "</p>");
             }
             $(thisObj).html(btnValue);
             $(thisObj).removeClass("disabled");
@@ -325,41 +335,76 @@ $(document).ready(function(){
             $("#modal-confirm-message1").modal();
         })
     })
+
+    $("#cptType").change(function(){
+    	loadData();
+    })
 });
-var template = $("#data-tbody").html();
-var  table;
+
 function loadData() {
-	 //加载部署数据
-	$.get("getCptInfoList",function(data,status){
-  		if(table != null) {
-  			table.destroy();
-  		}
-  		cptIds = new Array();
-  		$("#data-tbody").renderData(template,data);
-  		table = $('#example2').DataTable({
-  	      "paging": true,
-  	      "lengthChange": false,
-  	      "searching": true,
-  	      "ordering": true,
-  	      "info": false,
-  	      "autoWidth": false,
-  	      "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 0 , 5] }],
-  	      "aaSorting": [[1, "asc"]],
-  	      "oLanguage": {
-	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
-  	    	  "oPaginate": {
-	            "sFirst":    "第一页",
-	            "sPrevious": " 上一页 ",
-	            "sNext":     " 下一页 ",
-	            "sLast":     " 最后一页 "
-	          }
-	      }
-  	    });
-  		processTable();
-  		table.on('draw', function () {
-  			processTable();
-  		}); 
-	})
+	//加载部署数据
+	$('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "serverSide": true,
+      "ordering": false,
+      "info": false,
+      "destroy": true,
+      "autoWidth": false,
+      "iDisplayLength": 7,
+      "oLanguage": {
+    	  "sZeroRecords": "对不起，查询不到任何相关数据",
+    	  "oPaginate": {
+            "sFirst":    "第一页",
+            "sPrevious": " 上一页 ",
+            "sNext":     " 下一页 ",
+            "sLast":     " 最后一页 "
+          } 
+      },
+      "sAjaxSource":"getCptInfoList",
+      "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+    	aoData.push({"name":"cptType","value":$("#cptType").val()});
+    	oSettings.jqXHR = $.ajax({
+    		  "dataType": 'json',
+    		  "type": "GET",
+    		  "url": sSource,
+    		  "data": aoData,
+    		  "success": function(data) {
+    			  var ndata = {};//返回的数据需要固定格式，否则datatables无法解析，所以需要重新组装
+    			  console.log(data)
+    			  ndata.data = data.dataList;
+    			  ndata.recordsTotal = data.allCount;
+    			  ndata.recordsFiltered = ndata.recordsTotal;
+    			  fnCallback(ndata);
+    		  }
+         });
+      },
+      columns:[
+          { data: 'cptId'},
+          {"render": function ( data, type, full, meta) {
+        	  return "<div title='" + full.cptTitle +"' class='text_overflow'>" + full.cptTitle + "</div>"
+          }},
+          {"render": function ( data, type, full, meta) {
+        	  return "<a href='javascript:showWeId(\"" + full.weId +"\", \"" + full.weIdShow + "\")'>" + full.weIdShow + "</a><div class='display-none'>" + full.weId + "</div>"
+          }},
+          {"render": function ( data, type, full, meta) {
+        	  return "<div title='" + full.cptDesc +"' class='text_overflow'>" + full.cptDesc + "</div>"
+          }},
+          { "render": function (data, type, full, meta) {
+        	  return getLocalTime(full.time * 1000);
+          }},
+          {"render": function ( data, type, full, meta) {
+        	  var op = ""
+        	  op += "<button type='button' onclick='queryCptSchema(\"" + full.cptId + "\")' class='btn btn-inline btn-primary btn-flat'>预览模板</button>&nbsp;";
+        	  op += "<button type='button' onclick='downCpt(\"" + full.cptId + "\")' class='btn btn-inline btn-primary btn-flat'>下载模板</button>&nbsp;";
+        	  if (full.cptType == "user") {
+            	  op += "<button type='button' onclick='showPolicy(this, \"" + full.cptId + "\")' class='btn btn-inline btn-primary btn-flat' >注册Policy</button>";
+        	  }
+        	  return op;
+          }}
+        ]
+    });
 }
 
 function processTable() {
@@ -424,12 +469,22 @@ function clickCptId(thisObj, fix) {
 		fixSelectAll();
 	}
 }
+
 function getCptIds() {
 	return cptIds;
 }
 
-function showCptToPolicy(cptId) {
-	$("#fromCptId").val(cptId)
-	$("#policyId").val("")
-	$("#modal-cpt-to-policy").modal();
+function showPolicy(thisObj, cptId) {
+     var disabled = $(thisObj).attr("class").indexOf("disabled");
+     if(disabled > 0) return;;
+     $(thisObj).addClass("disabled");
+     policyEditor.setText("");
+     var formData = {};
+     formData.cptId = cptId;
+     $.get("cptToPolicy", formData, function(value,status){
+        policyEditor.set(JSON.parse(value));
+        $("#fromCptId").val(cptId)
+        $(thisObj).removeClass("disabled");
+        $("#modal-cpt-to-policy").modal();
+     })
 }

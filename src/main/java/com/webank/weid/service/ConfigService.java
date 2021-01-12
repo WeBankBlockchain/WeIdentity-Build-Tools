@@ -86,9 +86,13 @@ public class ConfigService {
         }
         //判断证书配置是否存在
         map.put("ca.crt", String.valueOf(FileUtils.exists("resources/ca.crt")));
-        map.put("client.keystore", String.valueOf(FileUtils.exists("resources/client.keystore")));
         map.put("node.crt", String.valueOf(FileUtils.exists("resources/node.crt")));
         map.put("node.key", String.valueOf(FileUtils.exists("resources/node.key")));
+        map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/gmca.crt")));
+        map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/gmsdk.crt")));
+        map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/gmsdk.key")));
+        map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/gmensdk.crt")));
+        map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/gmensdk.key")));
         return map;
     }
     
@@ -110,7 +114,8 @@ public class ConfigService {
     
     public boolean processNodeConfig(
         String address, 
-        String version, 
+        String version,
+        String encryptType,
         String orgId, 
         String amopId, 
         String groupId,
@@ -131,8 +136,10 @@ public class ConfigService {
                 buffer.append("org_id=").append(orgId).append("\n");
             } else  if (string.startsWith("amop_id")) {
                 buffer.append("amop_id=").append(amopId).append("\n");
-            }  else if (string.startsWith("group_id")) {
+            } else if (string.startsWith("group_id")) {
                 buffer.append("group_id=").append(groupId).append("\n");
+            } else if (string.startsWith("encrypt_type")) {
+                buffer.append("encrypt_type=").append(encryptType).append("\n");
             } else if (string.startsWith("cns_profile_active")) {
                 buffer.append("cns_profile_active=").append(profileActive).append("\n");
             } else {
@@ -346,6 +353,7 @@ public class ConfigService {
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
         fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
         fileStr = fileStr.replace("${GROUP_ID}", loadConfig.get("group_id"));
+        fileStr = fileStr.replace("${ENCRYPT_TYPE}", loadConfig.get("encrypt_type"));
         fileStr = fileStr.replace("${WEID_ADDRESS}", "");
         fileStr = fileStr.replace("${CPT_ADDRESS}", "");
         fileStr = fileStr.replace("${ISSUER_ADDRESS}", "");

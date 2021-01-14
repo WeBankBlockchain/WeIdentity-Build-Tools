@@ -123,6 +123,13 @@
                                     </select>
                               </div>
                               <div class="form-group">
+                                    <label for="encryptType">国密/非国密</label>
+                                    <select id="encryptType" name="encryptType" class="form-control">
+                                        <option value="0" selected = "selected">非国密</option>
+                                        <option value="1">国密</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
                                 <label for="ipPort">区块链节点 IP 和 Channel 端口</label>
                                 <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
                                 <div style="display:block; font-size: 12px;margin-bottom:0.5rem;color: gray;">如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>

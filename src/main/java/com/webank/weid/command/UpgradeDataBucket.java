@@ -19,10 +19,13 @@
 
 package com.webank.weid.command;
 
+import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.service.ConfigService;
 import java.math.BigInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.web3j.crypto.Credentials;
+import org.fisco.bcos.web3j.crypto.EncryptType;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
 import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
 import org.fisco.bcos.web3j.precompile.cns.CnsService;
@@ -52,6 +55,8 @@ public class UpgradeDataBucket {
      * log4j.
      */
     private static final Logger logger = LoggerFactory.getLogger(UpgradeDataBucket.class);
+
+    private static ConfigService configService = new ConfigService();
     
     public static void main(String[] args) {
         try {
@@ -62,6 +67,10 @@ public class UpgradeDataBucket {
                 System.out.println("the DataBucket upgrade fail: can not found the private key.");
                 System.exit(1);
             }
+
+            FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+            EncryptType encryptType = new EncryptType(Integer.parseInt(fiscoConfig.getEncryptType()));
+
             // 根据私钥获取Credentials
             Credentials credentials = GenCredential.create(new BigInteger(currentPrivateKey.getPrivateKey()).toString(16));
             // 重新部署所有的DataBucket

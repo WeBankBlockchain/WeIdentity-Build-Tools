@@ -58,10 +58,12 @@ import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.dto.CptInfo;
+import com.webank.weid.dto.DataPanel;
 import com.webank.weid.dto.Issuer;
 import com.webank.weid.dto.IssuerType;
 import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
+import com.webank.weid.dto.PolicyInfo;
 import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.ClaimPolicy;
@@ -81,9 +83,11 @@ import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.AuthorityIssuerService;
 import com.webank.weid.rpc.CptService;
+import com.webank.weid.rpc.PolicyService;
 import com.webank.weid.rpc.WeIdService;
 import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
 import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.service.impl.PolicyServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
 import com.webank.weid.service.impl.engine.EngineFactory;
@@ -118,14 +122,14 @@ public class BuildToolService {
     private WeIdService weIdService;
     private AuthorityIssuerService authorityIssuerService;
     private CptService cptService;
-//    private PolicyService policyService;
-//    
-//    private PolicyService getPolicyService() {
-//        if (policyService == null) {
-//            policyService = new PolicyServiceImpl();
-//        }
-//        return policyService;
-//    }
+    private PolicyService policyService;
+    
+    private PolicyService getPolicyService() {
+        if (policyService == null) {
+            policyService = new PolicyServiceImpl();
+        }
+        return policyService;
+    }
     
     private WeIdService getWeIdService() {
         if (weIdService == null) {
@@ -476,13 +480,8 @@ public class BuildToolService {
         } else {
             logger.warn("[getIssuerList] query issuerList from chain fail: {} - {}.", response.getErrorCode(), response.getErrorMessage());
         }
-        if (list.size() == 0) {//说明没有数据了
-            pageDto.setAllCount(pageDto.getStartIndex());
-        } else if (list.size() < pageDto.getPageSize()) { //说明最后一页了
-            pageDto.setAllCount(pageDto.getStartIndex() + list.size());
-        } else { //还可以继续分页
-            pageDto.setAllCount(pageDto.getStartIndex() + pageDto.getPageSize() + 1);
-        }
+        Integer allCount = this.getAuthorityIssuerService().getIssuerCount().getResult();
+        pageDto.setAllCount(allCount);
         pageDto.setDataList(list);
         return pageDto;
     }
@@ -772,6 +771,49 @@ public class BuildToolService {
         return list;
     }
     
+    public PageDto<CptInfo> getCptList(PageDto<CptInfo> pageDto) {
+        if ("user".equals(pageDto.getQuery().getCptType())) {
+            pageDto.setStartIndex(pageDto.getStartIndex() + BuildToolsConstant.CPTID_LIST.size());
+        }
+
+        ResponseData<List<Integer>> response = 
+            this.getCptService().getCptIdList(pageDto.getStartIndex(), pageDto.getPageSize());
+        List<CptInfo> list = new ArrayList<CptInfo>();
+        if (response.getErrorCode().intValue() == ErrorCode.SUCCESS.getCode()) {
+            for (Integer cptId : response.getResult()) {
+                Cpt cpt = this.getCptService().queryCpt(cptId).getResult();
+                CptInfo cptInfo = new CptInfo();
+                cptInfo.setCptId(cptId);
+                cptInfo.setCptTitle((String)cpt.getCptJsonSchema().get("title"));
+                cptInfo.setWeId(cpt.getCptPublisher());
+                cptInfo.setCptDesc((String)cpt.getCptJsonSchema().get("description"));
+                cptInfo.setTime(cpt.getCreated());
+                if (cptId < 1000) {
+                    cptInfo.setCptType("sys"); 
+                } else {
+                    cptInfo.setCptType("user"); 
+                }
+                if (StringUtils.isBlank(pageDto.getQuery().getCptType())) {
+                    list.add(cptInfo);
+                } else if (cptInfo.getCptType().equals(pageDto.getQuery().getCptType())) {
+                    list.add(cptInfo);
+                }
+            }
+        } else {
+            logger.warn("[getCptList] query getCptList from chain fail: {} - {}.", response.getErrorCode(), response.getErrorMessage());
+        }
+
+        if ("sys".equals(pageDto.getQuery().getCptType())) {
+            pageDto.setAllCount(BuildToolsConstant.CPTID_LIST.size()); 
+        } else if ("user".equals(pageDto.getQuery().getCptType())) {
+            pageDto.setAllCount(this.getCptService().getCptCount().getResult() - BuildToolsConstant.CPTID_LIST.size()); 
+        } else {
+            pageDto.setAllCount(this.getCptService().getCptCount().getResult()); 
+        }
+        pageDto.setDataList(list);
+        return pageDto;
+    }
+
     public String queryCptSchema(Integer cptId) {
         ResponseData<Cpt> response = getCptService().queryCpt(cptId);
         if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
@@ -786,7 +828,7 @@ public class BuildToolService {
             return ConfigUtils.serializeWithPrinter(response.getResult().getCptJsonSchema());
         }
     }
-    
+
     /**
      * 根据CPT文件生成java源文件
      * @param cptFile cpt文件
@@ -906,7 +948,38 @@ public class BuildToolService {
         Collections.sort(list);
         return list;
     }
-    
+
+    public PageDto<PolicyInfo> getPolicyList(PageDto<PolicyInfo> pageDto) {
+        ResponseData<List<Integer>> response = 
+            this.getPolicyService().getAllClaimPolicies(pageDto.getStartIndex(), pageDto.getPageSize());
+        List<PolicyInfo> list = new ArrayList<PolicyInfo>();
+        if (response.getResult() != null) {
+            for (Integer value : response.getResult()) {
+                PolicyInfo policyInfo = new PolicyInfo();
+                policyInfo.setId(value.toString());
+                list.add(policyInfo);
+            }
+        }
+        pageDto.setAllCount(this.getPolicyService().getPolicyCount().getResult());
+        pageDto.setDataList(list);
+        return pageDto;
+    }
+
+    public String queryPolicy(Integer policyId) {
+        ResponseData<ClaimPolicy> response = getPolicyService().getClaimPolicy(policyId);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            logger.error("[queryPolicy] query policy fail. ErrorCode is:{}, msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
+            return response.getErrorCode() + "-" + response.getErrorMessage();
+        } else {
+            logger.info(
+                "[queryPolicy] query policy is success. policy id = {}", policyId);
+            HashMap claimMap = DataToolUtils.deserialize(response.getResult().getFieldsToBeDisclosed(), HashMap.class);
+            return ConfigUtils.serializeWithPrinter(claimMap);
+        }
+    }
+
     public byte[] getJarBytes(String id) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         BufferedInputStream in = null;
@@ -1133,18 +1206,29 @@ public class BuildToolService {
         return rList;
     }
 
-//    public String registerClaimPolicy(Integer cptId, String policyJson) {
-//        WeIdAuthentication currentWeIdAuth = this.getCurrentWeIdAuth();
-//        ResponseData<Integer> response = getPolicyService().registerClaimPolicy(cptId, policyJson, currentWeIdAuth);
-//        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
-//            logger.error("[registerClaimPolicy] register ClaimPolicy fail. ErrorCode is:{}, msg :{}",
-//                response.getErrorCode(),
-//                response.getErrorMessage());
-//            return response.getErrorCode() + "-" + response.getErrorMessage();
-//        } else {
-//            logger.info(
-//                "[registerClaimPolicy] register ClaimPolicys success. cpt id = {}, policyId = {}", cptId, response.getResult());
-//            return BuildToolsConstant.SUCCESS;
-//        }
-//    }
+    public DataPanel getDataPanel() throws IOException {
+        DataPanel data = new DataPanel();
+        data.setBlockNumber(BaseService.getBlockNumber());
+        data.setWeIdCount(this.getWeIdService().getWeIdCount().getResult());
+        data.setCptCount(this.getCptService().getCptCount().getResult());
+        data.setPolicyCount(this.getPolicyService().getPolicyCount().getResult());
+        data.setIssuerCount(this.getAuthorityIssuerService().getIssuerCount().getResult());
+        data.setCredentialCount(20);
+        return data;
+    }
+
+    public String registerClaimPolicy(Integer cptId, String policyJson) {
+        WeIdAuthentication currentWeIdAuth = this.getCurrentWeIdAuth();
+        ResponseData<Integer> response = getPolicyService().registerClaimPolicy(cptId, policyJson, currentWeIdAuth);
+        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+            logger.error("[registerClaimPolicy] register ClaimPolicy fail. ErrorCode is:{}, msg :{}",
+                response.getErrorCode(),
+                response.getErrorMessage());
+            return response.getErrorCode() + "-" + response.getErrorMessage();
+        } else {
+            logger.info(
+                "[registerClaimPolicy] register ClaimPolicys success. cpt id = {}, policyId = {}", cptId, response.getResult());
+            return BuildToolsConstant.SUCCESS;
+        }
+    }
 }

@@ -25,6 +25,9 @@ chain_id=1
 #group id
 group_id=1
 
+#encrypt type, 0:非国密；1:国密
+encrypt_type=0
+
 #Configure your database information
 persistence_type=
 mysql_address=

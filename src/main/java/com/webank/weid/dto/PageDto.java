@@ -30,6 +30,7 @@ public class PageDto<T> {
     private int pageSize;
     private int allCount;
     private List<T> dataList;
+    private T query;
 
     public PageDto(int startIndex, int pageSize) {
         this.startIndex = startIndex;

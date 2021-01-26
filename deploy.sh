@@ -10,7 +10,7 @@ port=$(grep "server\.port" $applicationFile |awk -F "=" '{print $2}')
 function reloadAddressForWeb() {
     export WEB_PID=`ps aux|grep "BuildToolApplication" | grep -v grep|awk '{print $2}'|head -1`
     if [ -n "$WEB_PID" ];then
-        curl http://localhost:${port}/reloadAddress
+        curl http://localhost:${port}/weid/weid-build-tools/reloadAddress
     fi
 }
 
@@ -106,21 +106,28 @@ function clean_data()
 
 function check_node_cert(){
 
-	cd ${SOURCE_CODE_DIR}/resources 
-	if [ "${blockchain_fiscobcos_version}" = "1" ];then
+    cd ${SOURCE_CODE_DIR}/resources
+    if [ "${blockchain_fiscobcos_version}" = "1" ];then
         if [ ! -f  ca.crt -o ! -f  client.keystore ];then
-        echo "ERROR : fisco bcos version is 1.3, ca.crt and client.keystore are needed."
-        exit 1
-      fi
+            echo "ERROR : fisco bcos version is 1.3, ca.crt and client.keystore are needed."
+            exit 1
+        fi
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
-        if [ ! -f  ca.crt -o ! -f  node.crt -o ! -f  node.key ];then
-        echo "ERROR : fisco bcos version is 2.0. ca.crt, node.crt and node.key are needed."
-        exit 1
+        if [ "${encrypt_type}" = "0" ];then
+            if [ ! -f  ca.crt -o ! -f  node.crt -o ! -f  node.key ];then
+                echo "ERROR : fisco bcos version is 2.0. encrypt type is ECDSA, ca.crt, node.crt and node.key are needed."
+                exit 1
+            fi
+        else
+            if [ ! -f  gmca.crt -o ! -f  gmsdk.crt -o ! -f  gmsdk.key -o ! -f  gmensdk.crt -o ! -f  gmensdk.key ];then
+                echo "ERROR : fisco bcos version is 2.0, encrypt type is SM2, gmca.crt, gmsdk.crt, gmsdk.key, gmensdk.crt and gmensdk.key are needed."
+                exit 1
+            fi
         fi
     else
         echo "the version : ${blockchain_fiscobcos_version} is not supported, we only support FISCO BCOS 1.3 and 2.0."
         exit 1
-   fi
+    fi
 }
 
 function main()

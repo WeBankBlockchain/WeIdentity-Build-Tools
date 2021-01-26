@@ -130,88 +130,110 @@ $(document).ready(function(){
 	        $("#nodeForm  #orgId").val(data.org_id);
 	        $("#nodeForm  #amopId").val(data.amop_id);
 	        $("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
+	        $("#nodeForm  #encryptType").val(data.encrypt_type);
 	        $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
 	        $("#nodeForm  #ipPort").val(data.blockchain_address);
 //	        $("#nodeForm  #groupId").val(data.group_id);
-	        caDisplay(data.blockchain_fiscobcos_version);
+	        caDisplay(data.encrypt_type);
 	        checkCa(data);
 	    });
 	}
 	
 	// 证书检查
 	function  checkCa(data) {
-    	var message = "该证书已存在，重新上传将被覆盖。";
-    	if (data["ca.crt"] == "true") {
-    		$("#caCrtSpan").html(message).show();
-    	}
-    	if (data["node.key"] == "true") {
-    		$("#nodeKeySpan").html(message).show();
-    	}
-    	if (data["node.crt"] == "true") {
-    		$("#nodeCrtSpan").html(message).show();
-    	}
-    	if (data["client.keystore"] == "true") {
-    		$("#clientKeyStoreSpan").html(message).show();
-    	}
-    }
-    
-    function caDisplay(v) {
-    	if (v == "1") {
-        	$("#caV1").show();
-        	$("#caV2").hide();
-        } else {
-        	$("#caV2").show();
-        	$("#caV1").hide();
+        var message = "该证书已存在，重新上传将被覆盖。";
+        if (data["ca.crt"] == "true") {
+            $("#caCrtSpan").html(message).show();
+        }
+        if (data["node.key"] == "true") {
+            $("#nodeKeySpan").html(message).show();
+        }
+        if (data["node.crt"] == "true") {
+            $("#nodeCrtSpan").html(message).show();
+        }
+        if (data["gmca.crt"] == "true") {
+            $("#gmCaCrtSpan").html(message).show();
+        }
+        if (data["gmsdk.crt"] == "true") {
+            $("#gmSdkCrtSpan").html(message).show();
+        }
+        if (data["gmsdk.key"] == "true") {
+            $("#gmSdkKeySpan").html(message).show();
+        }
+        if (data["gmensdk.crt"] == "true") {
+            $("#gmenSdkCrtSpan").html(message).show();
+        }
+        if (data["gmensdk.key"] == "true") {
+            $("#gmenSdkKeySpan").html(message).show();
         }
     }
     
-    $("#nodeForm  #version").change(function(){
+    function caDisplay(v) {
+        if (v == "0") {
+            $("#ecdsa").show();
+            $("#sm2").hide();
+        } else {
+            $("#sm2").show();
+            $("#ecdsa").hide();
+        }
+    }
+    
+    $("#nodeForm  #encryptType").change(function(){
     	var selected = $(this).children('option:selected').val();
     	caDisplay(selected);
     })
 	
 	// 点击配置节点按钮
 	$('#postNodeBtn').click(function(){
-		var disabled = $(this).attr("class").indexOf("disabled");
+        var disabled = $(this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         var message = checkInputNode();
         if (message != null) {
-        	$("#messageBody").html("<p>"+message+"</p>");
-    	    $("#modal-message").modal();
-    	    return ;
+            $("#messageBody").html("<p>"+message+"</p>");
+            $("#modal-message").modal();
+            return ;
         }
         
-	    var formData = new FormData();
-	    formData.append("file", $("#caCrtFile")[0].files[0]);
-	    formData.append("file", $("#nodeCrtFile")[0].files[0]);
-	    formData.append("file", $("#nodeKeyFile")[0].files[0]);
-	    formData.append("file", $("#clientKeyStoreFile")[0].files[0]);
-	    formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
-	    formData.append("amopId", $.trim($("#nodeForm  #amopId").val()));
-	    formData.append("version", $("#nodeForm  #version").val());
-	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
-	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
-//	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
-	    $("#checkBody").html("<p>> 配置提交中...</p>");
-	    $("#modal-default").modal();
-	    $("#goNext").addClass("disabled");
-	    $.ajax({
-	        url:'nodeConfigUpload', /*接口域名地址*/
-	        type:'post',
-	        data: formData,
-	        contentType: false,
-	        processData: false,
-	        success:function(res) {
-	            if (res=="success") {
-	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='success-span'>成功</span>, 检查准备中...</p>");
-	            	setTimeout(checkNodeForTimeout,2000);
-	            } else {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            } 
-	        }
-	    })	
-	});
+        var formData = new FormData();
+        var encryptType = $("#encryptType option:selected").val();
+        if (encryptType == "0") {
+            formData.append("file", $("#caCrtFile")[0].files[0]);
+            formData.append("file", $("#nodeCrtFile")[0].files[0]);
+            formData.append("file", $("#nodeKeyFile")[0].files[0]);
+        } else {
+            formData.append("file", $("#gmCaCrtFile")[0].files[0]);
+            formData.append("file", $("#gmSdkCrtFile")[0].files[0]);
+            formData.append("file", $("#gmSdkKeyFile")[0].files[0]);
+            formData.append("file", $("#gmenSdkCrtFile")[0].files[0]);
+            formData.append("file", $("#gmenSdkKeyFile")[0].files[0]);
+        }
+        formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
+        formData.append("amopId", $.trim($("#nodeForm  #amopId").val()));
+        formData.append("version", $("#nodeForm  #version").val());
+        formData.append("encryptType", encryptType);
+        formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
+        formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
+//      formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
+        $("#checkBody").html("<p>> 配置提交中...</p>");
+        $("#modal-default").modal();
+        $("#goNext").addClass("disabled");
+        $.ajax({
+            url:'nodeConfigUpload', /*接口域名地址*/
+            type:'post',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success:function(res) {
+                if (res=="success") {
+                    //检查节点是否正确
+                    $("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='success-span'>成功</span>, 检查准备中...</p>");
+                    setTimeout(checkNodeForTimeout,2000);
+                } else {
+                    $("#checkBody").html($("#checkBody").html() + "<p>> 配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+                }
+            }
+        })
+    });
 	
 	// 检查节点输入信息
 	function checkInputNode() {
@@ -235,22 +257,43 @@ $(document).ready(function(){
 //		if(!r.test(groupId)) {
 //			return "groupId必须为整数";
 //		}
-		// 检查上传文件是否跟要求一致
-		var caCrtFile = $("#caCrtFile")[0].files[0];
-		if (caCrtFile != null && caCrtFile.name != "ca.crt") {
-			return "请选择正确的ca.crt文件";
-		}
-		var nodeCrtFile = $("#nodeCrtFile")[0].files[0];
-		if (nodeCrtFile != null && nodeCrtFile.name != "node.crt") {
-			return "请选择正确的node.crt文件";
-		}
-		var nodeKeyFile = $("#nodeKeyFile")[0].files[0];
-		if (nodeKeyFile != null && nodeKeyFile.name != "node.key") {
-			return "请选择正确的node.key文件";
-		}
-		var clientKeyStoreFile = $("#clientKeyStoreFile")[0].files[0];
-		if (clientKeyStoreFile != null && clientKeyStoreFile.name != "client.keystore") {
-			return "请选择正确的client.keystore文件";
+
+        var encryptType = $("#encryptType option:selected").val();
+        // 检查上传文件是否跟要求一致
+        if (encryptType == "0") {
+            var caCrtFile = $("#caCrtFile")[0].files[0];
+            if (caCrtFile != null && caCrtFile.name != "ca.crt") {
+                return "请选择正确的ca.crt文件";
+            }
+            var nodeCrtFile = $("#nodeCrtFile")[0].files[0];
+            if (nodeCrtFile != null && nodeCrtFile.name != "node.crt") {
+                return "请选择正确的node.crt文件";
+            }
+            var nodeKeyFile = $("#nodeKeyFile")[0].files[0];
+            if (nodeKeyFile != null && nodeKeyFile.name != "node.key") {
+                return "请选择正确的node.key文件";
+            }
+		} else {
+		    var gmCaCrtFile = $("#gmCaCrtFile")[0].files[0];
+            if (gmCaCrtFile != null && gmCaCrtFile.name != "gmca.crt") {
+                return "请选择正确的gmca.crt文件";
+            }
+            var gmSdkCrtFile = $("#gmSdkCrtFile")[0].files[0];
+            if (gmSdkCrtFile != null && gmSdkCrtFile.name != "gmsdk.crt") {
+                return "请选择正确的gmsdk.crt文件";
+            }
+            var gmSdkKeyFile = $("#gmSdkKeyFile")[0].files[0];
+            if (gmSdkKeyFile != null && gmSdkKeyFile.name != "gmsdk.key") {
+                return "请选择正确的gmsdk.key文件";
+            }
+            var gmenSdkCrtFile = $("#gmenSdkCrtFile")[0].files[0];
+            if (gmenSdkCrtFile != null && gmenSdkCrtFile.name != "gmensdk.crt") {
+                return "请选择正确的gmensdk.crt文件";
+            }
+            var gmenSdkKeyFile = $("#gmenSdkKeyFile")[0].files[0];
+            if (gmenSdkKeyFile != null && gmenSdkKeyFile.name != "gmensdk.key") {
+                return "请选择正确的gmensdk.key文件";
+            }
 		}
 		return null;
 	}

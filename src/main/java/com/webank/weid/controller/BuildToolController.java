@@ -69,11 +69,13 @@ import com.webank.weid.dto.BinLog;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.dto.CptInfo;
+import com.webank.weid.dto.DataPanel;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.Issuer;
 import com.webank.weid.dto.IssuerType;
 import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
+import com.webank.weid.dto.PolicyInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.exception.WeIdBaseException;
@@ -86,6 +88,7 @@ import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.DataBaseService;
 import com.webank.weid.service.DeployService;
+import com.webank.weid.service.PolicyFactory;
 import com.webank.weid.service.fisco.WeServerUtils;
 import com.webank.weid.service.TransactionService;
 import com.webank.weid.service.VerifyConfigService;
@@ -463,6 +466,7 @@ public class BuildToolController {
         String orgId = request.getParameter("orgId");
         String amopId = request.getParameter("amopId");
         String version = request.getParameter("version");
+        String encryptType = request.getParameter("encryptType");
         String ipPort = request.getParameter("ipPort");
         String groupId = configService.loadConfig().get("group_id");
         if (StringUtils.isBlank(groupId)) {
@@ -470,7 +474,7 @@ public class BuildToolController {
         }
         String profileActive = configService.loadConfig().get("cns_profile_active");
         //根据模板生成配置文件
-        if(configService.processNodeConfig(ipPort, version, orgId, amopId, groupId, profileActive)) {
+        if(configService.processNodeConfig(ipPort, version, encryptType, orgId, amopId, groupId, profileActive)) {
             return BuildToolsConstant.SUCCESS;
         }
         return BuildToolsConstant.FAIL;
@@ -694,12 +698,25 @@ public class BuildToolController {
         return BuildToolsConstant.FAIL;
     }
 
-    @Description("获取cpt列表")
+//    @Description("获取cpt列表")
+//    @GetMapping("/getCptInfoList")
+//    public List<CptInfo> getCptInfoList() {
+//        return buildToolService.getCptInfoList();
+//    }
+    
     @GetMapping("/getCptInfoList")
-    public List<CptInfo> getCptInfoList() {
-        return buildToolService.getCptInfoList();
+    public PageDto<CptInfo> getCptInfoList(
+        @RequestParam(value = "iDisplayStart") int iDisplayStart,
+        @RequestParam(value = "iDisplayLength") int iDisplayLength,
+        @RequestParam(value = "cptType") String cptType
+    ) {
+        PageDto<CptInfo> pageDto = new PageDto<CptInfo>(iDisplayStart, iDisplayLength);
+        pageDto.setQuery(new CptInfo());
+        pageDto.getQuery().setCptType(cptType);
+        pageDto = buildToolService.getCptList(pageDto);
+        return pageDto;
     }
-
+    
     @Description("获取cpt Schema信息")
     @GetMapping("/queryCptSchema/{cptId}")
     public String queryCptSchema(@PathVariable("cptId") Integer cptId) {
@@ -708,8 +725,7 @@ public class BuildToolController {
 
     @Description("将指定cptId转pojo")
     @GetMapping("/cptToPojo")
-    public String cptToPojo(
-            @RequestParam(value = "cptIds[]") Integer[] cptIds) {
+    public String cptToPojo(@RequestParam(value = "cptIds[]") Integer[] cptIds) {
         String pojoId = DataToolUtils.getUuId32();
         try {
             logger.info("[cptToPojo] begin cpt to pojo.");
@@ -765,6 +781,22 @@ public class BuildToolController {
     @GetMapping("/getPojoList")
     public List<PojoInfo> getPojoList() {
         return buildToolService.getPojoList();
+    }
+
+    @Description("获取Policy列表")
+    @GetMapping("/getPolicyList")
+    public PageDto<PolicyInfo> getPolicyList(
+        @RequestParam(value = "iDisplayStart") int iDisplayStart,
+        @RequestParam(value = "iDisplayLength") int iDisplayLength
+    ) {
+        PageDto<PolicyInfo> pageDto = new PageDto<PolicyInfo>(iDisplayStart, iDisplayLength);
+        return buildToolService.getPolicyList(pageDto);
+    }
+
+    @Description("获取cpt Schema信息")
+    @GetMapping("/queryPolicy/{policyId}")
+    public String queryPolicy(@PathVariable("policyId") Integer policyId) {
+        return buildToolService.queryPolicy(policyId);
     }
 
     @Description("查询交易列表")
@@ -969,37 +1001,56 @@ public class BuildToolController {
         return deployService.getGuideStatus();
     }
 
-//    @Description("将指定cptId转policy")
-//    @PostMapping("/cptToPolicy")
-//    public String cptToPolicy(
-//        @RequestParam(value = "cptId") Integer cptId,
-//        @RequestParam(value = "policyId") String policyId,
-//        @RequestParam(value = "policyType") String policyType
-//    ) {
-//       // 先根据cpt转pojo，然后根据pojo转policy
-//       // 生成pojoId
-//        String pojoId = DataToolUtils.getUuId32();
-//        try {
-//            logger.info("[cptToPolicy] begin cpt to pojo. cptId = {}.", cptId);
-//            // 获取cpt文件
-//            File cptFile = buildToolService.getCptFile(cptId);
-//            // 生成源码文件
-//            buildToolService.generateJavaCodeByCpt(cptFile, cptId, pojoId, "cpt");
-//            File sourceFile = buildToolService.getSourceFile(pojoId);
-//            // 转成jar文件
-//            Integer[] cptIds = {cptId};
-//            buildToolService.createJar(sourceFile, cptIds, "cpt", DataFrom.WEB);
-//            logger.info("[cptToPolicy] begin pojo to policy, cptId = {}, policyType = {}.", cptId, policyType);
-//            // 根据pojo转换policy
-//            String jarPath = buildToolService.getJarFile(pojoId).getAbsolutePath();
-//            String policy = PolicyFactory.loadJar(jarPath).generate(cptId);
-//            return buildToolService.registerClaimPolicy(cptId, policy);
-//        } catch (Exception e) {
-//            logger.error("[cptToPolicy] cpt to policy has error.", e);
-//            buildToolService.deletePojoInfo(pojoId);
-//            return BuildToolsConstant.FAIL;
-//        }
-//    }
+    @Description("将指定cptId转policy")
+    @GetMapping("/cptToPolicy")
+    public String cptToPolicy(
+        @RequestParam(value = "cptId") Integer cptId
+    ) {
+       // 先根据cpt转pojo，然后根据pojo转policy
+       // 生成pojoId
+        String pojoId = String.valueOf(cptId); //DataToolUtils.getUuId32();
+        try {
+            String jarPath = buildToolService.getJarFile(pojoId).getAbsolutePath();
+            File jarFile = new File(jarPath);
+            if (!jarFile.exists()) {
+                logger.info("[cptToPolicy] begin cpt to pojo. cptId = {}.", cptId);
+                // 获取cpt文件
+                File cptFile = buildToolService.getCptFile(cptId);
+                if (!cptFile.exists()) {
+                    //如果不存在cpt文件则 创建cpt文件
+                    String jsonSchema = buildToolService.queryCptSchema(cptId);
+                    FileUtils.writeToFile(jsonSchema, cptFile.getAbsolutePath());
+                }
+                // 生成源码文件
+                buildToolService.generateJavaCodeByCpt(cptFile, cptId, pojoId, "cpt");
+                File sourceFile = buildToolService.getSourceFile(pojoId);
+                // 转成jar文件
+                Integer[] cptIds = {cptId};
+                buildToolService.createJar(sourceFile, cptIds, "cpt", DataFrom.WEB);
+                logger.info("[cptToPolicy] begin pojo to policy, cptId = {}.", cptId);
+            }
+            // 根据pojo转换policy
+            String policy = PolicyFactory.loadJar(jarPath).generate(cptId);
+            return policy;
+        } catch (Exception e) {
+            logger.error("[cptToPolicy] cpt to policy has error.", e);
+            buildToolService.deletePojoInfo(pojoId);
+            return BuildToolsConstant.FAIL;
+        } 
+    }
+
+    @Description("注册policy到链上")
+    @PostMapping("/registerClaimPolicy")
+    public String registerClaimPolicy(HttpServletRequest request) {
+        try {
+            String policyJson = request.getParameter("policy");
+            policyJson = StringEscapeUtils.unescapeHtml(policyJson);
+            Integer cptId = Integer.parseInt(request.getParameter("cptId"));
+            return buildToolService.registerClaimPolicy(cptId, policyJson);
+        } catch (Exception e) {
+            return BuildToolsConstant.FAIL;
+        }
+    }
 
     @Description("查询群组列表")
     @GetMapping("/getGroupMapping")
@@ -1030,8 +1081,19 @@ public class BuildToolController {
             logger.info("[getUserListByHash] get user list by hash = {}.", hash);
             return buildToolService.getUserListByHash(hash);
         } catch (Exception e) {
-            logger.error("[getUserListByHash] get user list by hash = {} has error.", hash);
+            logger.error("[getUserListByHash] get user list by hash = {} has error.", hash, e);
             return new ArrayList<AuthorityIssuer>();
+        }
+    }
+
+    @Description("查询数据概览")
+    @GetMapping("/getDataPanel")
+    public DataPanel getDataPanel() {
+        try {
+            return buildToolService.getDataPanel();
+        } catch (Exception e) {
+            logger.error("[getDataPanel] get data panel has error.", e);
+            return new DataPanel();
         }
     }
 }

@@ -20,6 +20,7 @@
 package com.webank.weid.command;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fisco.bcos.web3j.crypto.EncryptType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +59,15 @@ public class DeployContract extends StaticConfig {
             .parse(args);
         String chainId = commandArgs.getChainId();
         String privateKeyFile = commandArgs.getPrivateKey();
+        // 获取配置
+        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+        fiscoConfig.setChainId(chainId);
+        new EncryptType(Integer.parseInt(fiscoConfig.getEncryptType()));
         // 说明给了私钥文件
         if (StringUtils.isNotBlank(privateKeyFile)) {
             String privateKey = FileUtils.readFile(privateKeyFile);
             deployService.createAdmin(privateKey);
         }
-        // 获取配置
-        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-        fiscoConfig.setChainId(chainId);
         // 部署合约
         String hash = deployService.deploy(fiscoConfig, DataFrom.COMMAND);
         System.out.println("the contract deploy successfully  --> hash : " +  hash);

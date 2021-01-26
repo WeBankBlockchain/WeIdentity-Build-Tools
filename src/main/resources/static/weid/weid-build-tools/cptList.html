@@ -159,6 +159,7 @@
                     <template slot-scope="scope"><el-button @click.native.prevent="deleteRow(scope.$index, tableData)">删除</el-button></template>
                   </el-table-column>
                 </el-table>
+                <span style="color:#017CFF;font-size:12px;display:inline-block">claim中的属性需要以字母开头</span>
                 <div style="margin-top: 10px">
                   <el-button @click.prevent="addDomain()">新增字段</el-button>
                 </div>
@@ -305,6 +306,7 @@
              	<p style='font-size:13px;color:gry'>说明: 点击模板按钮可以自动填充相应内容到下列代码输入框中</p>
              </div>
              <div id="jsonContent" style="height: 350px;margin-top: 10px"></div>
+             <span style="color:#017CFF;font-size:12px;display:inline-block">claim中的属性需要以字母开头</span>
              </form>
           </div>
         </div>

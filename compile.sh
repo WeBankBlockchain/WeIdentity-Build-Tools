@@ -84,9 +84,10 @@ function compile()
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
     export CHAIN_ID=${chain_id}
     export GROUP_ID=${group_id}
+    export ENCRYPT_TYPE=${encrypt_type}
     export CNS_PROFILE_ACTIVE=${cns_profile_active}
     export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
-    FISCOVAS='${GROUP_ID}:${CHAIN_ID}:${FISCO_BCOS_VERSION}:${CNS_PROFILE_ACTIVE}'
+    FISCOVAS='${GROUP_ID}:${CHAIN_ID}:${ENCRYPT_TYPE}:${FISCO_BCOS_VERSION}:${CNS_PROFILE_ACTIVE}'
     envsubst ${FISCOVAS}} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}

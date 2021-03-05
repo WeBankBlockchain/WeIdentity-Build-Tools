@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.webank.weid.service.GuideService;
 
-@WebFilter(urlPatterns = {"/*"})
+//@WebFilter(urlPatterns = {"/*"})
 public class BuildToolFilter implements Filter {
     
     private static List<String> filterUrl = new ArrayList<String>();

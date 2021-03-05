@@ -22,6 +22,7 @@ package com.webank.weid.service;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -222,7 +223,7 @@ public class ContractService {
             cns.setApplyName(applyName);
             dataList.add(cns);
         }
-
+        Collections.sort(dataList);
         dataList.forEach(cns -> {
             cns.setGroupId("group-" + WeIdSdkUtils.loadNewFiscoConfig().getGroupId());
             if (cns.isEnable()) { // 如果是启用状态
@@ -478,6 +479,7 @@ public class ContractService {
                 }
             }
         }
+        Collections.sort(result);
         return new ResponseData<>(result, ErrorCode.SUCCESS);
     }
     
@@ -552,7 +554,7 @@ public class ContractService {
         ShareInfo shareInfo = getShareInfoByHash(hash);
         if (shareInfo != null) {
             shareInfo.setLocal(true);
-            return new ResponseData<>(shareInfo, ErrorCode.BASE_ERROR);
+            return new ResponseData<>(shareInfo, ErrorCode.SUCCESS);
         }
 
         shareInfo = new ShareInfo();

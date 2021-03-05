@@ -26,16 +26,16 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @ServerEndpoint("/webSocket")
 @Component
+@Slf4j
 public class BuildWebSocket {
-    
-    private static final Logger logger = LoggerFactory.getLogger(BuildWebSocket.class);
-    
+
    // 与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
 
@@ -52,7 +52,7 @@ public class BuildWebSocket {
         this.session = session;
         SocketManager.webSocketSet.add(this);     // 加入set中
         SocketManager.addOnlineCount();           // 在线数加1
-        logger.info("有新连接加入！当前在线人数为" + SocketManager.getOnlineCount());
+        log.info("有新连接加入！当前在线人数为" + SocketManager.getOnlineCount());
     }
 
     /**
@@ -62,7 +62,7 @@ public class BuildWebSocket {
     public void onClose() {
         SocketManager.webSocketSet.remove(this);  // 从set中删除
         SocketManager.subOnlineCount();           // 在线数减1
-        logger.info("有一连接关闭！当前在线人数为" + SocketManager.getOnlineCount());
+        log.info("有一连接关闭！当前在线人数为" + SocketManager.getOnlineCount());
     }
 
     /**
@@ -72,7 +72,7 @@ public class BuildWebSocket {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        logger.info("来自客户端" + session.getId() + "的消息:" + message);
+        log.info("来自客户端" + session.getId() + "的消息:" + message);
     }
 
     /**
@@ -82,7 +82,7 @@ public class BuildWebSocket {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        logger.error(session.getId() + "发生错误");
+        log.error(session.getId() + "发生错误");
         error.printStackTrace();
     }
 }

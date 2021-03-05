@@ -1,23 +1,21 @@
 package com.webank.weid.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.suite.api.persistence.PersistenceFactory;
 import com.webank.weid.suite.api.persistence.inf.Persistence;
 import com.webank.weid.suite.api.persistence.params.PersistenceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class VerifyConfigService {
-
-    private static final Logger logger = LoggerFactory.getLogger(VerifyConfigService.class);
-
+    
     public boolean verifyPersistence(String persistenceType) {
-        logger.info("[verifyPersistence] begin verify persistence ...");
+        log.info("[verifyPersistence] begin verify persistence ...");
         PersistenceType type = null;
-        Persistence persistence = null;
         String domain = "domain.defaultInfo";
         String id = "test";
         String data = "data123456";
@@ -27,7 +25,7 @@ public class VerifyConfigService {
         } else if (persistenceType.equals("redis")) {
             type = PersistenceType.Redis;
         }
-        persistence = PersistenceFactory.build(type);
+        Persistence persistence = PersistenceFactory.build(type);
 
         ResponseData<Integer> resAdd = persistence.add(domain, id, data);
 
@@ -36,14 +34,11 @@ public class VerifyConfigService {
         ResponseData<Integer> resUpdate = persistence.update(
                 domain, id, data + " update");
         ResponseData<Integer> resDelete = persistence.delete(domain, id);
-        int addRes = resAdd.getErrorCode().intValue();
-        int getRes = resGet.getErrorCode().intValue();
-        int updateRes = resUpdate.getErrorCode().intValue();
-        int deleteRes = resDelete.getErrorCode().intValue();
-        if (ErrorCode.SUCCESS.getCode() == addRes && ErrorCode.SUCCESS.getCode() == getRes
-                && ErrorCode.SUCCESS.getCode() == updateRes && ErrorCode.SUCCESS.getCode() == deleteRes) {
-            return true;
-        }
-        return false;
+        int addRes = resAdd.getErrorCode();
+        int getRes = resGet.getErrorCode();
+        int updateRes = resUpdate.getErrorCode();
+        int deleteRes = resDelete.getErrorCode();
+        return ErrorCode.SUCCESS.getCode() == addRes && ErrorCode.SUCCESS.getCode() == getRes
+                && ErrorCode.SUCCESS.getCode() == updateRes && ErrorCode.SUCCESS.getCode() == deleteRes;
     }
 }

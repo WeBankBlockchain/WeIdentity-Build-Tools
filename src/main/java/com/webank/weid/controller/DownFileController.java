@@ -26,8 +26,7 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,42 +38,29 @@ import org.springframework.web.bind.annotation.RestController;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.WeIdInfo;
-import com.webank.weid.service.ConfigService;
-import com.webank.weid.service.BuildToolService;
-import com.webank.weid.service.DeployService;
+import com.webank.weid.service.ContractService;
 import com.webank.weid.service.PolicyFactory;
+import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/weid/weid-build-tools/")
 public class DownFileController {
     
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(DownFileController.class);
-    
     @Autowired
-    ConfigService configService;
-    
-    @Autowired
-    DeployService deployService;
-    
-    @Autowired
-    BuildToolService createWeIdService;
-    
-    @Autowired
-    BuildToolService buildToolService;
+    private WeIdSdkService weIdSdkService;
     
     @Description("配置文件下载")
     @GetMapping("/downConfig")
     public void downConfig(HttpServletResponse response) {
-        logger.info("[downConfig] begin to down config...");
+        log.info("[downConfig] begin to down config...");
         String fileName = "resources.zip";
-        boolean result = configService.toZip("resources", fileName);
+        boolean result = WeIdSdkUtils.toZip("resources", fileName);
         //说明打包成功，进行下载操作
         if (result) {
-            logger.info("[downConfig] the file toZip success, begin downloading.");
+            log.info("[downConfig] the file toZip success, begin downloading.");
             File file = new File(fileName);
             response.setContentType("application/force-download");// 设置强制下载不打开         
             response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
@@ -82,97 +68,95 @@ public class DownFileController {
             FileInputStream fis = null;
             BufferedInputStream bis = null;
             try {
-               fis = new FileInputStream(file.getAbsoluteFile());
-               bis = new BufferedInputStream(fis);
-               OutputStream outputStream = response.getOutputStream();
-               int i = bis.read(buffer);
-               while (i != -1) {
-                  outputStream.write(buffer, 0, i);
-                  i = bis.read(buffer);
-               }
-               outputStream.flush();
-               logger.info("[downConfig] the file downloading successfully.");
-               return;
+                fis = new FileInputStream(file.getAbsoluteFile());
+                bis = new BufferedInputStream(fis);
+                OutputStream outputStream = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    outputStream.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+                outputStream.flush();
+                log.info("[downConfig] the file downloading successfully.");
             } catch (Exception e) {
-                logger.error("[downConfig] the file downloading has error.", e);
+                log.error("[downConfig] the file downloading has error.", e);
             } finally {
-               FileUtils.close(bis);
-               FileUtils.close(fis);
+                FileUtils.close(bis);
+                FileUtils.close(fis);
             }
         } else {
-            logger.error("[downConfig] the file to zip fail.");
+            log.error("[downConfig] the file to zip fail.");
         }
     }
     
     @Description("配置文件下载")
     @GetMapping("/downEcdsaKey/{hash}")
     public void downEcdsaKey(HttpServletResponse response, @PathVariable("hash") String hash) {
-        logger.info("[downEcdsaKey] begin to down the EcdsaKey...");
+        log.info("[downEcdsaKey] begin to down the EcdsaKey...");
         String fileName = "ecdsa_key";
-        DeployInfo deployInfo = DeployService.getDepolyInfoByHash(hash);
+        DeployInfo deployInfo = ContractService.getDepolyInfoByHash(hash);
         if (deployInfo != null) {
             down(response, deployInfo.getEcdsaKey().getBytes(), fileName);
         } else {
-            logger.error("[downEcdsaKey] no found the file.");
+            log.error("[downEcdsaKey] no found the file.");
         }
     }
     
     private void down(HttpServletResponse response, byte[] buffer, String fileName) {
-        logger.info("[down] begin downloading, fileName is {}.", fileName);
+        log.info("[down] begin downloading, fileName is {}.", fileName);
         response.setContentType("application/force-download");// 设置强制下载不打开
         fileName = FileUtils.removeSpecial(fileName);//移除特殊符号
         response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
         try {
-           OutputStream outputStream = response.getOutputStream();
-           outputStream.write(buffer);
-           outputStream.flush();
-           logger.info("[down] the file downloading successfully.");
-           return;
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(buffer);
+            outputStream.flush();
+            log.info("[down] the file downloading successfully.");
         } catch (Exception e) {
-            logger.error("[down] the file downloading has error.", e);
+            log.error("[down] the file downloading has error.", e);
         }
     }
 
     @Description("weid私钥下载")
     @GetMapping("/downWeIdEcdsaKey/{address}")
     public void downWeIdEcdsaKey(HttpServletResponse response, @PathVariable("address") String address) {
-        logger.info("[downWeIdEcdsaKey] begin to down the EcdsaKey...");
+        log.info("[downWeIdEcdsaKey] begin to down the EcdsaKey...");
         String fileName = address + "_ecdsa_key";
-        WeIdInfo weIdInfo = createWeIdService.getWeIdInfo(address);
+        WeIdInfo weIdInfo = weIdSdkService.getWeIdInfo(address);
         if (weIdInfo != null) {
             down(response, weIdInfo.getEcdsaKey().getBytes(), fileName);
         } else {
-            logger.error("[downWeIdEcdsaKey] no found the file.");
+            log.error("[downWeIdEcdsaKey] no found the file.");
         }
     }
     
     @Description("weid公钥钥下载")
     @GetMapping("/downWeIdEcdsaPubKey/{address}")
     public void downWeIdEcdsaPubKey(HttpServletResponse response, @PathVariable("address") String address) {
-        logger.info("[downWeIdEcdsaPubKey] begin to down the EcdsaKey...");
+        log.info("[downWeIdEcdsaPubKey] begin to down the EcdsaKey...");
         String fileName = address + "_ecdsa_key.pub";
-        WeIdInfo weIdInfo = createWeIdService.getWeIdInfo(address);
+        WeIdInfo weIdInfo = weIdSdkService.getWeIdInfo(address);
         if (weIdInfo != null) {
             down(response, weIdInfo.getEcdsaPubKey().getBytes(), fileName);
         } else {
-            logger.error("[downWeIdEcdsaPubKey] no found the file.");
+            log.error("[downWeIdEcdsaPubKey] no found the file.");
         }
     }
     
     @Description("下载CPT")
     @GetMapping("/downCpt/{cptId}")
     public void downCpt(HttpServletResponse response, @PathVariable("cptId") String cptId) {
-        logger.info("[downCpt] begin to down the CPT...");
+        log.info("[downCpt] begin to down the CPT...");
         String fileName = "Cpt" + cptId + ".json";
-        String cptJson = buildToolService.queryCptSchema(Integer.parseInt(cptId));
+        String cptJson = weIdSdkService.queryCptSchema(Integer.parseInt(cptId)).getResult();
         down(response, cptJson.getBytes(), fileName);
     }
     
     @Description("下载CPT Pojo Jar")
     @GetMapping("/downPojoJar/{pojoId}")
     public void downPojoJar(HttpServletResponse response, @PathVariable("pojoId") String pojoId) {
-        logger.info("[downPojoJar] begin to down the CPT JAR...");
-        byte[] bytes = buildToolService.getJarBytes(pojoId);
+        log.info("[downPojoJar] begin to down the CPT JAR...");
+        byte[] bytes = WeIdSdkUtils.getJarBytes(pojoId);
         down(response, bytes, BuildToolsConstant.CPT_JAR_NAME);
     }
     
@@ -187,11 +171,11 @@ public class DownFileController {
         @RequestParam(value = "fromType") String fromType) {
 
         try {
-            String jarPath = buildToolService.getJarFile(pojoId).getAbsolutePath();
+            String jarPath = WeIdSdkUtils.getJarFile(pojoId).getAbsolutePath();
             String policy = PolicyFactory.loadJar(jarPath).generate(cptStr, policyType, policyId, fromType);
             down(response, policy.getBytes(), "presentation_policy.json");
         } catch (Exception e) {
-            logger.error("[downPolicy] down policy has error.", e);
+            log.error("[downPolicy] down policy has error.", e);
         }
     }
 }

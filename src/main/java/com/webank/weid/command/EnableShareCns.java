@@ -23,11 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.service.DeployService;
+import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.ContractService;
 
 public class EnableShareCns extends StaticConfig {
     
-    private static DeployService deployService = new DeployService();
+    private static ContractService contractService = new ContractService();
     
     public static void main(String[] args) {
         // TODO Auto-generated method stub
@@ -42,8 +44,8 @@ public class EnableShareCns extends StaticConfig {
             System.exit(1);
         }
         System.out.println("[EnableShareCns] beign enable new cns for evidence, cns = " + hash);
-        String restult = deployService.enableShareCns(hash);
-        if (restult.equals("success")) {
+        ResponseData<Boolean> responseData = contractService.enableShareCns(hash);
+        if (responseData.getErrorCode() == ErrorCode.SUCCESS.getCode()) {
             System.out.println("[EnableShareCns] new cns enable successfully."); 
             System.exit(0);
         } else {

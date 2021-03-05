@@ -22,34 +22,30 @@ package com.webank.weid.command;
 import java.io.File;
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.DataFrom;
+import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.impl.WeIdServiceImpl;
+import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
 /**
  * @author tonychen 2019/4/11
  */
+@Slf4j
 public class RegistCpt extends StaticConfig {
 
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(RegistCpt.class);
-
-    private static BuildToolService buildToolService = new BuildToolService();
+    private static WeIdSdkService weIdSdkService = new WeIdSdkService();
 
     private static WeIdService weIdService = new WeIdServiceImpl();
 
@@ -59,7 +55,7 @@ public class RegistCpt extends StaticConfig {
     public static void main(String[] args) {
 
         if (args == null || args.length < 6) {
-            logger.error("[RegisterCpt] input parameters error, please check your input!");
+            log.error("[RegisterCpt] input parameters error, please check your input!");
             System.exit(1);
         }
 
@@ -73,7 +69,7 @@ public class RegistCpt extends StaticConfig {
         
         ResponseData<Boolean> resp = weIdService.isWeIdExist(weId);
         if(!resp.getResult()) {
-        	logger.error("[RegisterCpt] weid ---> {} does not exist.", weId);
+        	log.error("[RegisterCpt] weid ---> {} does not exist.", weId);
         	System.out.println("[RegisterCpt] Error: the WeId ---> " + weId + " does not exist.");
             System.exit(1);
         }
@@ -91,7 +87,7 @@ public class RegistCpt extends StaticConfig {
             privateKeyFile = temp;
         }
         // 替换cnshash
-        String mainHash = buildToolService.getMainHash();
+        String mainHash = WeIdSdkUtils.getMainHash();
         privateKeyFile = privateKeyFile.replace("{cns_contract_follow}", mainHash);
         String privateKey = FileUtils.readFile(privateKeyFile);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
@@ -103,7 +99,7 @@ public class RegistCpt extends StaticConfig {
             try {
                 registerCpt(cptFile1, weIdAuthentication, cptId);
             } catch (Exception e) {
-                logger.error("register Cpt has error.", e);
+                log.error("register Cpt has error.", e);
                 System.exit(1);
             }
         }
@@ -116,7 +112,7 @@ public class RegistCpt extends StaticConfig {
         	}
             File file = new File(cptDir);
             if (!file.isDirectory()) {
-                logger.error("no CPT was found in dir :{}, please check your input.", file);
+                log.error("no CPT was found in dir :{}, please check your input.", file);
                 System.out.println("[RegisterCpt] no CPT was found in dir :" + file + ", please check your input.");
                 System.exit(1);
             }
@@ -124,7 +120,7 @@ public class RegistCpt extends StaticConfig {
                 try {
                     registerCpt(f, weIdAuthentication, cptId);
                 } catch (Exception e) {
-                    logger.error("register Cpt has error.", e);
+                    log.error("register Cpt has error.", e);
                     System.exit(1);
                 }
             }
@@ -136,13 +132,13 @@ public class RegistCpt extends StaticConfig {
         File cptFile,
         WeIdAuthentication callerAuth, 
         String cptId) throws IOException {
-        
-        CptFile result = buildToolService.registerCpt(cptFile, callerAuth, cptId, DataFrom.COMMAND);
-        System.out.print("[RegisterCpt] register cpt file:" + result.getCptFileName());
-        if (BuildToolsConstant.SUCCESS.equals(result.getMessage())) {
-            System.out.println("result ---> success. cpt id ---> " + result.getCptId());
+
+        ResponseData<CptFile> result = weIdSdkService.registerCpt(cptFile, callerAuth, cptId, DataFrom.COMMAND);
+        System.out.print("[RegisterCpt] register cpt file:" + result.getResult());
+        if (result.getErrorCode() == ErrorCode.SUCCESS.getCode()) {
+            System.out.println("result ---> success. cpt id ---> " + result.getResult().getCptId());
         } else {
-            System.out.println("result ---> fail. message ---> " + result.getMessage());
+            System.out.println("result ---> fail. message ---> " + result.getErrorMessage());
         }
     }
 }

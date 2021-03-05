@@ -27,19 +27,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @EnableAsync
-@Component
 @ConfigurationProperties(prefix = "async.thread")
 public class ExecutorConfig {
-    
-    private int corePoolSize = 5;
-    private int maxPoolSize = 20;
-    private int maxQueue = 1000;
-    private String namePrefix = "weid-async-thread-";
-    private int keepAlive = 10;
+
+    private int corePoolSize;
+    private int maxPoolSize;
+    private int maxQueue;
+    private String namePrefix;
+    private int keepAlive;
     
     @Bean
     public Executor asyncServiceExecutor() {
@@ -61,43 +59,5 @@ public class ExecutorConfig {
         executor.initialize();
         return executor;
     }
-    public int getCorePoolSize() {
-        return corePoolSize;
-    }
 
-    public void setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
-    }
-
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public void setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
-    public int getMaxQueue() {
-        return maxQueue;
-    }
-
-    public void setMaxQueue(int maxQueue) {
-        this.maxQueue = maxQueue;
-    }
-
-    public String getNamePrefix() {
-        return namePrefix;
-    }
-
-    public void setNamePrefix(String namePrefix) {
-        this.namePrefix = namePrefix;
-    }
-
-    public int getKeepAlive() {
-        return keepAlive;
-    }
-
-    public void setKeepAlive(int keepAlive) {
-        this.keepAlive = keepAlive;
-    }
 }

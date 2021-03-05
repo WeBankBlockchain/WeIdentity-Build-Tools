@@ -22,20 +22,17 @@ package com.webank.weid.service;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.web3j.crypto.Keys;
-import org.fisco.bcos.web3j.crypto.Credentials;
-import org.fisco.bcos.web3j.crypto.gm.GenCredential;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.webank.weid.config.FiscoConfig;
@@ -59,51 +56,64 @@ import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.service.fisco.WeServerUtils;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 import com.webank.weid.util.WeIdUtils;
 
 @Service
-public class DeployService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(DeployService.class);
-    private static final String HASH = "hash";
-    private static final String ECDSA_KEY = "ecdsa_key";
-    private static final String ECDSA_PUB_KEY = "ecdsa_key.pub";
-    private static final String ROLE_FILE = "role";
-    private static final String GUIDE_FILE = "guide";
-    private static final String ADMIN_PATH = "output/admin";
-    public static final String DEPLOY_PATH = "output/deploy";
-    public static final String SHARE_PATH = "output/share";
-    private static final String OTHER_PATH = "output/other";
-    
-    private static final String AUTH_ADDRESS_FILE_NAME = "authorityIssuer.address";
-    private static final String CPT_ADDRESS_FILE_NAME = "cptController.address";
-    private static final String WEID_ADDRESS_FILE_NAME = "weIdContract.address";
-    private static final String EVID_ADDRESS_FILE_NAME = "evidenceController.address";
-    private static final String SPECIFIC_ADDRESS_FILE_NAME = "specificIssuer.address";
-    
+@Slf4j
+public class ContractService {
+
+    private static String preMainHash;
+
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private WeIdSdkService weIdSdkService;
+
     static {
-        FileUtils.mkdirs(ADMIN_PATH);
-        FileUtils.mkdirs(DEPLOY_PATH);
+        FileUtils.mkdirs(BuildToolsConstant.ADMIN_PATH);
+        FileUtils.mkdirs(BuildToolsConstant.DEPLOY_PATH);
     }
-    
-    private BuildToolService buildToolService = new BuildToolService();
-  
-    public String deploy(FiscoConfig fiscoConfig, DataFrom from) {
-        logger.info("[deploy] begin depoly contract...");
-        File targetDir = new File(ADMIN_PATH, ECDSA_KEY);
+
+    public ResponseData<String> deploy(String chainId, String applyName) {
+        try {
+            FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
+            fiscoConfig.setChainId(chainId);
+            String hash = deployContract(fiscoConfig, DataFrom.WEB);
+            //configService.updateChainId(chainId);
+            log.info("[deploy] the hash: {}", hash);
+            //将应用名写入配置中
+            applyName = StringEscapeUtils.unescapeHtml(applyName);
+            WeIdPrivateKey currentPrivateKey = ContractService.getWeIdPrivateKey(hash);
+            ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.DEFAULT)
+                    .put(hash, BuildToolsConstant.APPLY_NAME, applyName, currentPrivateKey);
+            log.info("[deploy] put applyName: {}", response);
+            return new ResponseData<>(hash, ErrorCode.SUCCESS);
+        } catch (Exception e) {
+            log.error("[deploy] the contract depoly error.", e);
+            return new ResponseData<>(StringUtils.EMPTY, ErrorCode.UNKNOW_ERROR);
+        } finally {
+            FileUtils.clearDeployFile();
+        }
+    }
+
+    // 执行部署weId合约
+    public String deployContract(FiscoConfig fiscoConfig, DataFrom from) {
+        log.info("begin deploy contract...");
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
         String privateKey = null;
         if (targetDir.exists()) {
             privateKey = FileUtils.readFile(targetDir.getAbsolutePath());
         }
         DeployContractV2.deployContract(privateKey, fiscoConfig, false);
-        logger.info("[deploy] the contract depoly finish.");
+        log.info("the contract deploy finish.");
         //开始保存文件
         //将私钥移动到/output/admin中
         copyEcdsa();
@@ -111,40 +121,27 @@ public class DeployService {
     }
     
     private void copyEcdsa() {
-        logger.info("[copyEcdsa] begin copy the ecdsa to admin...");
-        File ecdsaFile = new File(ECDSA_KEY);
-        File targetDir = new File(ADMIN_PATH);
-        FileUtils.copy(ecdsaFile, new File(targetDir.getAbsoluteFile(), ECDSA_KEY));
+        log.info("[copyEcdsa] begin copy the ecdsa to admin...");
+        File ecdsaFile = new File(BuildToolsConstant.ECDSA_KEY);
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH);
+        FileUtils.copy(ecdsaFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_KEY));
         
-        File ecdsaPubFile = new File(ECDSA_PUB_KEY);
-        FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), ECDSA_PUB_KEY));
-        logger.info("[copyEcdsa] the ecdsa copy successfully.");
+        File ecdsaPubFile = new File(BuildToolsConstant.ECDSA_PUB_KEY);
+        FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_PUB_KEY));
+        log.info("[copyEcdsa] the ecdsa copy successfully.");
     }
     
     private String saveDeployInfo(FiscoConfig fiscoConfig, DataFrom from) {
-        logger.info("[saveDeployInfo] begin to save deploy info...");
+        log.info("[saveDeployInfo] begin to save deploy info...");
         //创建部署目录
-        String hash = FileUtils.readFile(HASH);
+        String hash = FileUtils.readFile(BuildToolsConstant.HASH);
         saveDeployInfo(buildInfo(fiscoConfig, hash, from));
-        logger.info("[saveDeployInfo] save the deploy info successfully.");
+        log.info("[saveDeployInfo] save the deploy info successfully.");
         return hash;
     }
     
-    public void clearDeployFile() {
-        //清理合約地址文件
-        FileUtils.delete(AUTH_ADDRESS_FILE_NAME);
-        FileUtils.delete(WEID_ADDRESS_FILE_NAME);
-        FileUtils.delete(CPT_ADDRESS_FILE_NAME);
-        FileUtils.delete(EVID_ADDRESS_FILE_NAME);
-        FileUtils.delete(SPECIFIC_ADDRESS_FILE_NAME);
-        FileUtils.delete(ECDSA_KEY); 
-        FileUtils.delete(ECDSA_PUB_KEY); 
-        FileUtils.delete(HASH); 
-        FileUtils.delete(BuildToolService.WEID_FILE); 
-    }
-    
     private  void saveDeployInfo(DeployInfo info) {
-        File deployDir = new File(DEPLOY_PATH);
+        File deployDir = new File(BuildToolsConstant.DEPLOY_PATH);
         File deployFile = new File(deployDir.getAbsoluteFile(), info.getHash());
         String jsonData = DataToolUtils.serialize(info);
         FileUtils.writeToFile(jsonData, deployFile.getAbsolutePath(), FileOperator.OVERWRITE);
@@ -155,7 +152,7 @@ public class DeployService {
         info.setHash(hash);
         long time = System.currentTimeMillis();
         info.setTime(time);
-        info.setEcdsaKey(FileUtils.readFile(ECDSA_KEY));
+        info.setEcdsaKey(FileUtils.readFile(BuildToolsConstant.ECDSA_KEY));
         BigInteger privateKey = new BigInteger(info.getEcdsaKey());
         info.setEcdsaPublicKey(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
         try {
@@ -164,11 +161,11 @@ public class DeployService {
             info.setNodeVerion(fiscoConfig.getVersion()); 
         }
         info.setNodeAddress(fiscoConfig.getNodes());
-        info.setAuthorityAddress(FileUtils.readFile(AUTH_ADDRESS_FILE_NAME));
-        info.setCptAddress(FileUtils.readFile(CPT_ADDRESS_FILE_NAME));
-        info.setWeIdAddress(FileUtils.readFile(WEID_ADDRESS_FILE_NAME));
-        info.setEvidenceAddress(FileUtils.readFile(EVID_ADDRESS_FILE_NAME));
-        info.setSpecificAddress(FileUtils.readFile(SPECIFIC_ADDRESS_FILE_NAME));
+        info.setAuthorityAddress(FileUtils.readFile(BuildToolsConstant.AUTH_ADDRESS_FILE_NAME));
+        info.setCptAddress(FileUtils.readFile(BuildToolsConstant.CPT_ADDRESS_FILE_NAME));
+        info.setWeIdAddress(FileUtils.readFile(BuildToolsConstant.WEID_ADDRESS_FILE_NAME));
+        info.setEvidenceAddress(FileUtils.readFile(BuildToolsConstant.EVID_ADDRESS_FILE_NAME));
+        info.setSpecificAddress(FileUtils.readFile(BuildToolsConstant.SPECIFIC_ADDRESS_FILE_NAME));
         info.setChainId(fiscoConfig.getChainId());
         info.setContractVersion(getVersionByClass(WeIdContract.class));
         info.setWeIdSdkVersion(getVersionByClass(WeIdServiceImpl.class));
@@ -182,21 +179,21 @@ public class DeployService {
         return jarFile.substring(0, jarFile.lastIndexOf("."));
     }
     
-    public LinkedList<CnsInfo> getDeployList() {
-        LinkedList<CnsInfo> dataList = new LinkedList<CnsInfo>();
+    public ResponseData<LinkedList<CnsInfo>> getDeployList() {
+        LinkedList<CnsInfo> dataList = new LinkedList<>();
         //如果没有部署databuket则直接返回
         org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.DEFAULT);
         if (cnsInfo == null) {
-            return dataList;
+            return new ResponseData<>(dataList, ErrorCode.BASE_ERROR);
         }
         //如果没有部署databuket则直接返回
         cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
-            return dataList;
+            return new ResponseData<>(dataList, ErrorCode.BASE_ERROR);
         }
-        String currentHash = buildToolService.getMainHash();
-        List<HashContract> result = buildToolService.getDataBucket(CnsType.DEFAULT).getAllBucket().getResult();
-        String roleType = this.getRoleType();
+        String currentHash = WeIdSdkUtils.getMainHash();
+        List<HashContract> result = WeIdSdkUtils.getDataBucket(CnsType.DEFAULT).getAllBucket().getResult();
+        String roleType = configService.getRoleType().getResult();
         for (HashContract hashContract : result) {
             CnsInfo cns = new CnsInfo();
             cns.setHash(hashContract.getHash());
@@ -218,14 +215,27 @@ public class DeployService {
             }
             // 查询此部署账户的权威机构名
             if (cns.isEnable()) {
-                AuthorityIssuer issuer = buildToolService.getIssuerByWeId(cns.getWeId());
+                AuthorityIssuer issuer = weIdSdkService.getIssuerByWeId(cns.getWeId());
                 cns.setIssuer(issuer);
             }
-            String applyName = buildToolService.getDataBucket(CnsType.DEFAULT).get(cns.getHash(), BuildToolsConstant.APPLY_NAME).getResult();
+            String applyName = WeIdSdkUtils.getDataBucket(CnsType.DEFAULT).get(cns.getHash(), BuildToolsConstant.APPLY_NAME).getResult();
             cns.setApplyName(applyName);
             dataList.add(cns);
         }
-        return dataList;
+
+        dataList.forEach(cns -> {
+            cns.setGroupId("group-" + WeIdSdkUtils.loadNewFiscoConfig().getGroupId());
+            if (cns.isEnable()) { // 如果是启用状态
+                //如果上一个地址不为空，并且新hash地址跟上一个地址不相同则reloadAddress
+                if (StringUtils.isNotBlank(preMainHash) && !preMainHash.equals(cns.getHash())) {
+                    configService.reloadAddress();
+                }
+                //当前账户创建weId，（内部有判断如果已创建则不会调用区块链创建）
+                createWeIdForCurrentUser(DataFrom.WEB);
+                preMainHash = cns.getHash();
+            }
+        });
+        return new ResponseData<>(dataList, ErrorCode.SUCCESS);
     }
     
     /**
@@ -259,12 +269,12 @@ public class DeployService {
     }
     
     private String getValueFromCns(CnsType cnsType, String hash, String key) {
-        return buildToolService.getDataBucket(cnsType).get(hash, key).getResult();
+        return WeIdSdkUtils.getDataBucket(cnsType).get(hash, key).getResult();
     }
     
     private static File getDeployFileByHash(String hash) {
         hash = FileUtils.getSecurityFileName(hash);
-        return new File(DEPLOY_PATH, hash);
+        return new File(BuildToolsConstant.DEPLOY_PATH, hash);
     }
     
     public static DeployInfo getDepolyInfoByHash(String hash) {
@@ -277,28 +287,33 @@ public class DeployService {
         }
     }
     
-    public boolean deploySystemCpt(String hash, DataFrom from) {
-        DeployInfo deployInfo = getDepolyInfoByHash(hash);
-        if (deployInfo == null) {
-            logger.error("[deploySystemCpt] can not found the admin ECDSA.");
-            return false;
-        }
-        // 注册weid
-        createWeId(deployInfo, from, true);
-        
-        logger.info("[deploySystemCpt] begin register systemCpt...");
-        //部署系统CPT, 
-        boolean result = registerSystemCpt(deployInfo);
-        if (result) {
-            logger.info("[deploySystemCpt] systemCpt is registed and to save.");
-            //更新部署信息,表示已部署系统CPT 
+    public ResponseData<Boolean> deploySystemCpt(String hash, DataFrom from) {
+        try {
+            DeployInfo deployInfo = getDepolyInfoByHash(hash);
+            if (deployInfo == null) {
+                log.error("[deploySystemCpt] can not found the admin ECDSA.");
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "can not found the admin ECDSA.");
+            }
+            // 注册weid
+            createWeId(deployInfo, from, true);
+
+            log.info("[deploySystemCpt] begin register systemCpt...");
+            //部署系统CPT, 
+            if (!registerSystemCpt(deployInfo)) {
+                log.error("[deploySystemCpt] systemCpt is register fail.");
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "systemCpt is register fail.");
+            }
+
+            log.info("[deploySystemCpt] systemCpt is registed and to save.");
+            //更新部署信息,表示已部署系统CPT
             deployInfo.setDeploySystemCpt(true);
             saveDeployInfo(deployInfo);
-            return true;
-        } else {
-            logger.error("[deploySystemCpt] systemCpt is register fail.");
-            return false;
+        } catch (Exception e) {
+            log.error("[deploySystemCpt] the System Cpt depoly error.", e);
+            return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR);
         }
+
+        return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
     }
     
     private boolean registerSystemCpt(DeployInfo deployInfo) {
@@ -316,13 +331,13 @@ public class DeployService {
         for (Integer cptId : BuildToolsConstant.CPTID_LIST) {
             String cptJsonSchema = DataToolUtils.generateDefaultCptJsonSchema(cptId);
             if (cptJsonSchema.isEmpty()) {
-                logger.info("[registerSystemCpt] Cannot generate CPT json schema with ID: " + cptId);
+                log.info("[registerSystemCpt] Cannot generate CPT json schema with ID: " + cptId);
                 return false;
             }
             cptStringArgs.setCptJsonSchema(cptJsonSchema);
             ResponseData<CptBaseInfo> responseData = cptService.registerCpt(cptStringArgs, cptId);
             if (responseData.getResult() == null) {
-                logger.info("[registerSystemCpt] Register System CPT failed with ID: " + cptId);
+                log.info("[registerSystemCpt] Register System CPT failed with ID: " + cptId);
                 return false;
             }
         }
@@ -330,27 +345,27 @@ public class DeployService {
     }
     
     private void createWeId(DeployInfo deployInfo, DataFrom from, boolean isAdmin) {
-        logger.info("[createWeId] begin createWeid for admin");
+        log.info("[createWeId] begin createWeid for admin");
         CreateWeIdArgs arg = new CreateWeIdArgs();
         arg.setPublicKey(deployInfo.getEcdsaPublicKey());
         WeIdPrivateKey pkey = new WeIdPrivateKey();
         pkey.setPrivateKey(deployInfo.getEcdsaKey());
         arg.setWeIdPrivateKey(pkey);
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
-        boolean checkWeId = buildToolService.checkWeId(weId);
+        boolean checkWeId = weIdSdkService.checkWeId(weId);
         if (!checkWeId) {
-            String result = buildToolService.createWeId(arg, from, isAdmin);
-            logger.info("[createWeId]  createWeId for admin result = {}", result);
+            String result = weIdSdkService.createWeId(arg, from, isAdmin).getResult();
+            log.info("[createWeId]  createWeId for admin result = {}", result);
             System.out.println("createWeId for admin result = " + result);
         } else {
-            logger.info("[createWeId] the weId is exist."); 
+            log.info("[createWeId] the weId is exist."); 
         }
         // 默认将当前weid注册成为权威机构，并认证
         String orgId = ConfigUtils.getCurrentOrgId();
         // 注册权威机构
-        buildToolService.registerIssuer(weId, orgId, null, from);
+        weIdSdkService.registerIssuer(weId, orgId, null);
         // 认证权威机构
-        buildToolService.recognizeAuthorityIssuer(weId);
+        weIdSdkService.recognizeAuthorityIssuer(weId);
     }
     
     /**
@@ -364,22 +379,22 @@ public class DeployService {
         arg.setWeIdPrivateKey(getCurrentPrivateKey());
         arg.setPublicKey(DataToolUtils.publicKeyFromPrivate(new BigInteger(arg.getWeIdPrivateKey().getPrivateKey())).toString());
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
-        logger.info("[createWeIdForCurrentUser] the current weId is = {}", weId);
-        boolean checkWeId = buildToolService.checkWeId(weId);
+        log.info("[createWeIdForCurrentUser] the current weId is = {}", weId);
+        boolean checkWeId = weIdSdkService.checkWeId(weId);
         if (!checkWeId) {
-            logger.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
-            String result = buildToolService.createWeId(arg, from, true);
-            logger.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
+            log.info("[createWeIdForCurrentUser] the current weId is not exist and begin create.");
+            String result = weIdSdkService.createWeId(arg, from, true).getResult();
+            log.info("[createWeIdForCurrentUser] create weid for current account result = {}", result);
             return result;
         } else {
-            logger.info("[createWeIdForCurrentUser] the current weId is exist.");
+            log.info("[createWeIdForCurrentUser] the current weId is exist.");
             return weId;
         }
     }
     
     public static WeIdPrivateKey getCurrentPrivateKey() {
         WeIdPrivateKey weIdPrivate = new WeIdPrivateKey();
-        File targetDir = new File(ADMIN_PATH, ECDSA_KEY);
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
         weIdPrivate.setPrivateKey(FileUtils.readFile(targetDir.getAbsolutePath()));
         return weIdPrivate;
     }
@@ -396,98 +411,46 @@ public class DeployService {
     }
     
     public void enableHash(CnsType cnsType, String hash, String oldHash) {
-        logger.info("[enableHash] begin enable the hash: {}", hash);
+        log.info("[enableHash] begin enable the hash: {}", hash);
         //启用新hash
         WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
-        ResponseData<Boolean> enableHash = buildToolService.getDataBucket(cnsType).enable(hash, privateKey);
-        logger.info("[enableHash] enable the hash {} --> result: {}", hash, enableHash);
+        ResponseData<Boolean> enableHash = WeIdSdkUtils.getDataBucket(cnsType).enable(hash, privateKey);
+        log.info("[enableHash] enable the hash {} --> result: {}", hash, enableHash);
         //如果原hash不为空，则停用原hash
         if (StringUtils.isNotBlank(oldHash)) {
-            ResponseData<Boolean> disableHash = buildToolService.getDataBucket(cnsType).disable(oldHash, privateKey);
-            logger.info("[enableHash] disable the old hash {} --> result: {}", oldHash, disableHash);
+            ResponseData<Boolean> disableHash = WeIdSdkUtils.getDataBucket(cnsType).disable(oldHash, privateKey);
+            log.info("[enableHash] disable the old hash {} --> result: {}", oldHash, disableHash);
         } else {
-            logger.info("[enableHash] no old hash to disable");
+            log.info("[enableHash] no old hash to disable");
         }
     }
     
-    public String removeHash(CnsType cnsType, String hash) {
-        logger.info("[removeHash] begin remove the hash: {}", hash);
+    public ResponseData<Boolean> removeHash(CnsType cnsType, String hash) {
+        log.info("[removeHash] begin remove the hash: {}", hash);
         WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
-        ResponseData<Boolean> remove = buildToolService.getDataBucket(cnsType)
-            .removeDataBucketItem(hash, false, privateKey);
-        if (remove.getErrorCode().intValue() != ErrorCode.SUCCESS.getCode()) {
-            logger.error("[removeHash] remove the hash {} --> result: {}", hash, remove);
-            return remove.getErrorCode().intValue() + "-" + remove.getErrorMessage();
-        }
-        logger.info("[removeHash] remove the hash successfully, hash: {}", hash);
-        return BuildToolsConstant.SUCCESS;
-    }
-    
-    public String createAdmin(String inputPrivateKey) {
-        logger.info("[createAdmin] begin create admin.");
-        Credentials credentials = null;
-        if (StringUtils.isNotBlank(inputPrivateKey)) {
-            logger.info("[createAdmin] create by private key.");
-            credentials = GenCredential.create(new BigInteger(inputPrivateKey).toString(16));
-        } else {
-            logger.info("[createAdmin] create by default.");
-            credentials = GenCredential.create();
-        }
-        String privateKey = credentials.getEcKeyPair().getPrivateKey().toString();
-        String publicKey = credentials.getEcKeyPair().getPublicKey().toString();
-        File ecdsaFile = new File(ADMIN_PATH, ECDSA_KEY);
-        FileUtils.writeToFile(privateKey, ecdsaFile.getAbsolutePath());
-        File ecdsaPubFile = new File(ADMIN_PATH, ECDSA_PUB_KEY);
-        FileUtils.writeToFile(publicKey, ecdsaPubFile.getAbsolutePath());
-        logger.info("[createAdmin] the admin create successfully.");
-        return "0x" + Keys.getAddress(new BigInteger(publicKey));
-    }
-    
-    public String checkAdmin() {
-        File ecdsaFile = new File(ADMIN_PATH, ECDSA_KEY);
-        File ecdsaPubFile = new File(ADMIN_PATH, ECDSA_PUB_KEY);
-        if (!ecdsaFile.exists() || !ecdsaPubFile.exists()) {
-            return StringUtils.EMPTY;
-        }
-        String publicKey = FileUtils.readFile(ecdsaPubFile.getAbsolutePath());
-        return "0x" + Keys.getAddress(new BigInteger(publicKey));
+        return WeIdSdkUtils.getDataBucket(cnsType).removeDataBucketItem(hash, false, privateKey);
     }
 
-    /**
-     * 获取群组列表
-     * @param filterMaster 是否过滤主群组
-     * @return 返回群组列表
-     */
-    public List<String> getAllGroup(boolean filterMaster) {
-        List<String> list = WeServerUtils.getGroupList();
-        if (filterMaster) {
-            return list.stream()
-                    .filter(s -> !s.equals(BaseService.masterGroupId.toString()))
-                    .collect(Collectors.toList());
-        }
-       return list;
-    }
-    
     /**
      * 获取所有的hash列表
      * @return 返回shareInfo列表数据
      */
-    public List<ShareInfo> getShareList() {
-        List<ShareInfo> result = new ArrayList<ShareInfo>();
+    public ResponseData<List<ShareInfo>> getShareList() {
+        List<ShareInfo> result = new ArrayList<>();
         // 如果没有部署databuket则直接返回
         org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.SHARE);
         if (cnsInfo == null) {
-            logger.warn("[getShareList] the cnsType does not regist, please deploy the evidence.");
-            return result;
+            log.warn("[getShareList] the cnsType does not regist, please deploy the evidence.");
+            return new ResponseData<>(result, ErrorCode.BASE_ERROR);
         }
         String orgId = ConfigUtils.getCurrentOrgId();
-        DataBucketServiceEngine dataBucket = buildToolService.getDataBucket(CnsType.SHARE);
+        DataBucketServiceEngine dataBucket = WeIdSdkUtils.getDataBucket(CnsType.SHARE);
         List<HashContract> list = dataBucket.getAllBucket().getResult();
         // 判断机构配置私钥是否匹配所有者，如果不匹配页面可以不用显示按钮
-        boolean isMatch =  buildToolService.isMatchThePrivateKey();
-        Map<String, AuthorityIssuer> cache = new HashMap<String, AuthorityIssuer>();
+        boolean isMatch = isMatchThePrivateKey();
+        Map<String, AuthorityIssuer> cache = new HashMap<>();
         if (CollectionUtils.isNotEmpty(list)) {
-            List<String> allGroup = getAllGroup(true);
+            List<String> allGroup = weIdSdkService.getAllGroup(true);
             for (HashContract hashContract : list) {
                 ShareInfo share = new ShareInfo();
                 share.setTime(hashContract.getTime());
@@ -499,13 +462,13 @@ public class DeployService {
                 if(StringUtils.isNotBlank(groupId) && allGroup.contains(groupId)) {
                     share.setGroupId(Integer.parseInt(groupId));
                     //判断是否启用此hash
-                    String enableHash = buildToolService.getDataBucket(CnsType.ORG_CONFING).get(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
+                    String enableHash = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).get(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
                     share.setEnable(hashContract.getHash().equals(enableHash));
                     //查询此部署账户的权威机构名
                     if(cache.containsKey(share.getOwner())) {
                         share.setIssuer(cache.get(share.getOwner()));
                     } else {
-                        AuthorityIssuer issuer = buildToolService.getIssuerByWeId(share.getOwner());
+                        AuthorityIssuer issuer = weIdSdkService.getIssuerByWeId(share.getOwner());
                         share.setIssuer(issuer);
                         cache.put(share.getOwner(), issuer);
                     }
@@ -515,7 +478,7 @@ public class DeployService {
                 }
             }
         }
-        return result;
+        return new ResponseData<>(result, ErrorCode.SUCCESS);
     }
     
     /**
@@ -526,7 +489,7 @@ public class DeployService {
      * @return 返回是否部署成功
      */
     public String deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {
-        logger.info("[deployEvidence] begin deploy the evidence, groupId = {}.", groupId);
+        log.info("[deployEvidence] begin deploy the evidence, groupId = {}.", groupId);
         try {
             //  获取私钥
             WeIdPrivateKey currentPrivateKey = getCurrentPrivateKey();
@@ -536,22 +499,22 @@ public class DeployService {
                 false
             );
             if (StringUtils.isBlank(hash)) {
-                logger.error("[deployEvidence] deploy the evidence fail, please check the log.");
+                log.error("[deployEvidence] deploy the evidence fail, please check the log.");
                 return StringUtils.EMPTY;
             }
             // 写部署文件
             ShareInfo share = buildShareInfo(fiscoConfig, hash, groupId, currentPrivateKey, from);
             saveShareInfo(share);
-            logger.info("[deployEvidence] the evidence deploy successfully.");
+            log.info("[deployEvidence] the evidence deploy successfully.");
             return hash;
         } catch (Exception e) {
-            logger.error("[deployEvidence] deploy the evidence has error.", e);
+            log.error("[deployEvidence] deploy the evidence has error.", e);
             return StringUtils.EMPTY;
         }
     }
     
     private  void saveShareInfo(ShareInfo info) {
-        File deployDir = new File(SHARE_PATH);
+        File deployDir = new File(BuildToolsConstant.SHARE_PATH);
         File deployFile = new File(deployDir.getAbsoluteFile(), info.getHash());
         String jsonData = DataToolUtils.serialize(info);
         FileUtils.writeToFile(jsonData, deployFile.getAbsolutePath(), FileOperator.OVERWRITE);
@@ -576,8 +539,7 @@ public class DeployService {
             info.setNodeVerion(fiscoConfig.getVersion()); 
         }
         info.setNodeAddress(fiscoConfig.getNodes());
-        String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(
-            hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
+        String evidenceAddress = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
         info.setEvidenceAddress(evidenceAddress);
         info.setContractVersion(getVersionByClass(WeIdContract.class));
         info.setWeIdSdkVersion(getVersionByClass(WeIdServiceImpl.class));
@@ -586,31 +548,32 @@ public class DeployService {
         return info;
     }
     
-    public ShareInfo getShareInfo(String hash) {
+    public ResponseData<ShareInfo> getShareInfo(String hash) {
         ShareInfo shareInfo = getShareInfoByHash(hash);
         if (shareInfo != null) {
             shareInfo.setLocal(true);
-        } else {
-            shareInfo = new ShareInfo();
-            shareInfo.setHash(hash);
-            String groupId = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
-            if(StringUtils.isNotBlank(groupId)) {
-                shareInfo.setGroupId(Integer.parseInt(groupId));
-            }
-            String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
-            if(StringUtils.isNotBlank(evidenceAddress)) {
-                shareInfo.setEvidenceAddress(evidenceAddress);
-            }
+            return new ResponseData<>(shareInfo, ErrorCode.BASE_ERROR);
         }
-        return shareInfo;
+
+        shareInfo = new ShareInfo();
+        shareInfo.setHash(hash);
+        String groupId = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
+        if(StringUtils.isNotBlank(groupId)) {
+            shareInfo.setGroupId(Integer.parseInt(groupId));
+        }
+        String evidenceAddress = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
+        if(StringUtils.isNotBlank(evidenceAddress)) {
+            shareInfo.setEvidenceAddress(evidenceAddress);
+        }
+        return new ResponseData<>(shareInfo, ErrorCode.SUCCESS);
     }
     
     private static File getShareFileByHash(String hash) {
         hash = FileUtils.getSecurityFileName(hash);
-        return new File(SHARE_PATH, hash);
+        return new File(BuildToolsConstant.SHARE_PATH, hash);
     }
     
-    public static ShareInfo getShareInfoByHash(String hash) {
+    private static ShareInfo getShareInfoByHash(String hash) {
         File shareFile = getShareFileByHash(hash);
         if (shareFile.exists()) {
             String jsonData = FileUtils.readFile(shareFile.getAbsolutePath());
@@ -620,66 +583,106 @@ public class DeployService {
         }
     }
     
-    public String enableShareCns(String hash) {
-        logger.info("[enableShareCns] begin enable new hash...");
+    public ResponseData<Boolean> enableShareCns(String hash) {
+        log.info("[enableShareCns] begin enable new hash...");
         try {
-            List<String> allGroup = getAllGroup(true);
+            List<String> allGroup = weIdSdkService.getAllGroup(true);
             // 查询hash对应的群组
-            String groupId = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
-            String evidenceAddress = buildToolService.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
+            String groupId = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
+            String evidenceAddress = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
             if (!allGroup.contains(groupId)) {
-                logger.error("[enableShareCns] the groupId of hash is not in your groupList. groupId = {}" , groupId);
-                return "fail";
+                log.error("[enableShareCns] the groupId of hash is not in your groupList. groupId = {}" , groupId);
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(),
+                        "the groupId of hash is not in your groupList");
             }
             // 获取原hash
-            String shareHashOld = buildToolService.getEvidenceHash(groupId);
+            String shareHashOld = getEvidenceHash(groupId);
             // 更新配置到链上机构配置中 evidenceAddress.<groupId> 
             String orgId = ConfigUtils.getCurrentOrgId();
             WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
-            ResponseData<Boolean> result = buildToolService.getDataBucket(CnsType.ORG_CONFING).put(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId, hash, privateKey);
+            ResponseData<Boolean> result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).
+                    put(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId, hash, privateKey);
             if (result.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
-                return result.getErrorCode() + "-" + result.getErrorMessage();
+                return new ResponseData<>(Boolean.FALSE, result.getErrorCode(), result.getErrorMessage());
             }
-            result = buildToolService.getDataBucket(CnsType.ORG_CONFING).put(orgId, WeIdConstant.CNS_EVIDENCE_ADDRESS + groupId, evidenceAddress, privateKey);
+            result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).put(orgId, WeIdConstant.CNS_EVIDENCE_ADDRESS + groupId, evidenceAddress, privateKey);
             if (result.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
-                return result.getErrorCode() + "-" + result.getErrorMessage();
+                return new ResponseData<>(Boolean.FALSE, result.getErrorCode(), result.getErrorMessage());
             }
             // 启用新hash并停用原hash
             this.enableHash(CnsType.SHARE, hash, shareHashOld);
-            logger.info("[enableShareCns] enable the hash {} successFully.", hash);
-            return "success";
+            log.info("[enableShareCns] enable the hash {} successFully.", hash);
         } catch (Exception e) {
-            logger.error("[enableShareCns] enable the hash error.", e);
-            return "fail";
+            log.error("[enableShareCns] enable the hash error.", e);
+            return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "enable the hash error");
         }
+
+        return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
     }
-    
-    
-    public boolean setRoleType(String roleType) {
-        File roleFile = new File(OTHER_PATH, ROLE_FILE);
-        FileUtils.writeToFile(roleType, roleFile.getAbsolutePath(), FileOperator.OVERWRITE);
-        return true;
+
+    // 判断当前机构配置跟当前私钥是否匹配
+    private boolean isMatchThePrivateKey() {
+        HashContract hashFromOrgIdCns = getHashFromOrgCns(ConfigUtils.getCurrentOrgId());
+        // 如果不存在机构配置，则可以匹配
+        if (hashFromOrgIdCns == null) {
+            log.info("[isMatchThePrivateKey] the orgId does not exist in orgConfig cns, default match.");
+            return true;//不存在
+        }
+        WeIdPrivateKey currentPrivateKey = ContractService.getCurrentPrivateKey();
+        String publicKey = DataToolUtils.publicKeyFromPrivate(
+                new BigInteger(currentPrivateKey.getPrivateKey())).toString();
+        String address = "0x" + Keys.getAddress(new BigInteger(publicKey));
+        if (address.equals(hashFromOrgIdCns.getOwner())) {
+            log.info("[isMatchThePrivateKey] the orgId is exist in orgConfig cns, match the private key.");
+            return true;//存在orgId并且为当前机构所有
+        }
+        log.info("[isMatchThePrivateKey] the orgId is exist, but misMatch the private key.");
+        return false; //存在机构id不为当前机构所有，私钥不匹配
     }
-    
-    public String getRoleType() {
-        File roleFile = new File(OTHER_PATH, ROLE_FILE);
-        if (!roleFile.exists()) {
+
+    /**
+     * 根据orgId获取org_config里面的hash数据.
+     * @param orgId 机构编码
+     * @return 返回hash对象信息
+     */
+    private HashContract getHashFromOrgCns(String orgId) {
+        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
+            return null;
+        }
+        List<HashContract> allHash = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).getAllBucket().getResult();
+        for (HashContract hashContract : allHash) {
+            if (hashContract.getHash().equals(orgId)) {
+                return hashContract;
+            }
+        }
+        return null;
+    }
+
+    public String getEvidenceHash(String groupId) {
+        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        if (cnsInfo == null) {
             return StringUtils.EMPTY;
         }
-        return FileUtils.readFile(roleFile.getAbsolutePath());
+        String orgId = ConfigUtils.getCurrentOrgId();
+        return WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).get(
+                orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
     }
-    
-    public boolean setGuideStatus(String step) {
-        File guideFile = new File(OTHER_PATH, GUIDE_FILE);
-        FileUtils.writeToFile(step, guideFile.getAbsolutePath(), FileOperator.OVERWRITE);
-        return true;
-    }
-    
-    public String getGuideStatus() {
-        File guideFile = new File(OTHER_PATH, GUIDE_FILE);
-        if (!guideFile.exists()) {
-            return StringUtils.EMPTY;
+
+    public ResponseData<List<AuthorityIssuer>> getUserListByHash(String hash) {
+        List<AuthorityIssuer> rList = new ArrayList<>();
+        ResponseData<List<String>> responseData = WeIdSdkUtils.getDataBucket(CnsType.SHARE).getActivatedUserList(hash);
+        if (responseData.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+            return new ResponseData<>(rList, responseData.getErrorCode(), responseData.getErrorMessage());
         }
-        return FileUtils.readFile(guideFile.getAbsolutePath());
+        for (String weIdAddress : responseData.getResult()) {
+            AuthorityIssuer issuer = weIdSdkService.getIssuerByWeId(weIdAddress);
+            if (issuer == null) {
+                issuer = new AuthorityIssuer();
+                issuer.setWeId(WeIdUtils.convertAddressToWeId(weIdAddress));
+            }
+            rList.add(issuer);
+        }
+        return new ResponseData<>(rList, ErrorCode.SUCCESS);
     }
 }

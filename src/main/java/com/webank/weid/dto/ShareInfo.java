@@ -47,4 +47,27 @@ public class ShareInfo extends DeployBase {
         this.owner = owner;
         this.ownerShow = super.getHideValue(owner, 20, 6);
     }
+    
+    @Override
+    public int compareTo(BaseDto o) {
+        if (o != null) {
+            ShareInfo c = (ShareInfo) o;
+            if (this.enable ^ c.enable) {
+                if (this.enable) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            } else {
+              if (super.getTime() < c.getTime()) {
+                  return 1;
+              } else if (super.getTime() == c.getTime()) {
+                  return 0;
+              } else {
+                  return -1;
+              }
+            }
+        }
+        return -1;
+    }
 }

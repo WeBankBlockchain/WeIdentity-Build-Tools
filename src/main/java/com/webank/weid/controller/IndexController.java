@@ -33,36 +33,18 @@ import com.webank.weid.service.GuideService;
 @RequestMapping(value = "/")
 public class IndexController {
     
-    @Autowired
-    private GuideService guideService;
-    
     @RequestMapping(value = "/")
     public String index(){
-       String value = guideService.getGuideStatus().getResult();
-        if (StringUtils.isBlank(value)) {
-            return "redirect:weid/weid-build-tools/guide.html";
-        } else {
-            return "redirect:weid/weid-build-tools/index.html";
-        }
+        return "redirect:weid/weid-build-tools/index.html";
     }
     
     @RequestMapping(value = "/weid/weid-build-tools/")
     public String index1(){
-       String value = guideService.getGuideStatus().getResult();
-        if (StringUtils.isBlank(value)) {
-            return "redirect:guide.html";
-        } else {
-            return "redirect:index.html";
-        }
+        return "redirect:index.html";
     }
     
     @RequestMapping(value = "/weid/weid-build-tools")
     public String index2(){
-       String value = guideService.getGuideStatus().getResult();
-        if (StringUtils.isBlank(value)) {
-            return "redirect:weid-build-tools/guide.html";
-        } else {
-            return "redirect:weid-build-tools/index.html";
-        }
+        return "redirect:weid-build-tools/index.html";
     }
 }

@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.webank.weid.service.DeployService;
+import com.webank.weid.service.GuideService;
 
 /**
  * 主页控制器.
@@ -34,11 +34,11 @@ import com.webank.weid.service.DeployService;
 public class IndexController {
     
     @Autowired
-    DeployService deployService;
+    private GuideService guideService;
     
     @RequestMapping(value = "/")
     public String index(){
-       String value = deployService.getGuideStatus(); 
+       String value = guideService.getGuideStatus().getResult();
         if (StringUtils.isBlank(value)) {
             return "redirect:weid/weid-build-tools/guide.html";
         } else {
@@ -48,7 +48,7 @@ public class IndexController {
     
     @RequestMapping(value = "/weid/weid-build-tools/")
     public String index1(){
-       String value = deployService.getGuideStatus(); 
+       String value = guideService.getGuideStatus().getResult();
         if (StringUtils.isBlank(value)) {
             return "redirect:guide.html";
         } else {
@@ -58,7 +58,7 @@ public class IndexController {
     
     @RequestMapping(value = "/weid/weid-build-tools")
     public String index2(){
-       String value = deployService.getGuideStatus(); 
+       String value = guideService.getGuideStatus().getResult();
         if (StringUtils.isBlank(value)) {
             return "redirect:weid-build-tools/guide.html";
         } else {

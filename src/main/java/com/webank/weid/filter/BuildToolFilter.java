@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.webank.weid.service.DeployService;
+import com.webank.weid.service.GuideService;
 
 @WebFilter(urlPatterns = {"/*"})
 public class BuildToolFilter implements Filter {
@@ -47,7 +47,7 @@ public class BuildToolFilter implements Filter {
         filterUrl.add("log.html");
     }
     @Autowired
-    DeployService deployService;
+    GuideService guideService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -60,7 +60,7 @@ public class BuildToolFilter implements Filter {
             chain.doFilter(request, response);
             return;
         } else if (uri.endsWith(".html") || uri.contains("webase-browser")) {
-            String guideResult = deployService.getGuideStatus();
+            String guideResult = guideService.getGuideStatus().getResult();
             if (uri.endsWith("guide.html") && StringUtils.isNotBlank(guideResult)) {
                 res.sendRedirect("index.html");
                 return;

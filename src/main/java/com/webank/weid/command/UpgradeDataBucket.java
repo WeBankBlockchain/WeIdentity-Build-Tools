@@ -19,10 +19,9 @@
 
 package com.webank.weid.command;
 
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.service.ConfigService;
 import java.math.BigInteger;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.EncryptType;
@@ -31,9 +30,8 @@ import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
 import org.fisco.bcos.web3j.precompile.cns.CnsService;
 import org.fisco.bcos.web3j.protocol.Web3j;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.v2.DataBucket;
@@ -41,34 +39,29 @@ import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.CnsResponse;
 import com.webank.weid.service.BaseService;
-import com.webank.weid.service.DeployService;
+import com.webank.weid.service.ContractService;
 import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
 /**
  * 升级dataBucket.
  * @author v_wbgyang
  *
  */
+@Slf4j
 public class UpgradeDataBucket {
-    
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(UpgradeDataBucket.class);
-
-    private static ConfigService configService = new ConfigService();
     
     public static void main(String[] args) {
         try {
             System.out.println("begin upgrade DataBucket...");
             // 获取私钥
-            WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+            WeIdPrivateKey currentPrivateKey = ContractService.getCurrentPrivateKey();
             if(StringUtils.isBlank(currentPrivateKey.getPrivateKey())) {
                 System.out.println("the DataBucket upgrade fail: can not found the private key.");
                 System.exit(1);
             }
 
-            FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+            FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
             EncryptType encryptType = new EncryptType(Integer.parseInt(fiscoConfig.getEncryptType()));
 
             // 根据私钥获取Credentials
@@ -97,7 +90,7 @@ public class UpgradeDataBucket {
             System.out.println("the DataBucket upgrade successfully.");
             System.exit(0);
         } catch (Exception e) {
-            logger.error("the DataBucket upgrade fail.", e);
+            log.error("the DataBucket upgrade fail.", e);
             System.out.println("the DataBucket upgrade fail.");
             System.exit(1);
         }

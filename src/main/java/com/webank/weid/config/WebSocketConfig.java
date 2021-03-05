@@ -17,7 +17,7 @@
  *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.webank.weid.app;
+package com.webank.weid.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

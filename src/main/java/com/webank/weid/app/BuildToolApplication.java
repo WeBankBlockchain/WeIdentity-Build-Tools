@@ -19,10 +19,6 @@
 
 package com.webank.weid.app;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -41,8 +37,9 @@ public class BuildToolApplication extends StaticConfig {
     public static String[] args;
     public static ConfigurableApplicationContext context;
     
-    public static void main(String[] args) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    public static void main(String[] args) {
         BuildToolApplication.args = args;
         BuildToolApplication.context = SpringApplication.run(BuildToolApplication.class, args);
-    }  
+    }
+
 }

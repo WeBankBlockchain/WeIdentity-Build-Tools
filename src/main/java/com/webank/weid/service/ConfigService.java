@@ -507,7 +507,7 @@ public class ConfigService {
                 log.info("[checkNode] the node version is 2.x in your configuration.");
                 checkNode = new CheckNodeServiceV2();
             }
-            if (checkNode == null || checkNode.check(fiscoConfig)) {
+            if (checkNode == null || !checkNode.check(fiscoConfig)) {
                 log.error("[checkNode] checkNode with fail.");
                 //configService.reloadAddress();
                 return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "checkNode with fail.");

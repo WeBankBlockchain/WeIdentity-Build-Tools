@@ -1,0 +1,89 @@
+@import './color';
+.el-table table{
+  height: auto !important;
+}
+.el-table th, .el-table tr{
+  font-size: 14px;
+  color:#000;
+
+}
+
+.el-table__header{
+  width: 100%;
+  .has-gutter{
+    tr{
+      color:#000;
+      background-color: #f4f4f4;
+      th{
+        display: table-cell !important;
+        background-color: #f4f4f4;
+        padding: 8px !important;
+        .cell{
+          background-color: #f4f4f4;
+          padding: 5px 0px;
+          line-height: normal;
+          display: inline-block;
+        }
+      }
+    }
+  }
+}
+
+.el-table__body{
+  width: 100%;
+  .el-table__row{
+    tr{
+      color:#000;
+      background-color: #f4f4f4;
+      th{
+        background-color: #f4f4f4;
+        .cell{
+          background-color: #f4f4f4;
+          padding: 5px 0px;
+          line-height: normal;
+          display: inline-block;
+          line-height: normal;
+          padding: 5px 0;
+          display: inline-block;
+          align-items: center;
+        }
+      }
+    }
+  }
+  .long_words{
+    display: inline-block;
+    width: 80%;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: default;
+  }
+  .link{
+    color: #017CFF;
+    cursor: pointer;
+  }
+}
+.el-pagination{
+  margin-top: 10px;
+  text-align: right !important;
+}
+.dialog-view{
+  .el-dialog__headerbtn, .el-message-box__headerbtn {
+    width: auto !important;
+    //margin-top: -10px !important;
+  }
+  .el-table{
+    tr{
+      th, td{
+        text-align: center;
+        height: 30px;
+        margin: 0px;
+        line-height: 30px;
+      }
+    }
+  }
+  .el-textarea__inner{
+    background-color: @bg_gray !important;
+  }
+}

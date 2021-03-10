@@ -19,7 +19,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.CheckNodeFace;
+import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.GuideService;
+import com.webank.weid.service.WeBaseService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
 import com.webank.weid.util.WeIdSdkUtils;
 
@@ -28,9 +30,15 @@ import com.webank.weid.util.WeIdSdkUtils;
 @Slf4j
 public class GuideController {
 
-	@Autowired
-	private GuideService guideService;
+    @Autowired
+    private GuideService guideService;
 
+    @Autowired
+    private WeBaseService weBaseService;
+
+    @Autowired
+    private ConfigService configService;
+	
 	@Description("设置引导完成状态")
 	@PostMapping("/setGuideStatus")
 	public ResponseData<Boolean> setGuideStatus(@RequestParam(value = "step") String step) {
@@ -62,7 +70,15 @@ public class GuideController {
 			} else {
 				inputPrivateKey = request.getParameter("privateKey");
 			}
-			return new ResponseData<>(guideService.createAdmin(inputPrivateKey), ErrorCode.SUCCESS);
+			// 创建账户
+			String account = guideService.createAdmin(inputPrivateKey);
+			// 获取群组
+			Integer groupId = configService.getMasterGroupId();
+			// 获取私钥
+			String privateKey = WeIdSdkUtils.getCurrentPrivateKey().getPrivateKey();
+			Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, account, privateKey);
+			log.info("[createAdmin] import privateKey to weBase result = {}", result);
+			return new ResponseData<>(account, ErrorCode.SUCCESS);
 		} catch (Exception e) {
 			log.error("[createAdmin] create admin hash error.", e);
 			return new ResponseData<>(StringUtils.EMPTY, ErrorCode.UNKNOW_ERROR);

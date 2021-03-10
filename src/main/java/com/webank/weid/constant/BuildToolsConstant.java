@@ -77,10 +77,14 @@ public final class BuildToolsConstant {
     public static final String HASH = "hash";
     public static final String ROLE_FILE = "role";
     public static final String GUIDE_FILE = "guide";
+    public static final String WEBASE_FILE = "webase";
     public static final String ADMIN_PATH = "output/admin";
     public static final String DEPLOY_PATH = "output/deploy";
     public static final String SHARE_PATH = "output/share";
     public static final String OTHER_PATH = "output/other";
+    public static final String RESOURCES_PATH = "resources/";
+    public static final String CONTRACT_PATH = "contract";
+    
 
     public static final String AUTH_ADDRESS_FILE_NAME = "authorityIssuer.address";
     public static final String CPT_ADDRESS_FILE_NAME = "cptController.address";

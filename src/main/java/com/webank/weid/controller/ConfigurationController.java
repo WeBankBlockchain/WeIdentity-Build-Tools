@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.webank.weid.app.BuildToolApplication;
-import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.ConfigService;

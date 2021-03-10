@@ -387,7 +387,7 @@ public class WeIdSdkService {
 		authorityIssuer.setDescription(description);
 		registerAuthorityIssuerArgs.setAuthorityIssuer(authorityIssuer);
 		String hash = WeIdSdkUtils.getMainHash();
-		registerAuthorityIssuerArgs.setWeIdPrivateKey(ContractService.getWeIdPrivateKey(hash));
+		registerAuthorityIssuerArgs.setWeIdPrivateKey(WeIdSdkUtils.getWeIdPrivateKey(hash));
 		return getAuthorityIssuerService().registerAuthorityIssuer(registerAuthorityIssuerArgs);
 	}
 
@@ -397,7 +397,7 @@ public class WeIdSdkService {
 	 * @return 返回认证结果
 	 */
 	public ResponseData<Boolean> recognizeAuthorityIssuer(String weId) {
-		WeIdPrivateKey weIdPrivateKey = ContractService.getWeIdPrivateKey(WeIdSdkUtils.getMainHash());
+		WeIdPrivateKey weIdPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(WeIdSdkUtils.getMainHash());
 		return getAuthorityIssuerService().recognizeAuthorityIssuer(weId, weIdPrivateKey);
 	}
 
@@ -407,7 +407,7 @@ public class WeIdSdkService {
 	 * @return 返回认证结果
 	 */
 	public ResponseData<Boolean> deRecognizeAuthorityIssuer(String weId) {
-		WeIdPrivateKey weIdPrivateKey = ContractService.getWeIdPrivateKey(WeIdSdkUtils.getMainHash());
+		WeIdPrivateKey weIdPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(WeIdSdkUtils.getMainHash());
 		return getAuthorityIssuerService().deRecognizeAuthorityIssuer(weId, weIdPrivateKey);
 	}
 
@@ -444,7 +444,7 @@ public class WeIdSdkService {
 		RemoveAuthorityIssuerArgs removeAuthorityIssuerArgs = new RemoveAuthorityIssuerArgs();
 		removeAuthorityIssuerArgs.setWeId(weId);
 		String hash = WeIdSdkUtils.getMainHash();
-		removeAuthorityIssuerArgs.setWeIdPrivateKey(ContractService.getWeIdPrivateKey(hash));
+		removeAuthorityIssuerArgs.setWeIdPrivateKey(WeIdSdkUtils.getWeIdPrivateKey(hash));
 
 		return getAuthorityIssuerService().removeAuthorityIssuer(removeAuthorityIssuerArgs);
 	}
@@ -475,7 +475,7 @@ public class WeIdSdkService {
 
 	private WeIdAuthentication getCurrentWeIdAuth() {
 		String hash = WeIdSdkUtils.getMainHash();
-		WeIdPrivateKey weIdPrivateKey = ContractService.getWeIdPrivateKey(hash);
+		WeIdPrivateKey weIdPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
 		WeIdAuthentication callerAuth = new WeIdAuthentication();
 		callerAuth.setWeIdPrivateKey(weIdPrivateKey);
 		callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(

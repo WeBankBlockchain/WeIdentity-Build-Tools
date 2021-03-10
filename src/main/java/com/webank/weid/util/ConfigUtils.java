@@ -25,6 +25,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -60,7 +61,7 @@ public final class ConfigUtils {
         }
         return result;
     }
-    
+
     public static <T extends Map> T objToMap(Object obj, Class<T> cls) throws IOException {
         return (T)OBJECT_MAPPER.readValue(serialize(obj), cls);
     }
@@ -69,4 +70,7 @@ public final class ConfigUtils {
         return PropertyUtils.getProperty("blockchain.orgid");
     }
 
+    public static int getEncryptType() {
+        return Integer.parseInt(PropertyUtils.getProperty("encrypt.type"));
+    }
 }

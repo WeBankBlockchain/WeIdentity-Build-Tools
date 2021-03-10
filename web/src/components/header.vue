@@ -87,7 +87,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     window.addEventListener('setItem', () => {
       this.menu1 = sessionStorage.getItem('menu1')
       this.menu2 = sessionStorage.getItem('menu2')

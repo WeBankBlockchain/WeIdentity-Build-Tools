@@ -92,6 +92,7 @@ export default {
       API.doPost('setGroupId', this.form).then(res => { // 保存选择的角色
         if (res.data.errorCode === 0) {
           this.$alert('群组配置成功!', '温馨提示', {}).then(() => {
+            localStorage.setItem('step', 3)
             this.$router.push({name: 'step3'})
           }).catch(() => {})
         } else {
@@ -103,6 +104,7 @@ export default {
       this.setGroupId()
     },
     prev () {
+      localStorage.setItem('step', 1)
       this.$router.push({name: 'step1'})
     },
     init () {
@@ -120,8 +122,8 @@ export default {
       })
     }
   },
-  created () {
-    localStorage.setItem('step', 2)
+  mounted () {
+    this.checkStep()
     this.init()
   }
 }

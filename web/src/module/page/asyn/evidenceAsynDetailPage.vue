@@ -118,7 +118,7 @@ export default {
       return date.toJSON().substr(0, 19).replace('T', ' ')
     }
   },
-  created () {
+  mounted () {
     var dataTime = this.$route.params.dataTime
     if (dataTime === '' || dataTime === undefined) {
       this.dataTime = sessionStorage.getItem('dataTime')

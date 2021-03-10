@@ -63,7 +63,7 @@
                 <span class="icon_question">什么是chain id?</span>
               </a>
             </div>
-            <el-input v-model="dialog.deployForm.chainId" placeholder="Enter chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')"></el-input>
+            <el-input v-model="dialog.deployForm.chainId" placeholder="Enter chainId" onKeyUp="this.value=this.value.replace(/\D/g,'')" @blur="dialog.deployForm.chainId = $event.target.value"></el-input>
           </el-form-item>
           <el-form-item label="应用名字" :label-width="formLabelWidth">
             <div class="mark-text">
@@ -285,6 +285,7 @@ export default {
             this.deploySystemCpt()
           } else {
             this.dialog.deployMessages.push('请继续操作。')
+            this.enableBtn(this.dialog.deployBtn)
             this.init()
           }
         } else {
@@ -347,7 +348,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     window.addEventListener('setItem', () => {
       this.changeRoleType()
     })

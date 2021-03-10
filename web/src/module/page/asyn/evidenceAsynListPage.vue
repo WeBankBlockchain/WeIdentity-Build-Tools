@@ -115,7 +115,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     // 检查数据库配置是否正确
     this.check()
   }

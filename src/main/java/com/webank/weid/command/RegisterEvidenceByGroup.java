@@ -40,7 +40,6 @@ import com.webank.weid.contract.deploy.v2.RegisterAddressV2;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.service.BaseService;
-import com.webank.weid.service.ContractService;
 import com.webank.weid.service.fisco.WeServer;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.WeIdSdkUtils;
@@ -83,7 +82,7 @@ public class RegisterEvidenceByGroup {
                 System.exit(1);
             }
             // 获取当前私钥账户
-            WeIdPrivateKey currentPrivateKey = ContractService.getCurrentPrivateKey();
+            WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
             String  privatekey = currentPrivateKey.getPrivateKey();
             // 检查输入cns 地址是否正确存在Evidence地址
             FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();

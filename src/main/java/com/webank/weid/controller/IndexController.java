@@ -19,12 +19,8 @@
 
 package com.webank.weid.controller;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.webank.weid.service.GuideService;
 
 /**
  * 主页控制器.

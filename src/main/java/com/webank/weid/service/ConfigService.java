@@ -38,6 +38,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.RedisException;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -61,7 +62,10 @@ import com.webank.weid.util.WeIdSdkUtils;
 public class ConfigService {
 
     private static boolean nodeCheck = false;
-
+    
+    @Autowired
+    private WeBaseService weBaseService;
+    
     // private FiscoConfig fiscoConfig;
     
     public boolean isExistsForProperties() {
@@ -95,6 +99,7 @@ public class ConfigService {
         map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/gmsdk.key")));
         map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/gmensdk.crt")));
         map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/gmensdk.key")));
+        map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
         return map;
     }
     
@@ -447,7 +452,7 @@ public class ConfigService {
     public ResponseData<Boolean> nodeConfigUpload(HttpServletRequest request) {
         nodeCheck = false;
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
-        File targetFIle = new File("resources/");
+        File targetFIle = new File(BuildToolsConstant.RESOURCES_PATH);
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             if (file.isEmpty()) {
@@ -542,5 +547,9 @@ public class ConfigService {
 
     public void setNodeCheck(boolean flag) {
         nodeCheck = flag;
+    }
+
+    public Integer getMasterGroupId() {
+        return Integer.parseInt(this.loadConfig().get("group_id"));
     }
 }

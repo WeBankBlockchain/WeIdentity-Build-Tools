@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.WeIdInfo;
-import com.webank.weid.service.ContractService;
 import com.webank.weid.service.PolicyFactory;
 import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.FileUtils;
@@ -94,7 +93,7 @@ public class DownFileController {
     public void downEcdsaKey(HttpServletResponse response, @PathVariable("hash") String hash) {
         log.info("[downEcdsaKey] begin to down the EcdsaKey...");
         String fileName = "ecdsa_key";
-        DeployInfo deployInfo = ContractService.getDepolyInfoByHash(hash);
+        DeployInfo deployInfo = WeIdSdkUtils.getDepolyInfoByHash(hash);
         if (deployInfo != null) {
             down(response, deployInfo.getEcdsaKey().getBytes(), fileName);
         } else {

@@ -8,7 +8,7 @@
             <div class="data">{{panleData.blockNumber}}</div>
           </div>
           <div class="right">
-            <img src="../../../assets/image/icon1.png" alt="">
+            <img src="../../../assets/image/block.png" alt="">
           </div>
         </div>
       </el-col>
@@ -19,7 +19,7 @@
             <div class="data">{{panleData.weIdCount}}</div>
           </div>
           <div class="right">
-            <img src="../../../assets/image/icon2.png" alt="">
+            <img src="../../../assets/image/weid.png" alt="">
           </div>
         </div>
       </el-col>
@@ -30,7 +30,7 @@
             <div class="data">{{panleData.cptCount}}</div>
           </div>
           <div class="right">
-            <img src="../../../assets/image/icon3.png" alt="">
+            <img src="../../../assets/image/cpt.png" alt="">
           </div>
         </div>
       </el-col>
@@ -43,7 +43,7 @@
             <div class="data">{{panleData.issuerCount}}</div>
           </div>
           <div class="right">
-            <img src="../../../assets/image/icon1.png" alt="">
+            <img src="../../../assets/image/issuer.png" alt="">
           </div>
         </div>
       </el-col>
@@ -54,7 +54,7 @@
             <div class="data">{{panleData.policyCount}}</div>
           </div>
           <div class="right">
-            <img src="../../../assets/image/icon2.png" alt="">
+            <img src="../../../assets/image/issuer-1.png" alt="">
           </div>
         </div>
       </el-col>

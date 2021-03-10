@@ -14,9 +14,15 @@
     "clipboard": "^2.0.6",
     "ecstatic": "^4.1.4",
     "element-ui": "^2.13.2",
+    "eslint-friendly-formatter": "^3.0.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "friendly-errors-webpack-plugin": "^1.7.0",
+    "html-webpack-plugin": "^2.30.1",
     "http-server": "^0.12.3",
     "js-base64": "^3.4.5",
+    "node-notifier": "^5.4.3",
     "qrcodejs2": "0.0.2",
+    "v-jsoneditor": "^1.4.2",
     "vue": "^2.5.2",
     "vue-clipboard2": "^0.3.1",
     "vue-json-editor": "^1.4.3",
@@ -76,9 +82,10 @@
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.5.2",
-    "webpack": "^3.6.0",
+    "webpack": "^3.12.0",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-dev-server": "2.9.1",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^2.9.1",
     "webpack-merge": "^4.1.0"
   },
   "engines": {
@@ -89,5 +96,8 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "main": ".eslintrc.js",
+  "keywords": [],
+  "license": "ISC"
 }

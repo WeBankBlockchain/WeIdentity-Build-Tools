@@ -56,3 +56,12 @@ Vue.prototype.enableBtn = function (target) {
     target.className = classNames
   }
 }
+
+Vue.prototype.checkStep = function () {
+  var path = this.$route.path
+  let step = path.substring(11, 12)
+  let currentStep = localStorage.getItem('step')
+  if (step !== currentStep) {
+    this.$router.push({name: 'step' + currentStep})
+  }
+}

@@ -29,7 +29,7 @@ export default {
   methods: {
     initStep () {
       let step = localStorage.getItem('step')
-      if (step === null || step === '0') {
+      if (step === null) {
         this.step = ''
       } else {
         this.step = step
@@ -46,7 +46,7 @@ export default {
       })
     }
   },
-  created () {
+  mounted () {
     this.checkGuideStatus()
   }
 }

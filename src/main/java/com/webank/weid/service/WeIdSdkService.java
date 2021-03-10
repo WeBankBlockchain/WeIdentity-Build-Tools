@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.fisco.bcos.web3j.crypto.Keys;
 import org.jsonschema2pojo.DefaultGenerationConfig;
 import org.jsonschema2pojo.GenerationConfig;
 import org.jsonschema2pojo.NoopAnnotator;
@@ -110,6 +111,9 @@ public class WeIdSdkService {
 
 	@Autowired
 	private ConfigService configService;
+	
+    @Autowired
+    private WeBaseService weBaseService;
 
 	public ResponseData<DataPanel> getDataPanel() {
 		DataPanel data = new DataPanel();
@@ -187,6 +191,8 @@ public class WeIdSdkService {
 		String publicKey = result.getUserWeIdPublicKey().getPublicKey();
 		String privateKey = result.getUserWeIdPrivateKey().getPrivateKey();
 		saveWeId(weId, publicKey, privateKey, from, false);
+		// 向WeBase导入私钥
+		importPrivateKeyToWeBase(weId, privateKey);
 		return new ResponseData<>(weId, ErrorCode.SUCCESS);
 	}
 
@@ -228,7 +234,12 @@ public class WeIdSdkService {
 		weIdPrivateKey.setPrivateKey(privateKey);
 		arg.setWeIdPrivateKey(weIdPrivateKey);
 		arg.setPublicKey(DataToolUtils.publicKeyFromPrivate(new BigInteger(privateKey)).toString());
-		return this.createWeId(arg, from, false);
+		ResponseData<String> response = this.createWeId(arg, from, false);
+		if (response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+		    // 向WeBase导入私钥
+	        importPrivateKeyToWeBase(response.getResult(), privateKey);
+        }
+		return response;
 	}
 
 	// 根据公钥代理创建weId(只有主群组管理员才可以调用)
@@ -271,7 +282,10 @@ public class WeIdSdkService {
 				return new ResponseData<>(StringUtils.EMPTY, response.getErrorCode(), response.getErrorMessage());
 			}
 			String weId = response.getResult();
+			// 本地保存WeId
 			saveWeId(weId, publicKey, null, from, false);
+			// 导入公钥到WeBase
+			importPublicKeyToWeBase(weId, publicKey);
 			return new ResponseData<>(weId, ErrorCode.SUCCESS);
 		}
 		return new ResponseData<>(StringUtils.EMPTY, ErrorCode.BASE_ERROR.getCode(),
@@ -1134,4 +1148,20 @@ public class WeIdSdkService {
 	private String getWeIdAddress(String weId) {
 		return WeIdUtils.convertWeIdToAddress(weId);
 	}
+	
+    private void importPrivateKeyToWeBase(String weId, String privateKey) {
+        String accountName = this.getWeIdAddress(weId);
+        // 获取群组
+        Integer groupId = configService.getMasterGroupId();
+        Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, accountName, privateKey);
+        log.info("[createWeId] import privateKey to weBase result = {}", result);
+	}
+
+    private void importPublicKeyToWeBase(String weId, String publicKey) {
+        String accountName = this.getWeIdAddress(weId);
+        // 获取群组
+        Integer groupId = configService.getMasterGroupId();
+        Boolean result = weBaseService.importPublicKeyToWeBase(groupId, accountName, publicKey);
+        log.info("[createWeId] import publicKey to weBase result = {}", result);
+    }
 }

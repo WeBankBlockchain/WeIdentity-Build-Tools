@@ -497,7 +497,7 @@ public class ConfigService {
             nodeCheck = false;
             log.info("[checkNode] begin check the node...");
             if (!isExistsForProperties()) {
-                new ResponseData<>(Boolean.FALSE,
+                return new ResponseData<>(Boolean.FALSE,
                         ErrorCode.UNKNOW_ERROR.getCode(),
                         "the configuration file does not exist.");
             }
@@ -505,7 +505,7 @@ public class ConfigService {
             CheckNodeFace checkNode = null;
             FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
             if (fiscoConfig.getVersion().startsWith(WeIdConstant.FISCO_BCOS_1_X_VERSION_PREFIX)) {
-                new ResponseData<>(Boolean.FALSE,
+                return new ResponseData<>(Boolean.FALSE,
                         ErrorCode.UNKNOW_ERROR.getCode(),
                         "not support 1.x version.");
             } else {

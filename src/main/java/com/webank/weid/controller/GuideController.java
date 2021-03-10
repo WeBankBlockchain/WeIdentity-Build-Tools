@@ -104,7 +104,13 @@ public class GuideController {
 			if (isExist) {
 				String address = guideService.checkAdmin();
 				if (StringUtils.isBlank(address)) {
-					guideService.createAdmin(null);
+					String account = guideService.createAdmin(null);
+					// 获取群组
+		            Integer groupId = configService.getMasterGroupId();
+					// 获取私钥
+		            String privateKey = WeIdSdkUtils.getCurrentPrivateKey().getPrivateKey();
+		            Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, account, privateKey);
+		            log.info("[checkOrgId] import privateKey to weBase result = {}", result);
 				}
 			}
 			return new ResponseData<>(isExist ? 1 : 0, ErrorCode.SUCCESS);

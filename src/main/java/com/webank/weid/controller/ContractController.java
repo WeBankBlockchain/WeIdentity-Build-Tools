@@ -174,7 +174,7 @@ public class ContractController {
 			String  oldHash = WeIdSdkUtils.getMainHash();
 			// 获取原配置
 			FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
-			WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
+			WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
 
 			// 获取部署数据
 			DeployInfo deployInfo = contractService.getDeployInfoByHashFromChain(hash);

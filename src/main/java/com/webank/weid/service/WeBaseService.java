@@ -27,7 +27,7 @@ import com.webank.weid.dto.webase.response.Certificate;
 import com.webank.weid.dto.webase.response.NodeInfo;
 import com.webank.weid.dto.webase.response.UserInfo;
 import com.webank.weid.exception.WeIdBaseException;
-import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -70,9 +70,9 @@ public class WeBaseService {
     public BaseResponse<Object> registerService(RegisterInfo registerInfo) {
         String requestUrl = getRequestUrl(registerInfo, "appRegister");
         Map<String, Object> request = new HashMap<String, Object>();
-        request.put("appIp", registerInfo.getWeIdHost());
-        request.put("appPort", registerInfo.getWeIdPort());
-        request.put("appLink", "http://" + registerInfo.getWeIdHost() + ":" + registerInfo.getWeIdPort());
+        request.put("appIp", registerInfo.getWeIdHost().split(":")[0]);
+        request.put("appPort", registerInfo.getWeIdHost().split(":")[1]);
+        request.put("appLink", "http://" + registerInfo.getWeIdHost());
         try {
             BaseResponse<Object> res = restTemplate.postForObject(requestUrl, request, BaseResponse.class);
             log.info("[registerService] code: {}, msg: {}", res.getCode(), res.getMessage());
@@ -85,13 +85,13 @@ public class WeBaseService {
 
     /**
      * 保存Webase注册信息。
-     * @param registerInfo
+     * @param registerInfo 服务注册信息
      */
      public void saveRegisterInfo(RegisterInfo registerInfo) {
         // 记录Webase数据
         File weBaseFile = getWeBaseFile();
         registerInfo.setUseWebase(true);
-        String data = DataToolUtils.serialize(registerInfo);
+        String data = ConfigUtils.serialize(registerInfo);
         FileUtils.writeToFile(data, weBaseFile.getAbsolutePath(), FileOperator.OVERWRITE);
     }
  
@@ -102,22 +102,22 @@ public class WeBaseService {
         File weBaseFile = getWeBaseFile();
         if (weBaseFile.exists()) {
             String info = FileUtils.readFile(weBaseFile.getAbsolutePath());
-            RegisterInfo registerInfo =DataToolUtils.deserialize(info, RegisterInfo.class);
+            RegisterInfo registerInfo = ConfigUtils.deserialize(info, RegisterInfo.class);
             registerInfo.setUseWebase(false);
-            String data = DataToolUtils.serialize(registerInfo);
+            String data = ConfigUtils.serialize(registerInfo);
             FileUtils.writeToFile(data, weBaseFile.getAbsolutePath(), FileOperator.OVERWRITE);
         }
     }
 
     /**
      * 判断是否集成WeBase。
-     * @param boolean true:集成了WeBase  false：没有集成Webase
+     * @return boolean true:集成了WeBase  false：没有集成Webase
      */
      public Boolean isIntegrateWebase() {
         File weBaseFile = getWeBaseFile();
         if (weBaseFile.exists()) {
             String info = FileUtils.readFile(weBaseFile.getAbsolutePath());
-            RegisterInfo registerInfo =DataToolUtils.deserialize(info, RegisterInfo.class);
+            RegisterInfo registerInfo = ConfigUtils.deserialize(info, RegisterInfo.class);
             return registerInfo.isUseWebase();
         }
         return false;
@@ -250,7 +250,7 @@ public class WeBaseService {
             }
             return StringUtils.EMPTY;
         } catch (Exception e) {
-            log.error("[createAdmin] creat admin from WeBase has error.", e);
+            log.error("[createAdmin] create admin from WeBase has error.", e);
             return StringUtils.EMPTY;
         }
     }
@@ -260,7 +260,7 @@ public class WeBaseService {
      * @param groupId 群组
      * @param userName 账户
      * @param privateKey 私钥
-     * @return
+     * @return 返回是否导入成功
      */
     public boolean importPrivateKeyToWeBase(Integer groupId, String userName, String privateKey) {
         if (this.isIntegrateWebase()) {
@@ -285,13 +285,46 @@ public class WeBaseService {
             return false;
         }
     }
-
+    
     /**
-     * 将合约导入到WeBase中。
+     * 将公钥导入到WeBase中。
      * @param groupId 群组
      * @param userName 账户
-     * @param privateKey 私钥
-     * @return
+     * @param publicKey 私钥
+     * @return 返回是否导入成功
+     */
+    public boolean importPublicKeyToWeBase(Integer groupId, String userName, String publicKey) {
+        if (this.isIntegrateWebase()) {
+            String requestUrl = getApi("importPublicKey");
+            Map<String, Object> request = new HashMap<String, Object>();
+            String hexPub = Numeric.toHexStringWithPrefix(new BigInteger(publicKey));
+            request.put("publicKey", hexPub);
+            request.put("groupId", groupId);
+            request.put("description", "From WeID");
+            request.put("userName", userName);
+            request.put("account", "admin");
+            try {
+                BaseResponse<?> res = restTemplate.postForObject(requestUrl, request, BaseResponse.class);
+                log.info("[importPublicKeyToWeBase] code: {}, msg: {}", res.getCode(), res.getMessage());
+                return res.getCode() == 0;
+            } catch (Exception e) {
+                log.error("[importPublicKeyToWeBase] import publicKey To WeBase has error.", e);
+                return false;
+            }
+        } else {
+            log.warn("[importPublicKeyToWeBase] the integrate mode is not WeBase.");
+            return false;
+        }
+    }
+    
+    /**
+     * 将合约导入到WeBase中。
+     * @param groupId 群组Id
+     * @param contractName 合约名称
+     * @param contractAddress 合约地址
+     * @param contractVersion 合约版本
+     * @param hash 合约部署编号
+     * @return 返回是否导入成功
      */
     public boolean contractSave(
         Integer groupId, 
@@ -325,7 +358,7 @@ public class WeBaseService {
     private <T> void buildForObject(BaseResponse<T> res, Class<T> clz) {
         T data = res.getData();
         try {
-           T v = (T)DataToolUtils.mapToObj((Map<String, Object>)data, clz);
+           T v = (T)ConfigUtils.mapToObj((Map<String, Object>)data, clz);
            res.setData(v);
         } catch (Exception e) {
             log.error("[buildForObject] build response data for Object error.", e);
@@ -334,8 +367,8 @@ public class WeBaseService {
 
     private <T> void buildForList(BaseResponse<List<T>> res, Class<T> clz) {
         try {
-           String json = DataToolUtils.serialize(res.getData());
-           List<T> list = DataToolUtils.deserializeToList(json, clz);
+           String json = ConfigUtils.serialize(res.getData());
+           List<T> list = ConfigUtils.deserializeToList(json, clz);
            res.setData(list);
         } catch (Exception e) {
             log.error("[buildForList] build response data for list error!", e);
@@ -357,7 +390,7 @@ public class WeBaseService {
            throw new WeIdBaseException("the webase info does not exists.");
         }
         String info = FileUtils.readFile(weBaseFile.getAbsolutePath());
-        RegisterInfo registerInfo =DataToolUtils.deserialize(info, RegisterInfo.class);
+        RegisterInfo registerInfo =ConfigUtils.deserialize(info, RegisterInfo.class);
         return getRequestUrl(registerInfo, methodName);
     }
 
@@ -371,8 +404,7 @@ public class WeBaseService {
         String appKey = registerInfo.getAppKey();
         String appSecret = registerInfo.getAppSecret();
         String signature = WeBaseService.md5Encrypt(timestamp, appKey, appSecret);
-        String api = "http://" + registerInfo.getWeBaseHost() + ":" + registerInfo.getWeBasePort() 
-            + WEBASE_CONTEXT + "api/" + methodName;
+        String api = "http://" + registerInfo.getWeBaseHost() + WEBASE_CONTEXT + "api/" + methodName;
         String requestUrl = api + "?appKey=" + appKey + "&signature=" + signature + "&timestamp=" + timestamp;
         return requestUrl;
     }

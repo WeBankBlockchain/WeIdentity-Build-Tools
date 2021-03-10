@@ -17,6 +17,12 @@ export default new Router({
           meta: { requireAuth: true },
           name: 'step',
           component: resolve => { import('@/module/guide/step.vue').then(module => resolve(module)) }
+        },
+        {
+          path: '/guide/step0',
+          meta: { requireAuth: true },
+          name: 'step0',
+          component: resolve => { import('@/module/guide/step0.vue').then(module => resolve(module)) }
         }, {
           path: '/guide/step1',
           meta: { requireAuth: true },

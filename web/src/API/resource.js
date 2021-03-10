@@ -18,6 +18,9 @@ class ResoruceService extends BaseModel {
     return this.ajax('post', url, param, this.headers_post, timeout)
   }
   doPostAndUploadFile (url, param, timeout) {
+    return this.doPostByJson(url, param, timeout)
+  }
+  doPostByJson (url, param, timeout) {
     return this.ajax('upload', url, param, null, timeout)
   }
   doGet (url, param, timeout) {

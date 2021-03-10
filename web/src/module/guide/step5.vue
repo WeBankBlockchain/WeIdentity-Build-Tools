@@ -188,17 +188,18 @@ export default {
       })
     },
     prev () {
+      localStorage.setItem('step', 4)
       this.$router.push({name: 'step4'})
     },
     setGuideStatus () {
       API.doPost('setGuideStatus', {step: '5'}).then(res => { // 保存选择的角色
-        localStorage.setItem('step', 0)
+        localStorage.setItem('step', '')
         this.$router.push({name: 'deployWeId'})
       })
     }
   },
-  created () {
-    localStorage.setItem('step', 5)
+  mounted () {
+    this.checkStep()
   }
 }
 </script>

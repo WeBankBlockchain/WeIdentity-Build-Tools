@@ -111,7 +111,27 @@ public final class FileUtils {
         }
         return StringUtils.EMPTY;
     }
-    
+
+    public static String readFileAsStream(String fileName) {
+        InputStream in = null;
+        try {
+            in = FileUtils.class.getClassLoader().getResourceAsStream(fileName);
+            byte[] data = new byte[in.available()];
+            int length = in.read(data);
+            if (length < 0) {
+                return StringUtils.EMPTY;
+            }
+            return new String(data, 0, length);
+        } catch (FileNotFoundException e) {
+            log.error("the file can not found.", e);
+        } catch (IOException e) {
+            log.error("read file exception.", e);
+        } finally {
+            close(in);
+        }
+        return StringUtils.EMPTY;
+    }
+
     public static List<String> readFileToList(String fileName) {
 
         File file = new File(fileName);

@@ -39,7 +39,6 @@ import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.CnsResponse;
 import com.webank.weid.service.BaseService;
-import com.webank.weid.service.ContractService;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.WeIdSdkUtils;
 
@@ -55,7 +54,7 @@ public class UpgradeDataBucket {
         try {
             System.out.println("begin upgrade DataBucket...");
             // 获取私钥
-            WeIdPrivateKey currentPrivateKey = ContractService.getCurrentPrivateKey();
+            WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
             if(StringUtils.isBlank(currentPrivateKey.getPrivateKey())) {
                 System.out.println("the DataBucket upgrade fail: can not found the private key.");
                 System.exit(1);

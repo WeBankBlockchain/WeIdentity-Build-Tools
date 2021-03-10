@@ -139,7 +139,7 @@ public class ContractController {
 		}
 		//将应用名写入配置中
 		evidenceName = StringEscapeUtils.unescapeHtml(evidenceName);
-		WeIdPrivateKey currentPrivateKey = ContractService.getWeIdPrivateKey(hash);
+		WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
 		ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.SHARE)
 				.put(hash, BuildToolsConstant.EVIDENCE_NAME, evidenceName, currentPrivateKey);
 		log.info("[deployEvidence] put evidenceName: {}", response);
@@ -174,7 +174,7 @@ public class ContractController {
 			String  oldHash = WeIdSdkUtils.getMainHash();
 			// 获取原配置
 			FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
-			WeIdPrivateKey currentPrivateKey = ContractService.getWeIdPrivateKey(hash);
+			WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
 
 			// 获取部署数据
 			DeployInfo deployInfo = contractService.getDeployInfoByHashFromChain(hash);

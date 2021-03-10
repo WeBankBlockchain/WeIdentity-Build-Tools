@@ -27,8 +27,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
 import com.webank.weid.config.FiscoConfig;
@@ -37,7 +42,10 @@ import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.dto.ContractSolInfo;
+import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.PojoInfo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.service.BaseService;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
 import com.webank.weid.service.impl.engine.EngineFactory;
@@ -182,5 +190,67 @@ public class WeIdSdkUtils {
             FileUtils.close(in);
             FileUtils.close(bos);
         }
+    }
+
+    public static WeIdPrivateKey getCurrentPrivateKey() {
+        WeIdPrivateKey weIdPrivate = new WeIdPrivateKey();
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+        weIdPrivate.setPrivateKey(FileUtils.readFile(targetDir.getAbsolutePath()));
+        return weIdPrivate;
+    }
+
+    public static WeIdPrivateKey getWeIdPrivateKey(String hash) {
+        // 根据部署编码获取当次部署的私钥
+        DeployInfo deployInfo = getDepolyInfoByHash(hash);
+        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
+        if (deployInfo != null) {
+            weIdPrivateKey.setPrivateKey(deployInfo.getEcdsaKey());
+            return weIdPrivateKey;
+        }
+        return getCurrentPrivateKey();
+    }
+
+    public static DeployInfo getDepolyInfoByHash(String hash) {
+        File deployDir = getDeployFileByHash(hash);
+        if (deployDir.exists()) {
+            String jsonData = FileUtils.readFile(deployDir.getAbsolutePath());
+            return DataToolUtils.deserialize(jsonData, DeployInfo.class);
+        } else {
+            return null;
+        }
+    }
+
+    private static File getDeployFileByHash(String hash) {
+        hash = FileUtils.getSecurityFileName(hash);
+        return new File(BuildToolsConstant.DEPLOY_PATH, hash);
+    }
+
+    public static List<ContractSolInfo> getContractList() {
+        URL contractUri = Thread.currentThread()
+            .getContextClassLoader().getResource(BuildToolsConstant.CONTRACT_PATH);
+        File file = new File(contractUri.getFile());
+        List<ContractSolInfo> contractSolList = new ArrayList<ContractSolInfo>();
+        for (File contractFile : file.listFiles()) {
+            ContractSolInfo contract = new ContractSolInfo();
+            String contractName = contractFile.getName();
+            contractName = contractName.substring(0, contractName.indexOf("."));
+            contract.setContractName(contractName);
+            try {
+                Class<?> forName = Class.forName("com.webank.weid.contract.v2." + contractName);
+                contract.setContractAbi(forName.getField("ABI").get(forName).toString());
+                if (ConfigUtils.getEncryptType() == 0) {
+                    contract.setBytecodeBin(forName.getField("BINARY").get(forName).toString());
+                } else {
+                    contract.setBytecodeBin(forName.getField("SM_BINARY").get(forName).toString());
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+                log.error("[getContractList] get the abi and bin has error. ");
+            }
+            String contractSource= FileUtils.readFile(contractFile.getAbsolutePath());
+            contract.setContractSource(Base64.encodeBase64String(contractSource.getBytes()));
+            contractSolList.add(contract);
+        }
+        return contractSolList;
     }
 }

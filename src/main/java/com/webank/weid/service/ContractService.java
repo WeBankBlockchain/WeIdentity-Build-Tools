@@ -60,6 +60,7 @@ import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
+import com.webank.weid.util.ClassUtils;
 import com.webank.weid.util.ConfigUtils;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
@@ -77,6 +78,11 @@ public class ContractService {
 
     @Autowired
     private WeIdSdkService weIdSdkService;
+    
+    @Autowired
+    private WeBaseService weBaseService;
+    
+    private static final String CONTRACT_JAR_PEFIX = "weid-contract-java-";
 
     static {
         FileUtils.mkdirs(BuildToolsConstant.ADMIN_PATH);
@@ -92,7 +98,7 @@ public class ContractService {
             log.info("[deploy] the hash: {}", hash);
             //将应用名写入配置中
             applyName = StringEscapeUtils.unescapeHtml(applyName);
-            WeIdPrivateKey currentPrivateKey = ContractService.getWeIdPrivateKey(hash);
+            WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
             ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.DEFAULT)
                     .put(hash, BuildToolsConstant.APPLY_NAME, applyName, currentPrivateKey);
             log.info("[deploy] put applyName: {}", response);
@@ -120,7 +126,7 @@ public class ContractService {
         copyEcdsa();
         return saveDeployInfo(fiscoConfig, from);
     }
-    
+
     private void copyEcdsa() {
         log.info("[copyEcdsa] begin copy the ecdsa to admin...");
         File ecdsaFile = new File(BuildToolsConstant.ECDSA_KEY);
@@ -131,23 +137,40 @@ public class ContractService {
         FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_PUB_KEY));
         log.info("[copyEcdsa] the ecdsa copy successfully.");
     }
-    
+
     private String saveDeployInfo(FiscoConfig fiscoConfig, DataFrom from) {
         log.info("[saveDeployInfo] begin to save deploy info...");
         //创建部署目录
         String hash = FileUtils.readFile(BuildToolsConstant.HASH);
-        saveDeployInfo(buildInfo(fiscoConfig, hash, from));
+        DeployInfo deployInfo = buildInfo(fiscoConfig, hash, from);
+        saveDeployInfo(deployInfo);
         log.info("[saveDeployInfo] save the deploy info successfully.");
+        saveContractToWeBase(deployInfo);
         return hash;
     }
-    
+
+    private void saveContractToWeBase(DeployInfo deployInfo) {
+        Integer groupId = configService.getMasterGroupId();
+        String version = getContractVersion();
+        String hash = deployInfo.getHash();
+        weBaseService.contractSave(groupId, "WeIdContract", deployInfo.getWeIdAddress(),version, hash);
+        weBaseService.contractSave(groupId, "CptController", deployInfo.getCptAddress(), version, hash);
+        weBaseService.contractSave(groupId, "AuthorityIssuerController", deployInfo.getAuthorityAddress(), version, hash);
+        weBaseService.contractSave(groupId, "SpecificIssuerController", deployInfo.getEvidenceAddress(), version, hash);
+        weBaseService.contractSave(groupId, "EvidenceContract", deployInfo.getSpecificAddress(), version, hash);
+    }
+
+    public String getContractVersion() {
+        return ClassUtils.getVersionByClass(WeIdContract.class, CONTRACT_JAR_PEFIX);
+    }
+
     private  void saveDeployInfo(DeployInfo info) {
         File deployDir = new File(BuildToolsConstant.DEPLOY_PATH);
         File deployFile = new File(deployDir.getAbsoluteFile(), info.getHash());
         String jsonData = DataToolUtils.serialize(info);
         FileUtils.writeToFile(jsonData, deployFile.getAbsolutePath(), FileOperator.OVERWRITE);
     }
-    
+
     private DeployInfo buildInfo(FiscoConfig fiscoConfig, String hash, DataFrom from) {
         DeployInfo info = new DeployInfo();
         info.setHash(hash);
@@ -168,18 +191,12 @@ public class ContractService {
         info.setEvidenceAddress(FileUtils.readFile(BuildToolsConstant.EVID_ADDRESS_FILE_NAME));
         info.setSpecificAddress(FileUtils.readFile(BuildToolsConstant.SPECIFIC_ADDRESS_FILE_NAME));
         info.setChainId(fiscoConfig.getChainId());
-        info.setContractVersion(getVersionByClass(WeIdContract.class));
-        info.setWeIdSdkVersion(getVersionByClass(WeIdServiceImpl.class));
+        info.setContractVersion(ClassUtils.getJarNameByClass(WeIdContract.class));
+        info.setWeIdSdkVersion(ClassUtils.getJarNameByClass(WeIdServiceImpl.class));
         info.setFrom(from.name());
         return info;
     }
-    
-    private static String getVersionByClass(Class<?> clazz) {
-        String jarFile = clazz.getProtectionDomain().getCodeSource().getLocation().getFile();
-        jarFile = jarFile.substring(jarFile.lastIndexOf("/")+1);
-        return jarFile.substring(0, jarFile.lastIndexOf("."));
-    }
-    
+
     public ResponseData<LinkedList<CnsInfo>> getDeployList() {
         LinkedList<CnsInfo> dataList = new LinkedList<>();
         //如果没有部署databuket则直接返回
@@ -207,7 +224,7 @@ public class ContractService {
                 continue;
             }
             
-            DeployInfo deployInfo = getDepolyInfoByHash(cns.getHash());
+            DeployInfo deployInfo = WeIdSdkUtils.getDepolyInfoByHash(cns.getHash());
             if (deployInfo != null && !deployInfo.isDeploySystemCpt()) {
                 cns.setNeedDeployCpt(true);
             }
@@ -238,7 +255,7 @@ public class ContractService {
         });
         return new ResponseData<>(dataList, ErrorCode.SUCCESS);
     }
-    
+
     /**
      * 根据hash从链上获取地址信息.
      * @param hash 获取部署数据的hash值
@@ -246,7 +263,7 @@ public class ContractService {
      */
     public DeployInfo getDeployInfoByHashFromChain(String hash) {
         //判断本地是否有次hash记录
-        DeployInfo deploy = getDepolyInfoByHash(hash);
+        DeployInfo deploy = WeIdSdkUtils.getDepolyInfoByHash(hash);
         if (deploy != null) {
             deploy.setLocal(true);//本地有
         } else {
@@ -268,29 +285,14 @@ public class ContractService {
         }
         return deploy;
     }
-    
+
     private String getValueFromCns(CnsType cnsType, String hash, String key) {
         return WeIdSdkUtils.getDataBucket(cnsType).get(hash, key).getResult();
     }
-    
-    private static File getDeployFileByHash(String hash) {
-        hash = FileUtils.getSecurityFileName(hash);
-        return new File(BuildToolsConstant.DEPLOY_PATH, hash);
-    }
-    
-    public static DeployInfo getDepolyInfoByHash(String hash) {
-        File deployDir = getDeployFileByHash(hash);
-        if (deployDir.exists()) {
-            String jsonData = FileUtils.readFile(deployDir.getAbsolutePath());
-            return DataToolUtils.deserialize(jsonData, DeployInfo.class);
-        } else {
-            return null;
-        }
-    }
-    
+
     public ResponseData<Boolean> deploySystemCpt(String hash, DataFrom from) {
         try {
-            DeployInfo deployInfo = getDepolyInfoByHash(hash);
+            DeployInfo deployInfo = WeIdSdkUtils.getDepolyInfoByHash(hash);
             if (deployInfo == null) {
                 log.error("[deploySystemCpt] can not found the admin ECDSA.");
                 return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "can not found the admin ECDSA.");
@@ -316,7 +318,7 @@ public class ContractService {
 
         return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
     }
-    
+
     private boolean registerSystemCpt(DeployInfo deployInfo) {
         CptStringArgs cptStringArgs = new CptStringArgs();
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
@@ -344,7 +346,7 @@ public class ContractService {
         }
         return true;
     }
-    
+
     private void createWeId(DeployInfo deployInfo, DataFrom from, boolean isAdmin) {
         log.info("[createWeId] begin createWeid for admin");
         CreateWeIdArgs arg = new CreateWeIdArgs();
@@ -368,7 +370,7 @@ public class ContractService {
         // 认证权威机构
         weIdSdkService.recognizeAuthorityIssuer(weId);
     }
-    
+
     /**
      * 给当前账户创建WeId.
      * @param from 创建来源
@@ -377,7 +379,7 @@ public class ContractService {
     public String createWeIdForCurrentUser(DataFrom from) {
         //判断当前私钥账户对应的weid是否存在，如果不存在则创建weId
         CreateWeIdArgs arg = new CreateWeIdArgs();
-        arg.setWeIdPrivateKey(getCurrentPrivateKey());
+        arg.setWeIdPrivateKey(WeIdSdkUtils.getCurrentPrivateKey());
         arg.setPublicKey(DataToolUtils.publicKeyFromPrivate(new BigInteger(arg.getWeIdPrivateKey().getPrivateKey())).toString());
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
         log.info("[createWeIdForCurrentUser] the current weId is = {}", weId);
@@ -392,29 +394,11 @@ public class ContractService {
             return weId;
         }
     }
-    
-    public static WeIdPrivateKey getCurrentPrivateKey() {
-        WeIdPrivateKey weIdPrivate = new WeIdPrivateKey();
-        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
-        weIdPrivate.setPrivateKey(FileUtils.readFile(targetDir.getAbsolutePath()));
-        return weIdPrivate;
-    }
-    
-    public static WeIdPrivateKey getWeIdPrivateKey(String hash) {
-        //根据部署编码获取当次部署的私钥
-        DeployInfo deployInfo = getDepolyInfoByHash(hash);
-        WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
-        if (deployInfo != null) {
-            weIdPrivateKey.setPrivateKey(deployInfo.getEcdsaKey());
-            return weIdPrivateKey;
-        }
-        return getCurrentPrivateKey();
-    }
-    
+
     public void enableHash(CnsType cnsType, String hash, String oldHash) {
         log.info("[enableHash] begin enable the hash: {}", hash);
         //启用新hash
-        WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
+        WeIdPrivateKey privateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
         ResponseData<Boolean> enableHash = WeIdSdkUtils.getDataBucket(cnsType).enable(hash, privateKey);
         log.info("[enableHash] enable the hash {} --> result: {}", hash, enableHash);
         //如果原hash不为空，则停用原hash
@@ -425,10 +409,10 @@ public class ContractService {
             log.info("[enableHash] no old hash to disable");
         }
     }
-    
+
     public ResponseData<Boolean> removeHash(CnsType cnsType, String hash) {
         log.info("[removeHash] begin remove the hash: {}", hash);
-        WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
+        WeIdPrivateKey privateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
         return WeIdSdkUtils.getDataBucket(cnsType).removeDataBucketItem(hash, false, privateKey);
     }
 
@@ -482,7 +466,7 @@ public class ContractService {
         Collections.sort(result);
         return new ResponseData<>(result, ErrorCode.SUCCESS);
     }
-    
+
     /**
      * 根据群组部署Evidence合约.
      * @param fiscoConfig 当前配置信息
@@ -494,7 +478,7 @@ public class ContractService {
         log.info("[deployEvidence] begin deploy the evidence, groupId = {}.", groupId);
         try {
             //  获取私钥
-            WeIdPrivateKey currentPrivateKey = getCurrentPrivateKey();
+            WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
             String hash = DeployEvidence.deployContract(
                 currentPrivateKey.getPrivateKey(), 
                 groupId, 
@@ -507,6 +491,9 @@ public class ContractService {
             // 写部署文件
             ShareInfo share = buildShareInfo(fiscoConfig, hash, groupId, currentPrivateKey, from);
             saveShareInfo(share);
+            // 导入合约到WeBase中
+            String version =  this.getContractVersion();
+            weBaseService.contractSave(groupId, "EvidenceContract", share.getEvidenceAddress(), version, hash);
             log.info("[deployEvidence] the evidence deploy successfully.");
             return hash;
         } catch (Exception e) {
@@ -514,14 +501,14 @@ public class ContractService {
             return StringUtils.EMPTY;
         }
     }
-    
+
     private  void saveShareInfo(ShareInfo info) {
         File deployDir = new File(BuildToolsConstant.SHARE_PATH);
         File deployFile = new File(deployDir.getAbsoluteFile(), info.getHash());
         String jsonData = DataToolUtils.serialize(info);
         FileUtils.writeToFile(jsonData, deployFile.getAbsolutePath(), FileOperator.OVERWRITE);
     }
-    
+
     private ShareInfo buildShareInfo(
         FiscoConfig fiscoConfig, 
         String hash,
@@ -543,13 +530,13 @@ public class ContractService {
         info.setNodeAddress(fiscoConfig.getNodes());
         String evidenceAddress = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
         info.setEvidenceAddress(evidenceAddress);
-        info.setContractVersion(getVersionByClass(WeIdContract.class));
-        info.setWeIdSdkVersion(getVersionByClass(WeIdServiceImpl.class));
+        info.setContractVersion(ClassUtils.getJarNameByClass(WeIdContract.class));
+        info.setWeIdSdkVersion(ClassUtils.getJarNameByClass(WeIdServiceImpl.class));
         info.setGroupId(groupId);
         info.setFrom(from.name());
         return info;
     }
-    
+
     public ResponseData<ShareInfo> getShareInfo(String hash) {
         ShareInfo shareInfo = getShareInfoByHash(hash);
         if (shareInfo != null) {
@@ -569,12 +556,12 @@ public class ContractService {
         }
         return new ResponseData<>(shareInfo, ErrorCode.SUCCESS);
     }
-    
+
     private static File getShareFileByHash(String hash) {
         hash = FileUtils.getSecurityFileName(hash);
         return new File(BuildToolsConstant.SHARE_PATH, hash);
     }
-    
+
     private static ShareInfo getShareInfoByHash(String hash) {
         File shareFile = getShareFileByHash(hash);
         if (shareFile.exists()) {
@@ -584,7 +571,7 @@ public class ContractService {
             return null;
         }
     }
-    
+
     public ResponseData<Boolean> enableShareCns(String hash) {
         log.info("[enableShareCns] begin enable new hash...");
         try {
@@ -601,7 +588,7 @@ public class ContractService {
             String shareHashOld = getEvidenceHash(groupId);
             // 更新配置到链上机构配置中 evidenceAddress.<groupId> 
             String orgId = ConfigUtils.getCurrentOrgId();
-            WeIdPrivateKey privateKey = getWeIdPrivateKey(hash);
+            WeIdPrivateKey privateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
             ResponseData<Boolean> result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).
                     put(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId, hash, privateKey);
             if (result.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
@@ -630,7 +617,7 @@ public class ContractService {
             log.info("[isMatchThePrivateKey] the orgId does not exist in orgConfig cns, default match.");
             return true;//不存在
         }
-        WeIdPrivateKey currentPrivateKey = ContractService.getCurrentPrivateKey();
+        WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         String publicKey = DataToolUtils.publicKeyFromPrivate(
                 new BigInteger(currentPrivateKey.getPrivateKey())).toString();
         String address = "0x" + Keys.getAddress(new BigInteger(publicKey));

@@ -82,7 +82,7 @@ public class DeployContract extends StaticConfig {
         contract.setSpecificIssuerAddress(deployInfo.getSpecificAddress());
         contract.setEvidenceAddress(deployInfo.getEvidenceAddress());
         contract.setCptAddress(deployInfo.getCptAddress());
-        WeIdPrivateKey currentPrivateKey = ContractService.getCurrentPrivateKey();
+        WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         // 写入全局配置中
         DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
         System.out.println("begin enable the hash.");

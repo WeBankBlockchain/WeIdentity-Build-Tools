@@ -18,7 +18,7 @@
       active-text-color="#ffd04b">
       <el-submenu :index="item.index" :key="item.name" v-for="(item) in menuData">
         <template slot="title">
-          <i class="el-icon-menu"></i>
+          <i :class="item.icon"></i>
           <span>{{item.name}}</span>
         </template>
         <el-menu-item
@@ -40,6 +40,7 @@ export default {
         {
           index: 1,
           name: '配置管理',
+          icon: 'el-icon-menu-self el-icon-menu-1',
           subList: [
             {index: 1, name: '配置区块链节点', linkName: 'nodeConfig', isShow: true},
             {index: 2, name: '配置主群组', linkName: 'groupConfig', isShow: true},
@@ -49,6 +50,7 @@ export default {
         }, {
           index: 2,
           name: '智能合约管理',
+          icon: 'el-icon-menu-self el-icon-menu-2',
           subList: [
             {index: 1, name: '部署WeIdentity智能合约', linkName: 'deployWeId', isShow: true},
             {index: 2, name: '部署存证智能合约', linkName: 'deployEvidence', isShow: true}
@@ -56,6 +58,7 @@ export default {
         }, {
           index: 3,
           name: '功能管理',
+          icon: 'el-icon-menu-self el-icon-menu-3',
           subList: [
             {index: 1, name: '数据概览', linkName: 'dataPanle', isShow: true},
             {index: 2, name: 'WeID管理', linkName: 'weidList', isShow: true},
@@ -67,12 +70,14 @@ export default {
         }, {
           index: 4,
           name: '异步上链管理',
+          icon: 'el-icon-menu-self el-icon-menu-4',
           subList: [
             {index: 1, name: '存证异步上链管理', linkName: 'asynEvidenceList', isShow: true}
           ]
         }, {
           index: 5,
           name: '配置检查管理',
+          icon: 'el-icon-menu-self el-icon-menu-5',
           subList: [
             {index: 1, name: '检查数据库配置', linkName: 'dbCheck', isShow: true}
           ]

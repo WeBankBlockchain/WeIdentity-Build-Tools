@@ -168,7 +168,7 @@ export default {
     },
     setGuideStatus () {
       API.doPost('setGuideStatus', {step: '5'}).then(res => { // 保存选择的角色
-        localStorage.setItem('step', 0)
+        localStorage.setItem('step', '')
         this.$router.push({name: 'deployWeId'})
       })
     },
@@ -178,6 +178,7 @@ export default {
           if (res.data.result === 1) { // 转主页
             this.setGuideStatus()
           } else if (res.data.result === 0) { // 创建账户
+            localStorage.setItem('step', 4)
             this.$router.push({name: 'step4'})
           } else {
             this.$alert('程序出现异常，请查看日志。', '温馨提示', {}).catch(() => {})
@@ -231,6 +232,7 @@ export default {
       this.submitDbConfig()
     },
     prev () {
+      localStorage.setItem('step', 2)
       this.$router.push({name: 'step2'})
     },
     init () {
@@ -245,9 +247,11 @@ export default {
       this.$alert('<p>如果您需要使用到下列功能，则需要配置数据库<br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>', '温馨提示', {dangerouslyUseHTMLString: true}).catch(() => {})
     }
   },
-  created () {
-    localStorage.setItem('step', 3)
+  mounted () {
     this.init()
+  },
+  created () {
+    this.checkStep()
   }
 }
 </script>

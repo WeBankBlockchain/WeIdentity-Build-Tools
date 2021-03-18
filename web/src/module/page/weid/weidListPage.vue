@@ -467,7 +467,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     window.addEventListener('setItem', () => {
       this.changeRoleType()
     })

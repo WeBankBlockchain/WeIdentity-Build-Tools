@@ -139,7 +139,6 @@ public class WebaseController {
     @PostMapping("/webase/registerApp")
     @ResponseBody
     public ResponseData<Boolean> registerApp(@RequestBody RegisterInfo registerInfo) {
-	    System.out.println(registerInfo);
         // 1. 向WeBase注册服务
         BaseResponse<Object> result = weBaseService.registerService(registerInfo);
         // 2. 如果服务注册成功，则从Webase拉取证书，如果失败则直接返回
@@ -153,8 +152,9 @@ public class WebaseController {
         boolean syncResult = weBaseService.syncCertificate();
         log.info("[registerApp] the result of sync certificate is {}", syncResult);
         if (syncResult) {
+            Integer encryptType = weBaseService.queryNodeType().getData();
             // 导入合约文件到WeBase
-            List<ContractSolInfo> contractList = WeIdSdkUtils.getContractList();
+            List<ContractSolInfo> contractList = WeIdSdkUtils.getContractList(encryptType);
             String contractVersion =  contractService.getContractVersion();
             log.info("[registerApp] contract szie = {}, contract version = {}", contractList.size(), contractVersion);
             syncResult = weBaseService.syncContractToWeBase(contractList, contractVersion);

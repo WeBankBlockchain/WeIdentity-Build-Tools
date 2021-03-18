@@ -1,5 +1,7 @@
 package com.webank.weid.dto.webase.response;
 
+import java.util.ArrayList;
+
 import lombok.Data;
 
 @Data
@@ -28,4 +30,5 @@ public class NodeInfo {
     private int channelPort;
     private int chainId;
     private String chainName;
+    private ArrayList<String> groupList;
 }

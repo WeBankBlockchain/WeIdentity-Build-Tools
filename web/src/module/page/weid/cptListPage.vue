@@ -560,7 +560,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.check()
   }
 }

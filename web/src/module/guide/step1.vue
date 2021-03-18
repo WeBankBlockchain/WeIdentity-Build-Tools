@@ -43,13 +43,14 @@
                   <div class="mark-bottom"><div>此ID用于链上AMOP通讯</div></div>
                 </el-form-item>
                 <el-form-item label="国密/非国密:" prop="encrypt_type">
-                  <el-select v-model="form.encrypt_type" placeholder="国密/非国密" style="width: 72%">
+                  <el-select v-model="form.encrypt_type" placeholder="国密/非国密" style="width: 72%" :disabled="useWeBase">
                     <el-option label="非国密" value="0"></el-option>
                     <el-option label="国密" value="1"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="区块链节点 IP 和 Channel 端口:" prop="blockchain_address">
                   <el-input v-model="form.blockchain_address" placeholder="IP:PORT,IP:PORT" maxlength="30" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="form.blockchain_address = $event.target.value"></el-input>
+                  <el-button type="primary" @click='queryNodeList' class="btn btn_100" style="margin-left:10px" v-if="useWeBase">查询</el-button>
                   <div class="mark-bottom">
                     <div>例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
                     <div>如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
@@ -176,6 +177,38 @@
         <el-button type="primary" class="width_100" @click="nextStep" :disabled="!dialog.checkStatus">下一步</el-button>
       </div>
     </el-dialog>
+
+    <!--显示节点列表 -->
+    <el-dialog
+      title="前置节点列表"
+      class="dialog-view"
+      width="45%"
+      :visible.sync="dialog.dialogNodeListVisible"
+      :close-on-click-modal="false">
+      <el-table :row-key="getkey" :data="dialog.nodeListPage.nodeList" border="true" cellpadding="0" cellspacing="0" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" :reserve-selection="true" width="55" align="center"></el-table-column>
+        <el-table-column label="节点ID">
+          <template slot-scope='scope'>
+            <span class='long_words' :title='scope.row.nodeId'>{{scope.row.nodeId}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column property="frontIp" label="节点IP" width="150"></el-table-column>
+        <el-table-column property="channelPort" label="节点端口" width="150"></el-table-column>
+        <el-table-column label="群组列表" width="150">
+          <template slot-scope="scope">
+            <div>
+                <span v-for="(item, index) in scope.row.groupList" :key="item">
+                  {{item}} <span v-if="index < (scope.row.groupList.length - 1)">,</span>
+                </span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column property="clientVersion" label="节点版本" width="150"></el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" class="width_100" @click="chooseNode">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -184,6 +217,7 @@ export default {
   data () {
     return {
       roleType: localStorage.getItem('roleType'),
+      useWeBase: false,
       form: {
         caCrtFileName: '',
         nodeKeyFile: '',
@@ -209,6 +243,11 @@ export default {
       },
       dialog: {
         checkDetailVisible: false,
+        dialogNodeListVisible: false,
+        nodeListPage: {
+          nodeList: [],
+          selectedRows: []
+        },
         checkMessages: [],
         checkStatus: false,
         nextBtn: null
@@ -216,6 +255,24 @@ export default {
     }
   },
   methods: {
+    getkey (row) {
+      return row.frontId
+    },
+    chooseNode () {
+      if (this.dialog.nodeListPage.selectedRows.length === 0) {
+        this.$alert('请选择需要配置的节点!', '温馨提示', {}).catch(() => {})
+        return
+      }
+      var nodeAddress = ''
+      this.dialog.nodeListPage.selectedRows.forEach((item, i) => {
+        nodeAddress = nodeAddress + item.frontIp + ':' + item.channelPort
+        if ((i + 1) < this.dialog.nodeListPage.selectedRows.length) {
+          nodeAddress = nodeAddress + ','
+        }
+      })
+      this.form.blockchain_address = nodeAddress
+      this.dialog.dialogNodeListVisible = false
+    },
     chooseFile (type, expectFileName) {
       var caCrtFileInput = document.getElementById(type)
       caCrtFileInput.value = ''
@@ -367,21 +424,45 @@ export default {
       this.nodeConfigUpload()
     },
     nextStep () {
+      localStorage.setItem('step', 2)
       this.$router.push({name: 'step2'})
     },
     prev () {
-      this.$router.push({name: 'step'})
+      localStorage.setItem('step', 0)
+      this.$router.push({name: 'step0'})
     },
     init () {
       API.doGet('loadConfig').then(res => { // 获取配置信息
         if (res.data.errorCode === 0) {
           this.form = Object.assign(this.form, res.data.result)
+          this.useWeBase = JSON.parse(this.form.useWeBase)
+          if (this.useWeBase) {
+            this.queryNodeType()
+          }
         }
       })
+    },
+    queryNodeType () {
+      API.doGet('webase/queryNodeType').then(res => { // 获取配置信息
+        if (res.data.errorCode === 0) {
+          this.form.encrypt_type = res.data.result + ''
+        }
+      })
+    },
+    queryNodeList () {
+      API.doGet('webase/queryNodeList').then(res => { // 获取前置节点列表信息
+        if (res.data.errorCode === 0) {
+          this.dialog.nodeListPage.nodeList = res.data.result
+          this.dialog.dialogNodeListVisible = true
+        }
+      })
+    },
+    handleSelectionChange (rows) {
+      this.dialog.nodeListPage.selectedRows = rows
     }
   },
-  created () {
-    localStorage.setItem('step', 1)
+  mounted () {
+    this.checkStep()
     // 初始化配置信息
     this.init()
   }

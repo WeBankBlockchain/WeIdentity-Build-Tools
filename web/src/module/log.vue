@@ -34,7 +34,7 @@ export default {
       window.scrollTo({top: document.body.scrollHeight})
     }
   },
-  created () {
+  mounted () {
     this.initConn()
   },
   destroyed () {

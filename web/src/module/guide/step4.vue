@@ -53,6 +53,10 @@
                       <span class='item_out_role'><span></span></span>
                       <p>自行上传私钥</p>
                     </div>
+                    <div :class="{'key_item active_key': createType === 3, 'key_item': createType !== 3}" type='3' @click="active(3)" v-if="useWeBase">
+                      <span class='item_out_role'><span></span></span>
+                      <p>WeBase同步账户</p>
+                    </div>
                   </div>
                   <div class="form-group" id="accountDiv" v-if='isExistsAdmin === true'>
                     <el-form-item prop="account">
@@ -105,6 +109,34 @@
           </div>
         </el-dialog>
       </section>
+
+      <!--显示账户列表 -->
+      <el-dialog
+        title="WeBase账户列表"
+        class="dialog-view"
+        width="40%"
+        :visible.sync="dialog.dialogUserListVisible"
+        :close-on-click-modal="false">
+        <el-table :data="dialog.userListPage.userList" border="true" cellpadding="0" cellspacing="0" >
+          <el-table-column label="选择" width="55">
+            <template slot-scope="scope">
+              <el-radio v-model="dialog.userListPage.selectedRow" :label="scope.row"><i></i></el-radio>
+            </template>
+          </el-table-column>
+          <el-table-column label="用户名">
+            <template slot-scope='scope'>
+              <span class='long_words' :title='scope.row.userName'>{{scope.row.userName}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column property="address" label="用户账户" width="350"></el-table-column>
+          <el-table-column property="createTime" label="创建时间" width="170"></el-table-column>
+        </el-table>
+        <el-pagination @current-change="indexChange" :current-page="dialog.userListPage.pageIndex"
+        :page-size="dialog.userListPage.pageSize" layout="total, prev, pager, next, jumper" :total="dialog.userListPage.total"></el-pagination>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" class="width_100" @click="chooseUser">确定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -120,13 +152,22 @@ export default {
       },
       dialog: {
         dialogVisible: false,
+        dialogUserListVisible: false,
         fileForm: {
           privateKeyFile: '',
           privateKeyFileName: ''
+        },
+        userListPage: {
+          userList: [],
+          pageIndex: 1,
+          pageSize: 5,
+          total: 0,
+          selectedRow: null
         }
       },
       isExistsAdmin: false,
-      title: '创建管理员WeID'
+      title: '创建管理员WeID',
+      useWeBase: false
     }
   },
   methods: {
@@ -151,9 +192,22 @@ export default {
         }
       })
     },
+    createAdminByWeBase () {
+      var formData = {}
+      formData.userId = this.dialog.userListPage.selectedRow.userId
+      API.doPost('webase/createAdmin', formData).then(res => { // 创建账户
+        if (res.data.errorCode === 0) {
+          this.$alert('账户启用成功!', '温馨提示', {}).catch(() => {})
+          this.dialog.dialogUserListVisible = false
+          this.init()
+        } else {
+          this.$alert('账户启用失败!', '温馨提示', {}).catch(() => {})
+        }
+      })
+    },
     setGuideStatus () {
       API.doPost('setGuideStatus', {step: '5'}).then(res => { // 保存选择的角色
-        localStorage.setItem('step', 0)
+        localStorage.setItem('step', '')
         this.$router.push({name: 'deployWeId'})
       })
     },
@@ -163,10 +217,13 @@ export default {
         if (this.roleType === '2') { // 到主页
           this.setGuideStatus()
         } else {
+          localStorage.setItem('step', 5)
           this.$router.push({name: 'step5'})
         }
       } else { // 表示不存在
-        if (this.createType === 2) { // 上传私钥方式创建
+        if (this.createType === 3) { // WeBase同步账户
+          this.queryUserList()
+        } else if (this.createType === 2) { // 上传私钥方式创建
           this.dialog.dialogVisible = true
         } else { // 系统方式创建
           this.$confirm('请确认，系统将自动为管理员的 WeID 创建公私钥?', '温馨提示', {closeOnClickModal: false, cancelButtonClass: 'el-button--primary', dangerouslyUseHTMLString: true})
@@ -177,6 +234,7 @@ export default {
       }
     },
     prev () {
+      localStorage.setItem('step', 3)
       this.$router.push({name: 'step3'})
     },
     chooseFile (type) {
@@ -190,6 +248,17 @@ export default {
         }
       }
     },
+    chooseUser () {
+      if (this.dialog.userListPage.selectedRow === null) {
+        this.$alert('请选择用户!', '温馨提示', {}).catch(() => {})
+        return
+      }
+      var user = this.dialog.userListPage.selectedRow.address
+      this.$confirm('确定使用[' + user + ']作为WeID的账户吗?', '温馨提示', {closeOnClickModal: false, cancelButtonClass: 'el-button--primary', dangerouslyUseHTMLString: true})
+        .then(_ => {
+          this.createAdminByWeBase()
+        }).catch(() => {})
+    },
     init () {
       API.doGet('checkAdmin').then(res => { // 检查账户是否存证
         if (res.data.result !== '') { // 账户存在
@@ -199,13 +268,38 @@ export default {
         } else { // 账户不存在
           this.isExistsAdmin = false
           this.title = '创建管理员WeID'
+          this.loadConfig()
         }
       })
       this.dialog.dialogVisible = false
+    },
+    loadConfig () {
+      API.doGet('loadConfig').then(res => { // 获取配置信息
+        if (res.data.errorCode === 0) {
+          this.useWeBase = JSON.parse(res.data.result.useWeBase)
+        }
+      })
+    },
+    indexChange (currentPage) {
+      this.dialog.userListPage.pageIndex = currentPage
+      this.queryUserList()
+    },
+    queryUserList () {
+      var formData = {}
+      formData.pageIndex = this.dialog.userListPage.pageIndex
+      formData.pageSize = this.dialog.userListPage.pageSize
+      API.doGet('webase/queryUserList', formData).then(res => { // 获取WeBase用户列表信息
+        if (res.data.errorCode === 0) {
+          this.dialog.userListPage.userList = res.data.result.dataList
+          this.dialog.userListPage.total = res.data.result.allCount
+          this.dialog.userListPage.selectedRow = null
+          this.dialog.dialogUserListVisible = true
+        }
+      })
     }
   },
-  created () {
-    localStorage.setItem('step', 4)
+  mounted () {
+    this.checkStep()
     this.init()
   }
 }

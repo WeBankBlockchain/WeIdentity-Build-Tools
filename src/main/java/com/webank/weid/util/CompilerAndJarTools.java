@@ -37,16 +37,14 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+@Slf4j
 public class CompilerAndJarTools {
-    
-    private static final Logger logger = LoggerFactory.getLogger(CompilerAndJarTools.class);
     
     private static volatile JavaCompiler javaCompiler;
     
@@ -81,7 +79,7 @@ public class CompilerAndJarTools {
     }
     
     public CompilerAndJarTools complier() throws IOException {  
-        logger.info("[complier] begin complier java source code.");
+        log.info("[complier] begin complier java source code.");
         File javaclassDir = new File(javaClassPath);  
         if (!javaclassDir.exists()) {  
             javaclassDir.mkdirs();  
@@ -124,9 +122,9 @@ public class CompilerAndJarTools {
         boolean success = task.call();
         fileManager.close();
         if (success) {
-            logger.info("[complier] complier successfully.");
+            log.info("[complier] complier successfully.");
         } else {
-            logger.error("[complier] complier fail.");
+            log.error("[complier] complier fail.");
             throw new RuntimeException("complier fail");
         }
         return this;
@@ -146,10 +144,10 @@ public class CompilerAndJarTools {
     }
     
     public void generateJar() throws FileNotFoundException, IOException {  
-        logger.info("[generateJar] begin generate Jar");
+        log.info("[generateJar] begin generate Jar");
         File file = new File(targetPath);
         createTempJar(javaClassPath, file.getParentFile().getAbsolutePath(), file.getName());
-        logger.info("[generateJar] generate jar finish, file = {}", targetPath);
+        log.info("[generateJar] generate jar finish, file = {}", targetPath);
     }
     
     /**

@@ -23,7 +23,7 @@ import com.webank.weid.config.FiscoConfig;
 
 public interface CheckNodeFace {
 
-    public boolean check(FiscoConfig fiscoConfig);
+    boolean check(FiscoConfig fiscoConfig);
     
-    public boolean checkOrgId(FiscoConfig fiscoConfig) throws Exception;
+    boolean checkOrgId(FiscoConfig fiscoConfig) throws Exception;
 }

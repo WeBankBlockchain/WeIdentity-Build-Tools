@@ -19,25 +19,22 @@
 
 package com.webank.weid.command;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.service.BuildToolService;
+import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.WeIdSdkService;
 
 /**
  * @author tonychen 2019/4/11
  */
+@Slf4j
 public class RegistAuthorityIssuer extends StaticConfig {
 
-
-    private static final Logger logger = LoggerFactory.getLogger(RegistAuthorityIssuer.class);
-
-    private static BuildToolService buildToolService = new BuildToolService();
+    private static WeIdSdkService weIdSdkService = new WeIdSdkService();
 
     /**
      * @param args 入参
@@ -45,7 +42,7 @@ public class RegistAuthorityIssuer extends StaticConfig {
     public static void main(String[] args) {
 
         if (args == null || args.length < 2) {
-            logger.error(
+            log.error(
                 "[RegisterAuthorityIssuer] input parameters error, please check your input!");
             System.exit(1);
         }
@@ -70,22 +67,22 @@ public class RegistAuthorityIssuer extends StaticConfig {
                 "[RegisterAuthorityIssuer] issuer weid and removed issuer can not be both iuput.");
             System.exit(1);
         }
-        String result = null;
+        ResponseData<Boolean> responseData = null;
         if (StringUtils.isNotEmpty(weid)) {
             System.out.println("registering authorityissuer ---> " + weid + ", name is :"+ orgId);
             String description = commandArgs.getDesc();
-            result = buildToolService.registerIssuer(weid, orgId, description, DataFrom.COMMAND);
-            if (!BuildToolsConstant.SUCCESS.equals(result)) {
-                System.out.println("register authority issuer " + weid + " failed :" + result);
-                logger.error("register authority issuer " + weid + " failed :" + result);
+            responseData = weIdSdkService.registerIssuer(weid, orgId, description);
+            if (responseData.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+                System.out.println("register authority issuer " + weid + " failed :" + responseData.getErrorMessage());
+                log.error("register authority issuer " + weid + " failed :" + responseData.getErrorMessage());
                 System.exit(1);
             }
         } else if (StringUtils.isNotEmpty(removedIssuer)) {
             System.out.println("removing authority issuer ---> " + removedIssuer + "...");
-            result = buildToolService.removeIssuer(removedIssuer);
-            if (!BuildToolsConstant.SUCCESS.equals(result)) {
-                System.out.println("remove faild. result is : " + result);
-                logger.error("remove faild. result is : " + result);
+            responseData = weIdSdkService.removeIssuer(removedIssuer);
+            if (responseData.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+                System.out.println("remove faild. result is : " + responseData.getErrorMessage());
+                log.error("remove faild. result is : " + responseData.getErrorMessage());
                 System.exit(1);
             }
             

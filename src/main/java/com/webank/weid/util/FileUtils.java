@@ -35,9 +35,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.FileOperator;
@@ -45,10 +44,9 @@ import com.webank.weid.constant.FileOperator;
 /**
  * @author tonychen 2019/4/8
  */
+@Slf4j
 public final class FileUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
-
+    
     public static void writeToFile(
         String content,
         String fileName,
@@ -68,7 +66,7 @@ public final class FileUtils {
                 flag = file.delete();
             }
             if (!flag) {
-                logger.error("writeAddressToFile() delete file is fail.");
+                log.error("writeAddressToFile() delete file is fail.");
                 return;
             }
             fos = new FileOutputStream(fileName, true);
@@ -76,7 +74,7 @@ public final class FileUtils {
             ow.write(content);
             ow.flush();
         } catch (IOException e) {
-            logger.error("writer file exception.", e);
+            log.error("writer file exception.", e);
         } finally {
             close(ow);
             close(fos);
@@ -105,15 +103,35 @@ public final class FileUtils {
             }
             return new String(data, 0, length);
         } catch (FileNotFoundException e) {
-            logger.error("the file can not found.", e);
+            log.error("the file can not found.", e);
         } catch (IOException e) {
-            logger.error("read file exception.", e);
+            log.error("read file exception.", e);
         } finally {
             close(in);
         }
         return StringUtils.EMPTY;
     }
-    
+
+    public static String readFileAsStream(String fileName) {
+        InputStream in = null;
+        try {
+            in = FileUtils.class.getClassLoader().getResourceAsStream(fileName);
+            byte[] data = new byte[in.available()];
+            int length = in.read(data);
+            if (length < 0) {
+                return StringUtils.EMPTY;
+            }
+            return new String(data, 0, length);
+        } catch (FileNotFoundException e) {
+            log.error("the file can not found.", e);
+        } catch (IOException e) {
+            log.error("read file exception.", e);
+        } finally {
+            close(in);
+        }
+        return StringUtils.EMPTY;
+    }
+
     public static List<String> readFileToList(String fileName) {
 
         File file = new File(fileName);
@@ -131,9 +149,9 @@ public final class FileUtils {
                 data.add(line);
             }
         } catch (FileNotFoundException e) {
-            logger.error("the file can not found.", e);
+            log.error("the file can not found.", e);
         } catch (IOException e) {
-            logger.error("read file exception.", e);
+            log.error("read file exception.", e);
         } finally {
             close(reader);
             close(in);
@@ -160,9 +178,9 @@ public final class FileUtils {
             }
             out.flush();
         } catch (FileNotFoundException e) {
-            logger.error("the file can not found.", e);
+            log.error("the file can not found.", e);
         } catch (IOException e) {
-            logger.error("copy file exception.", e);
+            log.error("copy file exception.", e);
         } finally {
             close(in);
             close(out);
@@ -174,7 +192,7 @@ public final class FileUtils {
             try {
                is.close();
             } catch (IOException e) {
-                logger.error("io close exception.", e);
+                log.error("io close exception.", e);
             }
         }
     }
@@ -184,7 +202,7 @@ public final class FileUtils {
             try {
                 os.close();
             } catch (IOException e) {
-                logger.error("io close exception.", e);
+                log.error("io close exception.", e);
             }
         }
     }
@@ -194,7 +212,7 @@ public final class FileUtils {
             try {
                 ow.close();
             } catch (IOException e) {
-                logger.error("io close exception.", e);
+                log.error("io close exception.", e);
             }
         }
     }
@@ -204,7 +222,7 @@ public final class FileUtils {
             try {
                 or.close();
             } catch (IOException e) {
-                logger.error("io close exception.", e);
+                log.error("io close exception.", e);
             }
         }
     }
@@ -244,5 +262,18 @@ public final class FileUtils {
     
     public static String removeSpecial(String fileName) {
         return fileName.replaceAll("[^a-zA-Z0-9-_\\.]", StringUtils.EMPTY);
+    }
+
+    //清理合約地址文件
+    public static void clearDeployFile() {
+        delete(BuildToolsConstant.AUTH_ADDRESS_FILE_NAME);
+        delete(BuildToolsConstant.WEID_ADDRESS_FILE_NAME);
+        delete(BuildToolsConstant.CPT_ADDRESS_FILE_NAME);
+        delete(BuildToolsConstant.EVID_ADDRESS_FILE_NAME);
+        delete(BuildToolsConstant.SPECIFIC_ADDRESS_FILE_NAME);
+        delete(BuildToolsConstant.ECDSA_KEY);
+        delete(BuildToolsConstant.ECDSA_PUB_KEY);
+        delete(BuildToolsConstant.HASH);
+        delete(BuildToolsConstant.WEID_FILE);
     }
 }

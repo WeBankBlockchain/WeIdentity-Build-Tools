@@ -26,12 +26,10 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ZipUtils {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ZipUtils.class);
     
     private static final int  BUFFER_SIZE = 2 * 1024;
         
@@ -51,7 +49,7 @@ public class ZipUtils {
             File sourceFile = new File(srcDir);
             compress(sourceFile,zos,sourceFile.getName(),KeepDirStructure);
             long end = System.currentTimeMillis();
-            logger.info("to zip finish, time: {}ms",(end - start));
+            log.info("to zip finish, time: {}ms",(end - start));
         } catch (Exception e) {
             throw new RuntimeException("zip error from ZipUtils",e);
         } finally {
@@ -82,7 +80,7 @@ public class ZipUtils {
                 FileUtils.close(in);
             }
             long end = System.currentTimeMillis();
-            logger.info("to zip finish, time: {}ms",(end - start));
+            log.info("to zip finish, time: {}ms",(end - start));
         } catch (Exception e) {
             throw new RuntimeException("zip error from ZipUtils",e);
         } finally {

@@ -19,16 +19,8 @@
 
 package com.webank.weid.service;
 
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.DataDriverConstant;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.service.impl.AbstractService;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.PropertyUtils;
-import com.webank.weid.util.ZipUtils;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -37,30 +29,44 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.RedisException;
 import org.redisson.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.DataDriverConstant;
+import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.constant.FileOperator;
+import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.exception.WeIdBaseException;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.impl.AbstractService;
+import com.webank.weid.service.v2.CheckNodeServiceV2;
+import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.PropertyUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
 @Service
+@Slf4j
 public class ConfigService {
+
+    private static boolean nodeCheck = false;
     
-    private static final Logger logger = LoggerFactory.getLogger(ConfigService.class);
+    @Autowired
+    private WeBaseService weBaseService;
     
-    private static final String RUN_CONFIG_BAK = "output/.run.config";
-    
-    public FiscoConfig loadNewFiscoConfig() {
-        logger.info("[loadNewFiscoConfig] reload the properties...");
-        PropertyUtils.reload();
-        FiscoConfig fiscoConfig = new FiscoConfig();
-        fiscoConfig.load();
-        logger.info("[loadNewFiscoConfig] the properties reload successfully.");
-        return fiscoConfig;
-    }
+    // private FiscoConfig fiscoConfig;
     
     public boolean isExistsForProperties() {
         if(this.getClass().getClassLoader().getResource("fisco.properties") == null) {
@@ -73,13 +79,13 @@ public class ConfigService {
     }
     
     public Map<String, String> loadConfig() {
-        logger.info("[loadConfig] begin load the run.config");
+        log.info("[loadConfig] begin load the run.config");
         //读取基本配置
         List<String> listStr = FileUtils.readFileToList("run.config");
         Map<String, String> map = processConfig(listStr);
         //判断如果节点配置为空，则重载备份配置
         if (StringUtils.isBlank(map.get("blockchain_address"))) {
-            listStr = FileUtils.readFileToList(RUN_CONFIG_BAK);
+            listStr = FileUtils.readFileToList(BuildToolsConstant.RUN_CONFIG_BAK);
             if (listStr.size() > 0) {
                 map = processConfig(listStr);
             }
@@ -93,6 +99,7 @@ public class ConfigService {
         map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/gmsdk.key")));
         map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/gmensdk.crt")));
         map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/gmensdk.key")));
+        map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
         return map;
     }
     
@@ -112,14 +119,14 @@ public class ConfigService {
         return map;
     }
     
-    public boolean processNodeConfig(
-        String address, 
-        String version,
-        String encryptType,
-        String orgId, 
-        String amopId, 
-        String groupId,
-        String profileActive
+    private boolean processNodeConfig(
+            String address,
+            String version,
+            String encryptType,
+            String orgId,
+            String amopId,
+            String groupId,
+            String profileActive
     ) {
         List<String> listStr = FileUtils.readFileToList("run.config");
         StringBuffer buffer = new StringBuffer();
@@ -153,7 +160,7 @@ public class ConfigService {
     }
     
     private void backRunConfig() {
-        FileUtils.copy(new File("run.config"), new File(RUN_CONFIG_BAK));
+        FileUtils.copy(new File("run.config"), new File(BuildToolsConstant.RUN_CONFIG_BAK));
     }
     
     public void updateChainId(String chainId) {
@@ -231,7 +238,7 @@ public class ConfigService {
     }
 
     //将空值转换成空字符串
-    public String replaceNull(String v) {
+    private String replaceNull(String v) {
         if (v == null) {
             return "";
         }
@@ -239,7 +246,7 @@ public class ConfigService {
     }
     
     public boolean checkDb() {
-        logger.info("[checkDb] begin reload the properties...");
+        log.info("[checkDb] begin reload the properties...");
         PropertyUtils.reload();
         String dbUrl = PropertyUtils.getProperty("datasource1." + DataDriverConstant.JDBC_URL);
         String userNameKey = "datasource1." + DataDriverConstant.JDBC_USER_NAME;
@@ -254,19 +261,19 @@ public class ConfigService {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(dbUrl, userName, passWord);
             if(connection != null) {
-                logger.info("[checkDb] the db check successfully.");
+                log.info("[checkDb] the db check successfully.");
                return true;
             } else {
-                logger.error("[checkDb] the db check fail...");
+                log.error("[checkDb] the db check fail...");
             }
         } catch (ClassNotFoundException | SQLException e) {
-            logger.error("[checkDb] the db check has error.", e);
+            log.error("[checkDb] the db check has error.", e);
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error("[checkDb] the connection close error.", e);
+                    log.error("[checkDb] the connection close error.", e);
                 }
             }
         }
@@ -274,7 +281,7 @@ public class ConfigService {
     }
 
     public boolean checkRedis() {
-        logger.info("[checkRedis] begin reload the properties...");
+        log.info("[checkRedis] begin reload the properties...");
         PropertyUtils.reload();
         Config config = new Config();
         RedissonClient client = null;
@@ -305,19 +312,19 @@ public class ConfigService {
             client = Redisson.create(config);
 
             if(client != null) {
-                logger.info("[checkRedis] the redis check successfully.");
+                log.info("[checkRedis] the redis check successfully.");
                 return true;
             } else {
-                logger.error("[checkRedis] the redis check fail...");
+                log.error("[checkRedis] the redis check fail...");
             }
         } catch (RedisException e) {
-            logger.error("[checkRedis] the redis check has error.", e);
+            log.error("[checkRedis] the redis check has error.", e);
         } finally {
             if (client != null) {
                 try {
                     client.shutdown();
                 } catch (RedisException e) {
-                    logger.error("[checkRedis] the redis connection close error.", e);
+                    log.error("[checkRedis] the redis connection close error.", e);
                 }
             }
         }
@@ -325,7 +332,7 @@ public class ConfigService {
     }
     
     private boolean generateProperties() {
-        logger.info("[generateProperties] begin generate properties and copy to classpath...");
+        log.info("[generateProperties] begin generate properties and copy to classpath...");
         try {
             Map<String, String> loadConfig = loadConfig();
             generateFiscoProperties(loadConfig);
@@ -342,13 +349,13 @@ public class ConfigService {
             }
             return true;
         } catch (Exception e) {
-            logger.error("[generateProperties] generate error.", e);
+            log.error("[generateProperties] generate error.", e);
             return false;
         }
     }
     
     private void generateFiscoProperties(Map<String, String> loadConfig) {
-        logger.info("[generateFiscoProperties] begin generate fisco.properties...");
+        log.info("[generateFiscoProperties] begin generate fisco.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/fisco.properties.tpl");
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
         fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
@@ -365,7 +372,7 @@ public class ConfigService {
     }
     
     private void generateWeidentityProperties(Map<String, String> loadConfig) {
-        logger.info("[generateWeidentityProperties] begin generate weidentity.properties...");
+        log.info("[generateWeidentityProperties] begin generate weidentity.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/weidentity.properties.tpl");
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
@@ -379,26 +386,6 @@ public class ConfigService {
         fileStr = fileStr.replace("${REDIS_PASSWORD}", loadConfig.get("redis_password"));
         //将文件写入resource目录
         FileUtils.writeToFile(fileStr, "resources/weidentity.properties", FileOperator.OVERWRITE);
-    }
-    
-    public boolean toZip(String srcPath, String targetPath) {
-        File resourcesFile = new File(targetPath);
-        if (resourcesFile.exists()) {
-            logger.info("[toZip] {} is exists, begin to delete it...", targetPath);
-            FileUtils.delete(resourcesFile);
-        }
-        FileOutputStream out = null;
-        try {
-            logger.info("[toZip] begin to zipFile...");
-            out = new FileOutputStream(targetPath);
-            ZipUtils.toZip(srcPath, out, true);
-            return true;
-        } catch (FileNotFoundException e) {
-            logger.error("[toZip] the file to zip error.", e);
-        } finally {
-            FileUtils.close(out);
-        }
-        return false;
     }
     
     /**
@@ -453,8 +440,6 @@ public class ConfigService {
         reloadAddress();
     }
     
-   
-    
     public void reloadAddress() {
         PropertyUtils.reload();
         new AbstractService() {
@@ -463,5 +448,108 @@ public class ConfigService {
             }
         };
     }
-    
+
+    public ResponseData<Boolean> nodeConfigUpload(HttpServletRequest request) {
+        nodeCheck = false;
+        List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
+        File targetFIle = new File(BuildToolsConstant.RESOURCES_PATH);
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            if (file.isEmpty()) {
+                continue;
+            }
+            String fileName = file.getOriginalFilename();
+            if(!fileName.endsWith(".crt") && !fileName.endsWith(".key")) {
+                log.error("[nodeConfigUpload] the file type error, fileName = {}.", fileName);
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
+            }
+            File dest = new File(targetFIle.getAbsoluteFile() + "/" + fileName);
+            try {
+                file.transferTo(dest);
+                log.info("[nodeConfigUpload] the {} upload success", fileName);
+            } catch (IOException e) {
+                log.error("[nodeConfigUpload] the {} upload fail", fileName, e);
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
+            }
+        }
+        log.info("[nodeConfigUpload] begin update run.config...");
+        //更新run.config
+        Map<String, String> configMap = loadConfig();
+        String orgId = request.getParameter("orgId");
+        String amopId = request.getParameter("amopId");
+        String version = request.getParameter("version");
+        String encryptType = request.getParameter("encryptType");
+        String ipPort = request.getParameter("ipPort");
+        String groupId = configMap.get("group_id");
+        if (StringUtils.isBlank(groupId)) {
+            groupId = "0";
+        }
+        String profileActive = configMap.get("cns_profile_active");
+        //根据模板生成配置文件
+        if(processNodeConfig(ipPort, version, encryptType, orgId, amopId, groupId, profileActive)) {
+            return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
+        }
+        return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
+    }
+
+    public ResponseData<Boolean> checkNode() {
+        try {
+            nodeCheck = false;
+            log.info("[checkNode] begin check the node...");
+            if (!isExistsForProperties()) {
+                return new ResponseData<>(Boolean.FALSE,
+                        ErrorCode.UNKNOW_ERROR.getCode(),
+                        "the configuration file does not exist.");
+            }
+
+            CheckNodeFace checkNode = null;
+            FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
+            if (fiscoConfig.getVersion().startsWith(WeIdConstant.FISCO_BCOS_1_X_VERSION_PREFIX)) {
+                return new ResponseData<>(Boolean.FALSE,
+                        ErrorCode.UNKNOW_ERROR.getCode(),
+                        "not support 1.x version.");
+            } else {
+                log.info("[checkNode] the node version is 2.x in your configuration.");
+                checkNode = new CheckNodeServiceV2();
+            }
+            if (checkNode == null || !checkNode.check(fiscoConfig)) {
+                log.error("[checkNode] checkNode with fail.");
+                //configService.reloadAddress();
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "checkNode with fail.");
+            }
+            log.info("[checkNode] the node check successfull.");
+            nodeCheck = true;
+        } catch (WeIdBaseException e) {
+            log.error("[checkNode] checkNode with same exception.", e);
+            return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), e.getMessage());
+        } catch (Exception e) {
+            log.error("[checkNode] checkNode with unkonw exception.", e);
+            return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), e.getMessage());
+        }
+
+        return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
+    }
+
+    public ResponseData<Boolean> nodeCheckState() {
+        if (!nodeCheck) {
+            return checkNode();
+        }
+        return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
+    }
+
+    public ResponseData<String> getRoleType() {
+        File roleFile = new File(BuildToolsConstant.OTHER_PATH, BuildToolsConstant.ROLE_FILE);
+        if (!roleFile.exists()) {
+            return new ResponseData<>(StringUtils.EMPTY, ErrorCode.UNKNOW_ERROR.getCode(), "role file not exists");
+        }
+        return new ResponseData<>(FileUtils.readFile(roleFile.getAbsolutePath()), ErrorCode.SUCCESS);
+    }
+
+    public void setNodeCheck(boolean flag) {
+        nodeCheck = flag;
+    }
+
+    public Integer getMasterGroupId() {
+        return Integer.parseInt(this.loadConfig().get("group_id"));
+    }
 }

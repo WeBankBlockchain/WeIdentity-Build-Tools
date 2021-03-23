@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="db-part">
-            <el-button type="primary" @click="queryUserList" class="btn btn_150">切换账户</el-button>
+            <el-button type="primary" @click="queryUserList" class="btn btn_150" v-if="useWeBase">切换账户</el-button>
           </div>
         </div>
       </div>

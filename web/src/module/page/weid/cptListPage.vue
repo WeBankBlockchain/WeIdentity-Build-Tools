@@ -87,7 +87,7 @@
               <el-input v-model="dialog.oneLeveFrom.cptDesc" placeholder="Enter cpt description" maxlength="30" style="width:70%"></el-input>
             </el-form-item>
             <el-form-item label="CPT ID (选填):" prop="registerCptId" style="margin-bottom: 12px">
-              <el-input v-model="dialog.oneLeveFrom.cptId" maxlength="30" style="width:70%" onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="Enter cptId"></el-input>
+              <el-input v-model="dialog.oneLeveFrom.cptId" maxlength="30" style="width:70%" onkeyup="this.value=this.value.replace(/\D/g,'')" @blur="dialog.oneLeveFrom.cptId = $event.target.value" placeholder="Enter cptId"></el-input>
               <div class="mark-bottom">
                 <span>只允许填入数字；如果不填，系统将自动按累加规则帮您生成CPT ID</span>
               </div>

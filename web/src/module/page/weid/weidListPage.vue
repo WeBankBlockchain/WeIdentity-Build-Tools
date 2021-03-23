@@ -312,7 +312,11 @@ export default {
           this.$alert('权威凭证发行者注册成功!', '温馨提示', {}).then(() => {
             this.dialog.dialogissuerFormVisible = false
           }).catch(() => {})
-          this.init()
+          this.page.weidList.forEach(weidInfo => {
+            if (weidInfo.weId === this.dialog.registForm.weId) {
+              weidInfo.issuer = true
+            }
+          })
         } else {
           this.$alert(res.data.errorMessage, '温馨提示', {}).catch(() => {})
         }
@@ -441,7 +445,8 @@ export default {
         }
       })
     },
-    init (blockNumber, indexInBlock, direction) {
+    init () {
+      this.page.pageIndex = 1
       this.queryWeIdList(1, 0, 0, true)
     },
     initWihteList () {

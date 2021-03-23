@@ -45,27 +45,27 @@
                 <!--mysql  -->
                 <div id="mysqlForm" v-if="dbForm.persistence_type === 'mysql'">
                   <el-form-item label="数据库IP:PORT:" prop="mysql_address">
-                    <el-input v-model="dbForm.mysql_address" placeholder="IP:PORT" maxlength="30" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" @blur="dbForm.mysql_address = $event.target.value"></el-input>
+                    <el-input v-model="dbForm.mysql_address" placeholder="IP:PORT" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" @blur="dbForm.mysql_address = $event.target.value"></el-input>
                   </el-form-item>
                   <el-form-item label="数据库名称:" prop="mysql_database">
-                    <el-input v-model="dbForm.mysql_database" placeholder="Enter DataBase Name" maxlength="30" style="width: 72%"></el-input>
+                    <el-input v-model="dbForm.mysql_database" placeholder="Enter DataBase Name" style="width: 72%"></el-input>
                     <div class="mark-bottom"><span>* 数据库需要提前自己搭建好，并建立好数据库，数据库名称(DataBase Name)可以自行决定</span></div>
                   </el-form-item>
                   <el-form-item label="数据库用户名:" prop="mysql_username">
-                    <el-input v-model="dbForm.mysql_username" placeholder="Enter username" maxlength="30" style="width: 72%"></el-input>
+                    <el-input v-model="dbForm.mysql_username" placeholder="Enter username" style="width: 72%"></el-input>
                   </el-form-item>
                   <el-form-item label="数据库密码:" prop="mysql_password">
-                    <el-input v-model="dbForm.mysql_password" type="password" placeholder="Enter password" maxlength="30" style="width: 72%"></el-input>
+                    <el-input v-model="dbForm.mysql_password" type="password" placeholder="Enter password" style="width: 72%"></el-input>
                   </el-form-item>
                 </div>
                 <!-- redis -->
                 <div id="redisForm" v-if="dbForm.persistence_type === 'redis'">
                   <el-form-item label="服务器IP:PORT:" prop="redis_address">
-                    <el-input v-model="dbForm.redis_address" placeholder="IP:PORT,IP:PORT" maxlength="30" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="dbForm.redis_address = $event.target.value"></el-input>
+                    <el-input v-model="dbForm.redis_address" placeholder="IP:PORT,IP:PORT" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="dbForm.redis_address = $event.target.value"></el-input>
                     <div class="mark-bottom"><span>如：127.0.0.1:6379 ；如果多个节点，则请用半角逗号","分割：127.0.0.1:7100,127.0.0.1:7101</span></div>
                   </el-form-item>
                   <el-form-item label="服务器密码（选填):" prop="redis_password">
-                    <el-input v-model="dbForm.redis_password" type="password" placeholder="Enter password" maxlength="30" style="width: 72%"></el-input>
+                    <el-input v-model="dbForm.redis_password" type="password" placeholder="Enter password" style="width: 72%"></el-input>
                     <div class="mark-bottom"><span>如未设置密码可不填写</span></div>
                   </el-form-item>
                 </div>
@@ -192,7 +192,7 @@ export default {
       API.doGet('checkPersistence').then(res => {
         this.dialog.checkDetailVisible = true
         this.enableBtn(this.dialog.nextBtn)
-        if (res.data.errorCode === 0) {
+        if (res.data.result) {
           this.dialog.checkStatus = true
           this.dialog.checkMessages.push('数据库配置检测成功。')
           this.dialog.checkMessages.push('请继续操作。')
@@ -239,7 +239,7 @@ export default {
       API.doGet('loadConfig').then(res => { // 获取配置信息
         if (res.data.errorCode === 0) {
           this.dbForm = res.data.result
-          if (this.dbForm.persistence_type !== 'mysql' || this.dbForm.persistence_type !== 'redis') {
+          if (this.dbForm.persistence_type !== 'mysql' && this.dbForm.persistence_type !== 'redis') {
             this.dbForm.persistence_type = 'mysql'
           }
         }

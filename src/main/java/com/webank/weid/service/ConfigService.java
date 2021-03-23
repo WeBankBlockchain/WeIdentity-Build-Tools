@@ -63,8 +63,7 @@ public class ConfigService {
 
     private static boolean nodeCheck = false;
     
-    @Autowired
-    private WeBaseService weBaseService;
+    private WeBaseService weBaseService = new WeBaseService();
     
     // private FiscoConfig fiscoConfig;
     

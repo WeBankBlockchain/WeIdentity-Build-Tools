@@ -19,7 +19,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="区块链节点 IP 和 Channel 端口:" prop="blockchain_address">
-              <el-input v-model="form.blockchain_address" placeholder="IP:PORT,IP:PORT" maxlength="30" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="form.blockchain_address = $event.target.value"></el-input>
+              <el-input v-model="form.blockchain_address" placeholder="IP:PORT,IP:PORT" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="form.blockchain_address = $event.target.value"></el-input>
               <el-button type="primary" @click='queryNodeList' class="btn btn_100" style="margin-left:10px" v-if="useWeBase">查询</el-button>
               <div class="mark-bottom">
                 <div>例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>

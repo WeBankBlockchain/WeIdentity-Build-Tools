@@ -109,11 +109,9 @@ public class WeIdSdkService {
 		return cptService;
 	}
 
-	@Autowired
-	private ConfigService configService;
+	private ConfigService configService = new ConfigService();
 	
-    @Autowired
-    private WeBaseService weBaseService;
+    private WeBaseService weBaseService = new WeBaseService();
 
 	public ResponseData<DataPanel> getDataPanel() {
 		DataPanel data = new DataPanel();
@@ -738,7 +736,7 @@ public class WeIdSdkService {
 				cptInfo.setWeId(cpt.getCptPublisher());
 				cptInfo.setCptDesc((String)cpt.getCptJsonSchema().get("description"));
 				cptInfo.setTime(cpt.getCreated());
-				if (cptId < 1000) {
+				if (BuildToolsConstant.CPTID_LIST.contains(cptId)) {
 					cptInfo.setCptType("sys");
 				} else {
 					cptInfo.setCptType("user");

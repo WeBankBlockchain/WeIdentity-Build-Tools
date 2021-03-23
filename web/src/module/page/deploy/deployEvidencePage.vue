@@ -131,7 +131,7 @@
           <el-col :span="4" class="title">区块链节点版本</el-col>
           <el-col :span="9" class="value">{{dialog.deployDetail.nodeVerion}}</el-col>
         </el-row>
-        <el-row>
+        <el-row v-if="dialog.deployDetail.local">
           <el-col :span="5" class="title">区块链节点</el-col>
           <el-col :span="19" class="value">{{dialog.deployDetail.nodeAddress}}</el-col>
         </el-row>

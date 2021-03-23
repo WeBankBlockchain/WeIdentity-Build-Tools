@@ -73,14 +73,11 @@ public class ContractService {
 
     private static String preMainHash;
 
-    @Autowired
-    private ConfigService configService;
+    private ConfigService configService = new ConfigService();
 
-    @Autowired
-    private WeIdSdkService weIdSdkService;
+    private WeIdSdkService weIdSdkService = new WeIdSdkService();
     
-    @Autowired
-    private WeBaseService weBaseService;
+    private WeBaseService weBaseService = new WeBaseService();
     
     private static final String CONTRACT_JAR_PEFIX = "weid-contract-java-";
 

@@ -55,11 +55,9 @@ public class WeBaseService {
 
     private static final String WEBASE_CONTEXT = "/WeBASE-Node-Manager/";
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private RestTemplate restTemplate = new RestTemplate();
     
-    @Autowired
-    private GuideService guideService;
+    private GuideService guideService = new GuideService();
 
     /**
      * 服務注冊接口，weId向WeBase注册服务。

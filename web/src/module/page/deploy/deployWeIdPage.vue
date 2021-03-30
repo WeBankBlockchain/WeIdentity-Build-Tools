@@ -251,7 +251,7 @@ export default {
       this.dialog.dialogDepolyDetailVisible = true
       this.dialog.deployMessages = []
       this.dialog.deployMessages.push('合约部署中...')
-      API.doPost('deploy', this.dialog.deployForm, 15).then(res => {
+      API.doPost('deploy', this.dialog.deployForm, 30).then(res => {
         this.dialog.dialogDepolyDetailVisible = true
         if (res.data.errorCode === 0) {
           this.dialog.hash = res.data.result

@@ -82,6 +82,7 @@ export default {
           this.dataForm.appKey = dataArray[1]
           this.dataForm.appSecret = dataArray[2]
           clear = false
+          sessionStorage.setItem('weBaseText', this.dataForm.text)
         }
       }
       if (clear) {
@@ -142,6 +143,8 @@ export default {
       } else {
         this.configMode = parseInt(type)
       }
+      this.dataForm.text = sessionStorage.getItem('weBaseText')
+      this.inputChange()
     }
   },
   mounted () {

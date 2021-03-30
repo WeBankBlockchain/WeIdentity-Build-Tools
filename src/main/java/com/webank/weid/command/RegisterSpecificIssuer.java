@@ -80,12 +80,6 @@ public class RegisterSpecificIssuer extends StaticConfig {
         // Register this issuer type anyway
         log.info("[RegisterIssuer] Registering issuer type with best effort: " + type);
         ResponseData<Boolean> responseData = weIdSdkService.registerIssuerType(type, DataFrom.COMMAND);
-        if (responseData.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
-            System.out.println("[registerIssuerType] register issuer type failed. Abort.");
-            log.error("[registerIssuerType] register issuer type failed. Abort.");
-            System.exit(1);
-        }
-
         if (!StringUtils.isEmpty(weid)) {
             // Add the DIDs into this type
             List<String> weIdList = Arrays.asList(weid.split(","));

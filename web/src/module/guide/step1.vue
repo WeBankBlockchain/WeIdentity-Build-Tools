@@ -47,6 +47,9 @@
                     <el-option label="非国密" value="0"></el-option>
                     <el-option label="国密" value="1"></el-option>
                   </el-select>
+                  <div class="mark-bottom">
+                    <div>国密链采用SSL通讯，非国密链采用非SSL通讯。</div>
+                  </div>
                 </el-form-item>
                 <el-form-item label="区块链节点 IP 和 Channel 端口:" prop="blockchain_address">
                   <el-input v-model="form.blockchain_address" placeholder="IP:PORT,IP:PORT" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="form.blockchain_address = $event.target.value"></el-input>

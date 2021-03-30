@@ -137,7 +137,7 @@ export default {
       this.dialog.dialogDetailVisible = true
       this.dialog.deployMessages = []
       this.dialog.deployMessages.push('合约部署中...')
-      API.doPost('deploy', this.deployForm, 15).then(res => { // 保存选择的角色
+      API.doPost('deploy', this.deployForm, 30).then(res => { // 保存选择的角色
         this.dialog.dialogDetailVisible = true
         if (res.data.errorCode === 0) {
           this.hash = res.data.result

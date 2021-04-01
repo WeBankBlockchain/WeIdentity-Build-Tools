@@ -27,6 +27,7 @@
               <div class="mark-bottom">
                 <div>例如：10.10.4.1:20200；如果多个节点，则请用半角逗号","分割：10.10.4.1:20200,10.10.4.2:20200</div>
                 <div>如果"运行 WeIdentity SDK 的 Server"与区块链节点部署在同一台机器，IP可以使用127.0.0.1</div>
+                <div>如果"运行 WeIdentity SDK 的 Server"与区块链节点部署不在同一台机器，需要根据实际情况进行修改</div>
               </div>
             </el-form-item>
             <div id="ecdsa"  v-if="form.encrypt_type === '0'">

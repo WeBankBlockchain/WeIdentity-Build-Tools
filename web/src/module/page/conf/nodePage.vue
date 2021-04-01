@@ -36,7 +36,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.caCrtFileName" placeholder="Enter caCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('caCrtFile', 'ca.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['ca.crt']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['ca.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='caCrtFile' style="display:none;">
@@ -46,7 +46,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.nodeCrtFileName" placeholder="Enter nodeCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('nodeCrtFile', 'node.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['node.crt']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['node.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='nodeCrtFile' style="display:none;" >
@@ -56,7 +56,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.nodeKeyFileName" placeholder="Enter nodeKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('nodeKeyFile', 'node.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['node.key']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['node.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='nodeKeyFile' style="display:none;">
@@ -68,7 +68,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.gmCaCrtFileName" placeholder="Enter gmCaCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('gmCaCrtFile', 'gmCa.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['gmCa.crt']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['gmCa.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='gmCaCrtFile' style="display:none;">
@@ -78,7 +78,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.gmSdkCrtFileName" placeholder="Enter gmSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('gmSdkCrtFile', 'gmSdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['gmSdk.crt']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['gmSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='gmSdkCrtFile' style="display:none;">
@@ -88,7 +88,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.gmSdkKeyFileName" placeholder="Enter gmSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('gmSdkKeyFile', 'gmSdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['gmSdk.key']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['gmSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='gmSdkKeyFile' style="display:none;">
@@ -98,7 +98,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.gmenSdkCrtFileName" placeholder="Enter gmenSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('gmenSdkCrtFile', 'gmenSdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['gmenSdk.crt']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['gmenSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='gmenSdkCrtFile' style="display:none;">
@@ -108,7 +108,7 @@
                   <div class='input_item'>
                     <el-input v-model="form.gmenSdkKeyFileName" placeholder="Enter gmenSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
                     <button type="button" @click="chooseFile('gmenSdkKeyFile', 'gmenSdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
-                    <div class="mark-bottom mark-red" v-if="form['gmenSdk.key']"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                    <div class="mark-bottom mark-red" v-if="form['gmenSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='gmenSdkKeyFile' style="display:none;">

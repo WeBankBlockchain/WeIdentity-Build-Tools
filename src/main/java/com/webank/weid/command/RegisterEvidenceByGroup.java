@@ -21,6 +21,7 @@ package com.webank.weid.command;
 
 import java.math.BigInteger;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.fisco.bcos.web3j.abi.datatypes.generated.Bytes32;
@@ -29,8 +30,6 @@ import org.fisco.bcos.web3j.crypto.gm.GenCredential;
 import org.fisco.bcos.web3j.protocol.Web3j;
 import org.fisco.bcos.web3j.tuples.generated.Tuple2;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.FiscoConfig;
@@ -41,19 +40,13 @@ import com.webank.weid.contract.deploy.v2.RegisterAddressV2;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.service.BaseService;
-import com.webank.weid.service.ConfigService;
-import com.webank.weid.service.DeployService;
 import com.webank.weid.service.fisco.WeServer;
 import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
+@Slf4j
 public class RegisterEvidenceByGroup {
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(RegisterEvidenceByGroup.class);
-    
-    private static ConfigService configService = new ConfigService();
-    
+
     public static void main(String[] args) {
         String goupIdStr = null;
         String cns = null;
@@ -89,10 +82,10 @@ public class RegisterEvidenceByGroup {
                 System.exit(1);
             }
             // 获取当前私钥账户
-            WeIdPrivateKey currentPrivateKey = DeployService.getCurrentPrivateKey();
+            WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
             String  privatekey = currentPrivateKey.getPrivateKey();
             // 检查输入cns 地址是否正确存在Evidence地址
-            FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
+            FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
             WeServer<?, ?, ?> weServer = WeServer.getInstance(fiscoConfig, groupId);
             Credentials credentials = GenCredential.create(new BigInteger(privatekey).toString(16));
             // 加载DataBucket
@@ -137,7 +130,7 @@ public class RegisterEvidenceByGroup {
             System.out.println("[RegisterEvidenceByGroup] register address into cns by group has successfully.");
             System.exit(0);
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "[RegisterEvidenceByGroup] register address into cns by group has error. cns = {}, groupId = {}",
                 cns, 
                 goupIdStr,

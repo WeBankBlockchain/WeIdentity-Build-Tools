@@ -42,4 +42,27 @@ public class CnsInfo extends BaseDto {
         this.weId = weId;
         this.weIdShow = super.getHideValue(weId, 20, 6);
     }
+    
+    @Override
+    public int compareTo(BaseDto o) {
+        if (o != null) {
+            CnsInfo c = (CnsInfo) o;
+            if (this.enable ^ c.enable) {
+                if (this.enable) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            } else {
+              if (super.getTime() < c.getTime()) {
+                  return 1;
+              } else if (super.getTime() == c.getTime()) {
+                  return 0;
+              } else {
+                  return -1;
+              }
+            }
+        }
+        return -1;
+    }
 }

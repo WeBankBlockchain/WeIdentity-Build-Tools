@@ -11,7 +11,7 @@
         <div class="card-mark">
           <div class="card-mark-text">选择一个FISCO-BCOS的群组，作为 WeIdentity 的主群组（即部署 WeIdentity 智能合约的群组）</div>
           <div class="card-mark-icon">
-            <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id6" target="blank_">
+            <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html?highlight=群组#group-selection" target="blank_">
               <img class="icon_question" src="../../../assets/image/icon-question.svg" alt="">
               <span class="icon_question" style="color:#017CFF;font-size:12px;display:inline-block"> 什么是群组？</span>
             </a>
@@ -37,7 +37,7 @@
             <el-button type="primary" @click='setGroupId' class="btn btn_150">完成</el-button>
           </div>
           <div class='sql_warning bg_color' style='right:-160px'>
-            <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id6" target="blank_" style='display:block'>
+            <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#group-selection" target="blank_" style='display:block'>
               <img class="icon_question" src="../../../assets/image/icon-question.svg" alt="">
               <span class="icon_question" style="color:#017CFF;font-size:12px;display:inline-block">点击查看配置配置教程</span>
             </a>

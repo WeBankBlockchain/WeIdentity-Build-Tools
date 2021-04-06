@@ -19,8 +19,7 @@
 
 package com.webank.weid.command;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.service.DataBaseService;
@@ -28,12 +27,8 @@ import com.webank.weid.service.DataBaseService;
 /**
  * @author tonychen 2019/4/11
  */
+@Slf4j
 public class DataBaseInit extends StaticConfig {
-
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(DataBaseInit.class);
 
     private static DataBaseService dataBaseService = new DataBaseService();
 
@@ -41,7 +36,7 @@ public class DataBaseInit extends StaticConfig {
      * @param args 入参
      */
     public static void main(String[] args) {
-        logger.info("[DataBaseInit] begin init DataBase.");
+        log.info("[DataBaseInit] begin init DataBase.");
         dataBaseService.initDataBase();
         System.exit(0);
     }

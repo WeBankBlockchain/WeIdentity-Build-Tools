@@ -19,10 +19,7 @@
 
 package com.webank.weid.service;
 
-import com.webank.weid.suite.api.persistence.params.PersistenceType;
-import com.webank.weid.util.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.webank.weid.constant.DataDriverConstant;
@@ -30,14 +27,13 @@ import com.webank.weid.constant.SqlConstant;
 import com.webank.weid.suite.persistence.mysql.ConnectionPool;
 import com.webank.weid.suite.persistence.mysql.SqlExecutor;
 import com.webank.weid.suite.api.persistence.inf.Persistence;
+import com.webank.weid.suite.api.persistence.params.PersistenceType;
 import com.webank.weid.suite.api.persistence.PersistenceFactory;
+import com.webank.weid.util.PropertyUtils;
 
 @Service
+@Slf4j
 public class DataBaseService {
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(DataBaseService.class);
     
     // sql执行器
     private static SqlExecutor sqlExecutor;
@@ -84,7 +80,7 @@ public class DataBaseService {
     private void initConfig() {
         //初始化Domain, 预留未来默认初始化系统配置
         getPersistence();
-        logger.info("[DataBaseService.initConfig] init successfully.");
+        log.info("[DataBaseService.initConfig] init successfully.");
     }
     //初始化自定义表
     private void initTable() {
@@ -100,9 +96,9 @@ public class DataBaseService {
         String checkTableSql = buildCheckSql(CHECK_TABLE_SQL, tableName);
         boolean result = getSqlExecutor().createTable(checkTableSql, createTableSql);
         if (result) {
-            logger.info("[DataBaseService.initTable] {} init successfully.", tableName);
+            log.info("[DataBaseService.initTable] {} init successfully.", tableName);
         } else {
-            logger.error("[DataBaseService.initTable] {} init fail.", tableName);
+            log.error("[DataBaseService.initTable] {} init fail.", tableName);
         }
     }
     

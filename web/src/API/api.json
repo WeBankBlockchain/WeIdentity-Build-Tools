@@ -1,0 +1,6 @@
+{
+  "invoke": {
+    "method": "post",
+    "url": "/"
+  }
+}

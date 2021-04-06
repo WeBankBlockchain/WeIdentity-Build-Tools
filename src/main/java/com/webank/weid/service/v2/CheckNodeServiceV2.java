@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.channel.client.Service;
 import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
@@ -40,8 +41,6 @@ import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
 import org.fisco.bcos.web3j.protocol.core.methods.response.BlockNumber;
 import org.fisco.bcos.web3j.tuples.generated.Tuple4;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -50,15 +49,14 @@ import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.v2.DataBucket;
-import com.webank.weid.controller.BuildToolController;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.util.WeIdUtils;
 
+@Slf4j
 public class CheckNodeServiceV2 implements CheckNodeFace {
     
-    private static final Logger logger = LoggerFactory.getLogger(BuildToolController.class);
     
     private Channel2Connections channelConnections = new Channel2Connections();
     
@@ -66,7 +64,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
         try {
             Web3j web3j = getWeb3j(fiscoConfig);
             if (web3j == null) {
-                logger.error("[check] build the web3j fail.");
+                log.error("[check] build the web3j fail.");
                 throw new WeIdBaseException("init web3j fail.");
             }
 //            // 检查群组配置
@@ -76,15 +74,15 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
 //            }
 //            Credentials  credentials = GenCredential.create();
 //            if (credentials == null) {
-//                logger.error("[check] create the Credentials fail.");
+//                log.error("[check] create the Credentials fail.");
 //                throw new WeIdBaseException("the Credentials create fail.");
 //            }
             try {
                 web3j.getGroupList().send().getGroupList();
-                logger.info("[check] check node successfully.");
+                log.info("[check] check node successfully.");
                 return true;
             } catch (Exception e) {
-                logger.error("[check] check node fail.", e);
+                log.error("[check] check node fail.", e);
                 throw new WeIdBaseException("can not connection the node.");
             } finally {
                 channelConnections.stopWork();
@@ -92,7 +90,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
         } catch (WeIdBaseException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("[check] check the node fail.", e);
+            log.error("[check] check the node fail.", e);
             return false;
         }
     }
@@ -149,10 +147,10 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     protected ThreadPoolTaskExecutor initializePool(FiscoConfig fiscoConfig) {
         ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
         pool.setBeanName("web3sdk");
-        pool.setCorePoolSize(Integer.valueOf(fiscoConfig.getWeb3sdkCorePoolSize()));
-        pool.setMaxPoolSize(Integer.valueOf(fiscoConfig.getWeb3sdkMaxPoolSize()));
-        pool.setQueueCapacity(Integer.valueOf(fiscoConfig.getWeb3sdkQueueSize()));
-        pool.setKeepAliveSeconds(Integer.valueOf(fiscoConfig.getWeb3sdkKeepAliveSeconds()));
+        pool.setCorePoolSize(Integer.parseInt(fiscoConfig.getWeb3sdkCorePoolSize()));
+        pool.setMaxPoolSize(Integer.parseInt(fiscoConfig.getWeb3sdkMaxPoolSize()));
+        pool.setQueueCapacity(Integer.parseInt(fiscoConfig.getWeb3sdkQueueSize()));
+        pool.setKeepAliveSeconds(Integer.parseInt(fiscoConfig.getWeb3sdkKeepAliveSeconds()));
         pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.AbortPolicy());
         pool.initialize();
         return pool;
@@ -173,14 +171,14 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
             try {
                 service.run();
             } catch (Exception e) {
-                logger.error("[check] the service run fail.", e);
+                log.error("[check] the service run fail.", e);
                 throw e;
             }
             ChannelEthereumService channelEthereumService = new ChannelEthereumService();
             channelEthereumService.setChannelService(service);
             Web3j web3j = Web3j.build(channelEthereumService, Integer.parseInt(fiscoConfig.getGroupId()));
             if (web3j == null) {
-                logger.error("[check] build the web3j fail.");
+                log.error("[check] build the web3j fail.");
                 throw new WeIdBaseException("init web3j fail.");
             }
             return web3j;
@@ -248,10 +246,10 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
                 }
                 startIndex = next.intValue();
             }
-            logger.info("[getAllHash] get the all hash success.");
+            log.info("[getAllHash] get the all hash success.");
             return hashContractList;
         } catch (Exception e) {
-            logger.error("[getAllHash] get the all hash fail.", e);
+            log.error("[getAllHash] get the all hash fail.", e);
             throw e;
         } finally {
             channelConnections.stopWork();
@@ -264,10 +262,10 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
         HashContract hashFromOrgIdCns = getHashFromOrgCns(fiscoConfig);
         // 如果不存在机构配置，则返回前端进行私钥配置
         if (hashFromOrgIdCns == null) {
-            logger.info("[checkOrgId] the orgId does not exist in orgConfig cns.");
+            log.info("[checkOrgId] the orgId does not exist in orgConfig cns.");
             return false;//不存在
         }
-        logger.info("[checkOrgId] the orgId exist in orgConfig cns.");
+        log.info("[checkOrgId] the orgId exist in orgConfig cns.");
         return true;
     }
     
@@ -283,7 +281,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     // 查询cns地址
     private CnsInfo queryCnsInfo(Web3j web3j, Credentials credentials, CnsType cnsType) throws WeIdBaseException {
         try {
-            logger.info("[queryBucketFromCns] query address by type = {}.", cnsType.getName());
+            log.info("[queryBucketFromCns] query address by type = {}.", cnsType.getName());
             CnsService cnsService = new CnsService(web3j, credentials);
             List<CnsInfo> cnsInfoList = cnsService.queryCnsByName(cnsType.getName());
             if (cnsInfoList != null) {
@@ -294,15 +292,15 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
                 for (int i = cnsInfoList.size() - 1; i >= 0; i--) {
                     CnsInfo cnsInfo = cnsInfoList.get(i);
                     if (cnsInfo.getVersion().startsWith(preV)) {
-                        logger.info("[queryBucketFromCns] query address form CNS successfully.");
+                        log.info("[queryBucketFromCns] query address form CNS successfully.");
                         return cnsInfo;
                     }
                 }
             }
-            logger.warn("[queryBucketFromCns] can not find data from CNS.");
+            log.warn("[queryBucketFromCns] can not find data from CNS.");
             return null;
         } catch (Exception e) {
-            logger.error("[queryBucketFromCns] query address has error.", e);
+            log.error("[queryBucketFromCns] query address has error.", e);
             throw new WeIdBaseException(ErrorCode.UNKNOW_ERROR);
         }
     }

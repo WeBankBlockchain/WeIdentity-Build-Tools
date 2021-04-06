@@ -25,9 +25,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -57,17 +56,17 @@ import com.webank.weid.util.OffLineBatchTask;
  *
  */
 @Service
+@Slf4j
 public class TransactionService {
     
-    private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
     private static final int SEND_SUCCESS = 1;
     private static final int SEND_FAIL = 3;
     
     @Async
     public void reTrybatchTransaction(int time) {
-        logger.info("[reTrybatchTransaction] batchTransaction by web");
+        log.info("[reTrybatchTransaction] batchTransaction by web");
         boolean result = batchTransaction(time, AsyncStatus.FAIL);
-        logger.info("[reTrybatchTransaction] batchTransaction by web result = {}", result);
+        log.info("[reTrybatchTransaction] batchTransaction by web result = {}", result);
     }
     
     /**
@@ -79,7 +78,7 @@ public class TransactionService {
     public boolean batchTransaction(int time, AsyncStatus asyncStatus) {
         try {
             if (checkLock(time, asyncStatus)) {
-                logger.info("[batchTransaction] begin do batchTransaction.");
+                log.info("[batchTransaction] begin do batchTransaction.");
                 //锁定成功 进行批量上链操作
                 AsyncInfo asyncInfo = null;
                 try {
@@ -91,7 +90,7 @@ public class TransactionService {
                         asyncInfo.getFailSize() == 0 ? 
                         AsyncStatus.SUCCESS.getCode() : AsyncStatus.FAIL.getCode());
                 } catch (Exception e) {
-                    logger.error("[batchTransaction] do batchTransaction error.", e);
+                    log.error("[batchTransaction] do batchTransaction error.", e);
                     if (asyncInfo != null) {
                         asyncInfo.setStatus(AsyncStatus.FAIL.getCode());
                     }
@@ -106,14 +105,14 @@ public class TransactionService {
                 return true;
             }
         } catch (Exception e) {
-            logger.error("[batchTransaction] do batchTransaction error.", e);
+            log.error("[batchTransaction] do batchTransaction error.", e);
         }
         return false;
     }
     
     private boolean checkLock(int time, AsyncStatus asyncStatus) {
         try {
-            logger.info("[checkLock] begin check lock. time = {}, status = {}", time, asyncStatus);
+            log.info("[checkLock] begin check lock. time = {}, status = {}", time, asyncStatus);
             // 根据time查询是否有异步记录
             String selectSql = SqlConstant.DML_SELECT_ASYNC_INFO + " and data_time = ?";
             AsyncInfo asyncInfo = JdbcHelper.queryOne(selectSql, AsyncInfo.class, time);
@@ -126,12 +125,12 @@ public class TransactionService {
                     asyncInfo.setAllSize(allSize);
                     List<Object> params = buildInsertAsync(asyncInfo);
                     JdbcHelper.execute(SqlConstant.DML_INSERT_ASYNC_INFO, params.toArray());
-                    logger.info("[checkLock] lock success.");
+                    log.info("[checkLock] lock success.");
                     //表示已锁定
                     return true;
                 } catch (Exception e) {
                     //报错直接返回,无法获取锁定
-                    logger.error("[checkLock] lock fail, insert async info error.", e);
+                    log.error("[checkLock] lock fail, insert async info error.", e);
                     return false;
                 } 
             } else {
@@ -140,15 +139,15 @@ public class TransactionService {
                     SqlConstant.DML_UPDATE_ASYNC_INFO_LOCK, asyncStatus.getCode(), time);
                 if (res == 1) { //更新成功才有权限执行处理
                     //表示已锁定
-                    logger.info("[checkLock] lock success.");
+                    log.info("[checkLock] lock success.");
                     return true;
                 }
-                logger.info("[checkLock] lock fail, update status fail.");
+                log.info("[checkLock] lock fail, update status fail.");
                 //锁定失败
                 return false;
             }
         } catch (Exception e) {
-            logger.error("[checkLock] lock fail, unkonw exception.", e);
+            log.error("[checkLock] lock fail, unkonw exception.", e);
             return false;
         }
     }
@@ -192,7 +191,7 @@ public class TransactionService {
      * 批量上链.
      */
     private void batchTransaction(AsyncInfo asyncInfo) {
-        logger.info("begin send Transaction, time = {}.", asyncInfo.getDataTime());
+        log.info("begin send Transaction, time = {}.", asyncInfo.getDataTime());
         // 状态修改, 如异常情况，正常情况不存在这种异常
         fixedStatus(asyncInfo.getDataTime());
         // 查询当前需要处理上链的记录总数
@@ -226,11 +225,11 @@ public class TransactionService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("batchTransaction has error.", e);
+                log.error("batchTransaction has error.", e);
                 break;
             } 
         }
-        logger.info(
+        log.info(
             "send Transacation end, all:{}, success:{}, fail:{}.", 
             result.getAllSize(), 
             result.getSuccessSize(), 
@@ -262,7 +261,7 @@ public class TransactionService {
                 }
             }
         } catch (SQLException e) {
-            logger.error("[fixedStatus] fixed status error.");
+            log.error("[fixedStatus] fixed status error.");
         }
     }
     
@@ -280,23 +279,23 @@ public class TransactionService {
     }
     
     private int[] sendBatchTransaction(List<BinLog> binLogList) {
-        logger.info("[sendBatchTransaction] begin sendBatchTransaction size: {}", binLogList.size());
+        log.info("[sendBatchTransaction] begin sendBatchTransaction size: {}", binLogList.size());
         List<TransactionArgs> list = buildTransactionArgsList(binLogList);
         ResponseData<List<Boolean>> response = null;
         try {
             response = OffLineBatchTask.sendBatchTransaction(list);
-            logger.info(
+            log.info(
                 "[sendBatchTransaction] sendBatchTransaction end and return： {} - {}.", 
                 response.getErrorCode(), 
                 response.getErrorMessage()
             );
         } catch (Throwable e) {
-            logger.error("[sendBatchTransaction] has unkonw exception.", e);
-            response = new ResponseData<List<Boolean>>(null, ErrorCode.UNKNOW_ERROR);
+            log.error("[sendBatchTransaction] has unkonw exception.", e);
+            response = new ResponseData<>(null, ErrorCode.UNKNOW_ERROR);
         }
         int[] result = new int[binLogList.size()];
-        if (response.getErrorCode().intValue() != ErrorCode.SUCCESS.getCode()) {
-            logger.error("[sendBatchTransaction] sendBatchTransaction fail. ");
+        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+            log.error("[sendBatchTransaction] sendBatchTransaction fail. ");
             Arrays.fill(result, SEND_FAIL);
             return result;
         }
@@ -312,7 +311,7 @@ public class TransactionService {
     }
     
     private List<TransactionArgs> buildTransactionArgsList(List<BinLog> binLogList) {
-        List<TransactionArgs> list = new ArrayList<TransactionArgs>();
+        List<TransactionArgs> list = new ArrayList<>();
         for (BinLog binLog : binLogList) {
             TransactionArgs args = new TransactionArgs();
             args.setArgs(binLog.getTransactionArgs());
@@ -325,18 +324,18 @@ public class TransactionService {
         }
         return list;
     }
-    
-    /**
-     * 分页查询binLog记录,包括条件查询
-     * @param pageDto 分页操作实体对象
-     * @param binLog 查询条件实体
-     */
-    public void queryBinLogList(PageDto<BinLog> pageDto, BinLog binLog) {
+
+    public ResponseData<PageDto<BinLog>> queryBinLogList(int batch, int status, int iDisplayStart, int iDisplayLength) {
+        PageDto<BinLog> pageDto = new PageDto<>(iDisplayStart, iDisplayLength);
+        BinLog binLog = new BinLog();
+        binLog.setBatch(batch);
+        binLog.setStatus(status);
+
         StringBuffer queryDataSql = new StringBuffer(
             SqlConstant.DML_SELECT_OFFLINE_TRANSACTION_FOR_PAGE);
         StringBuffer queryCountSql = new StringBuffer(
             SqlConstant.DML_SELECT_OFFLINE_TRANSACTION_COUNT);
-        List<Object> params = new ArrayList<Object>();
+        List<Object> params = new ArrayList<>();
         params.add(binLog.getBatch());
         StringBuffer where = new StringBuffer();
         if (binLog.getStatus() != -1) {
@@ -354,19 +353,22 @@ public class TransactionService {
             List<BinLog> list = JdbcHelper.queryList(sql, BinLog.class, params.toArray());
             pageDto.setDataList(list);
         } catch (SQLException e) {
-            logger.error("queryBinLogList fail.", e);
+            log.error("queryBinLogList fail.", e);
+            return new ResponseData<>(null, ErrorCode.UNKNOW_ERROR);
         }
+
+        return new ResponseData<>(pageDto, ErrorCode.SUCCESS);
     }
-    
-    /**
-     * 分页查询异步记录
-     * @param pageDto 分页操作实体
-     * @param asyncInfo 查询条件实体
-     */
-    public void queryAsyncList(PageDto<AsyncInfo> pageDto, AsyncInfo asyncInfo) {
+
+    public ResponseData<PageDto<AsyncInfo>> queryAsyncList(int dataTime, int status, int iDisplayStart, int iDisplayLength) {
+        PageDto<AsyncInfo> pageDto = new PageDto<>(iDisplayStart, iDisplayLength);
+        AsyncInfo asyncInfo = new AsyncInfo();
+        asyncInfo.setDataTime(dataTime);
+        asyncInfo.setStatus(status);
+
         StringBuffer queryData = new StringBuffer(SqlConstant.DML_SELECT_ASYNC_INFO);
         StringBuffer queryCount = new StringBuffer(SqlConstant.DML_SELECT_ASYNC_INFO_COUNT);
-        List<Object> params = new ArrayList<Object>();
+        List<Object> params = new ArrayList<>();
         StringBuffer where = new StringBuffer();
         if (asyncInfo.getStatus() != -1) {
             where.append(" and status = ? ");
@@ -390,8 +392,11 @@ public class TransactionService {
                 queryData.toString(), AsyncInfo.class, params.toArray());
             pageDto.setDataList(list);
         } catch (SQLException e) {
-            logger.error("queryAsyncList fail.", e);
+            log.error("queryAsyncList fail.", e);
+            return new ResponseData<>(null, ErrorCode.UNKNOW_ERROR.getCode(), e.getMessage());
         }
+
+        return new ResponseData<>(pageDto, ErrorCode.SUCCESS);
     }
     
     /**
@@ -399,14 +404,14 @@ public class TransactionService {
      * @param reqeustId 重试请求Id
      * @return 重试处理结果
      */
-    public boolean reTryTransaction(int reqeustId) {
+    public ResponseData<Boolean> reTryTransaction(int reqeustId) {
         // 根据id查询交易记录
         try {
-            logger.info("begin retry to sendTransaction by reqeustId = {}.", reqeustId);
+            log.info("begin retry to sendTransaction by reqeustId = {}.", reqeustId);
             BinLog binLog = JdbcHelper.queryOne(
                 SqlConstant.DML_SELECT_OFFLINE_TRANSACTION_FOR_RETRY,BinLog.class, reqeustId);
             if (binLog == null) {
-                return false;
+                return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
             }
             // 获取锁，乐观锁，如果批次是失败状态，并且可以更新成功, 则获取锁
             if (checkLock(binLog.getBatch(), AsyncStatus.FAIL) ){
@@ -418,13 +423,13 @@ public class TransactionService {
                 // 回写上链结果
                 int count = JdbcHelper.execute(
                     SqlConstant.DML_UPDATE_OFFLINE_TRANSACTION_BY_ID, status, new Date(), reqeustId);
-                logger.info("update status result = {}.", count);
-                return count == 1;
+                log.info("update status result = {}.", count);
+                return new ResponseData<>(count == 1, ErrorCode.SUCCESS);
             }
-            return false;
+            return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
         } catch (Exception e) {
-            logger.error("reTryTransaction error.", e);
-            return false;
+            log.error("reTryTransaction error.", e);
+            return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR.getCode(), e.getMessage());
         }
     }
 }

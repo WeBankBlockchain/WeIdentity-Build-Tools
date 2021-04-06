@@ -24,10 +24,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.DataFrom;
@@ -36,17 +35,18 @@ import com.webank.weid.constant.FileOperator;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.protocol.base.PresentationPolicyE;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.service.BuildToolService;
+import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
 /**
  * @author tonychen 2019/4/9
  */
+@Slf4j
 public class ToPojo {
 
-    private static final Logger logger = LoggerFactory.getLogger(ToPojo.class);
-    private static BuildToolService buildToolService = new BuildToolService();
+    private static WeIdSdkService weIdSdkService = new WeIdSdkService();
 
     /**
      * @param args 入参
@@ -90,7 +90,7 @@ public class ToPojo {
     }
 
     private static void createJarByCpt(String cptStr) {
-    	
+
         List<Integer> succeedList = new ArrayList<>();
         List<Integer> failedList = new ArrayList<>();
         String pojoId = DataToolUtils.getUuId32();
@@ -101,16 +101,16 @@ public class ToPojo {
             //根据cptId找registerId
             for (int i = 0; i < cptIdStrs.length; i++) {
                 int cptId = Integer.parseInt(cptIdStrs[i]);
-                File cptFile = buildToolService.getCptFile(cptId);
+                File cptFile = weIdSdkService.getCptFile(cptId);
                 if (!cptFile.exists()) {//如果找不到cpt文件
-                    logger.error(
+                    log.error(
                         "[CptToPojo] Error: the CPT ---> " + cptId + " does not exists. ");
                     failedList.add(cptId);
                     System.out.println(
                         "[CptToPojo] Error: the CPT ---> " + cptId + " does not exists. ");
                     continue;
                 }
-                buildToolService.generateJavaCodeByCpt(cptFile, cptId, pojoId, "cpt");
+                weIdSdkService.generateJavaCodeByCpt(cptFile, cptId, pojoId, "cpt");
                 cptIdList.add(cptId);
             }
             if (cptIdList.size() == 0) {
@@ -118,14 +118,14 @@ public class ToPojo {
                 System.exit(1);
             }
             Integer[] cptIds = cptIdList.toArray(new Integer[cptIdList.size()]);
-            File sourceFile = buildToolService.getSourceFile(pojoId);
-            buildToolService.createJar(sourceFile, cptIds, "cpt", DataFrom.COMMAND);
+            File sourceFile = WeIdSdkUtils.getSourceFile(pojoId);
+            WeIdSdkUtils.createJar(sourceFile, cptIds, "cpt", DataFrom.COMMAND);
             succeedList.addAll(cptIdList);
             FileUtils.writeToFile(pojoId, "pojoId", FileOperator.OVERWRITE);
         } catch (Exception e) {
-            logger.error("[CptToPojo] execute with exception, {}", e);
+            log.error("[CptToPojo] execute with exception, {}", e);
             System.out.println("[CptToPojo] execute failed.");
-            buildToolService.deletePojoInfo(pojoId);
+            WeIdSdkUtils.deletePojoInfo(pojoId);
             System.exit(1);
         }
 
@@ -141,7 +141,7 @@ public class ToPojo {
                 "cpt:" + succeedList + " are successfully transformed to pojo, List:["
                     + failedList + "] are failed.");
         }
-        System.out.println("The weidentity-cpt.jar can be found in:" + buildToolService.getJarFile(pojoId).getAbsolutePath());
+        System.out.println("The weidentity-cpt.jar can be found in:" + WeIdSdkUtils.getJarFile(pojoId).getAbsolutePath());
     }
 
     /**
@@ -155,13 +155,13 @@ public class ToPojo {
             PresentationPolicyE policyE = PresentationPolicyE.create(policyFile);
             if (policyE == null) {
                 System.out.println("[policyToPojo] Presentation policy is null, illegal!");
-                logger.error("[policyToPojo] Presentation policy from file--->{} is null, illegal!",
+                log.error("[policyToPojo] Presentation policy from file--->{} is null, illegal!",
                     policyFile);
                 System.exit(1);
             }
             String policy = DataToolUtils.serialize(policyE);
-            ResponseData<List<CptFile>> result = 
-                buildToolService.generateCptFileListByPolicy(policy);
+            ResponseData<List<CptFile>> result =
+                weIdSdkService.generateCptFileListByPolicy(policy);
             if (result.getErrorCode().intValue() != ErrorCode.SUCCESS.getCode()) {
                 System.out.println("[policyToPojo] " + result.getErrorMessage());
                 System.exit(1);
@@ -169,19 +169,19 @@ public class ToPojo {
             List<Integer> cptIdList = new ArrayList<>();
             for (CptFile cptFile : result.getResult()) {
                 File file = new File(cptFile.getCptFileName());
-                buildToolService.generateJavaCodeByCpt(file, cptFile.getCptId(), pojoId, "policy");
+                weIdSdkService.generateJavaCodeByCpt(file, cptFile.getCptId(), pojoId, "policy");
                 cptIdList.add(cptFile.getCptId());
                 //cpt生成代码文件后进行删除policy生成的中间cpt文件
                 FileUtils.delete(file);
             }
-            File sourceFile = buildToolService.getSourceFile(pojoId);
+            File sourceFile = WeIdSdkUtils.getSourceFile(pojoId);
             Integer[] cptIds = cptIdList.toArray(new Integer[cptIdList.size()]);
-            buildToolService.createJar(sourceFile, cptIds, "policy", DataFrom.COMMAND);
+            WeIdSdkUtils.createJar(sourceFile, cptIds, "policy", DataFrom.COMMAND);
             System.out.println("Generate Pojo file by policy " + policyFile + " successfully.");
-            System.out.println("The weidentity-cpt.jar can be found in:" + buildToolService.getJarFile(pojoId).getAbsolutePath());
+            System.out.println("The weidentity-cpt.jar can be found in:" + WeIdSdkUtils.getJarFile(pojoId).getAbsolutePath());
         } catch (Exception e) {
             System.out.println("Generate Pojo by policy " + policyFile + " failed.");
-            logger.error("[CptToPojo] Generate Pojo by policy {} failed.", policyFile);
+            log.error("[CptToPojo] Generate Pojo by policy {} failed.", policyFile);
             System.exit(1);
         }
     }

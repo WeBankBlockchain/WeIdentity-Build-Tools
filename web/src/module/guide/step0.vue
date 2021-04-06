@@ -25,7 +25,7 @@
                 <el-button type="primary" @click='next' class="btn btn_150">下一步</el-button>
               </div>
               <div class='sql_warning' style='right:-160px'>
-                <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#id3" target="blank_" style='display:block'>
+                <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/deploy-via-web.html#role-selection" target="blank_" style='display:block'>
                   <img class="icon_question" src="../../assets/image/icon-question.svg" alt="">
                   <span class="icon_question" style="color:#017CFF;font-size:12px;display:inline-block">点击查看配置配置教程</span>
                 </a>

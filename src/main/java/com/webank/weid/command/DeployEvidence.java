@@ -26,14 +26,15 @@ import com.beust.jcommander.JCommander;
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.service.ConfigService;
-import com.webank.weid.service.DeployService;
+import com.webank.weid.service.ContractService;
+import com.webank.weid.service.GuideService;
+import com.webank.weid.util.WeIdSdkUtils;
 
 public class DeployEvidence extends StaticConfig {
 
-    private static DeployService deployService = new DeployService();
-    private static ConfigService configService = new ConfigService();
-    
+    private static ContractService contractService = new ContractService();
+    private static GuideService guideService = new GuideService();
+
     public static void main(String[] args) {
         CommandArgs commandArgs = new CommandArgs();
         JCommander.newBuilder()
@@ -52,13 +53,13 @@ public class DeployEvidence extends StaticConfig {
         System.out.println("[DeployEvidence] begin deploy the evidence by groupId, groupId = " + goupIdStr);
         Integer groupId = Integer.parseInt(goupIdStr);
         // 检查是否有admin账户，如果没有则创建admin账户
-        String adminAddress = deployService.checkAdmin();
+        String adminAddress = guideService.checkAdmin();
         if (StringUtils.isBlank(adminAddress)) {
             System.out.println("[DeployEvidence] begin create admin...");
-            deployService.createAdmin(null);
+            guideService.createAdmin(null);
         }
-        FiscoConfig fiscoConfig = configService.loadNewFiscoConfig();
-        String hash = deployService.deployEvidence(fiscoConfig, groupId, DataFrom.COMMAND);
+        FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
+        String hash = contractService.deployEvidence(fiscoConfig, groupId, DataFrom.COMMAND);
         if (StringUtils.isNotBlank(hash)) {
             System.out.println("[DeployEvidence] the evidence deploy successfully, cns --> " + hash);
             System.exit(0);

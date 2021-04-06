@@ -19,9 +19,8 @@
 
 package com.webank.weid.dto;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.webank.weid.util.DateFormatUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 

@@ -21,23 +21,19 @@ package com.webank.weid.command;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.FileOperator;
-import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.PolicyFactory;
 import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 
 /**
  * @author tonychen 2019/5/24
  */
+@Slf4j
 public class GeneratePolicy {
-
-    private static final Logger logger = LoggerFactory.getLogger(GeneratePolicy.class);
-    
-    private static BuildToolService buildToolService = new BuildToolService();
 
     /**
      * @param args 入参
@@ -61,7 +57,7 @@ public class GeneratePolicy {
         String policyType = commandArgs.getType();//original，zkp
         
         try {
-            File file = buildToolService.getJarFile(pojoId);
+            File file = WeIdSdkUtils.getJarFile(pojoId);
             if (!file.exists()) {
                 System.err.println("[GeneratePolicy] the pojo does not exists.");
                 System.exit(1);
@@ -72,7 +68,7 @@ public class GeneratePolicy {
                 FileOperator.OVERWRITE);
             System.exit(0);
         } catch (Exception e) {
-            logger.error("[GeneratePolicy] generate policy has error.", e);
+            log.error("[GeneratePolicy] generate policy has error.", e);
             System.out.println("generate policy fail, please check the log.");
             System.exit(1);
         }

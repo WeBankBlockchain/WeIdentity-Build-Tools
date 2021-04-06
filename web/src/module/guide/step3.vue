@@ -88,7 +88,7 @@
                   </a>
                 </p>
                 <p>
-                  <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/how-to-use-persisitence.html" target="blank_" style='display:block'>
+                  <a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/how-to-use-persistence.html" target="blank_" style='display:block'>
                     <img class="icon_question" src="../../assets/image/icon-question.svg" alt="">
                     <span class="icon_question" style="color:#017CFF;font-size:12px;display:inline-block">使用教程</span>
                   </a>

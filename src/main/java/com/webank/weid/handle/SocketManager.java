@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
@@ -34,10 +35,9 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class SocketManager {
-    
-    private static final Logger logger = LoggerFactory.getLogger(SocketManager.class);
-    
+
     // 用来记录当前在线连接数
     private static volatile int onlineCount = 0;
 
@@ -64,7 +64,7 @@ public class SocketManager {
     public static synchronized void startListening() {
         File file = new File(rootDir);
         if (!file.exists()) {
-            logger.error("[startListening] the monitor path not exists.");
+            log.error("[startListening] the monitor path not exists.");
             return;
         }
         
@@ -88,7 +88,7 @@ public class SocketManager {
             monitor.start();
             running = true;
         } catch (Exception e) {
-            logger.error("[startListening] the monitor start error.", e);
+            log.error("[startListening] the monitor start error.", e);
         }
     }
 
@@ -111,7 +111,7 @@ public class SocketManager {
                 monitor.stop();
                 running = false;
             } catch (Exception e) {
-                logger.error("[subOnlineCount] stop the monitor error.", e);
+                log.error("[subOnlineCount] stop the monitor error.", e);
             }
         }
     }
@@ -133,13 +133,13 @@ public class SocketManager {
                         .count();
                 }
             } catch (Exception e) {
-                logger.error("[onFileChange] read the log file error.", e);
+                log.error("[onFileChange] read the log file error.", e);
             } finally {
                 if (fis != null) {
                     try {
                         fis.close();
                     } catch (IOException e) {
-                        logger.error("[onFileChange] FileInputStream close error.", e);
+                        log.error("[onFileChange] FileInputStream close error.", e);
                     }
                 }
             }
@@ -150,7 +150,7 @@ public class SocketManager {
                 try {
                     item.getSession().getBasicRemote().sendText(msg);
                 } catch (IOException ex) {
-                    logger.error("[sendMsgToAll] send message error.", ex);
+                    log.error("[sendMsgToAll] send message error.", ex);
                 }
             });
         }

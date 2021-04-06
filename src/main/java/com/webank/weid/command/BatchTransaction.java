@@ -21,9 +21,8 @@ package com.webank.weid.command;
 
 import java.util.Calendar;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
@@ -36,12 +35,8 @@ import com.webank.weid.util.DateFormatUtils;
  * @author yanggang
  *
  */
+@Slf4j
 public class BatchTransaction extends StaticConfig {
-    
-    /**
-     * log4j.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(BatchTransaction.class);
     
     //异步处理入口
     private static TransactionService transactionService = new  TransactionService();
@@ -95,13 +90,13 @@ public class BatchTransaction extends StaticConfig {
             }
         } catch (Exception e) {
             String message = "[BatchTransaction] process has error.";
-            logger.error(message, e);
+            log.error(message, e);
             System.out.println(message);
         }
         System.exit(1);
     }
     private static void log(String message) {
-        logger.info(message);
+        log.info(message);
         System.out.println(message);
     }
 }

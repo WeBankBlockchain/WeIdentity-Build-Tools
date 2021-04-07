@@ -217,7 +217,7 @@ export default {
         }).catch(() => {})
     },
     removeHash (hash, target) {
-      API.doGet('removeHash/' + hash + '/1').then(res => {
+      API.doPost('removeHash/' + hash + '/1').then(res => {
         if (res.data.errorCode === 0) {
           this.$alert('删除成功!', '温馨提示').catch(() => {})
           this.init()

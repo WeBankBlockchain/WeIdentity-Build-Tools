@@ -81,7 +81,7 @@ export default {
     },
     inputChange () {
       var clear = true
-      if (this.dataForm.text !== '') {
+      if (this.dataForm.text !== '' && this.dataForm.text !== null) {
         var dataArray = this.dataForm.text.split(',')
         if (dataArray.length >= 3) {
           this.dataForm.address = dataArray[0]

@@ -292,9 +292,9 @@ export default {
         if (res.data.errorCode === 0) {
           this.dialog.userListPage.userList = res.data.result.dataList
           this.dialog.userListPage.total = res.data.result.allCount
-          this.dialog.userListPage.selectedRow = null
           this.dialog.dialogUserListVisible = true
         }
+        this.dialog.userListPage.selectedRow = null
       })
     }
   },

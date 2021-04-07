@@ -23,12 +23,12 @@ import com.webank.weid.constant.FileOperator;
 import com.webank.weid.dto.CptInfo;
 import com.webank.weid.dto.DataPanel;
 import com.webank.weid.dto.Issuer;
-import com.webank.weid.dto.IssuerType;
 import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.PolicyInfo;
 import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.protocol.base.AuthorityIssuer;
+import com.webank.weid.protocol.base.IssuerType;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.BaseService;
 import com.webank.weid.service.ContractService;
@@ -81,13 +81,24 @@ public class WeIdSdkController {
 
 	@Description("查询issuer type列表")
 	@GetMapping("/getIssuerTypeList")
-	public ResponseData<List<IssuerType>> getIssuerTypeList() {
-		log.info("begin getIssuerTypeList.");
-		return new ResponseData<>(weIdSdkService.getIssuerTypeList(), ErrorCode.SUCCESS);
+	public ResponseData<PageDto<IssuerType>> getIssuerTypeList(
+	    @RequestParam(value = "iDisplayStart") int iDisplayStart,
+	    @RequestParam(value = "iDisplayLength") int iDisplayLength
+	) {
+		log.info("begin get issuer type list, iDisplayStart:{}, iDisplayLength:{}", iDisplayStart, iDisplayLength);
+        PageDto<IssuerType> pageDto = new PageDto<IssuerType>(iDisplayStart, iDisplayLength);
+		return weIdSdkService.getIssuerTypeList(pageDto);
 	}
 
+    @Description("删除issuer type列表")
+    @PostMapping("/removeIssuerType")
+    public ResponseData<Boolean> removeIssuerType(@RequestParam("issuerType") String type) {
+        log.info("begin remove issuer type: {}", type);
+        return weIdSdkService.removeIssuerType(type);
+    }
+
 	@Description("系统自动生成公私钥生成weId")
-	@GetMapping("/createWeId")
+	@PostMapping("/createWeId")
 	public ResponseData<String> createWeId() {
 		log.info("[createWeId] begin create weid...");
 		return weIdSdkService.createWeId(DataFrom.WEB_BY_DEFAULT);
@@ -156,11 +167,24 @@ public class WeIdSdkController {
 	}
 
 	@Description("查询issuer成员列表")
-	@PostMapping("/getAllIssuerInType")
-	public ResponseData<List<AuthorityIssuer>> getAllIssuerInType(@RequestParam("issuerType") String type) {
-		log.info("begin getAllIssuerInType. issuerType：{}", type);
-		return new ResponseData<>(weIdSdkService.getAllSpecificTypeIssuerList(type), ErrorCode.SUCCESS);
+	@PostMapping("/getIssuerListInType")
+	public ResponseData<PageDto<AuthorityIssuer>> getIssuerListInType(
+	    @RequestParam("issuerType") String type,
+	    @RequestParam(value = "iDisplayStart") int iDisplayStart,
+	    @RequestParam(value = "iDisplayLength") int iDisplayLength
+	) {
+		log.info("begin get issuer list in type, iDisplayStart:{}, iDisplayLength:{}", iDisplayStart, iDisplayLength);
+        PageDto<AuthorityIssuer> pageDto = new PageDto<AuthorityIssuer>(iDisplayStart, iDisplayLength);
+		return weIdSdkService.getSpecificTypeIssuerList(pageDto, type);
 	}
+
+    @Description("查询type中issuer成员总数")
+    @GetMapping("/getSpecificTypeIssuerSize")
+    public ResponseData<Integer> getSpecificTypeIssuerSize(
+        @RequestParam("issuerType") String type
+    ) {
+        return weIdSdkService.getSpecificTypeIssuerSize(type);
+    }
 
 	@Description("向IssuerType中添加成员")
 	@PostMapping("/addIssuerIntoIssuerType")

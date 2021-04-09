@@ -55,7 +55,7 @@
                     </div>
                     <div :class="{'key_item active_key': createType === 3, 'key_item': createType !== 3}" type='3' @click="active(3)" v-if="useWeBase">
                       <span class='item_out_role'><span></span></span>
-                      <p>WeBase同步账户</p>
+                      <p>WeBASE同步账户</p>
                     </div>
                   </div>
                   <div class="form-group" id="accountDiv" v-if='isExistsAdmin === true'>
@@ -112,7 +112,7 @@
 
       <!--显示账户列表 -->
       <el-dialog
-        title="WeBase账户列表"
+        title="WeBASE账户列表"
         class="dialog-view"
         width="40%"
         :visible.sync="dialog.dialogUserListVisible"

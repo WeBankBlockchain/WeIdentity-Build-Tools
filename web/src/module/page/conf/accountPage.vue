@@ -40,7 +40,7 @@
 
     <!--显示账户列表 -->
     <el-dialog
-      title="WeBase账户列表"
+      title="WeBASE账户列表"
       class="dialog-view"
       width="40%"
       :visible.sync="dialog.dialogUserListVisible"

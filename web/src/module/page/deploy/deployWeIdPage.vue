@@ -251,7 +251,7 @@ export default {
       this.dialog.dialogDepolyDetailVisible = true
       this.dialog.deployMessages = []
       this.dialog.deployMessages.push('合约部署中...')
-      API.doPost('deploy', this.dialog.deployForm, 30).then(res => {
+      API.doPost('deploy', this.dialog.deployForm, 120).then(res => {
         this.dialog.dialogDepolyDetailVisible = true
         if (res.data.errorCode === 0) {
           this.dialog.hash = res.data.result
@@ -335,7 +335,7 @@ export default {
         if (res.data.errorCode === 0) {
           this.page.deployList = res.data.result
           this.page.total = this.page.deployList.length
-          if (this.page.total === (this.page.pageSize * (this.page.pageIndex - 1))) {
+          if (this.page.total !== 0 && this.page.total === (this.page.pageSize * (this.page.pageIndex - 1))) {
             this.handleCurrentChange(this.page.pageIndex - 1)
           }
         }

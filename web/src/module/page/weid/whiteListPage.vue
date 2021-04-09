@@ -173,7 +173,7 @@ export default {
           this.dialog.whiteWeIdListPage.whiteWeIdList = res.data.result
           this.dialog.whiteWeIdListPage.total = res.data.result.length
         }
-        if (this.dialog.whiteWeIdListPage.total === (this.dialog.whiteWeIdListPage.pageSize * (this.dialog.whiteWeIdListPage.pageIndex - 1))) {
+        if (this.dialog.whiteWeIdListPage.total !== 0 && this.dialog.whiteWeIdListPage.total === (this.dialog.whiteWeIdListPage.pageSize * (this.dialog.whiteWeIdListPage.pageIndex - 1))) {
           this.indexChange2(this.dialog.whiteWeIdListPage.pageIndex - 1)
         }
       })

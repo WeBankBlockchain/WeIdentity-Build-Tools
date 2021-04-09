@@ -205,7 +205,7 @@ export default {
           this.page.issuerList = res.data.result.dataList
           this.page.total = res.data.result.allCount
         }
-        if (this.page.total === (this.page.pageSize * (this.page.pageIndex - 1))) {
+        if (this.page.total !== 0 && this.page.total === (this.page.pageSize * (this.page.pageIndex - 1))) {
           this.indexChange(this.page.pageIndex - 1)
         }
       })

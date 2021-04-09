@@ -11,7 +11,7 @@
               <div class="card-mark">
                 <div class="card-mark-text">
                   <div>1. WeID原始模式: 原WeID的引导配置步骤。</div>
-                  <div>2. WeID+WeBase集成模式: 原WeID的引导配置过程中可选择WeBase同步的数据,如: 节点，账户等数据，且合约部署会同步到WeBase。</div>
+                  <div>2. WeID+WeBASE集成模式: 原WeID的引导配置过程中可选择WeBASE同步的数据,如: 节点，账户等数据，且合约部署会同步到WeBASE。</div>
                 </div>
               </div>
               <el-form ref="dataForm" :model="dataForm" style="margin-top:15px" label-position="right" label-width="150px">
@@ -22,18 +22,18 @@
                   </div>
                   <div :class="{'key_item active_key': configMode === 2, 'key_item': configMode !== 2}" type='1' @click="active(2)">
                     <span class='item_out_role'><span></span></span>
-                    <p>WeID + WeBase集成模式</p>
+                    <p>WeID + WeBASE集成模式</p>
                   </div>
                 </div>
                 <div style="margin-top: 30px" v-if = "configMode === 2">
-                  <div class="card-header card-title"><h3>WeBase配置</h3></div>
+                  <div class="card-header card-title"><h3>WeBASE配置</h3></div>
                   <el-form-item label="粘贴区:" prop="org_id">
-                    <el-input v-model="dataForm.text" placeholder="Your can copy data from WeBase" resize='none'  @keyup.native="inputChange()"  type="textarea" style="width: 72%"></el-input>
+                    <el-input v-model="dataForm.text" placeholder="Your can copy data from WeBASE" resize='none'  @keyup.native="inputChange()"  type="textarea" style="width: 72%"></el-input>
                     <div class="mark-bottom">
-                      <div>请从WeBase管理台复制此应用的配置内容，然后粘贴此处。</div>
+                      <div>请从WeBASE管理台复制此应用的配置内容，然后粘贴此处。</div>
                     </div>
                   </el-form-item>
-                  <el-form-item label="WeBase服务地址:" prop="org_id">
+                  <el-form-item label="WeBASE服务地址:" prop="org_id">
                     <el-input v-model="dataForm.address" placeholder="Enter IP:PORT" maxlength="30"  style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');" @blur="dataForm.address = $event.target.value"></el-input>
                   </el-form-item>
                   <el-form-item label="appKey:" prop="org_id">
@@ -119,7 +119,7 @@ export default {
       formData.appSecret = this.dataForm.appSecret
       formData.weIdHost = window.location.host
       if (formData.weBaseHost === '') {
-        this.$alert('请输入WeBase服务地址!', '温馨提示', {}).catch(() => {})
+        this.$alert('请输入WeBASE服务地址!', '温馨提示', {}).catch(() => {})
         return
       }
       if (formData.appKey === '') {

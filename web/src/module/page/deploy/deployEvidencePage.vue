@@ -324,7 +324,7 @@ export default {
         if (res.data.errorCode === 0) {
           this.page.deployList = res.data.result
           this.page.total = this.page.deployList.length
-          if (this.page.total === (this.page.pageSize * (this.page.pageIndex - 1))) {
+          if (this.page.total !== 0 && this.page.total === (this.page.pageSize * (this.page.pageIndex - 1))) {
             this.indexChange(this.page.pageIndex - 1)
           }
         }

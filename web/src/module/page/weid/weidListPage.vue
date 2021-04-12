@@ -170,13 +170,19 @@
             <div class="mark-line" v-if="dialog.hashWihteList == false">
               <span href="#" @click="toAddWihte()">前往新增白名单</span>
             </div>
-            <el-select v-model="dialog.whiteListForm.issuerType" placeholder="白名单" style="width: 100%">
-              <el-option v-for="val in dialog.whiteList"
-              :key="val.type"
-              :label="val.type"
-              :value="val.type">
-              </el-option>
-            </el-select>
+            <el-table :data="dialog.page.whiteList" border="true" align="center">
+              <el-table-column label="选择" width="100">
+                <template slot-scope="scope">
+                  <el-radio v-model="dialog.page.selectedRow" :label="scope.row"><span></span></el-radio>
+                </template>
+              </el-table-column>
+              <el-table-column prop="type" label="白名单名称" align="center">
+                <template slot-scope='scope'>
+                  <span class='long_words' :title='scope.row.typeName'>{{scope.row.typeName}}</span>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-pagination @current-change="indexChange2" :current-page="dialog.page.pageIndex" :page-size="dialog.page.pageSize" layout="total, prev, pager, next, jumper" :total="dialog.page.total"></el-pagination>
           </el-form-item>
         </el-form>
       </div>
@@ -245,10 +251,16 @@ export default {
           weId: ''
         },
         hashWihteList: false,
-        whiteList: [],
         showData: {
           weId: '',
           hasPath: false
+        },
+        page: {
+          selectedRow: null,
+          whiteList: [],
+          pageIndex: 1,
+          pageSize: 4,
+          total: 0
         }
       }
     }
@@ -322,11 +334,18 @@ export default {
         }
       })
     },
-    showRegistWhiteList (weId) {
+    async showRegistWhiteList (weId) {
       this.dialog.whiteListForm.weId = weId
+      this.dialog.page.pageIndex = 1
+      await this.queryIssueTypeList()
       this.dialog.dialogwhiteFormVisible = true
     },
     addWeIdToWhiteList () {
+      if (this.dialog.page.selectedRow == null) {
+        this.$alert('请选择白名单', '温馨提示', {}).catch(() => {})
+        return
+      }
+      this.dialog.whiteListForm.issuerType = this.dialog.page.selectedRow.typeName
       API.doPost('addIssuerIntoIssuerType', this.dialog.whiteListForm).then(res => { // 保存选择的角色
         if (res.data.errorCode === 0) {
           this.$alert('添加白名单成功!', '温馨提示', {}).then(() => {
@@ -361,7 +380,7 @@ export default {
       }
     },
     createBySys () {
-      API.doGet('createWeId').then(res => {
+      API.doPost('createWeId').then(res => {
         if (res.data.errorCode === 0) {
           this.$alert('WeID创建成功!', '温馨提示', {}).then(() => {
             this.dialog.dialogCreateWeIdVisible = false
@@ -449,16 +468,24 @@ export default {
       this.page.pageIndex = 1
       this.queryWeIdList(1, 0, 0, true)
     },
-    initWihteList () {
-      API.doGet('getIssuerTypeList').then(res => {
+    async queryIssueTypeList () {
+      var formData = {}
+      formData.iDisplayStart = (this.dialog.page.pageIndex - 1) * this.dialog.page.pageSize
+      formData.iDisplayLength = this.dialog.page.pageSize
+      await API.doGet('getIssuerTypeList', formData).then(res => {
+        this.dialog.page.selectedRow = null
         if (res.data.errorCode === 0) {
-          this.dialog.whiteList = res.data.result
-          if (this.dialog.whiteList.length > 0) {
-            this.dialog.hashWihteList = true
-            this.dialog.whiteListForm.issuerType = this.dialog.whiteList[0].type
-          }
+          this.dialog.page.whiteList = res.data.result.dataList
+          this.dialog.page.total = res.data.result.allCount
+        }
+        if (this.dialog.page.whiteList.length > 0) {
+          this.dialog.hashWihteList = true
         }
       })
+    },
+    indexChange2 (currentPage) {
+      this.dialog.page.pageIndex = currentPage
+      this.queryIssueTypeList()
     },
     dateFormat (row) {
       var date = new Date(parseInt(row.weIdPojo.created * 1000) + 8 * 3600 * 1000)
@@ -468,7 +495,6 @@ export default {
       await check.checkNodeState(true)
       if (check.data.nodeStatus) {
         this.init()
-        this.initWihteList()
       }
     }
   },

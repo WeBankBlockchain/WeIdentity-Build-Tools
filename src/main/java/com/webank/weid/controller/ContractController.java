@@ -82,7 +82,7 @@ public class ContractController {
 		return new ResponseData<>(contractService.getDeployInfoByHashFromChain(hash), ErrorCode.SUCCESS);
 	}
 
-	@GetMapping("/removeHash/{hash}/{type}")
+	@PostMapping("/removeHash/{hash}/{type}")
 	public ResponseData<Boolean> removeHash(@PathVariable("hash") String hash, @PathVariable("type") Integer type){
 		log.info("start removeHash, hash:{}, type:{}", hash, type);
 		if (type != 1 && type != 2) {

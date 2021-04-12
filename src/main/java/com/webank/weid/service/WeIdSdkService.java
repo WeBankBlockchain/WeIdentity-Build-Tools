@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.Keys;
 import org.jsonschema2pojo.DefaultGenerationConfig;
 import org.jsonschema2pojo.GenerationConfig;
 import org.jsonschema2pojo.NoopAnnotator;
@@ -28,7 +26,6 @@ import org.jsonschema2pojo.SchemaGenerator;
 import org.jsonschema2pojo.SchemaMapper;
 import org.jsonschema2pojo.SchemaStore;
 import org.jsonschema2pojo.rules.RuleFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -45,7 +42,6 @@ import com.webank.weid.dto.CptFile;
 import com.webank.weid.dto.CptInfo;
 import com.webank.weid.dto.DataPanel;
 import com.webank.weid.dto.Issuer;
-import com.webank.weid.dto.IssuerType;
 import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.PolicyInfo;
@@ -476,12 +472,6 @@ public class WeIdSdkService {
 		}
 
 		log.info("[registerIssuerType] register issuer type {} success.", type);
-		String id = DataToolUtils.getUuId32();
-		//文件落地处理,每注册一个issuerType 记录一个文件
-		File issuerTypeFile = new File(BuildToolsConstant.ISSUER_TYPE_PATH + "/" + WeIdSdkUtils.getMainHash(), id);
-		IssuerType info = buildIssuerType(type, from);
-		String data = DataToolUtils.serialize(info);
-		FileUtils.writeToFile(data, issuerTypeFile.getAbsolutePath(), FileOperator.OVERWRITE);
 		return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
 	}
 
@@ -496,72 +486,62 @@ public class WeIdSdkService {
 		return callerAuth;
 	}
 
-	private IssuerType buildIssuerType(String type, DataFrom from) {
-		IssuerType info = new IssuerType();
-		info.setHash(WeIdSdkUtils.getMainHash());
-		long time = System.currentTimeMillis();
-		info.setTime(time);
-		info.setType(type);
-		info.setFrom(from.name());
-		return info;
-	}
+    public ResponseData<PageDto<IssuerType>> getIssuerTypeList(PageDto<IssuerType> pageDto) {
+        ResponseData<List<IssuerType>> response =
+            getAuthorityIssuerService().getIssuerTypeList(pageDto.getStartIndex(), pageDto.getPageSize());
+        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+            log.error("getIssuerTypeList error, msg:{}", response.getErrorMessage());
+            return new ResponseData<>(null, response.getErrorCode(), response.getErrorMessage());
+        }
+        pageDto.setAllCount(getAuthorityIssuerService().getIssuerTypeCount().getResult());
+        pageDto.setDataList(response.getResult());
+        return new ResponseData<>(pageDto, ErrorCode.SUCCESS);
+    }
 
-	public List<IssuerType> getIssuerTypeList() {
-		String currentHash = WeIdSdkUtils.getMainHash();
-		List<IssuerType> list = new ArrayList<>();
-		if (StringUtils.isBlank(currentHash)) {
-			return list;
-		}
-		File targetDir = new File(BuildToolsConstant.ISSUER_TYPE_PATH + "/" + currentHash);
-		if (!targetDir.exists()) {
-			return list;
-		}
-		for (File file : Objects.requireNonNull(targetDir.listFiles())) {
-			//根据weid判断本地是否存在
-			String jsonData = FileUtils.readFile(file.getAbsolutePath());
-			IssuerType info = DataToolUtils.deserialize(jsonData, IssuerType.class);
-			list.add(info);
-		}
-		Collections.sort(list);
-		return list;
-	}
+    public ResponseData<Boolean> removeIssuerType(String type) {
+        log.info("[removeIssuerType] removeing issuer type with best effort: " + type);
+        ResponseData<Boolean> response = getAuthorityIssuerService()
+                .removeIssuerType(getCurrentWeIdAuth(), type);
+        if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
+            log.error(
+                    "[removeIssuerType] remove issuer type {} faild. error code : {}, error msg :{}",
+                    type,
+                    response.getErrorCode(),
+                    response.getErrorMessage()
+            );
+            return response;
+        }
+        log.info("[removeIssuerType] remove issuer type {} success.", type);
+        return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
+    }
 
-	public List<AuthorityIssuer> getAllSpecificTypeIssuerList(String issuerType) {
-		List<String> list = new ArrayList<>();
-		int num = 10;
-		int startIndex = 0;
-		while(true) {
-			ResponseData<List<String>> result = getAuthorityIssuerService()
-					.getAllSpecificTypeIssuerList(issuerType, startIndex, num);
-			if (result.getResult() != null && result.getResult().size() > 0 ) {
-				list.addAll(convertToWeId(result.getResult()));
-				if (result.getResult().size() < num) {
-					break;
-				}
-				startIndex = startIndex + num;
-			} else {
-				break;
-			}
-		}
-		List<AuthorityIssuer> rList = new ArrayList<>();
-		for (String weId : list) {
-			AuthorityIssuer issuer = this.getIssuerByWeId(this.getWeIdAddress(weId));
-			if (issuer == null) {
-				issuer = new AuthorityIssuer();
-				issuer.setWeId(weId);
-			}
-			rList.add(issuer);
-		}
-		return rList;
-	}
+    public ResponseData<PageDto<AuthorityIssuer>> getSpecificTypeIssuerList(PageDto<AuthorityIssuer> pageDto, String type) {
+        ResponseData<List<String>> response =
+            getAuthorityIssuerService().getAllSpecificTypeIssuerList(type, pageDto.getStartIndex(), pageDto.getPageSize());
+        List<AuthorityIssuer> rList = new ArrayList<>();
+        if (response.getErrorCode() == ErrorCode.SUCCESS.getCode()) {
+            if (CollectionUtils.isNotEmpty(response.getResult())) {
+                response.getResult().forEach(value -> {
+                    AuthorityIssuer issuer = this.getIssuerByWeId(value);
+                    if (issuer == null) {
+                        issuer = new AuthorityIssuer();
+                        issuer.setWeId(WeIdUtils.convertAddressToWeId(value));
+                    }
+                    rList.add(issuer);
+                });
+            }
+        } else {
+            log.warn("[getSpecificTypeIssuerList] query issuerList in type from chain fail: {} - {}.", response.getErrorCode(), response.getErrorMessage());
+            return new ResponseData<>(null, response.getErrorCode(),  response.getErrorMessage());
+        }
+        pageDto.setAllCount(getAuthorityIssuerService().getSpecificTypeIssuerSize(type).getResult());
+        pageDto.setDataList(rList);
+        return new ResponseData<>(pageDto, ErrorCode.SUCCESS);
+    }
 
-	private List<String> convertToWeId(List<String> data) {
-		List<String> list = new ArrayList<>();
-		for (String string : data) {
-			list.add(WeIdUtils.convertAddressToWeId(string));
-		}
-		return list;
-	}
+    public ResponseData<Integer> getSpecificTypeIssuerSize(String type) {
+        return getAuthorityIssuerService().getSpecificTypeIssuerSize(type);
+    }
 
 	public ResponseData<Boolean> addIssuerIntoIssuerType(String type, String weId) {
 		log.info("[addIssuerIntoIssuerType] Adding WeIdentity DID {} in {}", weId, type);

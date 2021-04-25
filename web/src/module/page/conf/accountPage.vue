@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="db-part">
-            <el-button type="primary" @click="queryUserList" class="btn btn_150" v-if="useWeBase">切换账户</el-button>
+            <el-button type="primary" @click="showUserList" class="btn btn_150" v-if="useWeBase">切换账户</el-button>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
       <el-table :data="dialog.userListPage.userList" border="true" cellpadding="0" cellspacing="0" >
         <el-table-column label="选择" width="55">
           <template slot-scope="scope">
-            <el-radio v-model="dialog.userListPage.selectedRow" :label="scope.row"><i></i></el-radio>
+            <el-radio v-model="dialog.userListPage.selectedRow" :label="scope.row"><span></span></el-radio>
           </template>
         </el-table-column>
         <el-table-column label="用户名">
@@ -102,6 +102,9 @@ export default {
         }
       })
     },
+    showUserList () {
+      this.queryUserList()
+    },
     chooseUser () {
       if (this.dialog.userListPage.selectedRow === null) {
         this.$alert('请选择用户!', '温馨提示', {}).catch(() => {})
@@ -125,9 +128,9 @@ export default {
         if (res.data.errorCode === 0) {
           this.dialog.userListPage.userList = res.data.result.dataList
           this.dialog.userListPage.total = res.data.result.allCount
-          this.dialog.userListPage.selectedRow = null
           this.dialog.dialogUserListVisible = true
         }
+        this.dialog.userListPage.selectedRow = null
       })
     },
     loadConfig () {

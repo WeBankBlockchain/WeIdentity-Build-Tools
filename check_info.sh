@@ -113,6 +113,12 @@ ca_crt="$classpathDir/ca.crt"
 client_keystore="$classpathDir/client.keystore"
 node_crt="$classpathDir/node.crt"
 node_key="$classpathDir/node.key"
+
+gmca_crt="$classpathDir/gmca.crt"
+gmensdk_crt="$classpathDir/gmensdk.crt"
+gmensdk_key="$classpathDir/gmensdk.key"
+gmsdk_crt="$classpathDir/gmsdk.crt"
+gmsdk_key="$classpathDir/gmsdk.key"
 sdk_version=
 
 # check the user configure
@@ -132,24 +138,15 @@ function check_user_config() {
     else
         echo "the weidentity.properties is exists."
     fi
-    if [ ! -f "$ca_crt" ];
+    encrypt_type=$(grep "encrypt\.type" $fisco_properties |awk -F"=" '{print $2}')
+    if [[ $encrypt_type == 0 ]];
     then
-        echo "ERROR: the ca.crt does not exists."
-    else
-        echo "the ca.crt is exists and the MD5 is `md5sum $ca_crt  | cut -d " " -f1`"        
-    fi
-
-    bcos_version=$(grep "bcos\.version" $fisco_properties |awk -F"=" '{print $2}')
-    if [[ $bcos_version == 1* ]];
-    then
-        if [ ! -f "$client_keystore" ];
+        if [ ! -f "$ca_crt" ];
         then
-            echo "ERROR: the client.keystore does not exists."
+            echo "ERROR: the ca.crt does not exists."
         else
-            echo "the client.keystore is exists and the MD5 is `md5sum $client_keystore  | cut -d " " -f1`"        
+            echo "the ca.crt is exists and the MD5 is `md5sum $ca_crt  | cut -d " " -f1`"        
         fi
-    elif [[ $bcos_version == 2* ]];
-    then
         if [ ! -f "$node_crt" ];
         then
             echo "ERROR: the node.crt does not exists."
@@ -162,8 +159,40 @@ function check_user_config() {
         else
             echo "the node.key is exists and the MD5 is `md5sum $node_key  | cut -d " " -f1`"        
         fi
+    elif [[ $encrypt_type == 1 ]];
+    then
+        if [ ! -f "$gmca_crt" ];
+        then
+            echo "ERROR: the gmca.crt does not exists."
+        else
+            echo "the gmca.crt is exists and the MD5 is `md5sum $gmca_crt  | cut -d " " -f1`"        
+        fi
+        if [ ! -f "$gmensdk_crt" ];
+        then
+            echo "ERROR: the gmca.crt does not exists."
+        else
+            echo "the gmensdk.crt is exists and the MD5 is `md5sum $gmensdk_crt  | cut -d " " -f1`"        
+        fi
+        if [ ! -f "$gmensdk_key" ];
+        then
+            echo "ERROR: the gmca.crt does not exists."
+        else
+            echo "the gmensdk.key is exists and the MD5 is `md5sum $gmensdk_key  | cut -d " " -f1`"        
+        fi
+        if [ ! -f "$gmsdk_crt" ];
+        then
+            echo "ERROR: the gmca.crt does not exists."
+        else
+            echo "the gmsdk.crt is exists and the MD5 is `md5sum $gmsdk_crt  | cut -d " " -f1`"        
+        fi
+        if [ ! -f "$gmsdk_key" ];
+        then
+            echo "ERROR: the gmca.crt does not exists."
+        else
+            echo "the gmsdk.key is exists and the MD5 is `md5sum $gmsdk_key  | cut -d " " -f1`"        
+        fi
     else
-        echo "ERROR: the bcos.version value is invalid."
+        echo "ERROR: the encrypt.type value is invalid."
     fi
 
     blockchain_orgid=$(grep "blockchain\.orgid=" $weidentity_properties |awk -F"=" '{print $2}')

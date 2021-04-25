@@ -243,7 +243,7 @@ export default {
         }).catch(() => {})
     },
     removeHash (hash) {
-      API.doGet('removeHash/' + hash + '/2').then(res => {
+      API.doPost('removeHash/' + hash + '/2').then(res => {
         if (res.data.errorCode === 0) {
           this.$alert('删除成功!', '温馨提示').catch(() => {})
           this.getShareList()

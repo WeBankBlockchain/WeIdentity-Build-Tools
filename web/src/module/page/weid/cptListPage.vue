@@ -320,7 +320,7 @@ export default {
       this.init()
     },
     downCpt (cptId) {
-      this.$confirm('确定下载改CPT吗？', '温馨提示', {closeOnClickModal: false, cancelButtonClass: 'el-button--primary'})
+      this.$confirm('确定下载该CPT吗？', '温馨提示', {closeOnClickModal: false, cancelButtonClass: 'el-button--primary'})
         .then(_ => {
           window.location.href = config.URL + '/downCpt/' + cptId
         }).catch(() => {})

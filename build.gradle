@@ -132,6 +132,7 @@ dependencies {
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
+                exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
         }
     }
@@ -143,6 +144,7 @@ dependencies {
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
+                exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')

@@ -65,11 +65,11 @@ List jcommander = [
 ]
 
 List log4j = [
-        "org.apache.logging.log4j:log4j-api:2.13.3",
-        "org.apache.logging.log4j:log4j-web:2.13.3",
-        "org.apache.logging.log4j:log4j-core:2.13.3",
-        "org.apache.logging.log4j:log4j-jcl:2.13.3",
-        "org.apache.logging.log4j:log4j-slf4j-impl:2.13.3",
+        "org.apache.logging.log4j:log4j-api:2.15.0",
+        "org.apache.logging.log4j:log4j-web:2.15.0",
+        "org.apache.logging.log4j:log4j-core:2.15.0",
+        "org.apache.logging.log4j:log4j-jcl:2.15.0",
+        "org.apache.logging.log4j:log4j-slf4j-impl:2.15.0",
         "org.slf4j:jul-to-slf4j:1.7.30",
         "org.slf4j:slf4j-api:1.7.30"
 ]
@@ -132,6 +132,7 @@ dependencies {
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
+                exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
         }
     }
@@ -143,6 +144,7 @@ dependencies {
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
+                exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')

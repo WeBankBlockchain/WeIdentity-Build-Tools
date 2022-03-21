@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -128,6 +130,8 @@ public class ConfigurationController {
 		String mysqlPassword = request.getParameter("mysql_password");
 		String redisAddress = request.getParameter("redis_address");
 		String redisPassword = request.getParameter("redis_password");
+		mysqlPassword = StringEscapeUtils.unescapeHtml(mysqlPassword);
+		redisPassword = StringEscapeUtils.unescapeHtml(redisPassword);
 		//根据模板生成配置文件
 		if(configService.processDbConfig(persistenceType, mysqlAddress, database, username,
 				mysqlPassword, redisAddress, redisPassword)) {

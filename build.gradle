@@ -46,7 +46,8 @@ repositories {
         mavenLocal()
         if ("cn" == repo) {
             println "use cn repo"
-            maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+//            maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+            mavenCentral()
         } else {
             println "use default repo"
             mavenCentral()
@@ -95,7 +96,7 @@ List http_proxy = [
 ]
 
 List redis_driver = [
-        "org.redisson:redisson:3.15.0"
+        "org.redisson:redisson:3.15.6"
 ]
 
 def spring_version = "5.3.18"
@@ -130,6 +131,8 @@ dependencies {
     localDeps lombok
     compile('org.springframework.boot:spring-boot-starter-web')
     compile("org.springframework.boot:spring-boot-starter-websocket")
+    // cover old version
+    compile 'io.netty:netty-all:4.1.68.Final'
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
             compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy

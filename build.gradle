@@ -294,8 +294,8 @@ uploadArchives {
 
                 licenses {
                     license {
-                        name 'GNU Lesser General Public License version 3'
-                        url 'https://opensource.org/licenses/LGPL-3.0'
+                        name 'Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         distribution 'repo'
                     }
                 }

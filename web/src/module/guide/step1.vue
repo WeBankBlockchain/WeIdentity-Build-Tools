@@ -72,20 +72,20 @@
                     <input type="file" id ='caCrtFile' style="display:none;">
                   </div>
                   <div class='file_part'>
-                    <el-form-item label="node.crt证书:" prop="nodeCrtFileName">
+                    <el-form-item label="sdk.crt证书:" prop="nodeCrtFileName">
                       <div class='input_item'>
-                        <el-input v-model="form.nodeCrtFileName" placeholder="Enter nodeCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                        <button type="button" @click="chooseFile('nodeCrtFile', 'node.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                        <el-input v-model="form.nodeCrtFileName" placeholder="Enter sdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                        <button type="button" @click="chooseFile('nodeCrtFile', 'sdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                       </div>
                       <div class="mark-bottom mark-red" v-if="form['node.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                     </el-form-item>
                     <input type="file" id ='nodeCrtFile' style="display:none;" >
                   </div>
                   <div class='file_part'>
-                    <el-form-item label="node.key证书:" prop="nodeKeyFileName">
+                    <el-form-item label="sdk.key证书:" prop="nodeKeyFileName">
                       <div class='input_item'>
-                        <el-input v-model="form.nodeKeyFileName" placeholder="Enter nodeKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                        <button type="button" @click="chooseFile('nodeKeyFile', 'node.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                        <el-input v-model="form.nodeKeyFileName" placeholder="Enter sdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                        <button type="button" @click="chooseFile('nodeKeyFile', 'sdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                       </div>
                       <div class="mark-bottom mark-red" v-if="form['node.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                     </el-form-item>
@@ -352,11 +352,11 @@ export default {
           return false
         }
         if (this.form.nodeCrtFile === '' && !this.form['node.crt'] === 'false') {
-          this.$alert('请选择 node.crt 证书文件!', '温馨提示', {}).catch(() => {})
+          this.$alert('请选择 sdk.crt 证书文件!', '温馨提示', {}).catch(() => {})
           return false
         }
         if (this.form.nodeKeyFile === '' && !this.form['node.key'] === 'false') {
-          this.$alert('请选择 node.key 证书文件!', '温馨提示', {}).catch(() => {})
+          this.$alert('请选择 sdk.key 证书文件!', '温馨提示', {}).catch(() => {})
           return false
         }
       } else {

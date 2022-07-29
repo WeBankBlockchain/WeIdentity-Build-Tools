@@ -13,7 +13,7 @@ public class ShareInfo extends DeployBase {
 
     private String owner;
     private String ownerShow;
-    private Integer groupId;
+    private String groupId;
     private String showGroupId;
     private String evidenceAddress;
     private boolean enable; 
@@ -21,7 +21,7 @@ public class ShareInfo extends DeployBase {
     private boolean showBtn;
     private String evidenceName;
     
-    public void setGroupId(Integer groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
         this.showGroupId = "group-" + groupId;
     }

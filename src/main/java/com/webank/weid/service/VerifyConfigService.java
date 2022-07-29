@@ -9,6 +9,9 @@ import com.webank.weid.suite.api.persistence.PersistenceFactory;
 import com.webank.weid.suite.api.persistence.inf.Persistence;
 import com.webank.weid.suite.api.persistence.params.PersistenceType;
 
+/**
+ * 验证db
+ */
 @Service
 @Slf4j
 public class VerifyConfigService {

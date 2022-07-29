@@ -1,37 +1,6 @@
 package com.webank.weid.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jsonschema2pojo.DefaultGenerationConfig;
-import org.jsonschema2pojo.GenerationConfig;
-import org.jsonschema2pojo.NoopAnnotator;
-import org.jsonschema2pojo.SchemaGenerator;
-import org.jsonschema2pojo.SchemaMapper;
-import org.jsonschema2pojo.SchemaStore;
-import org.jsonschema2pojo.rules.RuleFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
 import com.sun.codemodel.JCodeModel;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.CnsType;
@@ -46,7 +15,17 @@ import com.webank.weid.dto.PageDto;
 import com.webank.weid.dto.PojoInfo;
 import com.webank.weid.dto.PolicyInfo;
 import com.webank.weid.dto.WeIdInfo;
-import com.webank.weid.protocol.base.*;
+import com.webank.weid.protocol.base.AuthorityIssuer;
+import com.webank.weid.protocol.base.ClaimPolicy;
+import com.webank.weid.protocol.base.Cpt;
+import com.webank.weid.protocol.base.CptBaseInfo;
+import com.webank.weid.protocol.base.HashContract;
+import com.webank.weid.protocol.base.IssuerType;
+import com.webank.weid.protocol.base.PresentationPolicyE;
+import com.webank.weid.protocol.base.WeIdAuthentication;
+import com.webank.weid.protocol.base.WeIdPojo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.protocol.base.WeIdPublicKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.request.RegisterAuthorityIssuerArgs;
@@ -67,6 +46,34 @@ import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
 import com.webank.weid.util.WeIdUtils;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.fisco.bcos.sdk.client.Client;
+import org.jsonschema2pojo.DefaultGenerationConfig;
+import org.jsonschema2pojo.GenerationConfig;
+import org.jsonschema2pojo.NoopAnnotator;
+import org.jsonschema2pojo.SchemaGenerator;
+import org.jsonschema2pojo.SchemaMapper;
+import org.jsonschema2pojo.SchemaStore;
+import org.jsonschema2pojo.rules.RuleFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 @Slf4j
@@ -608,7 +615,7 @@ public class WeIdSdkService {
 			log.error("the file type error. fileName={}", fileName);
 			return new ResponseData<>(result, ErrorCode.UNKNOW_ERROR.getCode(), "the file type error");
 		}
-		JsonNode jsonNode = JsonLoader.fromFile(cptFile);
+		JsonNode jsonNode = DataToolUtils.loadJsonObjectFromFile(cptFile);
 		String cptJsonSchema = jsonNode.toString();
 		CptStringArgs cptStringArgs = new CptStringArgs();
 		cptStringArgs.setCptJsonSchema(cptJsonSchema);
@@ -1130,7 +1137,7 @@ public class WeIdSdkService {
     private void importPrivateKeyToWeBase(String weId, String privateKey) {
         String accountName = this.getWeIdAddress(weId);
         // 获取群组
-        Integer groupId = configService.getMasterGroupId();
+		String groupId = configService.getMasterGroupId();
         Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, accountName, privateKey);
         log.info("[createWeId] import privateKey to weBase result = {}", result);
 	}
@@ -1138,7 +1145,7 @@ public class WeIdSdkService {
     private void importPublicKeyToWeBase(String weId, String publicKey) {
         String accountName = this.getWeIdAddress(weId);
         // 获取群组
-        Integer groupId = configService.getMasterGroupId();
+        String groupId = configService.getMasterGroupId();
         Boolean result = weBaseService.importPublicKeyToWeBase(groupId, accountName, publicKey);
         log.info("[createWeId] import publicKey to weBase result = {}", result);
     }

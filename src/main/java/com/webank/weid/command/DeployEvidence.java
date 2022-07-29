@@ -34,7 +34,7 @@ public class DeployEvidence extends StaticConfig {
             System.exit(1);
         }
         System.out.println("[DeployEvidence] begin deploy the evidence by groupId, groupId = " + goupIdStr);
-        Integer groupId = Integer.parseInt(goupIdStr);
+        String groupId = goupIdStr;
         // 检查是否有admin账户，如果没有则创建admin账户
         String adminAddress = guideService.checkAdmin();
         if (StringUtils.isBlank(adminAddress)) {

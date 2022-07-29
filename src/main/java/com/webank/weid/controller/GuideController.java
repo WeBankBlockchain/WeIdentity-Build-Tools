@@ -1,5 +1,8 @@
 package com.webank.weid.controller;
 
+import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.service.v3.CheckNodeServiceV3;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,7 +76,7 @@ public class GuideController {
 			// 创建账户
 			String account = guideService.createAdmin(inputPrivateKey);
 			// 获取群组
-			Integer groupId = configService.getMasterGroupId();
+			String groupId = configService.getMasterGroupId();
 			// 获取私钥
 			String privateKey = WeIdSdkUtils.getCurrentPrivateKey().getPrivateKey();
 			Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, account, privateKey);
@@ -98,7 +101,15 @@ public class GuideController {
 		try {
 			log.info("[checkOrgId] begin check the orgId.");
 			// 判断是否存在机构配置
-			CheckNodeFace checkNode = new CheckNodeServiceV2();
+			CheckNodeFace checkNode = null;
+			FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
+			if (fiscoConfig.getVersion().startsWith(WeIdConstant.FISCO_BCOS_2_X_VERSION_PREFIX)) {
+				log.info("[checkNode] the node version is 2.x in your configuration.");
+				checkNode = new CheckNodeServiceV2();
+			} else {
+				log.info("[checkNode] the node version is 3.x in your configuration.");
+				checkNode = new CheckNodeServiceV3();
+			}
 			boolean isExist = checkNode.checkOrgId(WeIdSdkUtils.loadNewFiscoConfig());
 			// 如果存在
 			if (isExist) {
@@ -106,7 +117,7 @@ public class GuideController {
 				if (StringUtils.isBlank(address)) {
 					String account = guideService.createAdmin(null);
 					// 获取群组
-		            Integer groupId = configService.getMasterGroupId();
+		            String groupId = configService.getMasterGroupId();
 					// 获取私钥
 		            String privateKey = WeIdSdkUtils.getCurrentPrivateKey().getPrivateKey();
 		            Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, account, privateKey);

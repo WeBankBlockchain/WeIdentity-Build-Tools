@@ -1,6 +1,7 @@
 
 package com.webank.weid.util;
 
+import com.webank.weid.protocol.response.CnsInfo;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -69,7 +70,7 @@ public class WeIdSdkUtils {
     }
 
     public static String getMainHash() {
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return StringUtils.EMPTY;
         }
@@ -164,8 +165,9 @@ public class WeIdSdkUtils {
             byte[] buffer = new byte[1024];
             while (true) {
                 int count = in.read(buffer);
-                if (count == -1)
+                if (count == -1) {
                     break;
+                }
                 bos.write(buffer, 0, count);
             }
             bos.flush();

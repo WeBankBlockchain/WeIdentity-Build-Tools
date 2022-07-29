@@ -3,7 +3,6 @@
 package com.webank.weid.command;
 
 import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.EncryptType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,6 @@ public class DeployContract extends StaticConfig {
         // 获取配置
         FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
         fiscoConfig.setChainId(chainId);
-        new EncryptType(Integer.parseInt(fiscoConfig.getEncryptType()));
         // 说明给了私钥文件
         if (StringUtils.isNotBlank(privateKeyFile)) {
             String privateKey = FileUtils.readFile(privateKeyFile);

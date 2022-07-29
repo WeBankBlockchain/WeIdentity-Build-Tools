@@ -25,7 +25,7 @@ import com.webank.weid.util.JdbcHelper;
 import com.webank.weid.util.OffLineBatchTask;
 
 /**
- * 交易业务类
+ * 上链交易业务类
  * 1. rsync使用过程，命令方式还是java方式
  *   如果是命令方式： 
  *      1. 应用服务器如何执行脚本，

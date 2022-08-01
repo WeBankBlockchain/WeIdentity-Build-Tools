@@ -23,7 +23,6 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.RedisException;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -77,7 +76,7 @@ public class ConfigService {
                 map = processConfig(listStr);
             }
         }
-        //判断证书配置是否存在
+        //判断证书配置是否存在  todo 改成resources下conf目录
         map.put("ca.crt", String.valueOf(FileUtils.exists("resources/ca.crt")));
         map.put("node.crt", String.valueOf(FileUtils.exists("resources/node.crt")));
         map.put("node.key", String.valueOf(FileUtils.exists("resources/node.key")));

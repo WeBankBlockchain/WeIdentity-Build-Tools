@@ -130,6 +130,7 @@ public class WeBaseService {
                 // 保存证书
                 for (Certificate certificate : res.getData()) {
                     String certificateName = certificate.getName();
+                    // todo javasdk用的是sdk证书，不是node证书
                     if ("sdk.crt".equals(certificateName)) {
                         certificateName = "node.crt";
                     } else if ("sdk.key".equals(certificateName)) {

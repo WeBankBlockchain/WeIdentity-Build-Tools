@@ -129,7 +129,7 @@ public class ContractController {
 	@Description("根据群组Id部署Evidence合约")
 	@PostMapping("/deployEvidence")
 	public ResponseData<String> deployEvidence(
-			@RequestParam(value = "groupId") Integer groupId,
+			@RequestParam(value = "groupId") String groupId,
 			@RequestParam(value = "evidenceName") String evidenceName
 	) {
 		log.info("start deploy evidence, groupId:{}, evidenceName:{}", groupId, evidenceName);

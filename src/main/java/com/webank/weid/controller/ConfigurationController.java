@@ -70,6 +70,11 @@ public class ConfigurationController {
 		return configService.getRoleType();
 	}
 
+    /**
+     *
+     * @param request orgId,amopId,version,useSmCrypto,ipPort,group_id
+     * @return
+     */
 	@Description("节点配置提交")
 	@PostMapping("/nodeConfigUpload")
 	public ResponseData<Boolean> nodeConfigUpload(HttpServletRequest request) {

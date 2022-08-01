@@ -1,40 +1,6 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.service;
-
-import java.io.File;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.BuildToolsConstant;
@@ -66,6 +32,19 @@ import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
 import com.webank.weid.util.WeIdUtils;
+import java.io.File;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -147,7 +126,7 @@ public class ContractService {
     }
 
     private void saveContractToWeBase(DeployInfo deployInfo) {
-        Integer groupId = configService.getMasterGroupId();
+        String groupId = configService.getMasterGroupId();
         String version = getContractVersion();
         String hash = deployInfo.getHash();
         weBaseService.contractSave(groupId, "WeIdContract", deployInfo.getWeIdAddress(),version, hash);
@@ -197,7 +176,7 @@ public class ContractService {
     public ResponseData<LinkedList<CnsInfo>> getDeployList() {
         LinkedList<CnsInfo> dataList = new LinkedList<>();
         //如果没有部署databuket则直接返回
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.DEFAULT);
+        com.webank.weid.protocol.response.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.DEFAULT);
         if (cnsInfo == null) {
             return new ResponseData<>(dataList, ErrorCode.BASE_ERROR);
         }
@@ -420,7 +399,7 @@ public class ContractService {
     public ResponseData<List<ShareInfo>> getShareList() {
         List<ShareInfo> result = new ArrayList<>();
         // 如果没有部署databuket则直接返回
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.SHARE);
+        com.webank.weid.protocol.response.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.SHARE);
         if (cnsInfo == null) {
             log.warn("[getShareList] the cnsType does not regist, please deploy the evidence.");
             return new ResponseData<>(result, ErrorCode.BASE_ERROR);
@@ -442,7 +421,7 @@ public class ContractService {
                 // 获取hash的群组
                 String groupId = dataBucket.get(hashContract.getHash(), WeIdConstant.CNS_GROUP_ID).getResult();
                 if(StringUtils.isNotBlank(groupId) && allGroup.contains(groupId)) {
-                    share.setGroupId(Integer.parseInt(groupId));
+                    share.setGroupId(groupId);
                     //判断是否启用此hash
                     String enableHash = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).get(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
                     share.setEnable(hashContract.getHash().equals(enableHash));
@@ -471,7 +450,7 @@ public class ContractService {
      * @param from 部署来源
      * @return 返回是否部署成功
      */
-    public String deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {
+    public String deployEvidence(FiscoConfig fiscoConfig, String groupId, DataFrom from) {
         log.info("[deployEvidence] begin deploy the evidence, groupId = {}.", groupId);
         try {
             //  获取私钥
@@ -509,7 +488,7 @@ public class ContractService {
     private ShareInfo buildShareInfo(
         FiscoConfig fiscoConfig, 
         String hash,
-        Integer groupId,
+        String groupId,
         WeIdPrivateKey currentPrivateKey,
         DataFrom from
     ) {
@@ -545,7 +524,7 @@ public class ContractService {
         shareInfo.setHash(hash);
         String groupId = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
         if(StringUtils.isNotBlank(groupId)) {
-            shareInfo.setGroupId(Integer.parseInt(groupId));
+            shareInfo.setGroupId(groupId);
         }
         String evidenceAddress = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
         if(StringUtils.isNotBlank(evidenceAddress)) {
@@ -617,7 +596,7 @@ public class ContractService {
         WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         String publicKey = DataToolUtils.publicKeyFromPrivate(
                 new BigInteger(currentPrivateKey.getPrivateKey())).toString();
-        String address = "0x" + Keys.getAddress(new BigInteger(publicKey));
+        String address = DataToolUtils.addressFromPublic(new BigInteger(publicKey));
         if (address.equals(hashFromOrgIdCns.getOwner())) {
             log.info("[isMatchThePrivateKey] the orgId is exist in orgConfig cns, match the private key.");
             return true;//存在orgId并且为当前机构所有
@@ -632,7 +611,7 @@ public class ContractService {
      * @return 返回hash对象信息
      */
     private HashContract getHashFromOrgCns(String orgId) {
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        com.webank.weid.protocol.response.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return null;
         }
@@ -646,7 +625,7 @@ public class ContractService {
     }
 
     public String getEvidenceHash(String groupId) {
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        com.webank.weid.protocol.response.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return StringUtils.EMPTY;
         }

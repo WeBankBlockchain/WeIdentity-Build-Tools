@@ -1,11 +1,11 @@
 
 
-package com.webank.weid.service.v2;
+package com.webank.weid.service.v3;
 
 import com.webank.weid.config.FiscoConfig;
 import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.contract.v2.DataBucket;
+import com.webank.weid.contract.v3.DataBucket;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.protocol.response.CnsInfo;
@@ -23,20 +23,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.sdk.BcosSDK;
-import org.fisco.bcos.sdk.abi.datatypes.generated.tuples.generated.Tuple4;
-import org.fisco.bcos.sdk.client.Client;
-import org.fisco.bcos.sdk.client.RespCallback;
-import org.fisco.bcos.sdk.client.protocol.response.BlockNumber;
-import org.fisco.bcos.sdk.config.ConfigOption;
-import org.fisco.bcos.sdk.config.exceptions.ConfigException;
-import org.fisco.bcos.sdk.config.model.ConfigProperty;
-import org.fisco.bcos.sdk.contract.precompiled.cns.CnsService;
-import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
-import org.fisco.bcos.sdk.model.Response;
+import org.fisco.bcos.sdk.v3.BcosSDK;
+import org.fisco.bcos.sdk.v3.client.Client;
+import org.fisco.bcos.sdk.v3.client.RespCallback;
+import org.fisco.bcos.sdk.v3.client.protocol.response.BlockNumber;
+import org.fisco.bcos.sdk.v3.codec.datatypes.generated.tuples.generated.Tuple4;
+import org.fisco.bcos.sdk.v3.config.ConfigOption;
+import org.fisco.bcos.sdk.v3.config.exceptions.ConfigException;
+import org.fisco.bcos.sdk.v3.config.model.ConfigProperty;
+import org.fisco.bcos.sdk.v3.contract.precompiled.bfs.BFSPrecompiled.BfsInfo;
+import org.fisco.bcos.sdk.v3.contract.precompiled.bfs.BFSService;
+import org.fisco.bcos.sdk.v3.crypto.CryptoSuite;
+import org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.v3.model.Response;
+import org.fisco.bcos.sdk.v3.transaction.model.exception.ContractException;
 
 @Slf4j
-public class CheckNodeServiceV2 implements CheckNodeFace {
+public class CheckNodeServiceV3 implements CheckNodeFace {
     
 
     @Override
@@ -44,7 +47,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
         try {
             Client client = getWeb3j(fiscoConfig);
             try {
-                client.getGroupList().getGroupList();
+                client.getGroupList().getResult().getGroupList();
                 log.info("[check] check node successfully.");
                 return true;
             } catch (Exception e) {
@@ -93,7 +96,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
 
     private Client getWeb3j(FiscoConfig fiscoConfig) throws Exception {
         BcosSDK bcosSDK = buildBcosSDK(fiscoConfig);
-        Client client = bcosSDK.getClient(Integer.parseInt(fiscoConfig.getGroupId()));
+        Client client = bcosSDK.getClient(fiscoConfig.getGroupId());
         if (client == null) {
             log.error("[check] build the client fail.");
             throw new WeIdBaseException("init client fail or group not exist.");
@@ -148,7 +151,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     }
     
     private DataBucket getDataBucket(FiscoConfig fiscoConfig) throws Exception {
-        CryptoKeyPair credentials = DataToolUtils.cryptoSuite.getKeyPairFactory().generateKeyPair();
+        CryptoKeyPair credentials = new CryptoSuite(DataToolUtils.cryptoSuite.getCryptoTypeConfig()).getKeyPairFactory().generateKeyPair();
         Client client = getWeb3j(fiscoConfig);
         String contractAddress = getDataBucketAddress(client, credentials, CnsType.ORG_CONFING);
         if (StringUtils.isBlank(contractAddress)) {
@@ -229,24 +232,45 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     }
     
     // 查询cns地址
-    private CnsInfo queryCnsInfo(Client client, CryptoKeyPair credentials, CnsType cnsType) throws WeIdBaseException {
+    private CnsInfo queryCnsInfo(Client client, CryptoKeyPair credentials, CnsType cnsType) {
         try {
             log.info("[queryBucketFromCns] query address by type = {}.", cnsType.getName());
-            CnsService cnsService = new CnsService(client, credentials);
-            List<org.fisco.bcos.sdk.contract.precompiled.cns.CnsInfo> cnsInfoListChain
-                = cnsService.selectByName(cnsType.getName());
-            List<CnsInfo> cnsInfoList = cnsInfoListChain.stream().map(CnsInfo::new).collect(
-                Collectors.toList());
-            if (!cnsInfoList.isEmpty()) {
+            BFSService bfsService = new BFSService(client, credentials);
+            List<BfsInfo> bfsInfoList = null;
+            try {
+                bfsInfoList = bfsService.list("/apps/" + cnsType.getName());
+            } catch (ContractException ex) {
+                bfsInfoList = new ArrayList<>();
+            }
+            // 获取 /apps/helloworld下所有的版本记录，1.0 2.0
+            List<BfsInfo> versionInfoList = bfsInfoList.stream().filter(bfs
+                -> "link".equals(bfs.getFileType())).collect(Collectors.toList());
+            if (!versionInfoList.isEmpty()) {
                 // 获取当前cnsType的大版本前缀
                 String cnsTypeVersion = cnsType.getVersion();
                 String preV = cnsTypeVersion.substring(0, cnsTypeVersion.indexOf(".") + 1);
-                //从后往前找到相应大版本的数据
-                for (int i = cnsInfoList.size() - 1; i >= 0; i--) {
-                    CnsInfo cnsInfo = cnsInfoList.get(i);
-                    if (cnsInfo.getVersion().startsWith(preV)) {
-                        log.info("[queryBucketFromCns] query address form CNS successfully.");
-                        return cnsInfo;
+                // 从后往前找到相应大版本的数据
+                for (int i = versionInfoList.size() - 1; i >= 0; i--) {
+                    BfsInfo versionInfo = versionInfoList.get(i);
+                    String version = versionInfo.getFileName();
+                    if (version.startsWith(preV)) {
+                        List<BfsInfo> cnsInfoList = bfsService
+                            .list("/apps/" + cnsType.getName() + "/" + version);
+                        if (!cnsInfoList.isEmpty()) {
+                            BfsInfo cnsInfo = cnsInfoList.iterator().next();
+                            List<String> addressAndAbi = cnsInfo.getExt();
+                            if (addressAndAbi.size() != 2) {
+                                log.info("bfs return ext of address and abi is invalid, {}",
+                                    versionInfo);
+                                throw new WeIdBaseException(ErrorCode.UNKNOW_ERROR);
+                            }
+                            // 读取真正的地址
+                            String address = addressAndAbi.get(0);
+                            String abi = addressAndAbi.get(1);
+                            log
+                                .info("[queryBucketFromCns] query address form CNS successfully.");
+                            return new CnsInfo(cnsType.getName(), version, address, abi);
+                        }
                     }
                 }
             }

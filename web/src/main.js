@@ -10,6 +10,8 @@ const Vue = require('vue')
 Vue.use(VueClipboard)
 
 Vue.config.productionTip = false
+Vue.config.devtools = true;
+
 
 /* eslint-disable no-new */
 new Vue({

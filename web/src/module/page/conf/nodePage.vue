@@ -12,8 +12,8 @@
               <el-input v-model="form.amop_id" placeholder="Enter amopId" maxlength="30" style="width: 72%" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" @blur="form.amop_id = $event.target.value"></el-input>
               <div class="mark-bottom"><div>此ID用于链上AMOP通讯</div></div>
             </el-form-item>
-            <el-form-item label="国密/非国密:" prop="encrypt_type">
-              <el-select v-model="form.encrypt_type" placeholder="国密/非国密" style="width: 72%" :disabled="useWeBase">
+            <el-form-item label="非国密/国密SSL:" prop="encrypt_type">
+              <el-select v-model="form.encrypt_type" placeholder="非国密/国密SSL" style="width: 72%" :disabled="useWeBase">
                 <el-option label="非国密" value="0"></el-option>
                 <el-option label="国密" value="1"></el-option>
               </el-select>
@@ -367,7 +367,7 @@ export default {
       formData.append('orgId', this.form.org_id)
       formData.append('amopId', this.form.amop_id)
       formData.append('version', this.form.blockchain_fiscobcos_version)
-      formData.append('encryptType', this.form.encrypt_type)
+      formData.append('useSmCrypto', this.form.encrypt_type)
       formData.append('ipPort', this.form.blockchain_address)
 
       this.dialog.nextBtn = e.currentTarget

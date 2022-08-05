@@ -77,14 +77,14 @@ public class ConfigService {
             }
         }
         //判断证书配置是否存在  todo 改成resources下conf目录
-        map.put("ca.crt", String.valueOf(FileUtils.exists("resources/ca.crt")));
-        map.put("node.crt", String.valueOf(FileUtils.exists("resources/node.crt")));
-        map.put("node.key", String.valueOf(FileUtils.exists("resources/node.key")));
-        map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/gmca.crt")));
-        map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/gmsdk.crt")));
-        map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/gmsdk.key")));
-        map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/gmensdk.crt")));
-        map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/gmensdk.key")));
+        map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
+        map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
+        map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
+        map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmca.crt")));
+        map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.crt")));
+        map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.key")));
+        map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.crt")));
+        map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.key")));
         map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
         return map;
     }
@@ -455,6 +455,9 @@ public class ConfigService {
         nodeCheck = false;
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
         File targetFile = new File(BuildToolsConstant.RESOURCES_PATH + "conf"); // 存在conf目录下
+        if(request.getParameter("version").equals("2") && request.getParameter("useSmCrypto").equals("1")){
+            targetFile = new File(BuildToolsConstant.RESOURCES_PATH + "conf/gm"); // 如果是2.0的国密链，存在conf/gm目录下
+        }
         if (!targetFile.exists()) {
             boolean result = targetFile.mkdirs();
             log.info("create conf in resource result: {}", result);

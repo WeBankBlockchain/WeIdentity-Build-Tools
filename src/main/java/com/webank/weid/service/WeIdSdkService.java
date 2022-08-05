@@ -323,9 +323,9 @@ public class WeIdSdkService {
 			FileUtils.writeToFile(weId, BuildToolsConstant.WEID_FILE); //适配命令输出
 		}
 		FileUtils.writeToFile(weId, new File(targetDir, BuildToolsConstant.WEID_FILE).getAbsolutePath());
-		FileUtils.writeToFile(publicKey, new File(targetDir, BuildToolsConstant.ECDSA_PUB_KEY).getAbsolutePath());
+		FileUtils.writeToFile(publicKey, new File(targetDir, BuildToolsConstant.ADMIN_PUB_KEY).getAbsolutePath());
 		if (StringUtils.isNotBlank(privateKey)) {
-			FileUtils.writeToFile(privateKey, new File(targetDir, BuildToolsConstant.ECDSA_KEY).getAbsolutePath());
+			FileUtils.writeToFile(privateKey, new File(targetDir, BuildToolsConstant.ADMIN_KEY).getAbsolutePath());
 		}
 		saveWeIdInfo(weId, publicKey, privateKey, from, isAdmin);
 	}

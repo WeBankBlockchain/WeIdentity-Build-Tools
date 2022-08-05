@@ -183,7 +183,7 @@ public class WeIdSdkUtils {
 
     public static WeIdPrivateKey getCurrentPrivateKey() {
         WeIdPrivateKey weIdPrivate = new WeIdPrivateKey();
-        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
         weIdPrivate.setPrivateKey(FileUtils.readFile(targetDir.getAbsolutePath()));
         return weIdPrivate;
     }

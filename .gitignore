@@ -196,3 +196,4 @@ doc/bak/
 .idea/*
 secring.gpg
 output/
+resources/

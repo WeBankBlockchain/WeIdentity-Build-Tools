@@ -2,6 +2,7 @@
 
 package com.webank.weid.command;
 
+import com.webank.weid.contract.deploy.v3.DeployContractV3;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import com.webank.weid.service.ContractService;
 import com.webank.weid.service.GuideService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 public class DeployContract extends StaticConfig {
     
@@ -65,7 +68,12 @@ public class DeployContract extends StaticConfig {
         contract.setCptAddress(deployInfo.getCptAddress());
         WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         // 写入全局配置中
-        DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+        if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+            DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+        } else {
+            DeployContractV3.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+
+        }
         System.out.println("begin enable the hash.");
         // 节点启用新hash并停用原hash
         contractService.enableHash(CnsType.DEFAULT, hash, oldHash);

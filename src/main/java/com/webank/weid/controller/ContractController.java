@@ -3,6 +3,7 @@ package com.webank.weid.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.webank.weid.contract.deploy.v3.DeployContractV3;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,8 @@ import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.ContractService;
 import com.webank.weid.util.WeIdSdkUtils;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 /**
  * 智能合约管理
@@ -191,7 +194,11 @@ public class ContractController {
 				fiscoConfig.setChainId(configService.loadConfig().get("chain_id"));
 			}
 			// 写入全局配置中
-			DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+			if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+				DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+			} else {
+				DeployContractV3.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+			}
 			// 节点启用新hash并停用原hash
 			contractService.enableHash(CnsType.DEFAULT, hash, oldHash);
 			// 初始化机构cns 目的是当admin首次部署合约未启用evidenceHash之前，用此私钥占用其配置空间，并且vpc2可以检测出已vpc1已配置

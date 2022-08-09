@@ -75,7 +75,7 @@ public class DownFileController {
     @GetMapping("/downEcdsaKey/{hash}")
     public void downEcdsaKey(HttpServletResponse response, @PathVariable("hash") String hash) {
         log.info("[downEcdsaKey] begin to down the EcdsaKey...");
-        String fileName = "ecdsa_key";
+        String fileName = BuildToolsConstant.ADMIN_KEY;
         DeployInfo deployInfo = WeIdSdkUtils.getDepolyInfoByHash(hash);
         if (deployInfo != null) {
             down(response, deployInfo.getEcdsaKey().getBytes(), fileName);

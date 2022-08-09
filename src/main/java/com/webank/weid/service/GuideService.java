@@ -52,17 +52,17 @@ public class GuideService {
 		}
 		String privateKey = DataToolUtils.hexStr2DecStr(credentials.getHexPrivateKey());
 		String publicKey = DataToolUtils.hexStr2DecStr(credentials.getHexPublicKey());
-		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
 		FileUtils.writeToFile(privateKey, ecdsaFile.getAbsolutePath());
-		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_PUB_KEY);
+		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_PUB_KEY);
 		FileUtils.writeToFile(publicKey, ecdsaPubFile.getAbsolutePath());
 		log.info("[createAdmin] the admin create successfully.");
 		return DataToolUtils.addressFromPublic(new BigInteger(publicKey));
 	}
 
 	public String checkAdmin() {
-		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
-		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_PUB_KEY);
+		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
+		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_PUB_KEY);
 		if (!ecdsaFile.exists() || !ecdsaPubFile.exists()) {
 			return StringUtils.EMPTY;
 		}

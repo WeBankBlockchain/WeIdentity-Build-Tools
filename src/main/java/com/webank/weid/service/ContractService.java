@@ -11,6 +11,7 @@ import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.deploy.DeployEvidence;
 import com.webank.weid.contract.deploy.v2.DeployContractV2;
+import com.webank.weid.contract.deploy.v3.DeployContractV3;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
@@ -45,6 +46,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 @Service
 @Slf4j
@@ -90,28 +93,32 @@ public class ContractService {
     // 执行部署weId合约
     public String deployContract(FiscoConfig fiscoConfig, DataFrom from) {
         log.info("begin deploy contract...");
-        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
         String privateKey = null;
         if (targetDir.exists()) {
             privateKey = FileUtils.readFile(targetDir.getAbsolutePath());
         }
-        DeployContractV2.deployContract(privateKey, fiscoConfig, false);
+        if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+            DeployContractV2.deployContract(privateKey, fiscoConfig, false);
+        } else {
+            DeployContractV3.deployContract(privateKey, fiscoConfig, false);
+        }
         log.info("the contract deploy finish.");
         //开始保存文件
         //将私钥移动到/output/admin中
-        copyEcdsa();
+        copyKeyPair();
         return saveDeployInfo(fiscoConfig, from);
     }
 
-    private void copyEcdsa() {
-        log.info("[copyEcdsa] begin copy the ecdsa to admin...");
-        File ecdsaFile = new File(BuildToolsConstant.ECDSA_KEY);
+    private void copyKeyPair() {
+        log.info("[copyKeypair] begin copy the ecdsa to admin...");
+        File keypairFile = new File(BuildToolsConstant.ADMIN_KEY);
         File targetDir = new File(BuildToolsConstant.ADMIN_PATH);
-        FileUtils.copy(ecdsaFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_KEY));
+        FileUtils.copy(keypairFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ADMIN_KEY));
         
-        File ecdsaPubFile = new File(BuildToolsConstant.ECDSA_PUB_KEY);
-        FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_PUB_KEY));
-        log.info("[copyEcdsa] the ecdsa copy successfully.");
+        File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PUB_KEY);
+        FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ADMIN_PUB_KEY));
+        log.info("[copyKeypair] the keypair copy successfully.");
     }
 
     private String saveDeployInfo(FiscoConfig fiscoConfig, DataFrom from) {
@@ -152,7 +159,7 @@ public class ContractService {
         info.setHash(hash);
         long time = System.currentTimeMillis();
         info.setTime(time);
-        info.setEcdsaKey(FileUtils.readFile(BuildToolsConstant.ECDSA_KEY));
+        info.setEcdsaKey(FileUtils.readFile(BuildToolsConstant.ADMIN_KEY));
         BigInteger privateKey = new BigInteger(info.getEcdsaKey());
         info.setEcdsaPublicKey(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
         try {

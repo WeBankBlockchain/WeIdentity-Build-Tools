@@ -42,20 +42,8 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     @Override
     public boolean check(FiscoConfig fiscoConfig) {
         try {
-            Client client = getWeb3j(fiscoConfig);
-            try {
-                client.getGroupList().getGroupList();
-                log.info("[check] check node successfully.");
-                return true;
-            } catch (Exception e) {
-                log.error("[check] check node fail.", e);
-                throw new WeIdBaseException("can not connection the node.");
-            }
-//            finally {
-//                client.stop();
-//            }
-        } catch (WeIdBaseException e) {
-            throw e;
+            BcosSDK bcosSDK = buildBcosSDK(fiscoConfig);
+            return true;
         } catch (Exception e) {
             log.error("[check] check the node fail.", e);
             return false;

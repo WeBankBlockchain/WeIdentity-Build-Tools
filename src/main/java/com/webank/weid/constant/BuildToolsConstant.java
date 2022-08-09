@@ -46,8 +46,8 @@ public final class BuildToolsConstant {
     public static final List<Integer> CPTID_LIST = Arrays.asList(11, 101, 103, 105, 106, 107, 108, 109, 110, 111);
 
     public static final String WEID_FILE = "weid";
-    public static final String ECDSA_KEY = "ecdsa_key";
-    public static final String ECDSA_PUB_KEY = "ecdsa_key.pub";
+    public static final String ADMIN_KEY = "private_key";
+    public static final String ADMIN_PUB_KEY = "public_key";
     public static final String WEID_PATH = "output/create_weid";
     public static final String ISSUER_TYPE_PATH = "output/issuer_type";
     public static final String CPT_PATH = "output/cpt";

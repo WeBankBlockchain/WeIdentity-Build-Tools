@@ -41,6 +41,9 @@ import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.PropertyUtils;
 import com.webank.weid.util.WeIdSdkUtils;
 
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
+import static com.webank.weid.constant.ChainVersion.FISCO_V3;
+
 /**
  * read run.config file to load configuration
  */
@@ -76,16 +79,28 @@ public class ConfigService {
                 map = processConfig(listStr);
             }
         }
-        //判断证书配置是否存在  todo 改成resources下conf目录
-        map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
-        map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
-        map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
-        map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmca.crt")));
-        map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.crt")));
-        map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.key")));
-        map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.crt")));
-        map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.key")));
-        map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
+        //判断证书配置是否存在
+        if(FISCO_V3.getVersion() == Integer.parseInt(map.get("blockchain_fiscobcos_version"))) {
+            map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
+            map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
+            map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
+            map.put("smca.crt", String.valueOf(FileUtils.exists("resources/conf/smca.crt")));
+            map.put("smsdk.crt", String.valueOf(FileUtils.exists("resources/conf/smsdk.crt")));
+            map.put("smsdk.key", String.valueOf(FileUtils.exists("resources/conf/smsdk.key")));
+            map.put("smensdk.crt", String.valueOf(FileUtils.exists("resources/conf/smensdk.crt")));
+            map.put("smensdk.key", String.valueOf(FileUtils.exists("resources/conf/smensdk.key")));
+            map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
+        } else {
+            map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
+            map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
+            map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
+            map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmca.crt")));
+            map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.crt")));
+            map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.key")));
+            map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.crt")));
+            map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.key")));
+            map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
+        }
         return map;
     }
     
@@ -360,8 +375,8 @@ public class ConfigService {
         log.info("[generateFiscoProperties] begin generate fisco.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/fisco.properties.tpl");
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
-        fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
-        fileStr = fileStr.replace("${GROUP_ID}", loadConfig.get("group_id"));
+//        fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
+        fileStr = fileStr.replace("${MASTER_GROUP_ID}", loadConfig.get("group_id"));
         fileStr = fileStr.replace("${SDK_SM_CRYPTO}", loadConfig.get("sm_crypto"));
         fileStr = fileStr.replace("${WEID_ADDRESS}", "");
         fileStr = fileStr.replace("${CPT_ADDRESS}", "");
@@ -491,8 +506,12 @@ public class ConfigService {
         String ipPort = request.getParameter("ipPort");
         String groupId = configMap.get("group_id");
         if (StringUtils.isBlank(groupId)) {
-            groupId = "0";
+            groupId = "1";
         }
+        if (FISCO_V3.getVersion() == Integer.parseInt(version)) {
+            groupId = "group0";
+        }
+        log.info("nodeConfigUpload groupId:{}", groupId);
         if (!ChainVersion.contains(Integer.parseInt(version))) {
             throw new RuntimeException("chain version only support 2 or 3");
         }

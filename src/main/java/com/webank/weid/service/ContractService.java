@@ -11,6 +11,7 @@ import com.webank.weid.constant.FileOperator;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.deploy.DeployEvidence;
 import com.webank.weid.contract.deploy.v2.DeployContractV2;
+import com.webank.weid.contract.deploy.v3.DeployContractV3;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
@@ -45,6 +46,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 @Service
 @Slf4j
@@ -95,7 +98,11 @@ public class ContractService {
         if (targetDir.exists()) {
             privateKey = FileUtils.readFile(targetDir.getAbsolutePath());
         }
-        DeployContractV2.deployContract(privateKey, fiscoConfig, false);
+        if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+            DeployContractV2.deployContract(privateKey, fiscoConfig, false);
+        } else {
+            DeployContractV3.deployContract(privateKey, fiscoConfig, false);
+        }
         log.info("the contract deploy finish.");
         //开始保存文件
         //将私钥移动到/output/admin中

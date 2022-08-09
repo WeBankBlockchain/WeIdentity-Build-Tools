@@ -62,8 +62,8 @@ function deploy_contract()
     #mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
     #mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
 
-    rm -f ecdsa_key
-    rm -f ecdsa_key.pub
+    rm -f private_key
+    rm -f public_key
     rm -f hash
     rm -f weid
 }

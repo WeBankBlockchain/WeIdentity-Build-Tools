@@ -139,8 +139,9 @@ public class CheckNodeServiceV3 implements CheckNodeFace {
     }
     
     private DataBucket getDataBucket(FiscoConfig fiscoConfig) throws Exception {
-        CryptoKeyPair credentials = new CryptoSuite(DataToolUtils.cryptoSuite.getCryptoTypeConfig()).getKeyPairFactory().generateKeyPair();
+        //CryptoKeyPair credentials = new CryptoSuite(DataToolUtils.cryptoSuite.getCryptoTypeConfig()).getKeyPairFactory().generateKeyPair();
         Client client = getWeb3j(fiscoConfig);
+        CryptoKeyPair credentials = client.getCryptoSuite().getKeyPairFactory().generateKeyPair();
         String contractAddress = getDataBucketAddress(client, credentials, CnsType.ORG_CONFING);
         if (StringUtils.isBlank(contractAddress)) {
             return null;

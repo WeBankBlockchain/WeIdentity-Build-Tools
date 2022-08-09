@@ -254,8 +254,8 @@ public final class FileUtils {
         delete(BuildToolsConstant.CPT_ADDRESS_FILE_NAME);
         delete(BuildToolsConstant.EVID_ADDRESS_FILE_NAME);
         delete(BuildToolsConstant.SPECIFIC_ADDRESS_FILE_NAME);
-        delete(BuildToolsConstant.ECDSA_KEY);
-        delete(BuildToolsConstant.ECDSA_PUB_KEY);
+        delete(BuildToolsConstant.ADMIN_KEY);
+        delete(BuildToolsConstant.ADMIN_PUB_KEY);
         delete(BuildToolsConstant.HASH);
         delete(BuildToolsConstant.WEID_FILE);
     }

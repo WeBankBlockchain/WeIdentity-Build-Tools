@@ -505,7 +505,7 @@ public class ConfigService {
         String useSmCrypto = request.getParameter("useSmCrypto"); // todo
         String ipPort = request.getParameter("ipPort");
         String groupId = configMap.get("group_id");
-        if (StringUtils.isBlank(groupId)) {
+        if (FISCO_V2.getVersion() == Integer.parseInt(version)) {
             groupId = "1";
         }
         if (FISCO_V3.getVersion() == Integer.parseInt(version)) {

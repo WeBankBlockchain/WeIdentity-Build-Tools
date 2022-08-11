@@ -39,7 +39,7 @@
                   <div class="form-group" style='width:100%;'><a href="https://weidentity.readthedocs.io/zh_CN/latest/docs/weidentity-spec.html?highlight=chain-id#id4" target="blank_">
                     <span style="color: #017CFF;"><img class="icon_question" src="../../assets/image/icon-question.svg" alt=""> 什么是chain id?</span></a>
                     <el-form-item prop="chainId" :rules="{required: true, message: '请输入ChainId', trigger: 'blur'}">
-                      <el-input v-model="deployForm.chainId" placeholder="Enter chainId" maxlength="30" style="width: 100%" onKeyUp="this.value=this.value.replace(/\D/g,'')" @blur="deployForm.chainId = $event.target.value"></el-input>
+                      <el-input v-model="deployForm.chainId" placeholder="Enter chainId" maxlength="30" style="width: 100%" onKeyUp="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" @blur="deployForm.chainId = $event.target.value"></el-input>
                     </el-form-item>
                   </div>
                 </div>

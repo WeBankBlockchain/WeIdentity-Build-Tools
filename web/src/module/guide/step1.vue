@@ -239,7 +239,7 @@ export default {
         gmenSdkCrtFile: '',
         gmenSdkKeyFileName: '',
         gmenSdkKeyFile: '',
-        encrypt_type: 0,
+        encrypt_type: '1',
         org_id: '',
         amop_id: '',
         blockchain_address: '',

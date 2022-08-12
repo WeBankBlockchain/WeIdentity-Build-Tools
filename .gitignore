@@ -197,7 +197,7 @@ doc/bak/
 .idea/*
 secring.gpg
 output/
-resources/conf/*
+resources/conf*
 resources/fisco.properties
 resources/weidentity.properties
 resources/log4j2.xml

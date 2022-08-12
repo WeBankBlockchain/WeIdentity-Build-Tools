@@ -76,7 +76,7 @@
                 <el-form-item label="gmca.crt证书:" prop="gmCaCrtFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmCaCrtFileName" placeholder="Enter gmCaCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmCaCrtFile', 'gmCa.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmCaCrtFile', 'gmca.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmCa.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -86,7 +86,7 @@
                 <el-form-item label="gmsdk.crt证书:" prop="gmSdkCrtFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmSdkCrtFileName" placeholder="Enter gmSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmSdkCrtFile', 'gmSdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmSdkCrtFile', 'gmsdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -96,7 +96,7 @@
                 <el-form-item label="gmsdk.key证书:" prop="gmSdkKeyFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmSdkKeyFileName" placeholder="Enter gmSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmSdkKeyFile', 'gmSdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmSdkKeyFile', 'gmsdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -106,7 +106,7 @@
                 <el-form-item label="gmensdk.crt证书:" prop="gmenSdkCrtFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmenSdkCrtFileName" placeholder="Enter gmenSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmenSdkCrtFile', 'gmenSdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmenSdkCrtFile', 'gmensdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmenSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -116,7 +116,7 @@
                 <el-form-item label="gmensdk.key证书:" prop="gmenSdkKeyFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmenSdkKeyFileName" placeholder="Enter gmenSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmenSdkKeyFile', 'gmenSdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmenSdkKeyFile', 'gmensdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmenSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>

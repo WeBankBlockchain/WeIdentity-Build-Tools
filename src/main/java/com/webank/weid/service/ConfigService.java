@@ -84,11 +84,11 @@ public class ConfigService {
             map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
             map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
             map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
-            map.put("smca.crt", String.valueOf(FileUtils.exists("resources/conf/smca.crt")));
-            map.put("smsdk.crt", String.valueOf(FileUtils.exists("resources/conf/smsdk.crt")));
-            map.put("smsdk.key", String.valueOf(FileUtils.exists("resources/conf/smsdk.key")));
-            map.put("smensdk.crt", String.valueOf(FileUtils.exists("resources/conf/smensdk.crt")));
-            map.put("smensdk.key", String.valueOf(FileUtils.exists("resources/conf/smensdk.key")));
+            map.put("smca.crt", String.valueOf(FileUtils.exists("resources/conf/sm_ca.crt")));
+            map.put("smsdk.crt", String.valueOf(FileUtils.exists("resources/conf/sm_sdk.crt")));
+            map.put("smsdk.key", String.valueOf(FileUtils.exists("resources/conf/sm_sdk.key")));
+            map.put("smensdk.crt", String.valueOf(FileUtils.exists("resources/conf/sm_ensdk.crt")));
+            map.put("smensdk.key", String.valueOf(FileUtils.exists("resources/conf/sm_ensdk.key")));
             map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
         } else {
             map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));

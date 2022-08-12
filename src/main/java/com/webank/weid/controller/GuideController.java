@@ -66,7 +66,7 @@ public class GuideController {
 	@PostMapping("/createAdmin")
 	public ResponseData<String> createAdmin(HttpServletRequest request) {
 		try {
-			MultipartFile file = ((MultipartHttpServletRequest) request).getFile("ecdsa");
+			MultipartFile file = ((MultipartHttpServletRequest) request).getFile("private_key");
 			String inputPrivateKey;
 			if (file != null) { //说明是传入的私钥文件
 				inputPrivateKey = new String(file.getBytes(), StandardCharsets.UTF_8);

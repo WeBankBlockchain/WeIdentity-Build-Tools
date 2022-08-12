@@ -114,7 +114,7 @@ List spring = [
         "org.springframework:spring-web:$spring_version"
 ]
 
-def gson_version = "2.8.6"
+def gson_version = "2.8.9"
 List gson = [
         "com.google.code.gson:gson:$gson_version"
 ]
@@ -127,7 +127,7 @@ configurations {
 }
 
 // In this section you declare the dependencies for your production and test code
-weidSdkVersion='1.8.5-rc.5-SNAPSHOT'
+weidSdkVersion='1.8.5-rc.8-SNAPSHOT'
 dependencies {
     localDeps lombok
     compile('org.springframework.boot:spring-boot-starter-web')

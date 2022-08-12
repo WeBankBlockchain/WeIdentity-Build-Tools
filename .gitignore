@@ -201,5 +201,3 @@ resources/conf/*
 resources/fisco.properties
 resources/weidentity.properties
 resources/log4j2.xml
-private_key
-public_key

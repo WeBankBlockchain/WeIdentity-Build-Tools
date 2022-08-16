@@ -196,6 +196,7 @@ doc/bak/
 #xxb
 .idea/*
 secring.gpg
+gradle.properties
 output/
 resources/conf/
 resources/fisco.properties

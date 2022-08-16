@@ -507,7 +507,7 @@ export default {
         formData.append('file', this.form.caCrtFile)
         formData.append('file', this.form.nodeCrtFile)
         formData.append('file', this.form.nodeKeyFile)
-      } else if(this.form.chainVerison==='2'){
+      } else if(this.form.chainVersion==='2'){
         formData.append('file', this.form.gmCaCrtFile)
         formData.append('file', this.form.gmSdkCrtFile)
         formData.append('file', this.form.gmSdkKeyFile)

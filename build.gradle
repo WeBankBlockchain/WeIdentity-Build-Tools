@@ -127,7 +127,7 @@ configurations {
 }
 
 // In this section you declare the dependencies for your production and test code
-weidSdkVersion='1.8.5-rc.8-SNAPSHOT'
+weidSdkVersion='1.8.5-rc1'
 dependencies {
     localDeps lombok
     compile('org.springframework.boot:spring-boot-starter-web')

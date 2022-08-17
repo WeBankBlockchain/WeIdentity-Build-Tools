@@ -11,6 +11,7 @@ WeIdentity JAVA SDK安装部署工具
 
 | weid-build-tools 版本 | weid-java-sdk 版本 | weid-contract-java 版本 | 备注 |
 | :---- | :---- | :---- | :---- |
+| v1.3.0 | v1.8.5 | v1.3.0 | 替换web3sdk、支持国密和FISCO BCOS 3.0 |
 | v1.0.28 | v1.8.3 | v1.2.30 | 升级log4j |
 | v1.0.27 | v1.8.2 | v1.2.30 | - |
 | v1.0.26 | v1.8.1 | v1.2.30 | - |

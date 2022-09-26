@@ -23,7 +23,6 @@ import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.protocol.base.IssuerType;
 import com.webank.weid.protocol.base.PresentationPolicyE;
 import com.webank.weid.protocol.base.WeIdAuthentication;
-import com.webank.weid.protocol.base.WeIdPojo;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.base.WeIdPublicKey;
 import com.webank.weid.protocol.request.CptStringArgs;
@@ -135,29 +134,26 @@ public class WeIdSdkService {
 
 	public ResponseData<PageDto<WeIdInfo>> getWeIdList(
 			PageDto<WeIdInfo> pageDto,
-			Integer blockNumber,
 			Integer pageSize,
-			Integer indexInBlock,
-			boolean direction
+			Integer indexFirst
 	) {
-		ResponseData<List<WeIdPojo>> response = getWeIdService().getWeIdList(blockNumber, pageSize, indexInBlock, direction);
+		ResponseData<List<String>> response = getWeIdService().getWeIdList(indexFirst, indexFirst+pageSize-1);
 		if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
 			log.error("[getWeIdList] get weIdList has error, {} - {}", response.getErrorCode(), response.getErrorMessage());
 			return new ResponseData<>(pageDto, response.getErrorCode(), response.getErrorMessage());
 		}
-		List<WeIdPojo> list = response.getResult();
+		List<String> list = response.getResult();
 		pageDto.setAllCount(getWeIdService().getWeIdCount().getResult());
 		List<WeIdInfo> rList = new ArrayList<>();
 		if (list.size() > 0) {
 			String mainHash = WeIdSdkUtils.getMainHash();
-			for (WeIdPojo weIdPojo : list) {
-				WeIdInfo weInfo = getWeIdInfo(this.getWeIdAddress(weIdPojo.getId()));
+			for (String weId : list) {
+				WeIdInfo weInfo = getWeIdInfo(this.getWeIdAddress(weId));
 				if(weInfo == null) {
 					weInfo = new WeIdInfo();
 				}
-				weInfo.setWeIdPojo(weIdPojo);
-				weInfo.setWeId(weIdPojo.getId());
-				AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(weIdPojo.getId()).getResult();
+				weInfo.setWeId(weId);
+				AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(weId).getResult();
 				weInfo.setIssuer(issuer != null);
 				weInfo.setHash(mainHash);
 				rList.add(weInfo);
@@ -274,7 +270,7 @@ public class WeIdSdkService {
 		if (currentWeIdAuth.getWeId().equals(owner)) {
 			WeIdPublicKey weidPublicKey = new WeIdPublicKey();
 			weidPublicKey.setPublicKey(publicKey);
-			ResponseData<String> response = getWeIdService().delegateCreateWeId(weidPublicKey, currentWeIdAuth);
+			ResponseData<String> response = getWeIdService().createWeIdByPublicKey(weidPublicKey, currentWeIdAuth.getWeIdPrivateKey());
 			if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 				log.error(
 						"[CreateWeId] create WeID faild. error code : {}, error msg :{}",
@@ -489,7 +485,6 @@ public class WeIdSdkService {
 		callerAuth.setWeIdPrivateKey(weIdPrivateKey);
 		callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(
 				DataToolUtils.publicKeyFromPrivate(new BigInteger(weIdPrivateKey.getPrivateKey())).toString()));
-		callerAuth.setWeIdPublicKeyId(callerAuth.getWeId());
 		return callerAuth;
 	}
 

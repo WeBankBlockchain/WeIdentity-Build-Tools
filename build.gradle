@@ -46,7 +46,7 @@ repositories {
         mavenLocal()
         if ("cn" == repo) {
             println "use cn repo"
-//            maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+            maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
             mavenCentral()
         } else {
             println "use default repo"
@@ -127,7 +127,6 @@ configurations {
 }
 
 // In this section you declare the dependencies for your production and test code
-weidSdkVersion='1.8.5-rc1'
 dependencies {
     localDeps lombok
     compile('org.springframework.boot:spring-boot-starter-web')

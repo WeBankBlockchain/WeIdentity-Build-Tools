@@ -60,23 +60,13 @@ public class WeIdSdkController {
 
 	@GetMapping("/getWeIdList")
 	public ResponseData<PageDto<WeIdInfo>> getWeIdList(
-			@RequestParam(value = "blockNumber") int blockNumber,
 			@RequestParam(value = "pageSize") int pageSize,
-			@RequestParam(value = "indexInBlock") int indexInBlock,
-			@RequestParam(value = "direction") boolean direction,
+			@RequestParam(value = "indexFirst") int indexFirst,
 			@RequestParam(value = "iDisplayStart") int iDisplayStart,
 			@RequestParam(value = "iDisplayLength") int iDisplayLength
 	) {
-		if (blockNumber == 0) {
-			try {
-				blockNumber = BaseService.getBlockNumber();
-			} catch (IOException e) {
-				log.error("[getWeIdList] get blockNumber fail.", e);
-				return new ResponseData<>(null, ErrorCode.BASE_ERROR);
-			}
-		}
 		PageDto<WeIdInfo> pageDto = new PageDto<WeIdInfo>(iDisplayStart, iDisplayLength);
-		return weIdSdkService.getWeIdList(pageDto, blockNumber, pageSize, indexInBlock, direction);
+		return weIdSdkService.getWeIdList(pageDto, pageSize, indexFirst);
 	}
 
 	@Description("查询issuer type列表")

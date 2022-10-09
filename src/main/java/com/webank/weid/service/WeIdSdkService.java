@@ -137,7 +137,10 @@ public class WeIdSdkService {
 			Integer pageSize,
 			Integer indexFirst
 	) {
-		ResponseData<List<String>> response = getWeIdService().getWeIdList(indexFirst, indexFirst+pageSize-1);
+		Integer total = getWeIdService().getWeIdCount().getResult();
+		Integer indexLast = indexFirst+pageSize-1;
+		if(indexFirst+pageSize > total) {indexLast = total-1;}
+		ResponseData<List<String>> response = getWeIdService().getWeIdList(indexFirst, indexLast);
 		if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
 			log.error("[getWeIdList] get weIdList has error, {} - {}", response.getErrorCode(), response.getErrorMessage());
 			return new ResponseData<>(pageDto, response.getErrorCode(), response.getErrorMessage());

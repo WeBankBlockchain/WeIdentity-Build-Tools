@@ -202,3 +202,4 @@ resources/fisco.properties
 resources/weidentity.properties
 resources/log4j2.xml
 run.config
+logs/

@@ -2,29 +2,9 @@ package com.webank.weid.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.JCodeModel;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.dto.CptFile;
-import com.webank.weid.dto.CptInfo;
-import com.webank.weid.dto.DataPanel;
-import com.webank.weid.dto.Issuer;
-import com.webank.weid.dto.PageDto;
-import com.webank.weid.dto.PojoInfo;
-import com.webank.weid.dto.PolicyInfo;
-import com.webank.weid.dto.WeIdInfo;
-import com.webank.weid.protocol.base.AuthorityIssuer;
-import com.webank.weid.protocol.base.ClaimPolicy;
-import com.webank.weid.protocol.base.Cpt;
-import com.webank.weid.protocol.base.CptBaseInfo;
-import com.webank.weid.protocol.base.HashContract;
-import com.webank.weid.protocol.base.IssuerType;
-import com.webank.weid.protocol.base.PresentationPolicyE;
-import com.webank.weid.protocol.base.WeIdAuthentication;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.base.WeIdPublicKey;
+import com.webank.weid.constant.*;
+import com.webank.weid.dto.*;
+import com.webank.weid.protocol.base.*;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.request.RegisterAuthorityIssuerArgs;
@@ -40,39 +20,25 @@ import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.PolicyServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
-import com.webank.weid.util.ConfigUtils;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.WeIdSdkUtils;
-import com.webank.weid.util.WeIdUtils;
+import com.webank.weid.util.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jsonschema2pojo.*;
+import org.jsonschema2pojo.rules.RuleFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.sdk.client.Client;
-import org.jsonschema2pojo.DefaultGenerationConfig;
-import org.jsonschema2pojo.GenerationConfig;
-import org.jsonschema2pojo.NoopAnnotator;
-import org.jsonschema2pojo.SchemaGenerator;
-import org.jsonschema2pojo.SchemaMapper;
-import org.jsonschema2pojo.SchemaStore;
-import org.jsonschema2pojo.rules.RuleFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 @Slf4j
@@ -486,8 +452,11 @@ public class WeIdSdkService {
 		WeIdPrivateKey weIdPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
 		WeIdAuthentication callerAuth = new WeIdAuthentication();
 		callerAuth.setWeIdPrivateKey(weIdPrivateKey);
-		callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(
-				DataToolUtils.publicKeyFromPrivate(new BigInteger(weIdPrivateKey.getPrivateKey())).toString()));
+		String weid = WeIdUtils.convertPublicKeyToWeId(
+				DataToolUtils.publicKeyFromPrivate(new BigInteger(weIdPrivateKey.getPrivateKey())).toString());
+		callerAuth.setWeId(weid);
+		WeIdDocument weIdDocument = getWeIdService().getWeIdDocument(weid).getResult();
+		callerAuth.setAuthenticationMethodId(weIdDocument.getAuthentication().get(0).getId());
 		return callerAuth;
 	}
 

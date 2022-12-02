@@ -36,6 +36,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     if (gradle.startParameter.isOffline()) {
@@ -186,7 +187,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives jar
     archives sourcesJar
-    archives javadocJar
+    //archives javadocJar
 }
 
 

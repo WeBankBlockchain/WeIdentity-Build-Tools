@@ -3,49 +3,32 @@
 package com.webank.weid.service;
 
 import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.contract.deploy.DeployEvidence;
+import com.webank.weid.constant.*;
 import com.webank.weid.contract.deploy.v2.DeployContractV2;
+import com.webank.weid.contract.deploy.v2.DeployEvidenceV2;
 import com.webank.weid.contract.deploy.v3.DeployContractV3;
+import com.webank.weid.contract.deploy.v3.DeployEvidenceV3;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.ShareInfo;
-import com.webank.weid.protocol.base.AuthorityIssuer;
-import com.webank.weid.protocol.base.CptBaseInfo;
-import com.webank.weid.protocol.base.HashContract;
-import com.webank.weid.protocol.base.WeIdAuthentication;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.protocol.base.*;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.util.ClassUtils;
-import com.webank.weid.util.ConfigUtils;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.WeIdSdkUtils;
-import com.webank.weid.util.WeIdUtils;
-import java.io.File;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.webank.weid.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.util.*;
 
 import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
@@ -462,11 +445,22 @@ public class ContractService {
         try {
             //  获取私钥
             WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
-            String hash = DeployEvidence.deployContract(
-                currentPrivateKey.getPrivateKey(), 
-                groupId, 
-                false
-            );
+            String hash = null;
+            if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+                hash = DeployEvidenceV2.deployContract(
+                        fiscoConfig,
+                        currentPrivateKey.getPrivateKey(),
+                        groupId,
+                        false
+                );
+            } else {
+                hash = DeployEvidenceV3.deployContract(
+                        fiscoConfig,
+                        currentPrivateKey.getPrivateKey(),
+                        groupId,
+                        false
+                );
+            }
             if (StringUtils.isBlank(hash)) {
                 log.error("[deployEvidence] deploy the evidence fail, please check the log.");
                 return StringUtils.EMPTY;

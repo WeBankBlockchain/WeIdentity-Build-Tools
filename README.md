@@ -9,6 +9,8 @@ WeIdentity JAVA SDK安装部署工具
 版本说明
 --------
 
+> WeIdentity及其组件的[兼容版本说明文档](https://weidentity.readthedocs.io/zh_CN/develop/docs/compatibility.html) 请查看！
+
 | weid-build-tools 版本 | weid-java-sdk 版本 | weid-contract-java 版本 | 备注 |
 | :---- | :---- | :---- | :---- |
 | v1.0.28 | v1.8.3 | v1.2.30 | 升级log4j |

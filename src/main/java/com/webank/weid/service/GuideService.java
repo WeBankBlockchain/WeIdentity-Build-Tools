@@ -1,5 +1,6 @@
 package com.webank.weid.service;
 
+import com.webank.weid.blockchain.service.fisco.CryptoFisco;
 import com.webank.weid.util.DataToolUtils;
 import java.io.File;
 import java.math.BigInteger;
@@ -45,10 +46,10 @@ public class GuideService {
 		CryptoKeyPair credentials;
 		if (StringUtils.isNotBlank(inputPrivateKey)) {
 			log.info("[createAdmin] create by private key.");
-			credentials = DataToolUtils.cryptoSuite.getKeyPairFactory().createKeyPair(new BigInteger(inputPrivateKey));
+			credentials = CryptoFisco.cryptoSuite.getKeyPairFactory().createKeyPair(new BigInteger(inputPrivateKey));
 		} else {
 			log.info("[createAdmin] create by default.");
-			credentials = DataToolUtils.cryptoSuite.getKeyPairFactory().generateKeyPair();
+			credentials = CryptoFisco.cryptoSuite.getKeyPairFactory().generateKeyPair();
 		}
 		String privateKey = DataToolUtils.hexStr2DecStr(credentials.getHexPrivateKey());
 		String publicKey = DataToolUtils.hexStr2DecStr(credentials.getHexPublicKey());

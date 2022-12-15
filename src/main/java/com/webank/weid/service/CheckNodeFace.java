@@ -2,7 +2,7 @@
 
 package com.webank.weid.service;
 
-import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.blockchain.config.FiscoConfig;
 
 public interface CheckNodeFace {
 

@@ -35,7 +35,7 @@ def repo ="${repoType}"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'utf-8'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -127,6 +127,10 @@ configurations {
    all*.exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
     localDeps lombok
@@ -142,6 +146,7 @@ dependencies {
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
+            compile("com.webank:weid-kit:3.0.0-rc.1")
         }
     }
     if (gradleVer.startsWith("5")) {
@@ -154,6 +159,7 @@ dependencies {
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
+            compile("com.webank:weid-kit:3.0.0-rc.1")
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')
             annotationProcessor files('dist/lib/lombok-1.18.12.jar')
@@ -187,7 +193,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives jar
     archives sourcesJar
-    //archives javadocJar
+    archives javadocJar
 }
 
 
@@ -318,9 +324,9 @@ signing {
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'assemble' }) {
+    if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'signDocsJar' || it.name == 'assemble' }) {
         tasks.findAll {
-            it.name == 'signArchives' || it.name == 'signDocsJar' || it.name == 'signTestJar'
+            it.name == 'signArchives' || it.name == 'signTestJar'
         }.each { task ->
             task.enabled = false
         }

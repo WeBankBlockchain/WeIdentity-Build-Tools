@@ -2,18 +2,14 @@
 
 package com.webank.weid.command;
 
-import com.webank.weid.contract.deploy.v3.DeployContractV3;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.beust.jcommander.JCommander;
-import com.webank.weid.config.ContractConfig;
-import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.blockchain.config.ContractConfig;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.deploy.v2.DeployContractV2;
+import com.webank.weid.blockchain.deploy.v3.DeployContractV3;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.contract.deploy.v2.DeployContractV2;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.service.ConfigService;
@@ -21,6 +17,9 @@ import com.webank.weid.service.ContractService;
 import com.webank.weid.service.GuideService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
@@ -69,9 +68,9 @@ public class DeployContract extends StaticConfig {
         WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         // 写入全局配置中
         if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
-            DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+            DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey.getPrivateKey());
         } else {
-            DeployContractV3.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+            DeployContractV3.putGlobalValue(fiscoConfig, contract, currentPrivateKey.getPrivateKey());
 
         }
         System.out.println("begin enable the hash.");

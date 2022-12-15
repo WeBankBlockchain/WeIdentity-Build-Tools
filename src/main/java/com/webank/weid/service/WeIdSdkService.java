@@ -2,6 +2,7 @@ package com.webank.weid.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.JCodeModel;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
 import com.webank.weid.constant.*;
 import com.webank.weid.dto.*;
 import com.webank.weid.protocol.base.*;
@@ -11,11 +12,13 @@ import com.webank.weid.protocol.request.RegisterAuthorityIssuerArgs;
 import com.webank.weid.protocol.request.RemoveAuthorityIssuerArgs;
 import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.AuthorityIssuerService;
-import com.webank.weid.rpc.CptService;
-import com.webank.weid.rpc.PolicyService;
-import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.fisco.WeServerUtils;
+import com.webank.weid.service.rpc.AuthorityIssuerService;
+import com.webank.weid.service.rpc.CptService;
+import com.webank.weid.service.rpc.PolicyService;
+import com.webank.weid.service.rpc.WeIdService;
+import com.webank.weid.blockchain.service.fisco.server.WeServerUtils;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.base.HashContract;
 import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.PolicyServiceImpl;
@@ -84,7 +87,7 @@ public class WeIdSdkService {
 	public ResponseData<DataPanel> getDataPanel() {
 		DataPanel data = new DataPanel();
 		try {
-			data.setBlockNumber(BaseService.getBlockNumber());
+			data.setBlockNumber(BaseServiceFisco.getBlockNumber());
 			data.setWeIdCount(getWeIdService().getWeIdCount().getResult());
 			data.setCptCount(getCptService().getCptCount().getResult());
 			data.setPolicyCount(getPolicyService().getPolicyCount().getResult());
@@ -1091,7 +1094,7 @@ public class WeIdSdkService {
 		List<String> list = WeServerUtils.getGroupList();
 		if (filterMaster) {
 			return list.stream()
-					.filter(s -> !s.equals(BaseService.masterGroupId.toString()))
+					.filter(s -> !s.equals(BaseServiceFisco.masterGroupId.toString()))
 					.collect(Collectors.toList());
 		}
 		return list;

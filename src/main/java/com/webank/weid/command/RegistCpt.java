@@ -2,12 +2,6 @@
 
 package com.webank.weid.command;
 
-import java.io.File;
-import java.io.IOException;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
@@ -16,11 +10,16 @@ import com.webank.weid.dto.CptFile;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.service.WeIdSdkService;
+import com.webank.weid.service.impl.WeIdServiceImpl;
+import com.webank.weid.service.rpc.WeIdService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author tonychen 2019/4/11

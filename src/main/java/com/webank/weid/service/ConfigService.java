@@ -2,21 +2,16 @@
 
 package com.webank.weid.service;
 
-import com.webank.weid.constant.ChainVersion;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.service.impl.AbstractService;
+import com.webank.weid.constant.*;
+import com.webank.weid.exception.WeIdBaseException;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.v2.CheckNodeServiceV2;
 import com.webank.weid.service.v3.CheckNodeServiceV3;
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.PropertyUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -27,19 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.DataDriverConstant;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.exception.WeIdBaseException;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.service.impl.AbstractService;
-import com.webank.weid.service.v2.CheckNodeServiceV2;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.PropertyUtils;
-import com.webank.weid.util.WeIdSdkUtils;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.*;
 
 import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 import static com.webank.weid.constant.ChainVersion.FISCO_V3;

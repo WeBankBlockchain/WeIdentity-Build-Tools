@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.webank.weid.kit.constant.KitErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -22,7 +23,7 @@ import com.webank.weid.dto.PageDto;
 import com.webank.weid.protocol.request.TransactionArgs;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.util.JdbcHelper;
-import com.webank.weid.util.OffLineBatchTask;
+import com.webank.weid.kit.util.OffLineBatchTask;
 
 /**
  * 上链交易业务类
@@ -264,25 +265,25 @@ public class TransactionService {
     private int[] sendBatchTransaction(List<BinLog> binLogList) {
         log.info("[sendBatchTransaction] begin sendBatchTransaction size: {}", binLogList.size());
         List<TransactionArgs> list = buildTransactionArgsList(binLogList);
-        ResponseData<List<Boolean>> response = null;
+        com.webank.weid.kit.protocol.response.ResponseData<List<Boolean>> resp = null;
         try {
-            response = OffLineBatchTask.sendBatchTransaction(list);
+            resp = OffLineBatchTask.sendBatchTransaction(list);
             log.info(
-                "[sendBatchTransaction] sendBatchTransaction end and return： {} - {}.", 
-                response.getErrorCode(), 
-                response.getErrorMessage()
+                "[sendBatchTransaction] sendBatchTransaction end and return： {} - {}.",
+                    resp.getErrorCode(),
+                    resp.getErrorMessage()
             );
         } catch (Throwable e) {
             log.error("[sendBatchTransaction] has unkonw exception.", e);
-            response = new ResponseData<>(null, ErrorCode.UNKNOW_ERROR);
+            resp = new com.webank.weid.kit.protocol.response.ResponseData<>(null, KitErrorCode.UNKNOW_ERROR);
         }
         int[] result = new int[binLogList.size()];
-        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+        if (resp.getErrorCode() != KitErrorCode.SUCCESS.getCode()) {
             log.error("[sendBatchTransaction] sendBatchTransaction fail. ");
             Arrays.fill(result, SEND_FAIL);
             return result;
         }
-        List<Boolean> resList = response.getResult();
+        List<Boolean> resList = resp.getResult();
         for (int i = 0; i < resList.size(); i++) {
             if (resList.get(i)) {
                 result[i] = SEND_SUCCESS;

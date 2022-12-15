@@ -1,14 +1,25 @@
 
 package com.webank.weid.util;
 
-import com.webank.weid.protocol.response.CnsInfo;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.response.CnsInfo;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
+import com.webank.weid.blockchain.service.fisco.engine.DataBucketServiceEngine;
+import com.webank.weid.blockchain.service.fisco.engine.EngineFactoryFisco;
+import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.DataFrom;
+import com.webank.weid.constant.FileOperator;
+import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.dto.ContractSolInfo;
+import com.webank.weid.dto.DeployInfo;
+import com.webank.weid.dto.PojoInfo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.JarURLConnection;
 import java.net.Socket;
@@ -18,25 +29,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.dto.ContractSolInfo;
-import com.webank.weid.dto.DeployInfo;
-import com.webank.weid.dto.PojoInfo;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.service.BaseService;
-import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.service.impl.engine.EngineFactory;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WeIdSdkUtils {
@@ -66,11 +58,11 @@ public class WeIdSdkUtils {
     }
 
     public static DataBucketServiceEngine getDataBucket(CnsType cnsType) {
-        return EngineFactory.createDataBucketServiceEngine(cnsType);
+        return EngineFactoryFisco.createDataBucketServiceEngine(cnsType);
     }
 
     public static String getMainHash() {
-        CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return StringUtils.EMPTY;
         }

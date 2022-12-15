@@ -2,17 +2,16 @@
 
 package com.webank.weid.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import com.webank.weid.constant.DataDriverConstant;
 import com.webank.weid.constant.SqlConstant;
+import com.webank.weid.suite.persistence.Persistence;
+import com.webank.weid.suite.persistence.PersistenceFactory;
+import com.webank.weid.suite.persistence.PersistenceType;
 import com.webank.weid.suite.persistence.mysql.ConnectionPool;
 import com.webank.weid.suite.persistence.mysql.SqlExecutor;
-import com.webank.weid.suite.api.persistence.inf.Persistence;
-import com.webank.weid.suite.api.persistence.params.PersistenceType;
-import com.webank.weid.suite.api.persistence.PersistenceFactory;
 import com.webank.weid.util.PropertyUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j

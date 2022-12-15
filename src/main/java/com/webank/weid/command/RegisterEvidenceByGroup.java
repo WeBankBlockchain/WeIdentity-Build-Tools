@@ -2,31 +2,31 @@
 
 package com.webank.weid.command;
 
+import com.beust.jcommander.JCommander;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.deploy.v2.RegisterAddressV2;
+import com.webank.weid.blockchain.deploy.v3.RegisterAddressV3;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
+import com.webank.weid.blockchain.service.fisco.CryptoFisco;
+import com.webank.weid.blockchain.service.fisco.server.WeServer;
 import com.webank.weid.constant.ChainVersion;
-import com.webank.weid.contract.deploy.v3.RegisterAddressV3;
-import java.math.BigInteger;
-
+import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.contract.deploy.AddressProcess;
+import com.webank.weid.contract.v2.DataBucket;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-
-import com.beust.jcommander.JCommander;
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.contract.deploy.AddressProcess;
-import com.webank.weid.contract.deploy.v2.RegisterAddressV2;
-import com.webank.weid.contract.v2.DataBucket;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.service.BaseService;
-import com.webank.weid.service.fisco.WeServer;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.WeIdSdkUtils;
 import org.fisco.bcos.sdk.abi.datatypes.generated.Bytes32;
 import org.fisco.bcos.sdk.abi.datatypes.generated.tuples.generated.Tuple2;
 import org.fisco.bcos.sdk.client.Client;
 import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
 import org.fisco.bcos.sdk.v3.crypto.CryptoSuite;
+
+import java.math.BigInteger;
 
 /**
  *  todo support v3 test
@@ -64,7 +64,7 @@ public class RegisterEvidenceByGroup {
             System.out.println("[RegisterEvidenceByGroup] begin register evidenceAddress by cns and groupId, cns = "+ cns + ", groupId = " + goupIdStr);
             // 检查群组是否存在
             String groupId = goupIdStr;
-            boolean checkGroupId = BaseService.checkGroupId(goupIdStr);
+            boolean checkGroupId = BaseServiceFisco.checkGroupId(goupIdStr);
             if (!checkGroupId) {
                 System.out.println("[RegisterEvidenceByGroup] input error, the group does not exists, Abort.");
                 System.exit(1);
@@ -77,7 +77,7 @@ public class RegisterEvidenceByGroup {
             WeServer<?, ?, ?> weServer = WeServer.getInstance(fiscoConfig, groupId);
             // v2 chain
             if (ChainVersion.FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
-                CryptoKeyPair credentials = DataToolUtils.cryptoSuite.getKeyPairFactory()
+                CryptoKeyPair credentials = CryptoFisco.cryptoSuite.getKeyPairFactory()
                     .createKeyPair(new BigInteger(privatekey));
                 // 加载DataBucket
                 DataBucket dataBucket = DataBucket.load(
@@ -102,7 +102,7 @@ public class RegisterEvidenceByGroup {
                 // 将地址注册到cns中
                 CnsType cnsType = CnsType.SHARE;
                 // 注册SHARE CNS 默认主群组
-                RegisterAddressV2.registerBucketToCns(cnsType, currentPrivateKey);
+                RegisterAddressV2.registerBucketToCns(cnsType, currentPrivateKey.getPrivateKey());
                 // 根据群组和evidence Address获取hash
                 String hash = AddressProcess.getHashForShare(groupId, evidenceAddress);
                 // 将evidence地址注册到cns中 默认主群组
@@ -111,7 +111,7 @@ public class RegisterEvidenceByGroup {
                     hash,
                     evidenceAddress,
                     WeIdConstant.CNS_EVIDENCE_ADDRESS,
-                    currentPrivateKey
+                    currentPrivateKey.getPrivateKey()
                 );
                 // 将群组编号注册到cns中 默认主群组
                 RegisterAddressV2.registerAddress(
@@ -119,11 +119,11 @@ public class RegisterEvidenceByGroup {
                     hash,
                     groupId,
                     WeIdConstant.CNS_GROUP_ID,
-                    currentPrivateKey
+                    currentPrivateKey.getPrivateKey()
                 );
             } else {
                 org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair credentials =
-                    new CryptoSuite(DataToolUtils.cryptoSuite.getCryptoTypeConfig()).getKeyPairFactory()
+                    new CryptoSuite(CryptoFisco.cryptoSuite.getCryptoTypeConfig()).getKeyPairFactory()
                     .createKeyPair(new BigInteger(privatekey));
                 // 加载DataBucket
                 com.webank.weid.contract.v3.DataBucket dataBucket =
@@ -150,7 +150,7 @@ public class RegisterEvidenceByGroup {
                 // 将地址注册到cns中
                 CnsType cnsType = CnsType.SHARE;
                 // 注册SHARE CNS 默认主群组
-                RegisterAddressV3.registerBucketToCns(cnsType, currentPrivateKey);
+                RegisterAddressV3.registerBucketToCns(cnsType, currentPrivateKey.getPrivateKey());
                 // 根据群组和evidence Address获取hash
                 String hash = AddressProcess.getHashForShare(groupId, evidenceAddress);
                 // 将evidence地址注册到cns中 默认主群组
@@ -159,7 +159,7 @@ public class RegisterEvidenceByGroup {
                     hash,
                     evidenceAddress,
                     WeIdConstant.CNS_EVIDENCE_ADDRESS,
-                    currentPrivateKey
+                    currentPrivateKey.getPrivateKey()
                 );
                 // 将群组编号注册到cns中 默认主群组
                 RegisterAddressV3.registerAddress(
@@ -167,7 +167,7 @@ public class RegisterEvidenceByGroup {
                     hash,
                     groupId,
                     WeIdConstant.CNS_GROUP_ID,
-                    currentPrivateKey
+                    currentPrivateKey.getPrivateKey()
                 );
 
             }

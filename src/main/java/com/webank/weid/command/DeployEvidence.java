@@ -2,16 +2,15 @@
 
 package com.webank.weid.command;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import com.beust.jcommander.JCommander;
-import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.blockchain.config.FiscoConfig;
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.service.ContractService;
 import com.webank.weid.service.GuideService;
 import com.webank.weid.util.WeIdSdkUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 public class DeployEvidence extends StaticConfig {
 
@@ -47,7 +46,7 @@ public class DeployEvidence extends StaticConfig {
             System.out.println("[DeployEvidence] the evidence deploy successfully, cns --> " + hash);
             System.exit(0);
         } else {
-            System.out.println("[DeployEvidence] the evidence deploy faile， please check the log.");
+            System.out.println("[DeployEvidence] the evidence deploy fail， please check the log.");
             System.exit(1);
         }
         

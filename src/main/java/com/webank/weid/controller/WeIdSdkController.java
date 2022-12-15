@@ -1,40 +1,24 @@
 package com.webank.weid.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
-import com.webank.weid.dto.CptInfo;
-import com.webank.weid.dto.DataPanel;
-import com.webank.weid.dto.Issuer;
-import com.webank.weid.dto.PageDto;
-import com.webank.weid.dto.PojoInfo;
-import com.webank.weid.dto.PolicyInfo;
-import com.webank.weid.dto.WeIdInfo;
+import com.webank.weid.dto.*;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.IssuerType;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.service.BaseService;
 import com.webank.weid.service.ContractService;
 import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.util.List;
 
 /**
  * WeId sdk功能管理

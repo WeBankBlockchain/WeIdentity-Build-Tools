@@ -2,25 +2,16 @@
 
 package com.webank.weid.service.v2;
 
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.CnsType;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.base.HashContract;
+import com.webank.weid.blockchain.protocol.response.CnsInfo;
+import com.webank.weid.blockchain.service.fisco.CryptoFisco;
+import com.webank.weid.blockchain.util.WeIdUtils;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.exception.WeIdBaseException;
-import com.webank.weid.protocol.base.HashContract;
-import com.webank.weid.protocol.response.CnsInfo;
 import com.webank.weid.service.CheckNodeFace;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.WeIdUtils;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.sdk.BcosSDK;
@@ -34,6 +25,12 @@ import org.fisco.bcos.sdk.config.model.ConfigProperty;
 import org.fisco.bcos.sdk.contract.precompiled.cns.CnsService;
 import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
 import org.fisco.bcos.sdk.model.Response;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class CheckNodeServiceV2 implements CheckNodeFace {
@@ -136,7 +133,7 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     }
     
     private DataBucket getDataBucket(FiscoConfig fiscoConfig) throws Exception {
-        CryptoKeyPair credentials = DataToolUtils.cryptoSuite.getKeyPairFactory().generateKeyPair();
+        CryptoKeyPair credentials = CryptoFisco.cryptoSuite.getKeyPairFactory().generateKeyPair();
         Client client = getWeb3j(fiscoConfig);
         String contractAddress = getDataBucketAddress(client, credentials, CnsType.ORG_CONFING);
         if (StringUtils.isBlank(contractAddress)) {

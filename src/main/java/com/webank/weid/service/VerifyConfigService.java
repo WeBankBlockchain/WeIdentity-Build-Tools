@@ -1,13 +1,12 @@
 package com.webank.weid.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.suite.api.persistence.PersistenceFactory;
-import com.webank.weid.suite.api.persistence.inf.Persistence;
-import com.webank.weid.suite.api.persistence.params.PersistenceType;
+import com.webank.weid.suite.persistence.Persistence;
+import com.webank.weid.suite.persistence.PersistenceFactory;
+import com.webank.weid.suite.persistence.PersistenceType;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * 验证db

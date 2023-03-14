@@ -364,7 +364,6 @@ public class ConfigService {
         log.info("[generateFiscoProperties] begin generate fisco.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/fisco.properties.tpl");
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
-//        fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
         fileStr = fileStr.replace("${MASTER_GROUP_ID}", loadConfig.get("group_id"));
         fileStr = fileStr.replace("${SDK_SM_CRYPTO}", loadConfig.get("sm_crypto"));
         fileStr = fileStr.replace("${WEID_ADDRESS}", "");
@@ -382,6 +381,7 @@ public class ConfigService {
         String fileStr = FileUtils.readFile("common/script/tpl/weidentity.properties.tpl");
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
+        fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
         fileStr = fileStr.replace("${PERSISTENCE_TYPE}", loadConfig.get("persistence_type"));
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));

@@ -39,22 +39,22 @@ targetCompatibility = 1.8
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    if (gradle.startParameter.isOffline()) {
-        maven {
-            url 'dependencies'
-        }
-    } else {
+    if (!gradle.startParameter.isOffline()) {
         mavenLocal()
         if ("cn" == repo) {
             println "use cn repo"
             maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
-            mavenCentral()
         } else {
             println "use default repo"
             mavenCentral()
         }
-        maven { url "https://dl.bintray.com/ethereum/maven/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         maven { url "https://oss.sonatype.org/content/groups/public/" }
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    } else {
+        maven {
+            url 'dependencies'
+        }
     }
 }
 
@@ -100,6 +100,12 @@ List redis_driver = [
         "org.redisson:redisson:3.20.0"
 ]
 
+def netty_version="4.1.90.Final"
+List netty = [
+        "io.netty:netty-codec-haproxy:$netty_version",
+        "io.netty:netty-codec:$netty_version"
+]
+
 def spring_version = "5.3.25"
 List spring = [
         "org.springframework:spring-aop:$spring_version",
@@ -142,26 +148,26 @@ dependencies {
 
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy, netty
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
-            compile("com.webank:weid-kit:3.0.0-rc.2")
+            compile("com.webank:weid-kit:3.0.0-rc.2-SNAPSHOT")
         }
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.18.12'
             annotationProcessor 'org.projectlombok:lombok:1.18.12'
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy, netty
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
-            compile("com.webank:weid-kit:3.0.0-rc.2")
+            compile("com.webank:weid-kit:3.0.0-rc.2-SNAPSHOT")
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')
             annotationProcessor files('dist/lib/lombok-1.18.12.jar')

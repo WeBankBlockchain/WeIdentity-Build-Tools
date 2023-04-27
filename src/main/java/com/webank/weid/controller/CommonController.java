@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.constant.ErrorCode;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.FileUtils;
 

@@ -22,7 +22,8 @@ import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.constant.ErrorCode;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
 import com.webank.weid.util.*;
@@ -62,7 +63,7 @@ public class ContractService {
             FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
             fiscoConfig.setChainId(chainId);
             String hash = deployContract(fiscoConfig, DataFrom.WEB);
-            //configService.updateChainId(chainId);
+            configService.updateChainId(chainId);
             log.info("[deploy] the hash: {}", hash);
             //将应用名写入配置中
             applyName = StringEscapeUtils.unescapeHtml(applyName);

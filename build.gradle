@@ -120,6 +120,22 @@ List gson = [
         "com.google.code.gson:gson:$gson_version"
 ]
 
+def netty_version = "4.1.89.Final";
+List netty = [
+        "io.netty:netty-common:$netty_version",
+        "io.netty:netty-codec:$netty_version",
+        "io.netty:netty-buffer:$netty_version",
+        "io.netty:netty-transport:$netty_version",
+        "io.netty:netty-resolver:$netty_version",
+        "io.netty:netty-resolver-dns:$netty_version",
+        "io.netty:netty-handler:$netty_version",
+        "io.netty:netty-handler-proxy:$netty_version",
+        "io.netty:netty-all:$netty_version",
+        "io.netty:netty-codec-dns:$netty_version",
+        "io.netty:netty-resolver-dns-native-macos:$netty_version",
+        "io.netty:netty-transport-native-kqueue:$netty_version",
+]
+
 configurations {
    localDeps
    all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
@@ -141,26 +157,26 @@ dependencies {
     //compile 'io.netty:netty-all:4.1.86.Final'
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy, netty
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
-            compile("com.webank:weid-kit:3.0.0-rc.1")
+            compile("com.webank:weid-kit:3.1.0-rc.1-SNAPSHOT")
         }
     }
     if (gradleVer.startsWith("5")) {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.18.12'
             annotationProcessor 'org.projectlombok:lombok:1.18.12'
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver, http_proxy, netty
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
-            compile("com.webank:weid-kit:3.0.0-rc.1")
+            compile("com.webank:weid-kit:3.1.0-rc.1-SNAPSHOT")
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')
             annotationProcessor files('dist/lib/lombok-1.18.12.jar')

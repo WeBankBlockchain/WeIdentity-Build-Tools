@@ -15,7 +15,7 @@ import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.contract.deploy.AddressProcess;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.util.DataToolUtils;
+import com.webank.weid.blockchain.util.DataToolUtils;
 import com.webank.weid.util.WeIdSdkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

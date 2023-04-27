@@ -6,8 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.constant.ErrorCode;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.ContractService;
 
 public class EnableShareCns extends StaticConfig {

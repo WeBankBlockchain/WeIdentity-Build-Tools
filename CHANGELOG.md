@@ -1,3 +1,10 @@
+### V3.1.0 (2023-4-28)
+* 优化功能:
+1. 修复创建并启用新的应用后配置文件没有更新chain.id导致registerAuthorityIssuer失败
+2. 生成的WeIdentity配置文件支持本地数据库部署
+3. 集成weid-java-sdk 3.1.0和weid-kit 3.1.0
+4. 更新多个已知漏洞的组件
+
 ### V3.0.0 (2022-12-15)
 * 优化功能:
 1. 修复registerPolicy失败和部署Evidence合约失败

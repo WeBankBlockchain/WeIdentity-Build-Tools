@@ -163,7 +163,7 @@ dependencies {
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
-            compile("com.webank:weid-kit:3.1.0-rc.1-SNAPSHOT")
+            compile("com.webank:weid-kit:3.1.0-rc.1")
         }
     }
     if (gradleVer.startsWith("5")) {
@@ -176,7 +176,7 @@ dependencies {
                 exclude group: "javax.validation", module: "validation-api"
                 exclude group: "org.codehaus.jackson", module: "jackson-mapper-asl"
             }
-            compile("com.webank:weid-kit:3.1.0-rc.1-SNAPSHOT")
+            compile("com.webank:weid-kit:3.1.0-rc.1")
         } else {
             compileOnly files('dist/lib/lombok-1.18.12.jar')
             annotationProcessor files('dist/lib/lombok-1.18.12.jar')

@@ -5,7 +5,7 @@ import com.webank.weid.constant.FileOperator;
 import com.webank.weid.dto.*;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.IssuerType;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.ContractService;
 import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.DataToolUtils;

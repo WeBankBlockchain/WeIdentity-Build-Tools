@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.constant.ErrorCode;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdUtils;

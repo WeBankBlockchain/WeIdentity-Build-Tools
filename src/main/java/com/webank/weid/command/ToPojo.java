@@ -13,11 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.constant.FileOperator;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.protocol.base.PresentationPolicyE;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.WeIdSdkService;
 import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.FileUtils;

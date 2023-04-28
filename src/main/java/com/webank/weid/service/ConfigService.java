@@ -180,6 +180,7 @@ public class ConfigService {
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
         backRunConfig();
+        generateProperties();
     }
 
 
@@ -382,6 +383,13 @@ public class ConfigService {
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
         fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
+
+        //暂时默认blockchain部署方式
+        fileStr = fileStr.replace("${DEPLOY_STYLE}", "blockchain");
+        fileStr = fileStr.replace("${CRYPTO_TYPE}", loadConfig.get("sm_crypto"));
+        //暂时默认使用FISCO BCOS区块链底层
+        fileStr = fileStr.replace("${CHAIN_TYPE}", "FISCO_BCOS");
+
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
         fileStr = fileStr.replace("${PERSISTENCE_TYPE}", loadConfig.get("persistence_type"));
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));

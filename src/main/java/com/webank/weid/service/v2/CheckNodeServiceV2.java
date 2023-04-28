@@ -8,7 +8,7 @@ import com.webank.weid.blockchain.protocol.base.HashContract;
 import com.webank.weid.blockchain.protocol.response.CnsInfo;
 import com.webank.weid.blockchain.service.fisco.CryptoFisco;
 import com.webank.weid.blockchain.util.WeIdUtils;
-import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.service.CheckNodeFace;

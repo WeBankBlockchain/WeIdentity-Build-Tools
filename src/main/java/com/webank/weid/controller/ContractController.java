@@ -7,7 +7,7 @@ import com.webank.weid.blockchain.deploy.v2.DeployContractV2;
 import com.webank.weid.blockchain.deploy.v3.DeployContractV3;
 import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
@@ -15,7 +15,7 @@ import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.ContractService;
 import com.webank.weid.util.WeIdSdkUtils;
@@ -183,6 +183,7 @@ public class ContractController {
 			contract.setCptAddress(deployInfo.getCptAddress());
 			if (StringUtils.isNotBlank(deployInfo.getChainId())) {
 				fiscoConfig.setChainId(deployInfo.getChainId());
+				configService.updateChainId(deployInfo.getChainId());
 			} else {
 				//兼容历史数据
 				fiscoConfig.setChainId(configService.loadConfig().get("chain_id"));

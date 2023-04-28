@@ -4,10 +4,10 @@ package com.webank.weid.service.v3;
 
 import com.webank.weid.blockchain.config.FiscoConfig;
 import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.blockchain.protocol.base.HashContract;
 import com.webank.weid.blockchain.protocol.response.CnsInfo;
 import com.webank.weid.blockchain.util.WeIdUtils;
-import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.contract.v3.DataBucket;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.service.CheckNodeFace;
@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.sdk.v3.BcosSDK;
 import org.fisco.bcos.sdk.v3.client.Client;
-import org.fisco.bcos.sdk.v3.client.RespCallback;
 import org.fisco.bcos.sdk.v3.client.protocol.response.BlockNumber;
 import org.fisco.bcos.sdk.v3.codec.datatypes.generated.tuples.generated.Tuple4;
 import org.fisco.bcos.sdk.v3.config.ConfigOption;
@@ -25,6 +24,7 @@ import org.fisco.bcos.sdk.v3.contract.precompiled.bfs.BFSPrecompiled.BfsInfo;
 import org.fisco.bcos.sdk.v3.contract.precompiled.bfs.BFSService;
 import org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair;
 import org.fisco.bcos.sdk.v3.model.Response;
+import org.fisco.bcos.sdk.v3.model.callback.RespCallback;
 import org.fisco.bcos.sdk.v3.transaction.model.exception.ContractException;
 
 import java.math.BigInteger;

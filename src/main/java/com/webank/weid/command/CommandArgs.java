@@ -1,5 +1,4 @@
 
-
 package com.webank.weid.command;
 
 import java.util.ArrayList;
@@ -73,4 +72,7 @@ public class CommandArgs {
     
     @Parameter(names = "--desc", description = "desc")
     private String desc;
+
+    @Parameter(names = "--apply-name", description = "apply name")
+    private String applyName;
 }

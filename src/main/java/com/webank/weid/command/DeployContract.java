@@ -1,5 +1,4 @@
 
-
 package com.webank.weid.command;
 
 import com.beust.jcommander.JCommander;
@@ -9,6 +8,7 @@ import com.webank.weid.blockchain.constant.CnsType;
 import com.webank.weid.blockchain.deploy.v2.DeployContractV2;
 import com.webank.weid.blockchain.deploy.v3.DeployContractV3;
 import com.webank.weid.config.StaticConfig;
+import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.DataFrom;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
@@ -44,6 +44,7 @@ public class DeployContract extends StaticConfig {
             .parse(args);
         String chainId = commandArgs.getChainId();
         String privateKeyFile = commandArgs.getPrivateKey();
+        String applyName = commandArgs.getApplyName();
         // 获取配置
         FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
         fiscoConfig.setChainId(chainId);
@@ -54,9 +55,17 @@ public class DeployContract extends StaticConfig {
         }
         // 部署合约
         String hash = contractService.deployContract(fiscoConfig, DataFrom.COMMAND);
-        System.out.println("the contract deploy successfully  --> hash : " +  hash);
+        System.out.println("the contract deploy successfully  --> hash : " + hash);
+        // 将应用名写入配置中
+        if (StringUtils.isNotBlank(applyName)) {
+            com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> response = WeIdSdkUtils
+                    .getDataBucket(CnsType.DEFAULT)
+                    .put(hash, BuildToolsConstant.APPLY_NAME, applyName,
+                            WeIdSdkUtils.getWeIdPrivateKey(hash).getPrivateKey());
+            System.out.println("[deploy] put applyName: " + applyName + ", resp: " + response);
+        }
         // 配置启用新hash
-        String  oldHash = WeIdSdkUtils.getMainHash();
+        String oldHash = WeIdSdkUtils.getMainHash();
         // 获取部署数据
         DeployInfo deployInfo = contractService.getDeployInfoByHashFromChain(hash);
         ContractConfig contract = new ContractConfig();

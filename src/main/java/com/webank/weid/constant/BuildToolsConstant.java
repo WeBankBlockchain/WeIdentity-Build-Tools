@@ -1,5 +1,4 @@
 
-
 package com.webank.weid.constant;
 
 import java.math.BigInteger;
@@ -32,18 +31,19 @@ public final class BuildToolsConstant {
      * UTF-8.
      */
     public static final String UTF_8 = "UTF-8";
-    
+
     public static final String CPT_JAR_NAME = "weidentity-cpt.jar";
-    
+
     public static final String SUCCESS = "success";
-    
+
     public static final String FAIL = "fail";
-    
+
     public static final String APPLY_NAME = "applyName";
-    
+
     public static final String EVIDENCE_NAME = "evidenceName";
-    
-    public static final List<Integer> CPTID_LIST = Arrays.asList(11, 101, 103, 105, 106, 107, 108, 109, 110, 111);
+
+    public static final List<Integer> CPTID_LIST = Arrays.asList(11, 101, 103, 105, 106, 107, 108, 109, 110, 111, 112,
+            113, 114, 115);
 
     public static final String WEID_FILE = "weid";
     public static final String ADMIN_KEY = "private_key";
@@ -67,7 +67,6 @@ public final class BuildToolsConstant {
     public static final String OTHER_PATH = "output/other";
     public static final String RESOURCES_PATH = "resources/";
     public static final String CONTRACT_PATH = "contract";
-    
 
     public static final String AUTH_ADDRESS_FILE_NAME = "authorityIssuer.address";
     public static final String CPT_ADDRESS_FILE_NAME = "cptController.address";

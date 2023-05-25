@@ -53,7 +53,7 @@ repositories {
             println "use default repo"
             mavenCentral()
         }
-        maven { url "https://dl.bintray.com/ethereum/maven/" }
+        // maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url "https://oss.sonatype.org/content/groups/public/" }
     }
 }

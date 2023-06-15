@@ -185,7 +185,7 @@ public class WeIdSdkUtils {
         DeployInfo deployInfo = getDepolyInfoByHash(hash);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         if (deployInfo != null) {
-            weIdPrivateKey.setPrivateKey(deployInfo.getEcdsaKey());
+            weIdPrivateKey.setPrivateKey(deployInfo.getPrivateKey());
             return weIdPrivateKey;
         }
         return getCurrentPrivateKey();

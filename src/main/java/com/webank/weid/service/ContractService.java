@@ -149,9 +149,9 @@ public class ContractService {
         info.setHash(hash);
         long time = System.currentTimeMillis();
         info.setTime(time);
-        info.setEcdsaKey(FileUtils.readFile(BuildToolsConstant.ADMIN_KEY));
-        BigInteger privateKey = new BigInteger(info.getEcdsaKey());
-        info.setEcdsaPublicKey(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
+        info.setPrivateKey(FileUtils.readFile(BuildToolsConstant.ADMIN_KEY));
+        BigInteger privateKey = new BigInteger(info.getPrivateKey());
+        info.setPublicKey(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
         try {
             info.setNodeVerion(BaseServiceFisco.getVersion());
         } catch (Exception e) {
@@ -295,8 +295,8 @@ public class ContractService {
     private boolean registerSystemCpt(DeployInfo deployInfo) {
         CptStringArgs cptStringArgs = new CptStringArgs();
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
-        BigInteger privateKey = new BigInteger(deployInfo.getEcdsaKey());
-        String weId = WeIdUtils.convertPublicKeyToWeId(deployInfo.getEcdsaPublicKey());
+        BigInteger privateKey = new BigInteger(deployInfo.getPrivateKey());
+        String weId = WeIdUtils.convertPublicKeyToWeId(deployInfo.getPublicKey());
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         weIdPrivateKey.setPrivateKey(privateKey.toString());
         weIdAuthentication.setWeIdPrivateKey(weIdPrivateKey);
@@ -323,9 +323,9 @@ public class ContractService {
     private void createWeId(DeployInfo deployInfo, DataFrom from, boolean isAdmin) {
         log.info("[createWeId] begin createWeid for admin");
         CreateWeIdArgs arg = new CreateWeIdArgs();
-        arg.setPublicKey(deployInfo.getEcdsaPublicKey());
+        arg.setPublicKey(deployInfo.getPublicKey());
         WeIdPrivateKey pkey = new WeIdPrivateKey();
-        pkey.setPrivateKey(deployInfo.getEcdsaKey());
+        pkey.setPrivateKey(deployInfo.getPrivateKey());
         arg.setWeIdPrivateKey(pkey);
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
         boolean checkWeId = weIdSdkService.checkWeId(weId);
@@ -504,9 +504,9 @@ public class ContractService {
         ShareInfo info = new ShareInfo();
         info.setHash(hash);
         info.setTime(System.currentTimeMillis());
-        info.setEcdsaKey(currentPrivateKey.getPrivateKey());
-        info.setEcdsaPublicKey(
-            DataToolUtils.publicKeyFromPrivate(new BigInteger(info.getEcdsaKey())).toString());
+        info.setPrivateKey(currentPrivateKey.getPrivateKey());
+        info.setPublicKey(
+            DataToolUtils.publicKeyFromPrivate(new BigInteger(info.getPrivateKey())).toString());
         try {
             info.setNodeVerion(BaseServiceFisco.getVersion());
         } catch (Exception e) {

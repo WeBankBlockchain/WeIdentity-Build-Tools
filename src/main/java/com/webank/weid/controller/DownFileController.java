@@ -78,7 +78,7 @@ public class DownFileController {
         String fileName = BuildToolsConstant.ADMIN_KEY;
         DeployInfo deployInfo = WeIdSdkUtils.getDepolyInfoByHash(hash);
         if (deployInfo != null) {
-            down(response, deployInfo.getEcdsaKey().getBytes(), fileName);
+            down(response, deployInfo.getPrivateKey().getBytes(), fileName);
         } else {
             log.error("[downEcdsaKey] no found the file.");
         }

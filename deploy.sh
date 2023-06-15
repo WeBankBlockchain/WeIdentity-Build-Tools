@@ -113,9 +113,9 @@ function check_node_cert(){
             exit 1
         fi
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
-        if [ "${encrypt_type}" = "0" ];then
-            if [ ! -f  ca.crt -o ! -f  node.crt -o ! -f  node.key ];then
-                echo "ERROR : fisco bcos version is 2.0. encrypt type is ECDSA, ca.crt, node.crt and node.key are needed."
+        if [ "${sm_crypto}" = "0" ];then
+            if [ ! -f  ca.crt -o ! -f  sdk.crt -o ! -f  sdk.key ];then
+                echo "ERROR : fisco bcos version is 2.0. encrypt type is ECDSA, ca.crt, sdk.crt and sdk.key are needed."
                 exit 1
             fi
         else
@@ -125,7 +125,7 @@ function check_node_cert(){
             fi
         fi
     elif [ "${blockchain_fiscobcos_version}" = "3" ];then
-        if [ "${encrypt_type}" = "0" ];then
+        if [ "${sm_crypto}" = "0" ];then
             if [ ! -f  ca.crt -o ! -f  sdk.crt -o ! -f  sdk.key ];then
                 echo "ERROR : fisco bcos version is 3.0. encrypt type is ECDSA, ca.crt, sdk.crt and sdk.key are needed."
                 exit 1

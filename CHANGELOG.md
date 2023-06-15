@@ -1,3 +1,10 @@
+### V3.1.1 (2023-6-15)
+* 优化功能:
+1. 更新complie.sh和deploy.sh，可以通过命令行执行脚本部署WeIdentity，和可视化部署效果一致
+2. 增加多个CPT模板
+3. 集成weid-java-sdk 3.1.1
+4. 更新多个已知漏洞的组件
+
 ### V3.1.0 (2023-4-28)
 * 优化功能:
 1. 修复创建并启用新的应用后配置文件没有更新chain.id导致registerAuthorityIssuer失败

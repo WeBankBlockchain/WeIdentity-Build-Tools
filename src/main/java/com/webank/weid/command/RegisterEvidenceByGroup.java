@@ -50,11 +50,12 @@ public class RegisterEvidenceByGroup {
                 System.out.println("[RegisterEvidenceByGroup] input error, the groupId is null. Abort.");
                 System.exit(1);
             }
-            // 检查输入群组编号是否为数字
-            if (!NumberUtils.isDigits(goupIdStr)) {
-                System.out.println("[RegisterEvidenceByGroup] input error, the groupId does not digits. Abort.");
-                System.exit(1);
-            }
+            //因为在3.+链的默认群组名为group0,所以暂时丢弃该检查
+//            // 检查输入群组编号是否为数字
+//            if (!NumberUtils.isDigits(goupIdStr)) {
+//                System.out.println("[RegisterEvidenceByGroup] input error, the groupId does not digits. Abort.");
+//                System.exit(1);
+//            }
             // 检查输入cns 地址是否为空
             cns = commandArgs.getCns();
             if(StringUtils.isBlank(cns)) {

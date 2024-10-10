@@ -27,11 +27,12 @@ public class DeployEvidence extends StaticConfig {
         if(StringUtils.isBlank(goupIdStr)) {
             System.out.println("[DeployEvidence] input error, the groupId is null. Abort.");
             System.exit(1);
-        } 
-        if (!NumberUtils.isDigits(goupIdStr)) {
-            System.out.println("[DeployEvidence] input error, the groupId does not digits. Abort.");
-            System.exit(1);
         }
+        //由于3.+的链默认群组名为group0 所以暂时丢弃该检查
+//        if (!NumberUtils.isDigits(goupIdStr)) {
+//            System.out.println("[DeployEvidence] input error, the groupId does not digits. Abort.");
+//            System.exit(1);
+//        }
         System.out.println("[DeployEvidence] begin deploy the evidence by groupId, groupId = " + goupIdStr);
         String groupId = goupIdStr;
         // 检查是否有admin账户，如果没有则创建admin账户

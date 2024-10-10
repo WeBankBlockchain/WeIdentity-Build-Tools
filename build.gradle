@@ -59,7 +59,7 @@ repositories {
 }
 
 List lombok = [
-        "org.projectlombok:lombok:1.18.12"
+        "org.projectlombok:lombok:1.18.28"
 ]
 
 List jcommander = [

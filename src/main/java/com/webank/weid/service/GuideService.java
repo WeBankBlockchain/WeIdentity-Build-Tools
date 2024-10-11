@@ -1,13 +1,14 @@
 package com.webank.weid.service;
 
+import com.webank.weid.blockchain.service.fisco.CryptoFisco;
+import com.webank.weid.util.DataToolUtils;
 import java.io.File;
 import java.math.BigInteger;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.Credentials;
-import org.fisco.bcos.web3j.crypto.Keys;
-import org.fisco.bcos.web3j.crypto.gm.GenCredential;
+import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.utils.Numeric;
 import org.springframework.stereotype.Service;
 
 import com.webank.weid.constant.BuildToolsConstant;
@@ -42,32 +43,32 @@ public class GuideService {
 
 	public String createAdmin(String inputPrivateKey) {
 		log.info("[createAdmin] begin create admin.");
-		Credentials credentials;
+		CryptoKeyPair credentials;
 		if (StringUtils.isNotBlank(inputPrivateKey)) {
 			log.info("[createAdmin] create by private key.");
-			credentials = GenCredential.create(new BigInteger(inputPrivateKey).toString(16));
+			credentials = CryptoFisco.cryptoSuite.getKeyPairFactory().createKeyPair(new BigInteger(inputPrivateKey));
 		} else {
 			log.info("[createAdmin] create by default.");
-			credentials = GenCredential.create();
+			credentials = CryptoFisco.cryptoSuite.getKeyPairFactory().generateKeyPair();
 		}
-		String privateKey = credentials.getEcKeyPair().getPrivateKey().toString();
-		String publicKey = credentials.getEcKeyPair().getPublicKey().toString();
-		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+		String privateKey = DataToolUtils.hexStr2DecStr(credentials.getHexPrivateKey());
+		String publicKey = DataToolUtils.hexStr2DecStr(credentials.getHexPublicKey());
+		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
 		FileUtils.writeToFile(privateKey, ecdsaFile.getAbsolutePath());
-		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_PUB_KEY);
+		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_PUB_KEY);
 		FileUtils.writeToFile(publicKey, ecdsaPubFile.getAbsolutePath());
 		log.info("[createAdmin] the admin create successfully.");
-		return "0x" + Keys.getAddress(new BigInteger(publicKey));
+		return DataToolUtils.addressFromPublic(new BigInteger(publicKey));
 	}
 
 	public String checkAdmin() {
-		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
-		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_PUB_KEY);
+		File ecdsaFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
+		File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_PUB_KEY);
 		if (!ecdsaFile.exists() || !ecdsaPubFile.exists()) {
 			return StringUtils.EMPTY;
 		}
 		String publicKey = FileUtils.readFile(ecdsaPubFile.getAbsolutePath());
-		return "0x" + Keys.getAddress(new BigInteger(publicKey));
+		return DataToolUtils.addressFromPublic(new BigInteger(publicKey));
 	}
 
 }

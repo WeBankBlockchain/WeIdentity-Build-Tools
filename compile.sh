@@ -61,14 +61,7 @@ function compile()
     do
     declare -i length
     length=${#array[@]}
-    if [ "${blockchain_fiscobcos_version}" = "1" ];then
-      if [ $num -lt $length ];then
-        content="${content}WeIdentity@$var,"
-      fi
-      if [ $num -eq $length ];then
-        content="${content}WeIdentity@$var"
-      fi
-    elif [ "${blockchain_fiscobcos_version}" = "2" ];then
+    if [ "${blockchain_fiscobcos_version}" = "2" ] || [ "${blockchain_fiscobcos_version}" = "3" ];then
     	if [ $num -lt $length ];then
         content="${content}$var,"
       fi
@@ -82,12 +75,11 @@ function compile()
     done
     
     export BLOCKCHIAN_NODE_INFO=$(echo -e ${content})
-    export CHAIN_ID=${chain_id}
-    export GROUP_ID=${group_id}
-    export ENCRYPT_TYPE=${encrypt_type}
+    export MASTER_GROUP_ID=${group_id}
+    export SDK_SM_CRYPTO=${sm_crypto}
     export CNS_PROFILE_ACTIVE=${cns_profile_active}
     export FISCO_BCOS_VERSION=${blockchain_fiscobcos_version}
-    FISCOVAS='${GROUP_ID}:${CHAIN_ID}:${ENCRYPT_TYPE}:${FISCO_BCOS_VERSION}:${CNS_PROFILE_ACTIVE}'
+    FISCOVAS='${MASTER_GROUP_ID}:${SDK_SM_CRYPTO}:${FISCO_BCOS_VERSION}:${CNS_PROFILE_ACTIVE}'
     envsubst ${FISCOVAS}} < ${FISCO_XML_CONFIG_TPL} >${FISCO_XML_CONFIG}
     if [ -f ${FISCO_XML_CONFIG_TMP} ];then
         rm ${FISCO_XML_CONFIG_TMP}
@@ -96,14 +88,18 @@ function compile()
     #cp -rf ${SOURCE_CODE_DIR}/resources ${SOURCE_CODE_DIR}/src/main/
     
     #modify weidentity properties
+    export DEPLOY_STYLE='blockchain'
+    export CRYPTO_TYPE=${sm_crypto}
     export ORG_ID=${org_id}
     export AMOP_ID=${amop_id}
+    export CHAIN_ID=${chain_id}
+    export CHAIN_TYPE='FISCO_BCOS'
     export PERSISTENCE_TYPE=${persistence_type}
     export MYSQL_ADDRESS=${mysql_address}
     export MYSQL_DATABASE=${mysql_database}
     export MYSQL_USERNAME=${mysql_username}
     export MYSQL_PASSWORD=${mysql_password}
-    VARS='${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${AMOP_ID}:${PERSISTENCE_TYPE}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
+    VARS='${DEPLOY_STYLE}:${CRYPTO_TYPE}:${BLOCKCHIAN_NODE_INFO}:${ORG_ID}:${CHAIN_ID}:${AMOP_ID}:${CHAIN_TYPE}:${PERSISTENCE_TYPE}:${MYSQL_ADDRESS}:${MYSQL_DATABASE}:${MYSQL_USERNAME}:${MYSQL_PASSWORD}'
     envsubst ${VARS} < ${WEIDENTITY_CONFIG_TPL} >${WEIDENTITY_CONFIG}
 
     if [ -f build.gradle ]; then
@@ -126,7 +122,7 @@ function compile()
 
 function setup()
 {
-	if [ "${blockchain_fiscobcos_version}" = "1" ] || [ "${blockchain_fiscobcos_version}" = "2" ];then 
+	if [ "${blockchain_fiscobcos_version}" = "2" ] || [ "${blockchain_fiscobcos_version}" = "3" ] ;then
         cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeployContract.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeployContract.java
         cp ${SOURCE_CODE_DIR}/script/tpl/deploy_code/DeploySystemCpt.java-${blockchain_fiscobcos_version}.x ${SOURCE_CODE_DIR}/src/main/java/com/webank/weid/command/DeploySystemCpt.java
     else

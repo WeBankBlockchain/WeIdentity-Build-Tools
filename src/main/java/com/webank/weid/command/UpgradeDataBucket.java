@@ -1,48 +1,30 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.command;
 
-import java.math.BigInteger;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.Credentials;
-import org.fisco.bcos.web3j.crypto.EncryptType;
-import org.fisco.bcos.web3j.crypto.gm.GenCredential;
-import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
-import org.fisco.bcos.web3j.precompile.cns.CnsService;
-import org.fisco.bcos.web3j.protocol.Web3j;
-import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
-
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.response.CnsInfo;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
+import com.webank.weid.blockchain.service.fisco.CryptoFisco;
+import com.webank.weid.constant.ChainVersion;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.response.CnsResponse;
-import com.webank.weid.service.BaseService;
-import com.webank.weid.util.DataToolUtils;
 import com.webank.weid.util.WeIdSdkUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.fisco.bcos.sdk.client.Client;
+import org.fisco.bcos.sdk.contract.precompiled.cns.CnsService;
+import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.model.RetCode;
+import org.fisco.bcos.sdk.v3.contract.precompiled.bfs.BFSService;
+import org.fisco.bcos.sdk.v3.crypto.CryptoSuite;
+
+import java.math.BigInteger;
 
 /**
+ * todo 支持v3
  * 升级dataBucket.
  * @author v_wbgyang
  *
@@ -61,30 +43,61 @@ public class UpgradeDataBucket {
             }
 
             FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
-            EncryptType encryptType = new EncryptType(Integer.parseInt(fiscoConfig.getEncryptType()));
-
-            // 根据私钥获取Credentials
-            Credentials credentials = GenCredential.create(new BigInteger(currentPrivateKey.getPrivateKey()).toString(16));
-            // 重新部署所有的DataBucket
-            for (CnsType cnsType : CnsType.values()) {
-                CnsInfo cnsInfo = BaseService.getBucketByCns(cnsType);
-                String oldVersion = cnsType.getVersion();
-                if (cnsInfo != null) {
-                    oldVersion = cnsInfo.getVersion();
+            // v2 chain
+            if (ChainVersion.FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+                // 根据私钥获取Credentials
+                CryptoKeyPair credentials = CryptoFisco.cryptoSuite.getKeyPairFactory()
+                    .createKeyPair(new BigInteger(currentPrivateKey.getPrivateKey()));
+                // 重新部署所有的DataBucket
+                for (CnsType cnsType : CnsType.values()) {
+                    CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(cnsType);
+                    String oldVersion = cnsType.getVersion();
+                    if (cnsInfo != null) {
+                        oldVersion = cnsInfo.getVersion();
+                    }
+                    String newVersion = newVersion(cnsType, cnsInfo);
+                    //部署DataBucket
+                    DataBucket dataBucket = DataBucket.deploy(
+                        (Client) BaseServiceFisco.getClient(),
+                        credentials);
+                    RetCode result = new CnsService((Client) BaseServiceFisco.getClient(), credentials)
+                        .registerCNS(cnsType.getName(), newVersion, dataBucket.getContractAddress(),
+                            DataBucket.ABI);
+                    if (result.getCode() != 0) {
+                        throw new WeIdBaseException(result.getCode() + "-" + result.getMessage());
+                    }
+                    System.out
+                        .println(cnsType.getName() + ": " + oldVersion + " --> " + newVersion);
                 }
-                String newVersion = newVersion(cnsType, cnsInfo);
-                //部署DataBucket
-                DataBucket dataBucket = DataBucket.deploy(
-                        (Web3j)BaseService.getWeb3j(),
-                        credentials, 
-                        new StaticGasProvider(WeIdConstant.GAS_PRICE, WeIdConstant.GAS_LIMIT)).send();
-                String resultJson = new CnsService((Web3j)BaseService.getWeb3j(), credentials)
-                .registerCns(cnsType.getName(), newVersion, dataBucket.getContractAddress(), DataBucket.ABI);
-                CnsResponse result = DataToolUtils.deserialize(resultJson, CnsResponse.class);
-                if (result.getCode() != 0) {
-                    throw new WeIdBaseException(result.getCode() + "-" + result.getMsg());
+            } else {
+                // 根据私钥获取Credentials
+                org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair credentials =
+                    new CryptoSuite(CryptoFisco.cryptoSuite.getCryptoTypeConfig()).getKeyPairFactory()
+                        .createKeyPair(new BigInteger(currentPrivateKey.getPrivateKey()));
+                // 重新部署所有的DataBucket
+                for (CnsType cnsType : CnsType.values()) {
+                    CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(cnsType);
+                    String oldVersion = cnsType.getVersion();
+                    if (cnsInfo != null) {
+                        oldVersion = cnsInfo.getVersion();
+                    }
+                    String newVersion = newVersion(cnsType, cnsInfo);
+                    //部署DataBucket
+                    org.fisco.bcos.sdk.v3.client.Client client =
+                        (org.fisco.bcos.sdk.v3.client.Client) BaseServiceFisco.getClient();
+                    com.webank.weid.contract.v3.DataBucket dataBucket =
+                        com.webank.weid.contract.v3.DataBucket.deploy(
+                            client, credentials);
+                    org.fisco.bcos.sdk.v3.model.RetCode result =
+                        new BFSService(client, credentials)
+                        .link(cnsType.getName(), newVersion, dataBucket.getContractAddress(),
+                            DataBucket.ABI);
+                    if (result.getCode() != 0) {
+                        throw new WeIdBaseException(result.getCode() + "-" + result.getMessage());
+                    }
+                    System.out
+                        .println(cnsType.getName() + ": " + oldVersion + " --> " + newVersion);
                 }
-                System.out.println(cnsType.getName() + ": " + oldVersion + " --> " + newVersion);
             }
             System.out.println("the DataBucket upgrade successfully.");
             System.exit(0);

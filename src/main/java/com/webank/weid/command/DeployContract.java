@@ -1,36 +1,15 @@
-/*
- *       Copyright© (2018-2019) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
 
 package com.webank.weid.command;
 
-import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.EncryptType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.beust.jcommander.JCommander;
-import com.webank.weid.config.ContractConfig;
-import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.blockchain.config.ContractConfig;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.deploy.v2.DeployContractV2;
+import com.webank.weid.blockchain.deploy.v3.DeployContractV3;
 import com.webank.weid.config.StaticConfig;
-import com.webank.weid.constant.CnsType;
+import com.webank.weid.constant.BuildToolsConstant;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.contract.deploy.v2.DeployContractV2;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.service.ConfigService;
@@ -38,6 +17,11 @@ import com.webank.weid.service.ContractService;
 import com.webank.weid.service.GuideService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 public class DeployContract extends StaticConfig {
     
@@ -60,10 +44,10 @@ public class DeployContract extends StaticConfig {
             .parse(args);
         String chainId = commandArgs.getChainId();
         String privateKeyFile = commandArgs.getPrivateKey();
+        String applyName = commandArgs.getApplyName();
         // 获取配置
         FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
         fiscoConfig.setChainId(chainId);
-        new EncryptType(Integer.parseInt(fiscoConfig.getEncryptType()));
         // 说明给了私钥文件
         if (StringUtils.isNotBlank(privateKeyFile)) {
             String privateKey = FileUtils.readFile(privateKeyFile);
@@ -71,9 +55,17 @@ public class DeployContract extends StaticConfig {
         }
         // 部署合约
         String hash = contractService.deployContract(fiscoConfig, DataFrom.COMMAND);
-        System.out.println("the contract deploy successfully  --> hash : " +  hash);
+        System.out.println("the contract deploy successfully  --> hash : " + hash);
+        // 将应用名写入配置中
+        if (StringUtils.isNotBlank(applyName)) {
+            com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> response = WeIdSdkUtils
+                    .getDataBucket(CnsType.DEFAULT)
+                    .put(hash, BuildToolsConstant.APPLY_NAME, applyName,
+                            WeIdSdkUtils.getWeIdPrivateKey(hash).getPrivateKey());
+            System.out.println("[deploy] put applyName: " + applyName + ", resp: " + response);
+        }
         // 配置启用新hash
-        String  oldHash = WeIdSdkUtils.getMainHash();
+        String oldHash = WeIdSdkUtils.getMainHash();
         // 获取部署数据
         DeployInfo deployInfo = contractService.getDeployInfoByHashFromChain(hash);
         ContractConfig contract = new ContractConfig();
@@ -84,7 +76,12 @@ public class DeployContract extends StaticConfig {
         contract.setCptAddress(deployInfo.getCptAddress());
         WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         // 写入全局配置中
-        DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+        if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+            DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey.getPrivateKey());
+        } else {
+            DeployContractV3.putGlobalValue(fiscoConfig, contract, currentPrivateKey.getPrivateKey());
+
+        }
         System.out.println("begin enable the hash.");
         // 节点启用新hash并停用原hash
         contractService.enableHash(CnsType.DEFAULT, hash, oldHash);

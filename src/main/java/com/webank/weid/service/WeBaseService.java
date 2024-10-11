@@ -10,8 +10,7 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.utils.Numeric;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.fisco.bcos.sdk.utils.Numeric;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -131,6 +130,7 @@ public class WeBaseService {
                 // 保存证书
                 for (Certificate certificate : res.getData()) {
                     String certificateName = certificate.getName();
+                    // todo javasdk用的是sdk证书，不是node证书
                     if ("sdk.crt".equals(certificateName)) {
                         certificateName = "node.crt";
                     } else if ("sdk.key".equals(certificateName)) {
@@ -260,7 +260,7 @@ public class WeBaseService {
      * @param privateKey 私钥
      * @return 返回是否导入成功
      */
-    public boolean importPrivateKeyToWeBase(Integer groupId, String userName, String privateKey) {
+    public boolean importPrivateKeyToWeBase(String groupId, String userName, String privateKey) {
         if (this.isIntegrateWebase()) {
             String requestUrl = getApi("importPrivateKey");
             Map<String, Object> request = new HashMap<String, Object>();
@@ -291,7 +291,7 @@ public class WeBaseService {
      * @param publicKey 私钥
      * @return 返回是否导入成功
      */
-    public boolean importPublicKeyToWeBase(Integer groupId, String userName, String publicKey) {
+    public boolean importPublicKeyToWeBase(String groupId, String userName, String publicKey) {
         if (this.isIntegrateWebase()) {
             String requestUrl = getApi("importPublicKey");
             Map<String, Object> request = new HashMap<String, Object>();
@@ -325,7 +325,7 @@ public class WeBaseService {
      * @return 返回是否导入成功
      */
     public boolean contractSave(
-        Integer groupId, 
+        String groupId,
         String contractName, 
         String contractAddress,
         String contractVersion,

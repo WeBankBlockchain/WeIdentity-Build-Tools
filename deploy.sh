@@ -62,8 +62,8 @@ function deploy_contract()
     #mv ecdsa_key.pub ${SOURCE_CODE_DIR}/output/admin
     #mv ecdsa_key ${SOURCE_CODE_DIR}/output/admin
 
-    rm -f ecdsa_key
-    rm -f ecdsa_key.pub
+    rm -f private_key
+    rm -f public_key
     rm -f hash
     rm -f weid
 }
@@ -106,21 +106,33 @@ function clean_data()
 
 function check_node_cert(){
 
-    cd ${SOURCE_CODE_DIR}/resources
+    cd ${SOURCE_CODE_DIR}/resources/conf
     if [ "${blockchain_fiscobcos_version}" = "1" ];then
         if [ ! -f  ca.crt -o ! -f  client.keystore ];then
             echo "ERROR : fisco bcos version is 1.3, ca.crt and client.keystore are needed."
             exit 1
         fi
     elif [ "${blockchain_fiscobcos_version}" = "2" ];then
-        if [ "${encrypt_type}" = "0" ];then
-            if [ ! -f  ca.crt -o ! -f  node.crt -o ! -f  node.key ];then
-                echo "ERROR : fisco bcos version is 2.0. encrypt type is ECDSA, ca.crt, node.crt and node.key are needed."
+        if [ "${sm_crypto}" = "0" ];then
+            if [ ! -f  ca.crt -o ! -f  sdk.crt -o ! -f  sdk.key ];then
+                echo "ERROR : fisco bcos version is 2.0. encrypt type is ECDSA, ca.crt, sdk.crt and sdk.key are needed."
                 exit 1
             fi
         else
             if [ ! -f  gmca.crt -o ! -f  gmsdk.crt -o ! -f  gmsdk.key -o ! -f  gmensdk.crt -o ! -f  gmensdk.key ];then
                 echo "ERROR : fisco bcos version is 2.0, encrypt type is SM2, gmca.crt, gmsdk.crt, gmsdk.key, gmensdk.crt and gmensdk.key are needed."
+                exit 1
+            fi
+        fi
+    elif [ "${blockchain_fiscobcos_version}" = "3" ];then
+        if [ "${sm_crypto}" = "0" ];then
+            if [ ! -f  ca.crt -o ! -f  sdk.crt -o ! -f  sdk.key ];then
+                echo "ERROR : fisco bcos version is 3.0. encrypt type is ECDSA, ca.crt, sdk.crt and sdk.key are needed."
+                exit 1
+            fi
+        else
+            if [ ! -f  sm_ca.crt -o ! -f  sm_sdk.crt -o ! -f  sm_sdk.key -o ! -f  sm_ensdk.crt -o ! -f  sm_ensdk.key ];then
+                echo "ERROR : fisco bcos version is 3.0, encrypt type is SM2, sm_ca.crt, sm_sdk.crt, sm_sdk.key, sm_ensdk.crt and sm_ensdk.key are needed."
                 exit 1
             fi
         fi

@@ -1,192 +1,126 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.service.v2;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.channel.client.Service;
-import org.fisco.bcos.channel.handler.GroupChannelConnectionsConfig;
-import org.fisco.bcos.web3j.crypto.Credentials;
-import org.fisco.bcos.web3j.crypto.EncryptType;
-import org.fisco.bcos.web3j.crypto.gm.GenCredential;
-import org.fisco.bcos.web3j.precompile.cns.CnsInfo;
-import org.fisco.bcos.web3j.precompile.cns.CnsService;
-import org.fisco.bcos.web3j.protocol.Web3j;
-import org.fisco.bcos.web3j.protocol.channel.ChannelEthereumService;
-import org.fisco.bcos.web3j.protocol.core.methods.response.BlockNumber;
-import org.fisco.bcos.web3j.tuples.generated.Tuple4;
-import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.base.HashContract;
+import com.webank.weid.blockchain.protocol.response.CnsInfo;
+import com.webank.weid.blockchain.service.fisco.CryptoFisco;
+import com.webank.weid.blockchain.util.WeIdUtils;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.contract.v2.DataBucket;
 import com.webank.weid.exception.WeIdBaseException;
-import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.service.CheckNodeFace;
-import com.webank.weid.util.WeIdUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.fisco.bcos.sdk.BcosSDK;
+import org.fisco.bcos.sdk.abi.datatypes.generated.tuples.generated.Tuple4;
+import org.fisco.bcos.sdk.client.Client;
+import org.fisco.bcos.sdk.client.RespCallback;
+import org.fisco.bcos.sdk.client.protocol.response.BlockNumber;
+import org.fisco.bcos.sdk.config.ConfigOption;
+import org.fisco.bcos.sdk.config.exceptions.ConfigException;
+import org.fisco.bcos.sdk.config.model.ConfigProperty;
+import org.fisco.bcos.sdk.contract.precompiled.cns.CnsService;
+import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.model.Response;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class CheckNodeServiceV2 implements CheckNodeFace {
     
-    
-    private Channel2Connections channelConnections = new Channel2Connections();
-    
+
+    @Override
     public boolean check(FiscoConfig fiscoConfig) {
         try {
-            Web3j web3j = getWeb3j(fiscoConfig);
-            if (web3j == null) {
-                log.error("[check] build the web3j fail.");
-                throw new WeIdBaseException("init web3j fail.");
-            }
-//            // 检查群组配置
-//            List<String> groupList = web3j.getGroupList().send().getGroupList();
-//            if (!groupList.contains(fiscoConfig.getGroupId())) {
-//                throw new WeIdBaseException("the groupId does not exist.");
-//            }
-//            Credentials  credentials = GenCredential.create();
-//            if (credentials == null) {
-//                log.error("[check] create the Credentials fail.");
-//                throw new WeIdBaseException("the Credentials create fail.");
-//            }
-            try {
-                web3j.getGroupList().send().getGroupList();
-                log.info("[check] check node successfully.");
-                return true;
-            } catch (Exception e) {
-                log.error("[check] check node fail.", e);
-                throw new WeIdBaseException("can not connection the node.");
-            } finally {
-                channelConnections.stopWork();
-            }
-        } catch (WeIdBaseException e) {
-            throw e;
+            BcosSDK bcosSDK = buildBcosSDK(fiscoConfig);
+            return true;
         } catch (Exception e) {
             log.error("[check] check the node fail.", e);
             return false;
         }
     }
     
-    private Service buildFiscoBcosService(FiscoConfig fiscoConfig) {
 
-        Service service = new Service();
-        service.setOrgID(fiscoConfig.getCurrentOrgId());
-        service.setConnectSeconds(Integer.valueOf(fiscoConfig.getWeb3sdkTimeout()));
-        // group info
-        Integer groupId = Integer.valueOf(fiscoConfig.getGroupId());
-        service.setGroupId(groupId);
+    private BcosSDK buildBcosSDK(FiscoConfig fiscoConfig) throws ConfigException {
+        ConfigProperty configProperty = new ConfigProperty();
 
-        // connect key and string
-        channelConnections.setGroupId(groupId);
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        if (fiscoConfig.getEncryptType().equals(String.valueOf(EncryptType.ECDSA_TYPE))) {
-            EncryptType encryptType = new EncryptType(EncryptType.ECDSA_TYPE);
-            channelConnections.setCaCert(
-                    resolver.getResource("classpath:" + fiscoConfig.getV2CaCrtPath()));
-            channelConnections.setSslCert(
-                    resolver.getResource("classpath:" + fiscoConfig.getV2NodeCrtPath()));
-            channelConnections.setSslKey(
-                    resolver.getResource("classpath:" + fiscoConfig.getV2NodeKeyPath()));
-        } else {
-            EncryptType encryptType = new EncryptType(EncryptType.SM2_TYPE);
+        List<String> nodeList = Arrays.asList(fiscoConfig.getNodes().split(","));
+        Map<String, Object> netWork = new HashMap<String, Object>();
+        netWork.put("peers", nodeList);
+        log.info("[initNetWork] the current netWork: {}.", netWork);
+        configProperty.setNetwork(netWork);
 
-            // gmca.crt
-            channelConnections.setGmCaCert(
-                    resolver.getResource("classpath:" + fiscoConfig.getGmCaCrtPath()));
-            // gmsdk.crt
-            channelConnections.setGmSslCert(
-                    resolver.getResource("classpath:" + fiscoConfig.getGmSdkCrtPath()));
-            // gmsdk.key
-            channelConnections.setGmSslKey(
-                    resolver.getResource("classpath:" + fiscoConfig.getGmSdkKeyPath()));
-            // gmensdk.crt
-            channelConnections.setGmEnSslCert(
-                    resolver.getResource("classpath:" + fiscoConfig.getGmenSdkCrtPath()));
-            // gmensdk.key
-            channelConnections.setGmEnSslKey(
-                    resolver.getResource("classpath:" + fiscoConfig.getGmenSdkKeyPath()));
-        }
+        Map<String, Object> cryptoMaterial = new HashMap<String, Object>();
+        cryptoMaterial.put("useSMCrypto", fiscoConfig.getSdkSMCrypto());
+        cryptoMaterial.put("certPath", fiscoConfig.getSdkCertPath());
+//        cryptoMaterial.put("certPath", "D:\\projects\\weid\\WeIdentity\\out\\test\\resources");
+//        cryptoMaterial.put("certPath", "D:\\projects\\weid\\WeIdentity\\out\\production\\resources");
+        log.info("[initThreadPool] the cryptoMaterial: {}.", cryptoMaterial);
+        configProperty.setCryptoMaterial(cryptoMaterial);
 
-        channelConnections.setConnectionsStr(Arrays.asList(fiscoConfig.getNodes().split(",")));
-        GroupChannelConnectionsConfig connectionsConfig = new GroupChannelConnectionsConfig();
-        connectionsConfig.setAllChannelConnections(Arrays.asList(channelConnections));
-        service.setAllChannelConnections(connectionsConfig);
-        // thread pool params
-        service.setThreadPool(initializePool(fiscoConfig));
-        return service;
-    }
-
-    protected ThreadPoolTaskExecutor initializePool(FiscoConfig fiscoConfig) {
-        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
-        pool.setBeanName("web3sdk");
-        pool.setCorePoolSize(Integer.parseInt(fiscoConfig.getWeb3sdkCorePoolSize()));
-        pool.setMaxPoolSize(Integer.parseInt(fiscoConfig.getWeb3sdkMaxPoolSize()));
-        pool.setQueueCapacity(Integer.parseInt(fiscoConfig.getWeb3sdkQueueSize()));
-        pool.setKeepAliveSeconds(Integer.parseInt(fiscoConfig.getWeb3sdkKeepAliveSeconds()));
-        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.AbortPolicy());
-        pool.initialize();
-        return pool;
-    }
-    
-    public int getBlockNumber(Web3j web3j) throws Exception {
-        BlockNumber response = web3j.getBlockNumber().sendAsync().get(5, TimeUnit.SECONDS);
-        return response.getBlockNumber().intValue();
-    }
-    
-    
-    private Web3j getWeb3j(FiscoConfig fiscoConfig) throws Exception {
+        BcosSDK bcosSdk = null;
         try {
-            Service service = buildFiscoBcosService(fiscoConfig);
-            Set<String> topics = new HashSet<String>();
-            topics.add(fiscoConfig.getCurrentOrgId());
-            service.setTopics(topics);
-            try {
-                service.run();
-            } catch (Exception e) {
-                log.error("[check] the service run fail.", e);
-                throw e;
-            }
-            ChannelEthereumService channelEthereumService = new ChannelEthereumService();
-            channelEthereumService.setChannelService(service);
-            Web3j web3j = Web3j.build(channelEthereumService, Integer.parseInt(fiscoConfig.getGroupId()));
-            if (web3j == null) {
-                log.error("[check] build the web3j fail.");
-                throw new WeIdBaseException("init web3j fail.");
-            }
-            return web3j;
-        } catch (Exception e) {
-            throw e;
+            bcosSdk = new BcosSDK(new ConfigOption(configProperty));
+            return bcosSdk;
+        } catch (ConfigException ex) {
+            log.error("init sdk instance failed", ex);
+            throw ex;
         }
     }
+
+
+    private Client getWeb3j(FiscoConfig fiscoConfig) throws Exception {
+        BcosSDK bcosSDK = buildBcosSDK(fiscoConfig);
+        Client client = bcosSDK.getClient(Integer.parseInt(fiscoConfig.getGroupId()));
+        if (client == null) {
+            log.error("[check] build the client fail.");
+            throw new WeIdBaseException("init client fail or group not exist.");
+        }
+        return client;
+    }
+
+//
+//    protected ThreadPoolTaskExecutor initializePool(FiscoConfig fiscoConfig) {
+//        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+//        pool.setBeanName("web3sdk");
+//        pool.setCorePoolSize(Integer.parseInt(fiscoConfig.getWeb3sdkCorePoolSize()));
+//        pool.setMaxPoolSize(Integer.parseInt(fiscoConfig.getWeb3sdkMaxPoolSize()));
+//        pool.setQueueCapacity(Integer.parseInt(fiscoConfig.getWeb3sdkQueueSize()));
+//        pool.setKeepAliveSeconds(Integer.parseInt(fiscoConfig.getWeb3sdkKeepAliveSeconds()));
+//        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.AbortPolicy());
+//        pool.initialize();
+//        return pool;
+//    }
     
+    public int getBlockNumber(Client client) throws Exception {
+        // callback
+        CompletableFuture<BigInteger> future = new CompletableFuture<>();
+        client.getBlockNumberAsync(new RespCallback<BlockNumber>() {
+            @Override
+            public void onResponse(BlockNumber blockNumber) {
+                future.complete(blockNumber.getBlockNumber());
+            }
+
+            @Override
+            public void onError(Response errorResponse) {
+                future.complete(BigInteger.valueOf(-1L));
+            }
+        });
+        try {
+            BigInteger blockNumber = future.get(5000, TimeUnit.MILLISECONDS);
+            return blockNumber.intValue();
+        } catch (Exception ex) {
+            throw new RuntimeException("get blockNumber failed after 5s wait");
+        }
+    }
+
     // 根据orgId获取org_config里面的hash数据.
     private HashContract getHashFromOrgCns(FiscoConfig fiscoConfig) throws Exception {
         List<HashContract> allHash = getAllHash(fiscoConfig);
@@ -199,25 +133,27 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     }
     
     private DataBucket getDataBucket(FiscoConfig fiscoConfig) throws Exception {
-        Credentials credentials = GenCredential.create();
-        Web3j web3j = getWeb3j(fiscoConfig);
-        String contractAddress = getDataBucketAddress(web3j, credentials, CnsType.ORG_CONFING);
+        CryptoKeyPair credentials = CryptoFisco.cryptoSuite.getKeyPairFactory().generateKeyPair();
+        Client client = getWeb3j(fiscoConfig);
+        String contractAddress = getDataBucketAddress(client, credentials, CnsType.ORG_CONFING);
         if (StringUtils.isBlank(contractAddress)) {
             return null;
         }
         return DataBucket.load(
             contractAddress, 
-            web3j, 
-            credentials, 
-            new StaticGasProvider(WeIdConstant.GAS_PRICE, WeIdConstant.GAS_LIMIT)
+            client, 
+            credentials
         );
+        //            finally {
+//                client.stop();
+//            }
     }
     
     // 获取所有的hash
     private List<HashContract> getAllHash(FiscoConfig fiscoConfig) throws Exception {
         int startIndex = 0;
         BigInteger num = BigInteger.valueOf(10);
-        List<HashContract>  hashContractList = new ArrayList<HashContract>();
+        List<HashContract> hashContractList = new ArrayList<HashContract>();
         try {
             DataBucket dataBucket = getDataBucket(fiscoConfig);
             if (dataBucket == null) {
@@ -225,8 +161,8 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
             }
             while (true) {
                 BigInteger offset = BigInteger.valueOf(startIndex);
-                Tuple4<List<String>, List<String>, List<BigInteger>, BigInteger> data = 
-                    dataBucket.getAllBucket(offset, num).send();
+                Tuple4<List<String>, List<String>, List<BigInteger>, BigInteger> data =
+                    dataBucket.getAllBucket(offset, num);
                 List<String> hashList = data.getValue1();
                 List<String> ownerList = data.getValue2();
                 List<BigInteger> timesList = data.getValue3();
@@ -251,27 +187,26 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
         } catch (Exception e) {
             log.error("[getAllHash] get the all hash fail.", e);
             throw e;
-        } finally {
-            channelConnections.stopWork();
         }
     }
     
     // 判断是否存在机构配置
+    @Override
     public boolean checkOrgId(FiscoConfig fiscoConfig) throws Exception {
         //从机构配置中获取当前机构的hash
         HashContract hashFromOrgIdCns = getHashFromOrgCns(fiscoConfig);
         // 如果不存在机构配置，则返回前端进行私钥配置
         if (hashFromOrgIdCns == null) {
             log.info("[checkOrgId] the orgId does not exist in orgConfig cns.");
-            return false;//不存在
+            return false; //不存在
         }
         log.info("[checkOrgId] the orgId exist in orgConfig cns.");
         return true;
     }
     
     // 获取databucket地址
-    private String getDataBucketAddress(Web3j web3j, Credentials credentials, CnsType cnsType) {
-        CnsInfo queryCnsInfo = queryCnsInfo(web3j, credentials, cnsType);
+    private String getDataBucketAddress(Client client, CryptoKeyPair credentials, CnsType cnsType) {
+        CnsInfo queryCnsInfo = queryCnsInfo(client, credentials, cnsType);
         if (queryCnsInfo != null) {
             return queryCnsInfo.getAddress();
         }
@@ -279,12 +214,15 @@ public class CheckNodeServiceV2 implements CheckNodeFace {
     }
     
     // 查询cns地址
-    private CnsInfo queryCnsInfo(Web3j web3j, Credentials credentials, CnsType cnsType) throws WeIdBaseException {
+    private CnsInfo queryCnsInfo(Client client, CryptoKeyPair credentials, CnsType cnsType) throws WeIdBaseException {
         try {
             log.info("[queryBucketFromCns] query address by type = {}.", cnsType.getName());
-            CnsService cnsService = new CnsService(web3j, credentials);
-            List<CnsInfo> cnsInfoList = cnsService.queryCnsByName(cnsType.getName());
-            if (cnsInfoList != null) {
+            CnsService cnsService = new CnsService(client, credentials);
+            List<org.fisco.bcos.sdk.contract.precompiled.cns.CnsInfo> cnsInfoListChain
+                = cnsService.selectByName(cnsType.getName());
+            List<CnsInfo> cnsInfoList = cnsInfoListChain.stream().map(CnsInfo::new).collect(
+                Collectors.toList());
+            if (!cnsInfoList.isEmpty()) {
                 // 获取当前cnsType的大版本前缀
                 String cnsTypeVersion = cnsType.getVersion();
                 String preV = cnsTypeVersion.substring(0, cnsTypeVersion.indexOf(".") + 1);

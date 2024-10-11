@@ -1,62 +1,41 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.service.impl.AbstractService;
+import com.webank.weid.constant.*;
+import com.webank.weid.exception.WeIdBaseException;
+import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.v2.CheckNodeServiceV2;
+import com.webank.weid.service.v3.CheckNodeServiceV3;
+import com.webank.weid.util.FileUtils;
+import com.webank.weid.util.PropertyUtils;
+import com.webank.weid.util.WeIdSdkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.RedisException;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.DataDriverConstant;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.exception.WeIdBaseException;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.service.impl.AbstractService;
-import com.webank.weid.service.v2.CheckNodeServiceV2;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.PropertyUtils;
-import com.webank.weid.util.WeIdSdkUtils;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.*;
 
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
+import static com.webank.weid.constant.ChainVersion.FISCO_V3;
+
+/**
+ * read run.config file to load configuration
+ */
 @Service
 @Slf4j
 public class ConfigService {
@@ -82,7 +61,7 @@ public class ConfigService {
         //读取基本配置
         List<String> listStr = FileUtils.readFileToList("run.config");
         Map<String, String> map = processConfig(listStr);
-        //判断如果节点配置为空，则重载备份配置
+        //判断如果节点配置为空，则重载备份配置(output/.run.config)
         if (StringUtils.isBlank(map.get("blockchain_address"))) {
             listStr = FileUtils.readFileToList(BuildToolsConstant.RUN_CONFIG_BAK);
             if (listStr.size() > 0) {
@@ -90,15 +69,27 @@ public class ConfigService {
             }
         }
         //判断证书配置是否存在
-        map.put("ca.crt", String.valueOf(FileUtils.exists("resources/ca.crt")));
-        map.put("node.crt", String.valueOf(FileUtils.exists("resources/node.crt")));
-        map.put("node.key", String.valueOf(FileUtils.exists("resources/node.key")));
-        map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/gmca.crt")));
-        map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/gmsdk.crt")));
-        map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/gmsdk.key")));
-        map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/gmensdk.crt")));
-        map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/gmensdk.key")));
-        map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
+        if(FISCO_V3.getVersion() == Integer.parseInt(map.get("blockchain_fiscobcos_version"))) {
+            map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
+            map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
+            map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
+            map.put("smca.crt", String.valueOf(FileUtils.exists("resources/conf/sm_ca.crt")));
+            map.put("smsdk.crt", String.valueOf(FileUtils.exists("resources/conf/sm_sdk.crt")));
+            map.put("smsdk.key", String.valueOf(FileUtils.exists("resources/conf/sm_sdk.key")));
+            map.put("smensdk.crt", String.valueOf(FileUtils.exists("resources/conf/sm_ensdk.crt")));
+            map.put("smensdk.key", String.valueOf(FileUtils.exists("resources/conf/sm_ensdk.key")));
+            map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
+        } else {
+            map.put("ca.crt", String.valueOf(FileUtils.exists("resources/conf/ca.crt")));
+            map.put("sdk.crt", String.valueOf(FileUtils.exists("resources/conf/sdk.crt")));
+            map.put("sdk.key", String.valueOf(FileUtils.exists("resources/conf/sdk.key")));
+            map.put("gmca.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmca.crt")));
+            map.put("gmsdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.crt")));
+            map.put("gmsdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmsdk.key")));
+            map.put("gmensdk.crt", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.crt")));
+            map.put("gmensdk.key", String.valueOf(FileUtils.exists("resources/conf/gm/gmensdk.key")));
+            map.put("useWeBase", String.valueOf(weBaseService.isIntegrateWebase()));
+        }
         return map;
     }
     
@@ -117,11 +108,22 @@ public class ConfigService {
         }
         return map;
     }
-    
+
+    /**
+     *
+     * @param address node ip port
+     * @param version 2 or 3
+     * @param useSmCrypto todo 是否使用国密SSL
+     * @param orgId
+     * @param amopId
+     * @param groupId
+     * @param profileActive
+     * @return
+     */
     private boolean processNodeConfig(
             String address,
             String version,
-            String encryptType,
+            String useSmCrypto,
             String orgId,
             String amopId,
             String groupId,
@@ -144,8 +146,8 @@ public class ConfigService {
                 buffer.append("amop_id=").append(amopId).append("\n");
             } else if (string.startsWith("group_id")) {
                 buffer.append("group_id=").append(groupId).append("\n");
-            } else if (string.startsWith("encrypt_type")) {
-                buffer.append("encrypt_type=").append(encryptType).append("\n");
+            } else if (string.startsWith("sm_crypto")) {
+                buffer.append("sm_crypto=").append(useSmCrypto).append("\n");
             } else if (string.startsWith("cns_profile_active")) {
                 buffer.append("cns_profile_active=").append(profileActive).append("\n");
             } else {
@@ -178,8 +180,10 @@ public class ConfigService {
         }
         FileUtils.writeToFile(buffer.toString(), "run.config", FileOperator.OVERWRITE);
         backRunConfig();
+        generateProperties();
     }
-    
+
+
     public boolean setMasterGroupId(String groupId) {
         List<String> listStr = FileUtils.readFileToList("run.config");
         StringBuffer buffer = new StringBuffer();
@@ -199,7 +203,7 @@ public class ConfigService {
         //根据模板生成配置文件
         return generateProperties();
     }
-    
+
     public boolean processDbConfig(String persistenceType, String mysqlAddress, String database,
                                    String username,
                                    String mysqlPassword, String redisAddress,
@@ -329,7 +333,11 @@ public class ConfigService {
         }
         return false;
     }
-    
+
+    /**
+     * 根据run.config中生成
+     * @return
+     */
     private boolean generateProperties() {
         log.info("[generateProperties] begin generate properties and copy to classpath...");
         try {
@@ -357,9 +365,8 @@ public class ConfigService {
         log.info("[generateFiscoProperties] begin generate fisco.properties...");
         String fileStr = FileUtils.readFile("common/script/tpl/fisco.properties.tpl");
         fileStr = fileStr.replace("${FISCO_BCOS_VERSION}", loadConfig.get("blockchain_fiscobcos_version"));
-        fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
-        fileStr = fileStr.replace("${GROUP_ID}", loadConfig.get("group_id"));
-        fileStr = fileStr.replace("${ENCRYPT_TYPE}", loadConfig.get("encrypt_type"));
+        fileStr = fileStr.replace("${MASTER_GROUP_ID}", loadConfig.get("group_id"));
+        fileStr = fileStr.replace("${SDK_SM_CRYPTO}", loadConfig.get("sm_crypto"));
         fileStr = fileStr.replace("${WEID_ADDRESS}", "");
         fileStr = fileStr.replace("${CPT_ADDRESS}", "");
         fileStr = fileStr.replace("${ISSUER_ADDRESS}", "");
@@ -375,6 +382,14 @@ public class ConfigService {
         String fileStr = FileUtils.readFile("common/script/tpl/weidentity.properties.tpl");
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
+        fileStr = fileStr.replace("${CHAIN_ID}", loadConfig.get("chain_id"));
+
+        //暂时默认blockchain部署方式
+        fileStr = fileStr.replace("${DEPLOY_STYLE}", "blockchain");
+        fileStr = fileStr.replace("${CRYPTO_TYPE}", loadConfig.get("sm_crypto"));
+        //暂时默认使用FISCO BCOS区块链底层
+        fileStr = fileStr.replace("${CHAIN_TYPE}", "FISCO_BCOS");
+
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
         fileStr = fileStr.replace("${PERSISTENCE_TYPE}", loadConfig.get("persistence_type"));
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));
@@ -451,7 +466,14 @@ public class ConfigService {
     public ResponseData<Boolean> nodeConfigUpload(HttpServletRequest request) {
         nodeCheck = false;
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
-        File targetFIle = new File(BuildToolsConstant.RESOURCES_PATH);
+        File targetFile = new File(BuildToolsConstant.RESOURCES_PATH + "conf"); // 存在conf目录下
+        if(request.getParameter("version").equals("2") && request.getParameter("useSmCrypto").equals("1")){
+            targetFile = new File(BuildToolsConstant.RESOURCES_PATH + "conf/gm"); // 如果是2.0的国密链，存在conf/gm目录下
+        }
+        if (!targetFile.exists()) {
+            boolean result = targetFile.mkdirs();
+            log.info("create conf in resource result: {}", result);
+        }
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             if (file.isEmpty()) {
@@ -462,7 +484,7 @@ public class ConfigService {
                 log.error("[nodeConfigUpload] the file type error, fileName = {}.", fileName);
                 return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
             }
-            File dest = new File(targetFIle.getAbsoluteFile() + "/" + fileName);
+            File dest = new File(targetFile.getAbsoluteFile() + "/" + fileName);
             try {
                 file.transferTo(dest);
                 log.info("[nodeConfigUpload] the {} upload success", fileName);
@@ -477,15 +499,22 @@ public class ConfigService {
         String orgId = request.getParameter("orgId");
         String amopId = request.getParameter("amopId");
         String version = request.getParameter("version");
-        String encryptType = request.getParameter("encryptType");
+        String useSmCrypto = request.getParameter("useSmCrypto"); // todo
         String ipPort = request.getParameter("ipPort");
         String groupId = configMap.get("group_id");
-        if (StringUtils.isBlank(groupId)) {
-            groupId = "0";
+        if (FISCO_V2.getVersion() == Integer.parseInt(version)) {
+            groupId = "1";
+        }
+        if (FISCO_V3.getVersion() == Integer.parseInt(version)) {
+            groupId = "group0";
+        }
+        log.info("nodeConfigUpload groupId:{}", groupId);
+        if (!ChainVersion.contains(Integer.parseInt(version))) {
+            throw new RuntimeException("chain version only support 2 or 3");
         }
         String profileActive = configMap.get("cns_profile_active");
         //根据模板生成配置文件
-        if(processNodeConfig(ipPort, version, encryptType, orgId, amopId, groupId, profileActive)) {
+        if(processNodeConfig(ipPort, version, useSmCrypto, orgId, amopId, groupId, profileActive)) {
             return new ResponseData<>(Boolean.TRUE, ErrorCode.SUCCESS);
         }
         return new ResponseData<>(Boolean.FALSE, ErrorCode.UNKNOW_ERROR);
@@ -507,11 +536,14 @@ public class ConfigService {
                 return new ResponseData<>(Boolean.FALSE,
                         ErrorCode.UNKNOW_ERROR.getCode(),
                         "not support 1.x version.");
-            } else {
+            } else if (fiscoConfig.getVersion().startsWith(WeIdConstant.FISCO_BCOS_2_X_VERSION_PREFIX)) {
                 log.info("[checkNode] the node version is 2.x in your configuration.");
                 checkNode = new CheckNodeServiceV2();
+            } else {
+                log.info("[checkNode] the node version is 3.x in your configuration.");
+                checkNode = new CheckNodeServiceV3();
             }
-            if (checkNode == null || !checkNode.check(fiscoConfig)) {
+            if (!checkNode.check(fiscoConfig)) {
                 log.error("[checkNode] checkNode with fail.");
                 //configService.reloadAddress();
                 return new ResponseData<>(Boolean.FALSE, ErrorCode.BASE_ERROR.getCode(), "checkNode with fail.");
@@ -548,7 +580,7 @@ public class ConfigService {
         nodeCheck = flag;
     }
 
-    public Integer getMasterGroupId() {
-        return Integer.parseInt(this.loadConfig().get("group_id"));
+    public String getMasterGroupId() {
+        return this.loadConfig().get("group_id");
     }
 }

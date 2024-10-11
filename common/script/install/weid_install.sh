@@ -87,7 +87,7 @@ function installWebase() {
     if [ ! -f "script/init.sh" ];then
         echo 'begin download init.sh'
         cd script
-        wget -c https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/fisco-bcos-browser/releases/download/v2.2.1-Integrated/init.sh
+        wget -c https://github.com/FISCO-BCOS/fisco-bcos-browser/releases/download/v2.2.1-Integrated/init.sh
         cd ..
     fi
     if [ ! -f "script/init.sh" ];then
@@ -145,11 +145,7 @@ function installBuildTools() {
         fi
         if [ ! -f "weid-install-tools.zip" ]; then
             echo "begin download the weid-install-tools.zip..."
-            if [[ ${repo} == "cn" ]];then
-                wget -c https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeIdentity/weid-install-tools.zip
-            else 
-                wget -c https://github.com/WeBankFinTech/WeIdentity-Build-Tools/releases/download/v1.0.12/weid-install-tools.zip
-            fi
+            wget -c https://github.com/WeBankBlockchain/WeIdentity-Build-Tools/releases/download/v1.0.12/weid-install-tools.zip
         fi
         # unzip weid-install-tools.zip
         unzip weid-install-tools.zip

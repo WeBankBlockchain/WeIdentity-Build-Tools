@@ -1,30 +1,25 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 package com.webank.weid.util;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.response.CnsInfo;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
+import com.webank.weid.blockchain.service.fisco.engine.DataBucketServiceEngine;
+import com.webank.weid.blockchain.service.fisco.engine.EngineFactoryFisco;
+import com.webank.weid.constant.BuildToolsConstant;
+import com.webank.weid.constant.DataFrom;
+import com.webank.weid.constant.FileOperator;
+import com.webank.weid.constant.WeIdConstant;
+import com.webank.weid.dto.ContractSolInfo;
+import com.webank.weid.dto.DeployInfo;
+import com.webank.weid.dto.PojoInfo;
+import com.webank.weid.protocol.base.WeIdPrivateKey;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.JarURLConnection;
 import java.net.Socket;
@@ -34,25 +29,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.dto.ContractSolInfo;
-import com.webank.weid.dto.DeployInfo;
-import com.webank.weid.dto.PojoInfo;
-import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.service.BaseService;
-import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.service.impl.engine.EngineFactory;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WeIdSdkUtils {
@@ -82,11 +58,11 @@ public class WeIdSdkUtils {
     }
 
     public static DataBucketServiceEngine getDataBucket(CnsType cnsType) {
-        return EngineFactory.createDataBucketServiceEngine(cnsType);
+        return EngineFactoryFisco.createDataBucketServiceEngine(cnsType);
     }
 
     public static String getMainHash() {
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return StringUtils.EMPTY;
         }
@@ -181,8 +157,9 @@ public class WeIdSdkUtils {
             byte[] buffer = new byte[1024];
             while (true) {
                 int count = in.read(buffer);
-                if (count == -1)
+                if (count == -1) {
                     break;
+                }
                 bos.write(buffer, 0, count);
             }
             bos.flush();
@@ -198,7 +175,7 @@ public class WeIdSdkUtils {
 
     public static WeIdPrivateKey getCurrentPrivateKey() {
         WeIdPrivateKey weIdPrivate = new WeIdPrivateKey();
-        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
         weIdPrivate.setPrivateKey(FileUtils.readFile(targetDir.getAbsolutePath()));
         return weIdPrivate;
     }
@@ -208,7 +185,7 @@ public class WeIdSdkUtils {
         DeployInfo deployInfo = getDepolyInfoByHash(hash);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         if (deployInfo != null) {
-            weIdPrivateKey.setPrivateKey(deployInfo.getEcdsaKey());
+            weIdPrivateKey.setPrivateKey(deployInfo.getPrivateKey());
             return weIdPrivateKey;
         }
         return getCurrentPrivateKey();

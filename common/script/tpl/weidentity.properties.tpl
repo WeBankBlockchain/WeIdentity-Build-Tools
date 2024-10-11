@@ -3,13 +3,24 @@
 #         application config                                                                          #
 #                                                                                                     #
 #######################################################################################################
+# Deploy WeIdentity with blockchain or only database
+deploy.style=${DEPLOY_STYLE}
+# Crypto type, only use for deploy with database, 0 for ECDSA, 1 for SM
+crypto.type=${CRYPTO_TYPE}
+
 # The organization ID for AMOP communication.
 blockchain.orgid=${ORG_ID}
+
+# The Blockchain Type
+blockchain.type=${CHAIN_TYPE}
+
+# The Chain Id
+chain.id=${CHAIN_ID}
 
 # AMOP Config
 # Timeout for amop request, default: 5000ms
 amop.request.timeout=5000
-# The Communication ID for AMOP
+
 amop.id=${AMOP_ID}
 
 # Blockchain node info.
@@ -43,7 +54,7 @@ datasource1.jdbc.timeBetweenEvictionRunsMillis=600000
 datasource1.jdbc.numTestsPerEvictionRun=5
 datasource1.jdbc.minEvictableIdleTimeMillis=1800000
 
-# Redisson config
+# Redis config
 # If you want to configure redis in cluster mode, enter multiple node addresses separated by commas.
 redis.url=${REDIS_ADDRESS}
 redis.password=${REDIS_PASSWORD}
@@ -62,13 +73,13 @@ redis_cluster.master_connection_pool_size=64
 #         persistence domain config                                                                   #
 #                                                                                                     #
 #######################################################################################################
-# Domain configuration, which divides colons into two segments, the first segment is the name of the data source, 
+# Domain configuration, which divides colons into two segments, the first segment is the name of the data source,
 # the second segment is the name of the table, and if not, the default is the first data source and the default table `sdk_all_data`,
 # Multiple domains can be configured at the same time.
 # example:
-# domain.credential=datasource1:credential_data
+# domain.credential=datasource1:credential_info
 # domain.credential.timeout=86400000
-# domain.weidDocument=datasource1:weid_document_data
+# domain.weIdDocument=datasource1:weid_document_info
 # domain.credential.timeout=86400000
 
 # the default domain
@@ -79,14 +90,14 @@ domain.defaultInfo.timeout=31556908799941
 domain.encryptKey=datasource1:encrypt_key_info
 domain.encryptKey.timeout=31556908799941
 
-# 
+# zkp credential template secret
 domain.templateSecret=datasource1:template_secret
 domain.templateSecret.timeout=31556908799941
 
-# 
+# zkp credential master secret
 domain.masterKey=datasource1:master_secret
 
-# 
+# zkp credential signature
 domain.credentialSignature=datasource1:credential_signature
 
 # weid auth info
@@ -95,6 +106,16 @@ domain.weIdAuth=datasource1:weid_auth
 # the domain for save resource
 domain.resourceInfo=datasource1:resource_info
 domain.resourceInfo.timeout=31556908799941
+
+# tables for running locally
+local.weIdDocument=datasource1:table_weid_document
+local.cpt=datasource1:table_cpt
+local.policy=datasource1:table_policy
+local.presentation=datasource1:table_presentation
+local.role=datasource1:table_role
+local.authorityIssuer=datasource1:table_authority_issuer
+local.specificIssuer=datasource1:table_specific_issuer
+local.evidence=datasource1:table_evidence
 
 
 #######################################################################################################
@@ -119,7 +140,7 @@ zkp.cpt.array.length=5
 #######################################################################################################
 # Endpoint Service Integration-side parameters
 # Listener port required to be opened for RPC Server, default: 6010
-rpc.listener.port=6010
+endpoint.listener.port=6010
 
 
 #######################################################################################################

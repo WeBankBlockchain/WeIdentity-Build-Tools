@@ -7,7 +7,7 @@ public class UserInfo {
     private int userId;
     private String userName; 
     private String account;
-    private int groupId;
+    private String groupId;
     private String publicKey;
     private String privateKey;
     private int userStatus; 

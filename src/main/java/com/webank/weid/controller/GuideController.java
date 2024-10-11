@@ -1,29 +1,26 @@
 package com.webank.weid.controller;
 
-import java.nio.charset.StandardCharsets;
-
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
+import com.webank.weid.blockchain.config.FiscoConfig;
 import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.GuideService;
 import com.webank.weid.service.WeBaseService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
+import com.webank.weid.service.v3.CheckNodeServiceV3;
 import com.webank.weid.util.WeIdSdkUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping(value = "/weid/weid-build-tools/")
@@ -63,7 +60,7 @@ public class GuideController {
 	@PostMapping("/createAdmin")
 	public ResponseData<String> createAdmin(HttpServletRequest request) {
 		try {
-			MultipartFile file = ((MultipartHttpServletRequest) request).getFile("ecdsa");
+			MultipartFile file = ((MultipartHttpServletRequest) request).getFile("private_key");
 			String inputPrivateKey;
 			if (file != null) { //说明是传入的私钥文件
 				inputPrivateKey = new String(file.getBytes(), StandardCharsets.UTF_8);
@@ -73,7 +70,7 @@ public class GuideController {
 			// 创建账户
 			String account = guideService.createAdmin(inputPrivateKey);
 			// 获取群组
-			Integer groupId = configService.getMasterGroupId();
+			String groupId = configService.getMasterGroupId();
 			// 获取私钥
 			String privateKey = WeIdSdkUtils.getCurrentPrivateKey().getPrivateKey();
 			Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, account, privateKey);
@@ -98,7 +95,15 @@ public class GuideController {
 		try {
 			log.info("[checkOrgId] begin check the orgId.");
 			// 判断是否存在机构配置
-			CheckNodeFace checkNode = new CheckNodeServiceV2();
+			CheckNodeFace checkNode = null;
+			FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
+			if (fiscoConfig.getVersion().startsWith(WeIdConstant.FISCO_BCOS_2_X_VERSION_PREFIX)) {
+				log.info("[checkNode] the node version is 2.x in your configuration.");
+				checkNode = new CheckNodeServiceV2();
+			} else {
+				log.info("[checkNode] the node version is 3.x in your configuration.");
+				checkNode = new CheckNodeServiceV3();
+			}
 			boolean isExist = checkNode.checkOrgId(WeIdSdkUtils.loadNewFiscoConfig());
 			// 如果存在
 			if (isExist) {
@@ -106,7 +111,7 @@ public class GuideController {
 				if (StringUtils.isBlank(address)) {
 					String account = guideService.createAdmin(null);
 					// 获取群组
-		            Integer groupId = configService.getMasterGroupId();
+		            String groupId = configService.getMasterGroupId();
 					// 获取私钥
 		            String privateKey = WeIdSdkUtils.getCurrentPrivateKey().getPrivateKey();
 		            Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, account, privateKey);

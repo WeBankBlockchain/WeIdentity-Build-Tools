@@ -1,72 +1,48 @@
 package com.webank.weid.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jsonschema2pojo.DefaultGenerationConfig;
-import org.jsonschema2pojo.GenerationConfig;
-import org.jsonschema2pojo.NoopAnnotator;
-import org.jsonschema2pojo.SchemaGenerator;
-import org.jsonschema2pojo.SchemaMapper;
-import org.jsonschema2pojo.SchemaStore;
-import org.jsonschema2pojo.rules.RuleFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
 import com.sun.codemodel.JCodeModel;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.dto.CptFile;
-import com.webank.weid.dto.CptInfo;
-import com.webank.weid.dto.DataPanel;
-import com.webank.weid.dto.Issuer;
-import com.webank.weid.dto.PageDto;
-import com.webank.weid.dto.PojoInfo;
-import com.webank.weid.dto.PolicyInfo;
-import com.webank.weid.dto.WeIdInfo;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
+import com.webank.weid.constant.*;
+import com.webank.weid.dto.*;
 import com.webank.weid.protocol.base.*;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
 import com.webank.weid.protocol.request.RegisterAuthorityIssuerArgs;
 import com.webank.weid.protocol.request.RemoveAuthorityIssuerArgs;
 import com.webank.weid.protocol.response.CreateWeIdDataResult;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.AuthorityIssuerService;
-import com.webank.weid.rpc.CptService;
-import com.webank.weid.rpc.PolicyService;
-import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.fisco.WeServerUtils;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
+import com.webank.weid.service.rpc.AuthorityIssuerService;
+import com.webank.weid.service.rpc.CptService;
+import com.webank.weid.service.rpc.PolicyService;
+import com.webank.weid.service.rpc.WeIdService;
+import com.webank.weid.blockchain.service.fisco.server.WeServerUtils;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.protocol.base.HashContract;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.PolicyServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
-import com.webank.weid.util.ConfigUtils;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.WeIdSdkUtils;
-import com.webank.weid.util.WeIdUtils;
+import com.webank.weid.util.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jsonschema2pojo.*;
+import org.jsonschema2pojo.rules.RuleFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -112,7 +88,7 @@ public class WeIdSdkService {
 	public ResponseData<DataPanel> getDataPanel() {
 		DataPanel data = new DataPanel();
 		try {
-			data.setBlockNumber(BaseService.getBlockNumber());
+			data.setBlockNumber(BaseServiceFisco.getBlockNumber());
 			data.setWeIdCount(getWeIdService().getWeIdCount().getResult());
 			data.setCptCount(getCptService().getCptCount().getResult());
 			data.setPolicyCount(getPolicyService().getPolicyCount().getResult());
@@ -128,29 +104,29 @@ public class WeIdSdkService {
 
 	public ResponseData<PageDto<WeIdInfo>> getWeIdList(
 			PageDto<WeIdInfo> pageDto,
-			Integer blockNumber,
 			Integer pageSize,
-			Integer indexInBlock,
-			boolean direction
+			Integer indexFirst
 	) {
-		ResponseData<List<WeIdPojo>> response = getWeIdService().getWeIdList(blockNumber, pageSize, indexInBlock, direction);
+		Integer total = getWeIdService().getWeIdCount().getResult();
+		Integer indexLast = indexFirst+pageSize-1;
+		if(indexFirst+pageSize > total) {indexLast = total-1;}
+		ResponseData<List<String>> response = getWeIdService().getWeIdList(indexFirst, indexLast);
 		if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
 			log.error("[getWeIdList] get weIdList has error, {} - {}", response.getErrorCode(), response.getErrorMessage());
 			return new ResponseData<>(pageDto, response.getErrorCode(), response.getErrorMessage());
 		}
-		List<WeIdPojo> list = response.getResult();
+		List<String> list = response.getResult();
 		pageDto.setAllCount(getWeIdService().getWeIdCount().getResult());
 		List<WeIdInfo> rList = new ArrayList<>();
 		if (list.size() > 0) {
 			String mainHash = WeIdSdkUtils.getMainHash();
-			for (WeIdPojo weIdPojo : list) {
-				WeIdInfo weInfo = getWeIdInfo(this.getWeIdAddress(weIdPojo.getId()));
+			for (String weId : list) {
+				WeIdInfo weInfo = getWeIdInfo(this.getWeIdAddress(weId));
 				if(weInfo == null) {
 					weInfo = new WeIdInfo();
 				}
-				weInfo.setWeIdPojo(weIdPojo);
-				weInfo.setWeId(weIdPojo.getId());
-				AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(weIdPojo.getId()).getResult();
+				weInfo.setWeId(weId);
+				AuthorityIssuer issuer = getAuthorityIssuerService().queryAuthorityIssuerInfo(weId).getResult();
 				weInfo.setIssuer(issuer != null);
 				weInfo.setHash(mainHash);
 				rList.add(weInfo);
@@ -267,7 +243,7 @@ public class WeIdSdkService {
 		if (currentWeIdAuth.getWeId().equals(owner)) {
 			WeIdPublicKey weidPublicKey = new WeIdPublicKey();
 			weidPublicKey.setPublicKey(publicKey);
-			ResponseData<String> response = getWeIdService().delegateCreateWeId(weidPublicKey, currentWeIdAuth);
+			ResponseData<String> response = getWeIdService().createWeIdByPublicKey(weidPublicKey, currentWeIdAuth.getWeIdPrivateKey());
 			if (!response.getErrorCode().equals(ErrorCode.SUCCESS.getCode())) {
 				log.error(
 						"[CreateWeId] create WeID faild. error code : {}, error msg :{}",
@@ -316,9 +292,9 @@ public class WeIdSdkService {
 			FileUtils.writeToFile(weId, BuildToolsConstant.WEID_FILE); //适配命令输出
 		}
 		FileUtils.writeToFile(weId, new File(targetDir, BuildToolsConstant.WEID_FILE).getAbsolutePath());
-		FileUtils.writeToFile(publicKey, new File(targetDir, BuildToolsConstant.ECDSA_PUB_KEY).getAbsolutePath());
+		FileUtils.writeToFile(publicKey, new File(targetDir, BuildToolsConstant.ADMIN_PUB_KEY).getAbsolutePath());
 		if (StringUtils.isNotBlank(privateKey)) {
-			FileUtils.writeToFile(privateKey, new File(targetDir, BuildToolsConstant.ECDSA_KEY).getAbsolutePath());
+			FileUtils.writeToFile(privateKey, new File(targetDir, BuildToolsConstant.ADMIN_KEY).getAbsolutePath());
 		}
 		saveWeIdInfo(weId, publicKey, privateKey, from, isAdmin);
 	}
@@ -480,9 +456,11 @@ public class WeIdSdkService {
 		WeIdPrivateKey weIdPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
 		WeIdAuthentication callerAuth = new WeIdAuthentication();
 		callerAuth.setWeIdPrivateKey(weIdPrivateKey);
-		callerAuth.setWeId(WeIdUtils.convertPublicKeyToWeId(
-				DataToolUtils.publicKeyFromPrivate(new BigInteger(weIdPrivateKey.getPrivateKey())).toString()));
-		callerAuth.setWeIdPublicKeyId(callerAuth.getWeId());
+		String weid = WeIdUtils.convertPublicKeyToWeId(
+				DataToolUtils.publicKeyFromPrivate(new BigInteger(weIdPrivateKey.getPrivateKey())).toString());
+		callerAuth.setWeId(weid);
+		WeIdDocument weIdDocument = getWeIdService().getWeIdDocument(weid).getResult();
+		callerAuth.setAuthenticationMethodId(weIdDocument.getAuthentication().get(0).getId());
 		return callerAuth;
 	}
 
@@ -608,7 +586,7 @@ public class WeIdSdkService {
 			log.error("the file type error. fileName={}", fileName);
 			return new ResponseData<>(result, ErrorCode.UNKNOW_ERROR.getCode(), "the file type error");
 		}
-		JsonNode jsonNode = JsonLoader.fromFile(cptFile);
+		JsonNode jsonNode = DataToolUtils.loadJsonObjectFromFile(cptFile);
 		String cptJsonSchema = jsonNode.toString();
 		CptStringArgs cptStringArgs = new CptStringArgs();
 		cptStringArgs.setCptJsonSchema(cptJsonSchema);
@@ -1117,7 +1095,7 @@ public class WeIdSdkService {
 		List<String> list = WeServerUtils.getGroupList();
 		if (filterMaster) {
 			return list.stream()
-					.filter(s -> !s.equals(BaseService.masterGroupId.toString()))
+					.filter(s -> !s.equals(BaseServiceFisco.masterGroupId.toString()))
 					.collect(Collectors.toList());
 		}
 		return list;
@@ -1130,7 +1108,7 @@ public class WeIdSdkService {
     private void importPrivateKeyToWeBase(String weId, String privateKey) {
         String accountName = this.getWeIdAddress(weId);
         // 获取群组
-        Integer groupId = configService.getMasterGroupId();
+		String groupId = configService.getMasterGroupId();
         Boolean result = weBaseService.importPrivateKeyToWeBase(groupId, accountName, privateKey);
         log.info("[createWeId] import privateKey to weBase result = {}", result);
 	}
@@ -1138,7 +1116,7 @@ public class WeIdSdkService {
     private void importPublicKeyToWeBase(String weId, String publicKey) {
         String accountName = this.getWeIdAddress(weId);
         // 获取群组
-        Integer groupId = configService.getMasterGroupId();
+        String groupId = configService.getMasterGroupId();
         Boolean result = weBaseService.importPublicKeyToWeBase(groupId, accountName, publicKey);
         log.info("[createWeId] import publicKey to weBase result = {}", result);
     }

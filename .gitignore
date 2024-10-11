@@ -192,3 +192,14 @@ doc/bak/
 .settings/
 .project
 .classpath
+
+#xxb
+.idea/*
+secring.gpg
+output/
+resources/conf/
+resources/fisco.properties
+resources/weidentity.properties
+resources/log4j2.xml
+run.config
+logs/

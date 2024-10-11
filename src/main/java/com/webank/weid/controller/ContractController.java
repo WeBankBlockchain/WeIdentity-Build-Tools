@@ -1,39 +1,36 @@
 package com.webank.weid.controller;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Description;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.webank.weid.config.ContractConfig;
-import com.webank.weid.config.FiscoConfig;
+import com.webank.weid.blockchain.config.ContractConfig;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.deploy.v2.DeployContractV2;
+import com.webank.weid.blockchain.deploy.v3.DeployContractV3;
 import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.contract.deploy.v2.DeployContractV2;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.ContractService;
 import com.webank.weid.util.WeIdSdkUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Description;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 /**
  * 智能合约管理
@@ -129,7 +126,7 @@ public class ContractController {
 	@Description("根据群组Id部署Evidence合约")
 	@PostMapping("/deployEvidence")
 	public ResponseData<String> deployEvidence(
-			@RequestParam(value = "groupId") Integer groupId,
+			@RequestParam(value = "groupId") String groupId,
 			@RequestParam(value = "evidenceName") String evidenceName
 	) {
 		log.info("start deploy evidence, groupId:{}, evidenceName:{}", groupId, evidenceName);
@@ -140,8 +137,8 @@ public class ContractController {
 		//将应用名写入配置中
 		evidenceName = StringEscapeUtils.unescapeHtml(evidenceName);
 		WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
-		ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.SHARE)
-				.put(hash, BuildToolsConstant.EVIDENCE_NAME, evidenceName, currentPrivateKey);
+		com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.SHARE)
+				.put(hash, BuildToolsConstant.EVIDENCE_NAME, evidenceName, currentPrivateKey.getPrivateKey());
 		log.info("[deployEvidence] put evidenceName: {}", response);
 		return new ResponseData<>(hash, ErrorCode.SUCCESS);
 	}
@@ -186,12 +183,17 @@ public class ContractController {
 			contract.setCptAddress(deployInfo.getCptAddress());
 			if (StringUtils.isNotBlank(deployInfo.getChainId())) {
 				fiscoConfig.setChainId(deployInfo.getChainId());
+				configService.updateChainId(deployInfo.getChainId());
 			} else {
 				//兼容历史数据
 				fiscoConfig.setChainId(configService.loadConfig().get("chain_id"));
 			}
 			// 写入全局配置中
-			DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey);
+			if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+				DeployContractV2.putGlobalValue(fiscoConfig, contract, currentPrivateKey.getPrivateKey());
+			} else {
+				DeployContractV3.putGlobalValue(fiscoConfig, contract, currentPrivateKey.getPrivateKey());
+			}
 			// 节点启用新hash并停用原hash
 			contractService.enableHash(CnsType.DEFAULT, hash, oldHash);
 			// 初始化机构cns 目的是当admin首次部署合约未启用evidenceHash之前，用此私钥占用其配置空间，并且vpc2可以检测出已vpc1已配置
@@ -199,7 +201,7 @@ public class ContractController {
 			WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).put(
 					fiscoConfig.getCurrentOrgId(),
 					WeIdConstant.CNS_EVIDENCE_ADDRESS + 0, "0x0",
-					currentPrivateKey
+					currentPrivateKey.getPrivateKey()
 			);
 			//重新加载合约地址
 			reloadAddress();

@@ -1,21 +1,4 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.service;
 
@@ -25,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.webank.weid.kit.constant.KitErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -39,10 +23,10 @@ import com.webank.weid.dto.PageDto;
 import com.webank.weid.protocol.request.TransactionArgs;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.util.JdbcHelper;
-import com.webank.weid.util.OffLineBatchTask;
+import com.webank.weid.kit.util.OffLineBatchTask;
 
 /**
- * 交易业务类
+ * 上链交易业务类
  * 1. rsync使用过程，命令方式还是java方式
  *   如果是命令方式： 
  *      1. 应用服务器如何执行脚本，
@@ -281,25 +265,25 @@ public class TransactionService {
     private int[] sendBatchTransaction(List<BinLog> binLogList) {
         log.info("[sendBatchTransaction] begin sendBatchTransaction size: {}", binLogList.size());
         List<TransactionArgs> list = buildTransactionArgsList(binLogList);
-        ResponseData<List<Boolean>> response = null;
+        com.webank.weid.kit.protocol.response.ResponseData<List<Boolean>> resp = null;
         try {
-            response = OffLineBatchTask.sendBatchTransaction(list);
+            resp = OffLineBatchTask.sendBatchTransaction(list);
             log.info(
-                "[sendBatchTransaction] sendBatchTransaction end and return： {} - {}.", 
-                response.getErrorCode(), 
-                response.getErrorMessage()
+                "[sendBatchTransaction] sendBatchTransaction end and return： {} - {}.",
+                    resp.getErrorCode(),
+                    resp.getErrorMessage()
             );
         } catch (Throwable e) {
             log.error("[sendBatchTransaction] has unkonw exception.", e);
-            response = new ResponseData<>(null, ErrorCode.UNKNOW_ERROR);
+            resp = new com.webank.weid.kit.protocol.response.ResponseData<>(null, KitErrorCode.UNKNOW_ERROR);
         }
         int[] result = new int[binLogList.size()];
-        if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
+        if (resp.getErrorCode() != KitErrorCode.SUCCESS.getCode()) {
             log.error("[sendBatchTransaction] sendBatchTransaction fail. ");
             Arrays.fill(result, SEND_FAIL);
             return result;
         }
-        List<Boolean> resList = response.getResult();
+        List<Boolean> resList = resp.getResult();
         for (int i = 0; i < resList.size(); i++) {
             if (resList.get(i)) {
                 result[i] = SEND_SUCCESS;

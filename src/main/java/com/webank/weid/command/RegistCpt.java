@@ -1,43 +1,25 @@
-/*
- *       Copyright© (2018-2019) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.command;
-
-import java.io.File;
-import java.io.IOException;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import com.beust.jcommander.JCommander;
 import com.webank.weid.config.StaticConfig;
 import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
+import com.webank.weid.blockchain.constant.ErrorCode;
 import com.webank.weid.dto.CptFile;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
-import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.WeIdService;
-import com.webank.weid.service.impl.WeIdServiceImpl;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.WeIdSdkService;
+import com.webank.weid.service.impl.WeIdServiceImpl;
+import com.webank.weid.service.rpc.WeIdService;
 import com.webank.weid.util.FileUtils;
 import com.webank.weid.util.WeIdSdkUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author tonychen 2019/4/11

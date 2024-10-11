@@ -18,7 +18,12 @@
               <span class='long_words link' @click="showAll(scope.row.weId, scope.row.id)" :title='scope.row.weId'>{{scope.row.weId}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" align="center" :formatter="dateFormat" width='200'></el-table-column>
+          <!-- <el-table-column label="创建时间" align="center" :formatter="dateFormat" width='200'></el-table-column> -->
+          <el-table-column label="创建时间" align="center" width='200'>
+            <template slot-scope='scope'>
+              <span>{{scope.row.createTime}}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" align="center" width='400'>
             <template slot-scope='scope'>
               <el-button  type="primary" class="btn" @click="showRegistIssuer(scope.row.weId)" :disabled='scope.row.issuer' style="width:180px;">注册为权威凭证发行者</el-button>
@@ -26,8 +31,8 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @current-change="indexChange" :current-page="page.pageIndex" :page-size="page.pageSize" layout="total, prev, slot, next" :total="page.total">
-          <span style="text-align: center;">{{page.pageIndex}}</span>
+        <el-pagination class="page" @current-change="indexChange" :current-page="page.pageIndex" :page-size="page.pageSize" layout="total, prev, pager, next" :total="page.total">
+          <!-- <span style="text-align: center;">{{page.pageIndex}}</span> -->
         </el-pagination>
     </div>
 
@@ -437,23 +442,24 @@ export default {
       var pageIndex = this.page.pageIndex
       this.page.pageIndex = currentPage
       var blockNumber, indexInBlock, direction
-      if (pageIndex > this.page.pageIndex) { // 向前
-        blockNumber = this.page.weidList[0].weIdPojo.currentBlockNum
-        indexInBlock = this.page.weidList[0].weIdPojo.index + 1
-        direction = false
-      } else { // 向后
-        blockNumber = this.page.weidList[this.page.weidList.length - 1].weIdPojo.currentBlockNum
-        indexInBlock = this.page.weidList[this.page.weidList.length - 1].weIdPojo.index - 1
-        direction = true
-      }
+      indexInBlock=currentPage-1
+      // if (pageIndex > this.page.pageIndex) { // 向前
+      //   blockNumber = this.page.weidList[0].weIdPojo.currentBlockNum
+      //   indexInBlock = this.page.weidList[0].weIdPojo.index + 1
+      //   direction = false
+      // } else { // 向后
+      //   blockNumber = this.page.weidList[this.page.weidList.length - 1].weIdPojo.currentBlockNum
+      //   indexInBlock = this.page.weidList[this.page.weidList.length - 1].weIdPojo.index - 1
+      //   direction = true
+      // }
       this.queryWeIdList(this.page.pageIndex, blockNumber, indexInBlock, direction)
     },
     queryWeIdList (pageIndex, blockNumber, indexInBlock, direction) {
       var formData = {}
-      formData.blockNumber = blockNumber
+      // formData.blockNumber = blockNumber
       formData.pageSize = this.page.pageSize
-      formData.indexInBlock = indexInBlock
-      formData.direction = direction
+      formData.indexFirst = indexInBlock * this.page.pageSize
+      // formData.direction = direction
       formData.iDisplayStart = pageIndex * this.page.pageSize
       formData.iDisplayLength = this.page.pageSize
 

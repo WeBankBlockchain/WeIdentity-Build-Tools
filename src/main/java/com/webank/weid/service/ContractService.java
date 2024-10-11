@@ -1,71 +1,43 @@
-/*
- *       Copyright© (2018-2020) WeBank Co., Ltd.
- *
- *       This file is part of weidentity-build-tools.
- *
- *       weidentity-build-tools is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published by
- *       the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       weidentity-build-tools is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
- */
+
 
 package com.webank.weid.service;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.fisco.bcos.web3j.crypto.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.webank.weid.config.FiscoConfig;
-import com.webank.weid.constant.BuildToolsConstant;
-import com.webank.weid.constant.CnsType;
-import com.webank.weid.constant.DataFrom;
-import com.webank.weid.constant.ErrorCode;
-import com.webank.weid.constant.FileOperator;
-import com.webank.weid.constant.WeIdConstant;
-import com.webank.weid.contract.deploy.DeployEvidence;
-import com.webank.weid.contract.deploy.v2.DeployContractV2;
+import com.webank.weid.blockchain.config.FiscoConfig;
+import com.webank.weid.blockchain.constant.CnsType;
+import com.webank.weid.blockchain.deploy.v2.DeployContractV2;
+import com.webank.weid.blockchain.deploy.v2.DeployEvidenceV2;
+import com.webank.weid.blockchain.deploy.v3.DeployContractV3;
+import com.webank.weid.blockchain.deploy.v3.DeployEvidenceV3;
+import com.webank.weid.blockchain.protocol.base.HashContract;
+import com.webank.weid.blockchain.service.fisco.BaseServiceFisco;
+import com.webank.weid.blockchain.service.fisco.engine.DataBucketServiceEngine;
+import com.webank.weid.constant.*;
 import com.webank.weid.contract.v2.WeIdContract;
 import com.webank.weid.dto.CnsInfo;
 import com.webank.weid.dto.DeployInfo;
 import com.webank.weid.dto.ShareInfo;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.CptBaseInfo;
-import com.webank.weid.protocol.base.HashContract;
 import com.webank.weid.protocol.base.WeIdAuthentication;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.request.CptStringArgs;
 import com.webank.weid.protocol.request.CreateWeIdArgs;
-import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.blockchain.constant.ErrorCode;
+import com.webank.weid.blockchain.protocol.response.ResponseData;
 import com.webank.weid.service.impl.CptServiceImpl;
 import com.webank.weid.service.impl.WeIdServiceImpl;
-import com.webank.weid.service.impl.engine.DataBucketServiceEngine;
-import com.webank.weid.util.ClassUtils;
-import com.webank.weid.util.ConfigUtils;
-import com.webank.weid.util.DataToolUtils;
-import com.webank.weid.util.FileUtils;
-import com.webank.weid.util.WeIdSdkUtils;
-import com.webank.weid.util.WeIdUtils;
+import com.webank.weid.util.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.util.*;
+
+import static com.webank.weid.constant.ChainVersion.FISCO_V2;
 
 @Service
 @Slf4j
@@ -91,13 +63,13 @@ public class ContractService {
             FiscoConfig fiscoConfig = WeIdSdkUtils.loadNewFiscoConfig();
             fiscoConfig.setChainId(chainId);
             String hash = deployContract(fiscoConfig, DataFrom.WEB);
-            //configService.updateChainId(chainId);
+            configService.updateChainId(chainId);
             log.info("[deploy] the hash: {}", hash);
             //将应用名写入配置中
             applyName = StringEscapeUtils.unescapeHtml(applyName);
             WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
-            ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.DEFAULT)
-                    .put(hash, BuildToolsConstant.APPLY_NAME, applyName, currentPrivateKey);
+            com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> response = WeIdSdkUtils.getDataBucket(CnsType.DEFAULT)
+                    .put(hash, BuildToolsConstant.APPLY_NAME, applyName, currentPrivateKey.getPrivateKey());
             log.info("[deploy] put applyName: {}", response);
             return new ResponseData<>(hash, ErrorCode.SUCCESS);
         } catch (Exception e) {
@@ -111,28 +83,32 @@ public class ContractService {
     // 执行部署weId合约
     public String deployContract(FiscoConfig fiscoConfig, DataFrom from) {
         log.info("begin deploy contract...");
-        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ECDSA_KEY);
+        File targetDir = new File(BuildToolsConstant.ADMIN_PATH, BuildToolsConstant.ADMIN_KEY);
         String privateKey = null;
         if (targetDir.exists()) {
             privateKey = FileUtils.readFile(targetDir.getAbsolutePath());
         }
-        DeployContractV2.deployContract(privateKey, fiscoConfig, false);
+        if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+            DeployContractV2.deployContract(privateKey, fiscoConfig, false);
+        } else {
+            DeployContractV3.deployContract(privateKey, fiscoConfig, false);
+        }
         log.info("the contract deploy finish.");
         //开始保存文件
         //将私钥移动到/output/admin中
-        copyEcdsa();
+        copyKeyPair();
         return saveDeployInfo(fiscoConfig, from);
     }
 
-    private void copyEcdsa() {
-        log.info("[copyEcdsa] begin copy the ecdsa to admin...");
-        File ecdsaFile = new File(BuildToolsConstant.ECDSA_KEY);
+    private void copyKeyPair() {
+        log.info("[copyKeypair] begin copy the ecdsa to admin...");
+        File keypairFile = new File(BuildToolsConstant.ADMIN_KEY);
         File targetDir = new File(BuildToolsConstant.ADMIN_PATH);
-        FileUtils.copy(ecdsaFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_KEY));
+        FileUtils.copy(keypairFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ADMIN_KEY));
         
-        File ecdsaPubFile = new File(BuildToolsConstant.ECDSA_PUB_KEY);
-        FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ECDSA_PUB_KEY));
-        log.info("[copyEcdsa] the ecdsa copy successfully.");
+        File ecdsaPubFile = new File(BuildToolsConstant.ADMIN_PUB_KEY);
+        FileUtils.copy(ecdsaPubFile, new File(targetDir.getAbsoluteFile(), BuildToolsConstant.ADMIN_PUB_KEY));
+        log.info("[copyKeypair] the keypair copy successfully.");
     }
 
     private String saveDeployInfo(FiscoConfig fiscoConfig, DataFrom from) {
@@ -147,7 +123,7 @@ public class ContractService {
     }
 
     private void saveContractToWeBase(DeployInfo deployInfo) {
-        Integer groupId = configService.getMasterGroupId();
+        String groupId = configService.getMasterGroupId();
         String version = getContractVersion();
         String hash = deployInfo.getHash();
         weBaseService.contractSave(groupId, "WeIdContract", deployInfo.getWeIdAddress(),version, hash);
@@ -173,11 +149,11 @@ public class ContractService {
         info.setHash(hash);
         long time = System.currentTimeMillis();
         info.setTime(time);
-        info.setEcdsaKey(FileUtils.readFile(BuildToolsConstant.ECDSA_KEY));
-        BigInteger privateKey = new BigInteger(info.getEcdsaKey());
-        info.setEcdsaPublicKey(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
+        info.setPrivateKey(FileUtils.readFile(BuildToolsConstant.ADMIN_KEY));
+        BigInteger privateKey = new BigInteger(info.getPrivateKey());
+        info.setPublicKey(DataToolUtils.publicKeyFromPrivate(privateKey).toString());
         try {
-            info.setNodeVerion(BaseService.getVersion());
+            info.setNodeVerion(BaseServiceFisco.getVersion());
         } catch (Exception e) {
             info.setNodeVerion(fiscoConfig.getVersion()); 
         }
@@ -197,12 +173,12 @@ public class ContractService {
     public ResponseData<LinkedList<CnsInfo>> getDeployList() {
         LinkedList<CnsInfo> dataList = new LinkedList<>();
         //如果没有部署databuket则直接返回
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.DEFAULT);
+        com.webank.weid.blockchain.protocol.response.CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.DEFAULT);
         if (cnsInfo == null) {
             return new ResponseData<>(dataList, ErrorCode.BASE_ERROR);
         }
         //如果没有部署databuket则直接返回
-        cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return new ResponseData<>(dataList, ErrorCode.BASE_ERROR);
         }
@@ -319,8 +295,8 @@ public class ContractService {
     private boolean registerSystemCpt(DeployInfo deployInfo) {
         CptStringArgs cptStringArgs = new CptStringArgs();
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
-        BigInteger privateKey = new BigInteger(deployInfo.getEcdsaKey());
-        String weId = WeIdUtils.convertPublicKeyToWeId(deployInfo.getEcdsaPublicKey());
+        BigInteger privateKey = new BigInteger(deployInfo.getPrivateKey());
+        String weId = WeIdUtils.convertPublicKeyToWeId(deployInfo.getPublicKey());
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
         weIdPrivateKey.setPrivateKey(privateKey.toString());
         weIdAuthentication.setWeIdPrivateKey(weIdPrivateKey);
@@ -347,9 +323,9 @@ public class ContractService {
     private void createWeId(DeployInfo deployInfo, DataFrom from, boolean isAdmin) {
         log.info("[createWeId] begin createWeid for admin");
         CreateWeIdArgs arg = new CreateWeIdArgs();
-        arg.setPublicKey(deployInfo.getEcdsaPublicKey());
+        arg.setPublicKey(deployInfo.getPublicKey());
         WeIdPrivateKey pkey = new WeIdPrivateKey();
-        pkey.setPrivateKey(deployInfo.getEcdsaKey());
+        pkey.setPrivateKey(deployInfo.getPrivateKey());
         arg.setWeIdPrivateKey(pkey);
         String weId = WeIdUtils.convertPublicKeyToWeId(arg.getPublicKey());
         boolean checkWeId = weIdSdkService.checkWeId(weId);
@@ -396,11 +372,11 @@ public class ContractService {
         log.info("[enableHash] begin enable the hash: {}", hash);
         //启用新hash
         WeIdPrivateKey privateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
-        ResponseData<Boolean> enableHash = WeIdSdkUtils.getDataBucket(cnsType).enable(hash, privateKey);
+        com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> enableHash = WeIdSdkUtils.getDataBucket(cnsType).enable(hash, privateKey.getPrivateKey());
         log.info("[enableHash] enable the hash {} --> result: {}", hash, enableHash);
         //如果原hash不为空，则停用原hash
         if (StringUtils.isNotBlank(oldHash)) {
-            ResponseData<Boolean> disableHash = WeIdSdkUtils.getDataBucket(cnsType).disable(oldHash, privateKey);
+            com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> disableHash = WeIdSdkUtils.getDataBucket(cnsType).disable(oldHash, privateKey.getPrivateKey());
             log.info("[enableHash] disable the old hash {} --> result: {}", oldHash, disableHash);
         } else {
             log.info("[enableHash] no old hash to disable");
@@ -410,7 +386,8 @@ public class ContractService {
     public ResponseData<Boolean> removeHash(CnsType cnsType, String hash) {
         log.info("[removeHash] begin remove the hash: {}", hash);
         WeIdPrivateKey privateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
-        return WeIdSdkUtils.getDataBucket(cnsType).removeDataBucketItem(hash, false, privateKey);
+        com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> resp = WeIdSdkUtils.getDataBucket(cnsType).removeDataBucketItem(hash, false, privateKey.getPrivateKey());
+        return new ResponseData<>(resp.getResult(), ErrorCode.getTypeByErrorCode(resp.getErrorCode()));
     }
 
     /**
@@ -420,7 +397,7 @@ public class ContractService {
     public ResponseData<List<ShareInfo>> getShareList() {
         List<ShareInfo> result = new ArrayList<>();
         // 如果没有部署databuket则直接返回
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.SHARE);
+        com.webank.weid.blockchain.protocol.response.CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.SHARE);
         if (cnsInfo == null) {
             log.warn("[getShareList] the cnsType does not regist, please deploy the evidence.");
             return new ResponseData<>(result, ErrorCode.BASE_ERROR);
@@ -442,7 +419,7 @@ public class ContractService {
                 // 获取hash的群组
                 String groupId = dataBucket.get(hashContract.getHash(), WeIdConstant.CNS_GROUP_ID).getResult();
                 if(StringUtils.isNotBlank(groupId) && allGroup.contains(groupId)) {
-                    share.setGroupId(Integer.parseInt(groupId));
+                    share.setGroupId(groupId);
                     //判断是否启用此hash
                     String enableHash = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).get(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId).getResult();
                     share.setEnable(hashContract.getHash().equals(enableHash));
@@ -471,16 +448,27 @@ public class ContractService {
      * @param from 部署来源
      * @return 返回是否部署成功
      */
-    public String deployEvidence(FiscoConfig fiscoConfig, Integer groupId, DataFrom from) {
+    public String deployEvidence(FiscoConfig fiscoConfig, String groupId, DataFrom from) {
         log.info("[deployEvidence] begin deploy the evidence, groupId = {}.", groupId);
         try {
             //  获取私钥
             WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
-            String hash = DeployEvidence.deployContract(
-                currentPrivateKey.getPrivateKey(), 
-                groupId, 
-                false
-            );
+            String hash = null;
+            if (FISCO_V2.getVersion() == Integer.parseInt(fiscoConfig.getVersion())) {
+                hash = DeployEvidenceV2.deployContract(
+                        fiscoConfig,
+                        currentPrivateKey.getPrivateKey(),
+                        groupId,
+                        false
+                );
+            } else {
+                hash = DeployEvidenceV3.deployContract(
+                        fiscoConfig,
+                        currentPrivateKey.getPrivateKey(),
+                        groupId,
+                        false
+                );
+            }
             if (StringUtils.isBlank(hash)) {
                 log.error("[deployEvidence] deploy the evidence fail, please check the log.");
                 return StringUtils.EMPTY;
@@ -509,18 +497,18 @@ public class ContractService {
     private ShareInfo buildShareInfo(
         FiscoConfig fiscoConfig, 
         String hash,
-        Integer groupId,
+        String groupId,
         WeIdPrivateKey currentPrivateKey,
         DataFrom from
     ) {
         ShareInfo info = new ShareInfo();
         info.setHash(hash);
         info.setTime(System.currentTimeMillis());
-        info.setEcdsaKey(currentPrivateKey.getPrivateKey());
-        info.setEcdsaPublicKey(
-            DataToolUtils.publicKeyFromPrivate(new BigInteger(info.getEcdsaKey())).toString());
+        info.setPrivateKey(currentPrivateKey.getPrivateKey());
+        info.setPublicKey(
+            DataToolUtils.publicKeyFromPrivate(new BigInteger(info.getPrivateKey())).toString());
         try {
-            info.setNodeVerion(BaseService.getVersion());
+            info.setNodeVerion(BaseServiceFisco.getVersion());
         } catch (Exception e) {
             info.setNodeVerion(fiscoConfig.getVersion()); 
         }
@@ -545,7 +533,7 @@ public class ContractService {
         shareInfo.setHash(hash);
         String groupId = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_GROUP_ID).getResult();
         if(StringUtils.isNotBlank(groupId)) {
-            shareInfo.setGroupId(Integer.parseInt(groupId));
+            shareInfo.setGroupId(groupId);
         }
         String evidenceAddress = WeIdSdkUtils.getDataBucket(CnsType.SHARE).get(hash, WeIdConstant.CNS_EVIDENCE_ADDRESS).getResult();
         if(StringUtils.isNotBlank(evidenceAddress)) {
@@ -586,12 +574,12 @@ public class ContractService {
             // 更新配置到链上机构配置中 evidenceAddress.<groupId> 
             String orgId = ConfigUtils.getCurrentOrgId();
             WeIdPrivateKey privateKey = WeIdSdkUtils.getWeIdPrivateKey(hash);
-            ResponseData<Boolean> result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).
-                    put(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId, hash, privateKey);
+            com.webank.weid.blockchain.protocol.response.ResponseData<Boolean> result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).
+                    put(orgId, WeIdConstant.CNS_EVIDENCE_HASH + groupId, hash, privateKey.getPrivateKey());
             if (result.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
                 return new ResponseData<>(Boolean.FALSE, result.getErrorCode(), result.getErrorMessage());
             }
-            result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).put(orgId, WeIdConstant.CNS_EVIDENCE_ADDRESS + groupId, evidenceAddress, privateKey);
+            result = WeIdSdkUtils.getDataBucket(CnsType.ORG_CONFING).put(orgId, WeIdConstant.CNS_EVIDENCE_ADDRESS + groupId, evidenceAddress, privateKey.getPrivateKey());
             if (result.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
                 return new ResponseData<>(Boolean.FALSE, result.getErrorCode(), result.getErrorMessage());
             }
@@ -617,7 +605,7 @@ public class ContractService {
         WeIdPrivateKey currentPrivateKey = WeIdSdkUtils.getCurrentPrivateKey();
         String publicKey = DataToolUtils.publicKeyFromPrivate(
                 new BigInteger(currentPrivateKey.getPrivateKey())).toString();
-        String address = "0x" + Keys.getAddress(new BigInteger(publicKey));
+        String address = DataToolUtils.addressFromPublic(new BigInteger(publicKey));
         if (address.equals(hashFromOrgIdCns.getOwner())) {
             log.info("[isMatchThePrivateKey] the orgId is exist in orgConfig cns, match the private key.");
             return true;//存在orgId并且为当前机构所有
@@ -632,7 +620,7 @@ public class ContractService {
      * @return 返回hash对象信息
      */
     private HashContract getHashFromOrgCns(String orgId) {
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        com.webank.weid.blockchain.protocol.response.CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return null;
         }
@@ -646,7 +634,7 @@ public class ContractService {
     }
 
     public String getEvidenceHash(String groupId) {
-        org.fisco.bcos.web3j.precompile.cns.CnsInfo cnsInfo = BaseService.getBucketByCns(CnsType.ORG_CONFING);
+        com.webank.weid.blockchain.protocol.response.CnsInfo cnsInfo = BaseServiceFisco.getBucketByCns(CnsType.ORG_CONFING);
         if (cnsInfo == null) {
             return StringUtils.EMPTY;
         }
@@ -657,7 +645,7 @@ public class ContractService {
 
     public ResponseData<List<AuthorityIssuer>> getUserListByHash(String hash) {
         List<AuthorityIssuer> rList = new ArrayList<>();
-        ResponseData<List<String>> responseData = WeIdSdkUtils.getDataBucket(CnsType.SHARE).getActivatedUserList(hash);
+        com.webank.weid.blockchain.protocol.response.ResponseData<List<String>> responseData = WeIdSdkUtils.getDataBucket(CnsType.SHARE).getActivatedUserList(hash);
         if (responseData.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
             return new ResponseData<>(rList, responseData.getErrorCode(), responseData.getErrorMessage());
         }

@@ -12,14 +12,23 @@
               <el-input v-model="form.amop_id" placeholder="Enter amopId" maxlength="30" style="width: 72%" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" @blur="form.amop_id = $event.target.value"></el-input>
               <div class="mark-bottom"><div>此ID用于链上AMOP通讯</div></div>
             </el-form-item>
-            <el-form-item label="国密/非国密:" prop="encrypt_type">
-              <el-select v-model="form.encrypt_type" placeholder="国密/非国密" style="width: 72%" :disabled="useWeBase">
+            <el-form-item label="非国密/国密SSL:" prop="encrypt_type">
+              <el-select v-model="form.encrypt_type" placeholder="非国密/国密SSL" style="width: 72%" :disabled="useWeBase">
                 <el-option label="非国密" value="0"></el-option>
                 <el-option label="国密" value="1"></el-option>
               </el-select>
               <div class="mark-bottom">
                 <div>国密链采用SSL通讯，非国密链采用非SSL通讯。</div>
               </div>
+            </el-form-item>
+            <el-form-item label="链版本:" prop="chainVersion">
+              <el-select v-model="form.chainVersion" placeholder="链版本" style="width: 72%">
+                <el-option label="2.0" value="2"></el-option>
+                <el-option label="3.0" value="3"></el-option>
+              </el-select>
+              <!-- <div class="mark-bottom">
+                <div>国密链采用SSL通讯，非国密链采用非SSL通讯。</div>
+              </div> -->
             </el-form-item>
             <el-form-item label="区块链节点 IP 和 Channel 端口:" prop="blockchain_address">
               <el-input v-model="form.blockchain_address" placeholder="IP:PORT,IP:PORT" style="width: 72%" onKeyUp="value=value=value.replace(/[^0-9：:，,。.]/g,'');value=value.replace(/[。]/g,'.');value=value.replace(/[：]/g,':');value=value.replace(/\s+/g,'');value=value.replace(/[，]/g,',');" @blur="form.blockchain_address = $event.target.value"></el-input>
@@ -42,32 +51,32 @@
                 <input type="file" id ='caCrtFile' style="display:none;">
               </div>
               <div class='file_part'>
-                <el-form-item label="node.crt证书:" prop="nodeCrtFileName">
+                <el-form-item label="sdk.crt证书:" prop="nodeCrtFileName">
                   <div class='input_item'>
-                    <el-input v-model="form.nodeCrtFileName" placeholder="Enter nodeCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('nodeCrtFile', 'node.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <el-input v-model="form.nodeCrtFileName" placeholder="Enter sdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('nodeCrtFile', 'sdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['node.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='nodeCrtFile' style="display:none;" >
               </div>
               <div class='file_part'>
-                <el-form-item label="node.key证书:" prop="nodeKeyFileName">
+                <el-form-item label="sdk.key证书:" prop="nodeKeyFileName">
                   <div class='input_item'>
-                    <el-input v-model="form.nodeKeyFileName" placeholder="Enter nodeKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('nodeKeyFile', 'node.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <el-input v-model="form.nodeKeyFileName" placeholder="Enter sdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('nodeKeyFile', 'sdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['node.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='nodeKeyFile' style="display:none;">
               </div>
             </div>
-            <div id="sm2" class="form-group" v-if="form.encrypt_type === '1'">
+            <div id="sm2" class="form-group" v-if="form.encrypt_type === '1'&&form.chainVersion==='2'">
               <div class='file_part'>
                 <el-form-item label="gmca.crt证书:" prop="gmCaCrtFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmCaCrtFileName" placeholder="Enter gmCaCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmCaCrtFile', 'gmCa.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmCaCrtFile', 'gmca.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmCa.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -77,7 +86,7 @@
                 <el-form-item label="gmsdk.crt证书:" prop="gmSdkCrtFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmSdkCrtFileName" placeholder="Enter gmSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmSdkCrtFile', 'gmSdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmSdkCrtFile', 'gmsdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -87,7 +96,7 @@
                 <el-form-item label="gmsdk.key证书:" prop="gmSdkKeyFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmSdkKeyFileName" placeholder="Enter gmSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmSdkKeyFile', 'gmSdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmSdkKeyFile', 'gmsdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -97,7 +106,7 @@
                 <el-form-item label="gmensdk.crt证书:" prop="gmenSdkCrtFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmenSdkCrtFileName" placeholder="Enter gmenSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmenSdkCrtFile', 'gmenSdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmenSdkCrtFile', 'gmensdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmenSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
@@ -107,11 +116,63 @@
                 <el-form-item label="gmensdk.key证书:" prop="gmenSdkKeyFileName">
                   <div class='input_item'>
                     <el-input v-model="form.gmenSdkKeyFileName" placeholder="Enter gmenSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
-                    <button type="button" @click="chooseFile('gmenSdkKeyFile', 'gmenSdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <button type="button" @click="chooseFile('gmenSdkKeyFile', 'gmensdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
                     <div class="mark-bottom mark-red" v-if="form['gmenSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
                   </div>
                 </el-form-item>
                 <input type="file" id ='gmenSdkKeyFile' style="display:none;">
+              </div>
+            </div>
+             <div id="sm3" class="form-group" v-if="form.encrypt_type === '1'&&form.chainVersion==='3'">
+              <div class='file_part'>
+                <el-form-item label="sm_ca.crt证书:" prop="smCaCrtFileName">
+                  <div class='input_item'>
+                    <el-input v-model="form.smCaCrtFileName" placeholder="Enter smCaCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('smCaCrtFile', 'sm_ca.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <div class="mark-bottom mark-red" v-if="form['smCa.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                  </div>
+                </el-form-item>
+                <input type="file" id ='smCaCrtFile' style="display:none;">
+              </div>
+              <div class='file_part'>
+                <el-form-item label="sm_sdk.crt证书:" prop="smSdkCrtFileName">
+                  <div class='input_item'>
+                    <el-input v-model="form.smSdkCrtFileName" placeholder="Enter smSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('smSdkCrtFile', 'sm_sdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <div class="mark-bottom mark-red" v-if="form['smSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                  </div>
+                </el-form-item>
+                <input type="file" id ='smSdkCrtFile' style="display:none;">
+              </div>
+              <div class='file_part'>
+                <el-form-item label="sm_sdk.key证书:" prop="smSdkKeyFileName">
+                  <div class='input_item'>
+                    <el-input v-model="form.smSdkKeyFileName" placeholder="Enter smSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('smSdkKeyFile', 'sm_sdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <div class="mark-bottom mark-red" v-if="form['smSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                  </div>
+                </el-form-item>
+                <input type="file" id ='smSdkKeyFile' style="display:none;">
+              </div>
+              <div class='file_part'>
+                <el-form-item label="sm_ensdk.crt证书:" prop="smenSdkCrtFileName">
+                  <div class='input_item'>
+                    <el-input v-model="form.smenSdkCrtFileName" placeholder="Enter smenSdkCrtFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('smenSdkCrtFile', 'sm_ensdk.crt')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <div class="mark-bottom mark-red" v-if="form['smenSdk.crt'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                  </div>
+                </el-form-item>
+                <input type="file" id ='smenSdkCrtFile' style="display:none;">
+              </div>
+              <div class='file_part'>
+                <el-form-item label="sm_ensdk.key证书:" prop="smenSdkKeyFileName">
+                  <div class='input_item'>
+                    <el-input v-model="form.smenSdkKeyFileName" placeholder="Enter smenSdkKeyFile" maxlength="30" readOnly style="width: 52%"></el-input>
+                    <button type="button" @click="chooseFile('smenSdkKeyFile', 'sm_ensdk.key')" class="upload-btn btn btn-block btn-primary btn-flat">选择文件</button>
+                    <div class="mark-bottom mark-red" v-if="form['smenSdk.key'] === 'true'"><div>该证书已存在，重新上传将被覆盖。</div></div>
+                  </div>
+                </el-form-item>
+                <input type="file" id ='smenSdkKeyFile' style="display:none;">
               </div>
             </div>
             <div style="text-align: left; padding-left: 26%;">
@@ -204,11 +265,22 @@ export default {
         gmenSdkCrtFile: '',
         gmenSdkKeyFileName: '',
         gmenSdkKeyFile: '',
-        encrypt_type: 0,
+        smCaCrtFileName: '',
+        smCaCrtFile: '',
+        smSdkCrtFileName: '',
+        smSdkCrtFile: '',
+        smSdkKeyFileName: '',
+        smSdkKeyFile: '',
+        smenSdkCrtFileName: '',
+        smenSdkCrtFile: '',
+        smenSdkKeyFileName: '',
+        smenSdkKeyFile: '',
+        encrypt_type: '1',
         org_id: '',
         amop_id: '',
         blockchain_address: '',
-        blockchain_fiscobcos_version: ''
+        blockchain_fiscobcos_version: '',
+        chainVersion:'2'
       },
       dialog: {
         checkDetailVisible: false,
@@ -278,6 +350,26 @@ export default {
             this.form.gmenSdkKeyFileName = $fileName
             this.form.gmenSdkKeyFile = $file
           }
+          else if (type === 'smCaCrtFile') {
+            this.form.smCaCrtFileName = $fileName
+            this.form.smCaCrtFile = $file
+          }
+          else if (type === 'smSdkCrtFile') {
+            this.form.smSdkCrtFileName = $fileName
+            this.form.smSdkCrtFile = $file
+          }
+          else if (type === 'smSdkKeyFile') {
+            this.form.smSdkKeyFileName = $fileName
+            this.form.smSdkKeyFile = $file
+          }
+          else if (type === 'smenSdkCrtFile') {
+            this.form.smenSdkCrtFileName = $fileName
+            this.form.smenSdkCrtFile = $file
+          }
+          else if (type === 'smenSdkKeyFile') {
+            this.form.smenSdkKeyFileName = $fileName
+            this.form.smenSdkKeyFile = $file
+          }
         }
       }
     },
@@ -315,14 +407,14 @@ export default {
           return false
         }
         if (this.form.nodeCrtFile === '' && !this.form['node.crt'] === 'false') {
-          this.$alert('请选择 node.crt 证书文件!', '温馨提示', {}).catch(() => {})
+          this.$alert('请选择 sdk.crt 证书文件!', '温馨提示', {}).catch(() => {})
           return false
         }
         if (this.form.nodeKeyFile === '' && !this.form['node.key'] === 'false') {
-          this.$alert('请选择 node.key 证书文件!', '温馨提示', {}).catch(() => {})
+          this.$alert('请选择 sdk.key 证书文件!', '温馨提示', {}).catch(() => {})
           return false
         }
-      } else {
+      } else if(this.chainVersion==='2'){
         if (this.form.gmCaCrtFile === '' && !this.form['gmCa.crt'] === 'false') {
           this.$alert('请选择 gmCa.crt 证书文件!', '温馨提示', {}).catch(() => {})
           return false
@@ -343,6 +435,27 @@ export default {
           this.$alert('请选择 gmenSdk.key 证书文件!', '温馨提示', {}).catch(() => {})
           return false
         }
+      }else{
+         if (this.form.smCaCrtFile === '' && !this.form['smCa.crt'] === 'false') {
+          this.$alert('请选择 smCa.crt 证书文件!', '温馨提示', {}).catch(() => {})
+          return false
+        }
+        if (this.form.smSdkCrtFile === '' && !this.form['smSdk.crt'] === 'false') {
+          this.$alert('请选择 smSdk.crt 证书文件!', '温馨提示', {}).catch(() => {})
+          return false
+        }
+        if (this.form.smSdkKeyFile === '' && !this.form['smSdk.key'] === 'false') {
+          this.$alert('请选择 smSdk.key 证书文件!', '温馨提示', {}).catch(() => {})
+          return false
+        }
+        if (this.form.smenSdkCrtFile === '' && !this.form['smenSdk.crt'] === 'false') {
+          this.$alert('请选择 smenSdk.crt 证书文件!', '温馨提示', {}).catch(() => {})
+          return false
+        }
+        if (this.form.smenSdkKeyFile === '' && !this.form['smenSdk.key'] === 'false') {
+          this.$alert('请选择 smenSdk.key 证书文件!', '温馨提示', {}).catch(() => {})
+          return false
+        }
       }
       return true
     },
@@ -357,17 +470,23 @@ export default {
         formData.append('file', this.form.caCrtFile)
         formData.append('file', this.form.nodeCrtFile)
         formData.append('file', this.form.nodeKeyFile)
-      } else {
+      } else if(this.form.chainVersion==='2') {
         formData.append('file', this.form.gmCaCrtFile)
         formData.append('file', this.form.gmSdkCrtFile)
         formData.append('file', this.form.gmSdkKeyFile)
         formData.append('file', this.form.gmenSdkCrtFile)
         formData.append('file', this.form.gmenSdkKeyFile)
+      }else{
+        formData.append('file', this.form.smCaCrtFile)
+        formData.append('file', this.form.smSdkCrtFile)
+        formData.append('file', this.form.smSdkKeyFile)
+        formData.append('file', this.form.smenSdkCrtFile)
+        formData.append('file', this.form.smenSdkKeyFile)
       }
       formData.append('orgId', this.form.org_id)
       formData.append('amopId', this.form.amop_id)
-      formData.append('version', this.form.blockchain_fiscobcos_version)
-      formData.append('encryptType', this.form.encrypt_type)
+      formData.append('version', this.form.chainVersion)
+      formData.append('useSmCrypto', this.form.encrypt_type)
       formData.append('ipPort', this.form.blockchain_address)
 
       this.dialog.nextBtn = e.currentTarget
